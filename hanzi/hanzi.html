@@ -13,10 +13,13 @@
 <main class="app">
     <section id="setupScreen" class="card home-card">
         <div class="home-intro">
-            <div style="margin-bottom: 12px;">
-                <a href="../index.html" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #4338ca; background: #eef2ff; padding: 6px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; border: 1px solid #c7d2fe; transition: all 0.2s;">
+            <div class="home-top-nav">
+                <a href="../index.html" class="nav-btn back-nav-btn">
                     ← 🏠 返回学习中心
                 </a>
+                <button id="openSettingsBtn" class="nav-btn settings-nav-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="朗读设置" title="朗读设置">
+                    ⚙️ 朗读设置
+                </button>
             </div>
             <div class="home-intro-title">
                 <h1>🔊 汉字听写小助手</h1>
@@ -26,8 +29,8 @@
         </div>
 
         <div class="home-section-title">
-            <span>⚙️</span>
-            <div><strong>练习设置</strong><small>设置练习内容与朗读方式</small></div>
+            <span>📝</span>
+            <div><strong>练习设置</strong><small>选择练习范围与每轮字数</small></div>
         </div>
 
         <div class="setup-grid">
@@ -43,35 +46,6 @@
                     <option value="20">20 个字</option>
                     <option value="30">30 个字</option>
                 </select>
-            </div>
-
-            <div class="field">
-                <label for="speechMode">朗读方式</label>
-                <select id="speechMode">
-                    <option value="hint" selected>汉字 + 提示词</option>
-                    <option value="char">只读汉字</option>
-                    <option value="twice">汉字读两遍</option>
-                </select>
-            </div>
-
-            <div class="field">
-                <label for="speechRate">朗读速度</label>
-                <select id="speechRate">
-                    <option value="0.65">很慢</option>
-                    <option value="0.78" selected>较慢</option>
-                    <option value="0.9">正常</option>
-                </select>
-            </div>
-
-            <div class="switch-row">
-                <div class="switch-copy">
-                    <strong>优先复习错字</strong>
-                    <span>抽题时增加以前写错过的字</span>
-                </div>
-                <label class="switch">
-                    <input id="preferWrong" type="checkbox" checked/>
-                    <span class="slider"></span>
-                </label>
             </div>
         </div>
 
@@ -351,6 +325,52 @@
             <button id="backHomeBtn" class="primary-btn">返回首页</button>
         </div>
     </section>
+
+    <!-- 朗读设置弹窗 -->
+    <div id="settingsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-wrap">
+                    <span class="modal-icon">⚙️</span>
+                    <h2 id="settingsModalTitle" class="modal-title">朗读设置</h2>
+                </div>
+                <button id="closeSettingsBtn" class="modal-close-btn" type="button" aria-label="关闭">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="field">
+                    <label for="speechMode">朗读方式</label>
+                    <select id="speechMode">
+                        <option value="hint" selected>汉字 + 提示词</option>
+                        <option value="char">只读汉字</option>
+                        <option value="twice">汉字读两遍</option>
+                    </select>
+                    <small class="field-hint">例如：“天，天空的天” 或直接读“天”</small>
+                </div>
+
+                <div class="field" style="margin-top: 16px;">
+                    <label for="speechRate">朗读速度</label>
+                    <select id="speechRate">
+                        <option value="0.65">很慢</option>
+                        <option value="0.78" selected>较慢</option>
+                        <option value="0.9">正常</option>
+                    </select>
+                    <small class="field-hint">建议选择“较慢”，听写更清晰</small>
+                </div>
+
+                <div class="settings-preview-wrap">
+                    <button id="testSpeechBtn" type="button" class="secondary-btn test-speech-btn">
+                        🔊 试听一下
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmSettingsBtn" type="button" class="primary-btn modal-confirm-btn">
+                    完成
+                </button>
+            </div>
+        </div>
+    </div>
 </main>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js" defer></script>

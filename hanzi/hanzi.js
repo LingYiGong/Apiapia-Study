@@ -3,6 +3,7 @@
 const STORAGE_KEY = "hanziDictationStatsV1";
 const STROKE_PROGRESS_KEY = "hanziStrokeProgressV1";
 const STROKE_ORDER_KEY = "hanziStrokeOrderV1";
+const SPEECH_SETTINGS_KEY = "hanziSpeechSettingsV1";
 
 const state = {
     mode: "dictation",
@@ -42,7 +43,12 @@ const els = {
     countSelect: document.getElementById("countSelect"),
     speechMode: document.getElementById("speechMode"),
     speechRate: document.getElementById("speechRate"),
-    preferWrong: document.getElementById("preferWrong"),
+    openSettingsBtn: document.getElementById("openSettingsBtn"),
+    closeSettingsBtn: document.getElementById("closeSettingsBtn"),
+    confirmSettingsBtn: document.getElementById("confirmSettingsBtn"),
+    modalBackdrop: document.getElementById("modalBackdrop"),
+    settingsModal: document.getElementById("settingsModal"),
+    testSpeechBtn: document.getElementById("testSpeechBtn"),
     startBtn: document.getElementById("startBtn"),
     recognitionStartBtn: document.getElementById("recognitionStartBtn"),
     choiceStartBtn: document.getElementById("choiceStartBtn"),
@@ -158,6 +164,91 @@ function saveStats(stats) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
 }
 
+function loadSpeechSettings() {
+    try {
+        const raw = localStorage.getItem(SPEECH_SETTINGS_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed.speechMode && els.speechMode) {
+                els.speechMode.value = parsed.speechMode;
+                state.speechMode = parsed.speechMode;
+            }
+            if (parsed.speechRate && els.speechRate) {
+                els.speechRate.value = parsed.speechRate;
+                state.speechRate = Number(parsed.speechRate);
+            }
+        } else {
+            if (els.speechMode) state.speechMode = els.speechMode.value;
+            if (els.speechRate) state.speechRate = Number(els.speechRate.value);
+        }
+    } catch (error) {
+        console.warn("读取朗读设置失败：", error);
+    }
+}
+
+function saveSpeechSettings() {
+    try {
+        if (!els.speechMode || !els.speechRate) return;
+        localStorage.setItem(SPEECH_SETTINGS_KEY, JSON.stringify({
+            speechMode: els.speechMode.value,
+            speechRate: els.speechRate.value
+        }));
+        state.speechMode = els.speechMode.value;
+        state.speechRate = Number(els.speechRate.value);
+    } catch (error) {
+        console.warn("保存朗读设置失败：", error);
+    }
+}
+
+function openSettingsModal() {
+    if (!els.settingsModal) return;
+    els.settingsModal.classList.remove("hidden");
+    if (els.openSettingsBtn) {
+        els.openSettingsBtn.setAttribute("aria-expanded", "true");
+    }
+}
+
+function closeSettingsModal() {
+    if (!els.settingsModal) return;
+    els.settingsModal.classList.add("hidden");
+    if (els.openSettingsBtn) {
+        els.openSettingsBtn.setAttribute("aria-expanded", "false");
+    }
+    window.speechSynthesis?.cancel?.();
+}
+
+function previewSpeech() {
+    if (!("speechSynthesis" in window)) {
+        alert("当前浏览器不支持语音朗读。建议使用 Chrome、Edge、Safari 或手机自带浏览器。");
+        return;
+    }
+    window.speechSynthesis.cancel();
+
+    const rate = Number(els.speechRate.value) || 0.78;
+    const mode = els.speechMode.value;
+    let text = "天。天空的天。";
+    if (mode === "char") {
+        text = "天";
+    } else if (mode === "twice") {
+        text = "天。天。";
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "zh-CN";
+    utterance.rate = rate;
+    utterance.pitch = 1.02;
+    utterance.volume = 1;
+
+    const voice = getChineseVoice();
+    if (voice) utterance.voice = voice;
+
+    utterance.onerror = event => {
+        console.warn("试听播放失败：", event.error);
+    };
+
+    window.speechSynthesis.speak(utterance);
+}
+
 function getCharStats(stats, char) {
     const saved = stats.characters[char] || {};
     return {
@@ -200,27 +291,6 @@ function getWrongCharacters(stats = loadStats()) {
         }))
         .filter(item => item.wrongScore > 0)
         .sort((a, b) => b.wrongScore - a.wrongScore);
-}
-
-// 艾宾浩斯式的简化遗忘模型：记忆强度随连续答对次数增长，
-// 距离上次练习越久，遗忘风险越高（0～1）。
-function getForgettingRisk(charStats, now = Date.now()) {
-    if (!charStats.lastPracticed) return 1;
-    const lastPracticedTime = new Date(charStats.lastPracticed).getTime();
-    if (!Number.isFinite(lastPracticedTime)) return 1;
-    const elapsedDays = Math.max(
-        0,
-        (now - lastPracticedTime) / 86400000
-    );
-    const strengthDays = Math.max(1, Math.pow(2, Math.min(charStats.streak, 6)));
-    return 1 - Math.exp(-elapsedDays / strengthDays);
-}
-
-function getReviewWeight(charStats) {
-    if (charStats.practiced === 0) return 2.2;
-    const wrongRate = charStats.wrong / charStats.practiced;
-    const forgettingRisk = getForgettingRisk(charStats);
-    return 1 + wrongRate * 7 + forgettingRisk * 5 + (charStats.wrong > 0 ? 1 : 0);
 }
 
 function refreshHomeStats() {
@@ -284,38 +354,14 @@ function shuffle(array) {
     return copy;
 }
 
-function weightedSampleWithoutReplacement(items, count, weightFn) {
-    const pool = [...items];
-    const result = [];
-
-    while (pool.length > 0 && result.length < count) {
-        const weights = pool.map(item => Math.max(0.01, weightFn(item)));
-        const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-        let random = Math.random() * totalWeight;
-        let selectedIndex = 0;
-
-        for (let i = 0; i < weights.length; i += 1) {
-            random -= weights[i];
-            if (random <= 0) {
-                selectedIndex = i;
-                break;
-            }
-        }
-
-        result.push(pool.splice(selectedIndex, 1)[0]);
-    }
-
-    return result;
-}
-
 function createSession() {
     const selectedCategory = els.categorySelect.value;
     const requestedCount = Number(els.countSelect.value);
-    const stats = loadStats();
 
     let pool;
 
     if (selectedCategory === "wrong") {
+        const stats = loadStats();
         pool = getWrongCharacters(stats);
         if (pool.length === 0) {
             alert("错字本还是空的，先完成一轮普通听写吧！");
@@ -328,13 +374,6 @@ function createSession() {
     }
 
     const count = Math.min(requestedCount, pool.length);
-
-    if (els.preferWrong.checked && selectedCategory !== "wrong") {
-        return weightedSampleWithoutReplacement(pool, count, item => {
-            const charStats = getCharStats(stats, item.char);
-            return getReviewWeight(charStats);
-        });
-    }
 
     return shuffle(pool).slice(0, count);
 }
@@ -1349,7 +1388,34 @@ els.practiceWrongBtn.addEventListener("click", () => {
 
 els.resetDataBtn.addEventListener("click", resetAllData);
 
+if (els.openSettingsBtn) {
+    els.openSettingsBtn.addEventListener("click", openSettingsModal);
+}
+if (els.closeSettingsBtn) {
+    els.closeSettingsBtn.addEventListener("click", closeSettingsModal);
+}
+if (els.confirmSettingsBtn) {
+    els.confirmSettingsBtn.addEventListener("click", closeSettingsModal);
+}
+if (els.modalBackdrop) {
+    els.modalBackdrop.addEventListener("click", closeSettingsModal);
+}
+if (els.speechMode) {
+    els.speechMode.addEventListener("change", saveSpeechSettings);
+}
+if (els.speechRate) {
+    els.speechRate.addEventListener("change", saveSpeechSettings);
+}
+if (els.testSpeechBtn) {
+    els.testSpeechBtn.addEventListener("click", previewSpeech);
+}
+
 document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && els.settingsModal && !els.settingsModal.classList.contains("hidden")) {
+        closeSettingsModal();
+        return;
+    }
+
     const dictationActive =
         !els.dictationScreen.classList.contains("hidden");
     const recognitionActive =
@@ -1411,3 +1477,4 @@ if ("speechSynthesis" in window) {
 
 buildCategoryOptions();
 refreshHomeStats();
+loadSpeechSettings();

@@ -110,6 +110,51 @@ input:focus-visible + .slider {
     padding-bottom: 2px;
 }
 
+.home-top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.18s ease;
+}
+
+.back-nav-btn {
+    color: #4338ca;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+}
+
+.back-nav-btn:hover {
+    background: #e0e7ff;
+    transform: translateY(-1px);
+}
+
+.settings-nav-btn {
+    color: #374151;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(49, 65, 90, 0.08);
+}
+
+.settings-nav-btn:hover {
+    background: var(--surface);
+    border-color: #cbd5e1;
+    color: #111827;
+    transform: translateY(-1px);
+}
+
 .home-intro-title {
     display: flex;
     align-items: center;
@@ -1117,6 +1162,138 @@ input:focus-visible + .slider {
 .recognition-replay {
     width: 100%;
     margin-bottom: 12px;
+}
+
+/* 朗读设置弹窗 */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.48);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: modalFadeIn 0.2s ease;
+}
+
+.modal-card {
+    position: relative;
+    z-index: 1;
+    width: min(440px, 100%);
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.2);
+    border: 1px solid rgba(223, 229, 239, 0.9);
+    overflow: hidden;
+    animation: modalScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalScaleIn {
+    from { opacity: 0; transform: scale(0.95) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-icon {
+    font-size: 20px;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.modal-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 22px;
+    line-height: 1;
+    padding: 0;
+    transition: all 0.15s ease;
+}
+
+.modal-close-btn:hover {
+    background: var(--surface);
+    color: var(--text);
+}
+
+.modal-body {
+    padding: 20px 22px;
+}
+
+.field-hint {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+}
+
+.settings-preview-wrap {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.test-speech-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 10px;
+}
+
+.modal-footer {
+    padding: 14px 22px 18px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+}
+
+.modal-confirm-btn {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 12px;
 }
 
 /* iPad 10：820×1180 竖屏、1180×820 横屏（CSS 逻辑像素） */
