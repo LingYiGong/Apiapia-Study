@@ -78,6 +78,17 @@
                     <button @click="showAudioSettings = false" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg text-base">✕</button>
                 </div>
 
+                <!-- iPad / iOS Special Tip Banner -->
+                <div v-if="isIOS" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs space-y-1 text-amber-800">
+                    <div class="font-bold flex items-center space-x-1">
+                        <span>🍎 iPad / iOS 专属发音提示：</span>
+                    </div>
+                    <p class="text-[11px] leading-relaxed">
+                        1. <strong>无声排查</strong>：请检查 iPad 右上角下拉控制中心中「<strong>静音模式（铃铛图标）</strong>」是否开启。开启静音模式会导致网页语音静音，<strong>关闭静音模式</strong>并调大音量即可发音。<br/>
+                        2. <strong>音源推荐</strong>：iPad 自带 Apple 高清日语音频（Siri / 京子），推荐选择下方的【系统本地 TTS 合成】。
+                    </p>
+                </div>
+
                 <!-- Engine Selection -->
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 mb-1.5">发音音源引擎</label>
@@ -88,9 +99,9 @@
                             <div>
                                 <div class="text-xs font-semibold text-gray-800 flex items-center space-x-1">
                                     <span>🌐 在线真实标准日语音频</span>
-                                    <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.2 rounded font-medium">推荐</span>
+                                    <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.2 rounded font-medium">电脑推荐</span>
                                 </div>
-                                <p class="text-[11px] text-gray-500 mt-0.5">原生东京都真人发音，音质清晰纯正，完美支持全平台，解决汉字发音错乱问题。</p>
+                                <p class="text-[11px] text-gray-500 mt-0.5">原生东京都真人词汇发音，音质清晰纯正（长句子将自动采用系统本地语音进行自然朗读）。</p>
                             </div>
                         </label>
 
@@ -98,18 +109,21 @@
                                :class="audioEngine === 'tts' ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-200 hover:bg-gray-50'">
                             <input type="radio" v-model="audioEngine" value="tts" @change="saveAudioConfig" class="mt-0.5 text-indigo-600 mr-2.5">
                             <div class="flex-1">
-                                <div class="text-xs font-semibold text-gray-800">💻 浏览器 / 系统本地 TTS 合成</div>
-                                <p class="text-[11px] text-gray-500 mt-0.5">调用系统本地语音引擎（支持离线）。</p>
+                                <div class="text-xs font-semibold text-gray-800 flex items-center space-x-1">
+                                    <span>💻 浏览器 / 系统本地 TTS 合成</span>
+                                    <span v-if="isIOS" class="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.2 rounded font-bold">iPad推荐</span>
+                                </div>
+                                <p class="text-[11px] text-gray-500 mt-0.5">调用系统本地语音引擎（iPad / iPhone 搭载 Apple 原生 Siri / 京子 高清日语音频，离线极速零延迟）。</p>
                                 
                                 <div v-if="audioEngine === 'tts'" class="mt-2 pt-2 border-t border-gray-200">
                                     <label class="block text-[11px] text-gray-600 mb-1">选择日语语音包：</label>
                                     <select v-if="availableVoices.length > 0" v-model="jaVoiceName" @change="saveAudioConfig" class="w-full text-xs border rounded-lg p-1.5 bg-white text-gray-700">
                                         <option v-for="v in availableVoices" :key="v.name" :value="v.name">
-                                            {{ v.name }}
+                                            {{ v.name }} {{ /siri/i.test(v.name) ? ' (Apple Siri)' : (/kyoko|京子/i.test(v.name) ? ' (Apple 京子)' : '') }}
                                         </option>
                                     </select>
                                     <div v-else class="text-[11px] text-amber-700 bg-amber-50 p-2 rounded-lg leading-relaxed mt-1">
-                                        ⚠️ 未在您的系统检测到日语 TTS 语音包（Windows 默认会退回中文语音朗读导致发音严重错误），强烈建议切换使用上方的【在线真实标准日语音频】！
+                                        {{ isIOS ? '💡 iPad 提示：请轻点任意试听按钮，系统将自动激活 Apple 原生日语语音。' : '⚠️ 未在您的系统检测到日语 TTS 语音包（Windows 默认会退回中文语音朗读），建议切换使用上方的【在线真实标准日语音频】。' }}
                                     </div>
                                 </div>
                             </div>
@@ -153,10 +167,10 @@
                 <!-- Test Audio Button -->
                 <div class="pt-2 border-t flex space-x-2">
                     <button @click="testAudio('こんにちは')" class="flex-1 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1 transition-colors">
-                        <span>🔊 试听「こんにちは」</span>
+                        <span>🔊 试听单词</span>
                     </button>
-                    <button @click="testAudio({ word: 'お茶', kana: 'おちゃ' })" class="flex-1 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1 transition-colors">
-                        <span>🔊 试听「お茶」</span>
+                    <button @click="testSentenceAudio({ japanese: '初めまして、よろしくお願いいたします。', kana: 'はじめまして、よろしくおねがいいたします。' })" class="flex-1 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1 transition-colors">
+                        <span>🔊 试听句子</span>
                     </button>
                 </div>
 
@@ -810,33 +824,63 @@
                 let debounceSyncTimer = null;
                 
                 // Audio / Voice Engine Config
+                const isIOS = typeof navigator !== 'undefined' && (
+                    /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+                );
+
                 const AUDIO_CONFIG_KEY = 'japanese_study_audio_config_v1';
                 const showAudioSettings = ref(false);
-                const audioEngine = ref('online'); // 'online' (推荐真人日语音频), 'tts' (系统语音)
+                const audioEngine = ref(isIOS ? 'tts' : 'online'); // iPad / iOS 优先推荐 Apple 原生 TTS，PC 推荐在线真人
                 const audioTarget = ref('kana'); // 'kana' (假名注音，精准避免多音字错误), 'word' (汉字原文)
                 const speechRate = ref(1.0); // 1.0, 1.2, 1.35, 1.5
                 const jaVoiceName = ref('');
                 const availableVoices = ref([]);
 
-                const synth = window.speechSynthesis;
+                const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
                 let currentAudio = null;
 
                 const initVoices = () => {
                     if (!synth) return;
                     const allVoices = synth.getVoices() || [];
                     const jaVoices = allVoices.filter(v => 
-                        (v.lang && (v.lang === 'ja-JP' || v.lang === 'ja' || v.lang.toLowerCase().startsWith('ja'))) ||
-                        /japanese|日本語/i.test(v.name)
+                        (v.lang && (v.lang === 'ja-JP' || v.lang === 'ja' || v.lang.toLowerCase().replace('_', '-').startsWith('ja'))) ||
+                        /japanese|日本語|kyoko|otoya|siri|hattori/i.test(v.name)
                     );
                     availableVoices.value = jaVoices;
 
                     if (jaVoices.length > 0) {
                         if (!jaVoiceName.value || !jaVoices.some(v => v.name === jaVoiceName.value)) {
+                            const siri = jaVoices.find(v => /siri/i.test(v.name));
+                            const kyoko = jaVoices.find(v => /kyoko|京子/i.test(v.name));
                             const natural = jaVoices.find(v => /natural|online/i.test(v.name));
                             const google = jaVoices.find(v => /google/i.test(v.name));
-                            jaVoiceName.value = (natural || google || jaVoices[0]).name;
+                            const otoya = jaVoices.find(v => /otoya|乙也/i.test(v.name));
+                            jaVoiceName.value = (siri || kyoko || natural || google || otoya || jaVoices[0]).name;
                         }
                     }
+                };
+
+                const getJapaneseVoice = () => {
+                    if (!synth) return null;
+                    const allVoices = synth.getVoices() || [];
+                    if (availableVoices.value.length === 0 && allVoices.length > 0) {
+                        initVoices();
+                    }
+                    const jaVoices = allVoices.filter(v => 
+                        (v.lang && (v.lang === 'ja-JP' || v.lang === 'ja' || v.lang.toLowerCase().replace('_', '-').startsWith('ja'))) ||
+                        /japanese|日本語|kyoko|otoya|siri|hattori/i.test(v.name)
+                    );
+                    if (jaVoiceName.value) {
+                        const found = jaVoices.find(v => v.name === jaVoiceName.value);
+                        if (found) return found;
+                    }
+                    const siri = jaVoices.find(v => /siri/i.test(v.name));
+                    const kyoko = jaVoices.find(v => /kyoko|京子/i.test(v.name));
+                    const natural = jaVoices.find(v => /natural|online/i.test(v.name));
+                    const google = jaVoices.find(v => /google/i.test(v.name));
+                    const otoya = jaVoices.find(v => /otoya|乙也/i.test(v.name));
+                    return siri || kyoko || natural || google || otoya || jaVoices[0] || null;
                 };
 
                 const loadAudioConfig = () => {
@@ -851,6 +895,10 @@
                                 speechRate.value = [1.0, 1.2, 1.35, 1.5].includes(r) ? r : 1.0;
                             }
                             if (parsed.jaVoiceName) jaVoiceName.value = parsed.jaVoiceName;
+                        } else {
+                            if (isIOS) {
+                                audioEngine.value = 'tts';
+                            }
                         }
                     } catch (e) {
                         console.error('Failed to load audio config', e);
@@ -1059,6 +1107,34 @@
                     if (synth && synth.onvoiceschanged !== undefined) {
                         synth.onvoiceschanged = initVoices;
                     }
+                    setTimeout(initVoices, 250);
+                    setTimeout(initVoices, 800);
+                    setTimeout(initVoices, 1600);
+
+                    // iPad / iOS WebKit audio & speech gesture unlocker
+                    const unlockAudioAndTTS = () => {
+                        if (synth) {
+                            try {
+                                const dummy = new SpeechSynthesisUtterance('');
+                                dummy.volume = 0;
+                                synth.speak(dummy);
+                            } catch (e) {}
+                            initVoices();
+                        }
+                        try {
+                            if (!currentAudio) {
+                                currentAudio = new Audio();
+                            }
+                            currentAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+                            currentAudio.play().then(() => {
+                                currentAudio.pause();
+                                currentAudio.currentTime = 0;
+                            }).catch(() => {});
+                        } catch (e) {}
+                    };
+                    window.addEventListener('touchstart', unlockAudioAndTTS, { once: true, passive: true });
+                    window.addEventListener('click', unlockAudioAndTTS, { once: true, passive: true });
+
                     loadAudioConfig();
                     loadData();
                     loadSentenceData();
@@ -1416,7 +1492,7 @@
 
                     if (queue.length > 0) {
                         practiceState.value = 'listening';
-                        setTimeout(() => speakCurrent(), 120);
+                        speakCurrent();
                     }
                 };
 
@@ -1441,18 +1517,19 @@
 
                 const playOnlineAudio = (text, onFallback) => {
                     try {
-                        if (currentAudio) {
-                            currentAudio.pause();
-                            currentAudio.currentTime = 0;
-                            currentAudio = null;
-                        }
                         if (synth && synth.speaking) {
                             synth.cancel();
                         }
+                        if (!currentAudio) {
+                            currentAudio = new Audio();
+                        }
+                        currentAudio.pause();
+
                         const encoded = encodeURIComponent(text);
                         const url = `https://dict.youdao.com/dictvoice?audio=${encoded}&le=jap`;
-                        currentAudio = new Audio(url);
+                        currentAudio.src = url;
                         currentAudio.playbackRate = Number(speechRate.value) || 1.0;
+
                         let fallbackCalled = false;
                         const triggerFallback = () => {
                             if (!fallbackCalled) {
@@ -1477,37 +1554,50 @@
                     }
                 };
 
+                let activeUtterance = null;
                 const speakTTS = (text) => {
                     if (!synth) return;
                     try {
                         if (currentAudio) {
                             currentAudio.pause();
                             currentAudio.currentTime = 0;
-                            currentAudio = null;
                         }
-                        synth.cancel();
+                        if (synth.paused) {
+                            synth.resume();
+                        }
+
                         const utter = new SpeechSynthesisUtterance(text);
                         utter.lang = 'ja-JP';
                         utter.rate = Number(speechRate.value) || 1.0;
 
-                        const jaVoices = availableVoices.value;
-                        let selectedVoice = null;
-                        if (jaVoiceName.value) {
-                            selectedVoice = jaVoices.find(v => v.name === jaVoiceName.value);
-                        }
-                        if (!selectedVoice && jaVoices.length > 0) {
-                            const natural = jaVoices.find(v => /natural|online/i.test(v.name));
-                            const google = jaVoices.find(v => /google/i.test(v.name));
-                            selectedVoice = natural || google || jaVoices[0];
-                        }
-
+                        const selectedVoice = getJapaneseVoice();
                         if (selectedVoice) {
                             utter.voice = selectedVoice;
-                        } else {
-                            console.warn('No Japanese voice available for TTS.');
                         }
 
-                        synth.speak(utter);
+                        // Retain reference on global scope to prevent iOS Safari GC premature cleanup bug
+                        activeUtterance = utter;
+                        window._japaneseActiveUtterance = utter;
+                        utter.onend = () => {
+                            activeUtterance = null;
+                            window._japaneseActiveUtterance = null;
+                        };
+                        utter.onerror = (err) => {
+                            console.warn('SpeechSynthesis error:', err);
+                            activeUtterance = null;
+                            window._japaneseActiveUtterance = null;
+                        };
+
+                        // On iOS Safari, calling cancel() immediately before speak() drops the utterance.
+                        // Add tiny delay only if actively speaking.
+                        if (synth.speaking) {
+                            synth.cancel();
+                            setTimeout(() => {
+                                synth.speak(utter);
+                            }, 25);
+                        } else {
+                            synth.speak(utter);
+                        }
                     } catch (e) {
                         console.error('SpeechSynthesis error:', e);
                     }
@@ -1535,7 +1625,12 @@
 
                 const testAudio = (sample) => {
                     playWord(sample);
-                    showToast('正在播放发音试听...');
+                    showToast('正在播放单词发音...');
+                };
+
+                const testSentenceAudio = (sample) => {
+                    playSentence(sample);
+                    showToast('正在播放句子发音...');
                 };
 
                 // Backward-compatibility aliases
@@ -1590,7 +1685,7 @@
                         todayQueue.value.push(current);
                     }
                     practiceState.value = 'listening';
-                    setTimeout(() => playCurrent(), 120);
+                    playCurrent();
                 };
 
                 const checkQueueStatus = () => {
@@ -1598,7 +1693,7 @@
                         practiceState.value = 'idle';
                     } else {
                         practiceState.value = 'listening';
-                        setTimeout(() => playCurrent(), 120);
+                        playCurrent();
                     }
                 };
 
@@ -1666,13 +1761,9 @@
                     text = text.replace(/[~～\-_—]/g, '').trim();
                     if (!text) return;
 
-                    if (audioEngine.value === 'online') {
-                        playOnlineAudio(text, () => {
-                            speakTTS(text);
-                        });
-                    } else {
-                        speakTTS(text);
-                    }
+                    // Sentences must use TTS: dictionary voice APIs (Youdao) do not support whole sentences.
+                    // Native system Japanese voices provide natural, fluent sentence intonation on iPad, mobile, and desktop.
+                    speakTTS(text);
                 };
 
                 const playCurrentSentence = () => {
@@ -1703,7 +1794,7 @@
 
                     if (queue.length > 0) {
                         sentencePracticeState.value = 'listening';
-                        setTimeout(() => playCurrentSentence(), 150);
+                        playCurrentSentence();
                     } else {
                         showToast('当前没有匹配的可练习句子');
                     }
@@ -1743,7 +1834,7 @@
                         sentenceQueue.value.push(current);
                     }
                     sentencePracticeState.value = 'listening';
-                    setTimeout(() => playCurrentSentence(), 150);
+                    playCurrentSentence();
                 };
 
                 const checkSentenceQueueStatus = () => {
@@ -1752,7 +1843,7 @@
                         showToast('🎉 太棒了！本轮句子听力练习完成！');
                     } else {
                         sentencePracticeState.value = 'listening';
-                        setTimeout(() => playCurrentSentence(), 150);
+                        playCurrentSentence();
                     }
                 };
 
@@ -1787,6 +1878,7 @@
                     pullFromCloud,
                     
                     // Audio & Voice Engine
+                    isIOS,
                     showAudioSettings,
                     audioEngine,
                     audioTarget,
@@ -1797,6 +1889,7 @@
                     playWord,
                     playCurrent,
                     testAudio,
+                    testSentenceAudio,
                     speakWord,
                     speakCurrent,
 
