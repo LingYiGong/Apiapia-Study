@@ -155,6 +155,27 @@ input:focus-visible + .slider {
     transform: translateY(-1px);
 }
 
+.top-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sync-nav-btn {
+    color: #4338ca;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    box-shadow: 0 1px 3px rgba(67, 56, 202, 0.08);
+}
+
+.sync-nav-btn:hover {
+    background: #e0e7ff;
+    border-color: #a5b4fc;
+    color: #3730a3;
+    transform: translateY(-1px);
+}
+
 .home-intro-title {
     display: flex;
     align-items: center;
@@ -1294,6 +1315,108 @@ input:focus-visible + .slider {
     font-size: 15px;
     font-weight: 700;
     border-radius: 12px;
+}
+
+/* 云端同步弹窗内部样式 */
+.sync-input {
+    width: 100%;
+    height: 44px;
+    padding: 10px 14px;
+    font-size: 15px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #ffffff;
+    color: var(--text);
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sync-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+.sync-toggle-wrap {
+    margin-top: 14px;
+}
+
+.sync-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.sync-toggle-label input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.sync-actions-wrap {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sync-btn-push,
+.sync-btn-pull {
+    width: 100%;
+    padding: 11px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 12px;
+}
+
+.sync-status-box {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sync-status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sync-status-label-title {
+    color: var(--muted);
+}
+
+.sync-status-val {
+    font-weight: 700;
+    color: #64748b;
+}
+
+.sync-status-val.success {
+    color: #16a34a;
+}
+
+.sync-status-val.syncing {
+    color: #d97706;
+}
+
+.sync-status-val.error {
+    color: #dc2626;
+}
+
+.sync-time-val {
+    color: var(--text);
+    font-family: monospace;
+    font-size: 12px;
 }
 
 /* iPad 10：820×1180 竖屏、1180×820 横屏（CSS 逻辑像素） */

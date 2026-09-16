@@ -17,9 +17,14 @@
                 <a href="../index.html" class="nav-btn back-nav-btn">
                     ← 🏠 返回学习中心
                 </a>
-                <button id="openSettingsBtn" class="nav-btn settings-nav-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="朗读设置" title="朗读设置">
-                    ⚙️ 朗读设置
-                </button>
+                <div class="top-nav-actions">
+                    <button id="openSyncBtn" class="nav-btn sync-nav-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="云端同步" title="云端同步">
+                        ☁️ 云端同步
+                    </button>
+                    <button id="openSettingsBtn" class="nav-btn settings-nav-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="朗读设置" title="朗读设置">
+                        ⚙️ 朗读设置
+                    </button>
+                </div>
             </div>
             <div class="home-intro-title">
                 <h1>🔊 汉字听写小助手</h1>
@@ -79,7 +84,7 @@
 
         <div class="home-section-title">
             <span>📊</span>
-            <div><strong>学习概览</strong><small>学习记录仅保存在当前浏览器</small></div>
+            <div><strong>学习概览</strong><small id="syncOverviewNote">支持 Cloudflare 云端备份与多端同步</small></div>
         </div>
 
         <div class="quick-stats">
@@ -366,6 +371,63 @@
             </div>
             <div class="modal-footer">
                 <button id="confirmSettingsBtn" type="button" class="primary-btn modal-confirm-btn">
+                    完成
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 云端同步设置弹窗 -->
+    <div id="syncModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="syncModalTitle">
+        <div class="modal-backdrop" id="syncModalBackdrop"></div>
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-wrap">
+                    <span class="modal-icon">☁️</span>
+                    <h2 id="syncModalTitle" class="modal-title">云端同步备份</h2>
+                </div>
+                <button id="closeSyncBtn" class="modal-close-btn" type="button" aria-label="关闭">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="field-hint" style="margin-top: 0; margin-bottom: 14px;">
+                    设置专属同步密钥 (Sync Key)，可在手机、平板、电脑等不同设备间无缝同步汉字听写进度、错字本和学习记录。
+                </p>
+
+                <div class="field">
+                    <label for="syncKeyInput">专属同步密钥 (Sync Key)</label>
+                    <input type="text" id="syncKeyInput" placeholder="例如：my-hanzi-key" autocomplete="off" spellcheck="false" class="sync-input" />
+                    <small class="field-hint">请妥善保管您的密钥，所有输入相同密钥的设备将共享学习数据。</small>
+                </div>
+
+                <div class="sync-toggle-wrap">
+                    <label class="sync-toggle-label">
+                        <input type="checkbox" id="autoSyncCheckbox" />
+                        <span>开启练习后自动云同步 (推荐)</span>
+                    </label>
+                </div>
+
+                <div class="sync-actions-wrap">
+                    <button id="pushSyncBtn" type="button" class="primary-btn sync-btn-push">
+                        ⬆️ 立即将本地进度推送到云端备份
+                    </button>
+                    <button id="pullSyncBtn" type="button" class="secondary-btn sync-btn-pull">
+                        ⬇️ 立即从云端拉取最新数据覆盖本地
+                    </button>
+                </div>
+
+                <div class="sync-status-box">
+                    <div class="sync-status-row">
+                        <span class="sync-status-label-title">同步状态：</span>
+                        <strong id="syncStatusLabel" class="sync-status-val">空闲</strong>
+                    </div>
+                    <div class="sync-status-row">
+                        <span class="sync-status-label-title">上次同步时间：</span>
+                        <span id="lastSyncTimeLabel" class="sync-time-val">未同步</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmSyncBtn" type="button" class="primary-btn modal-confirm-btn">
                     完成
                 </button>
             </div>

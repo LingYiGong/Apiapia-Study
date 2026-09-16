@@ -4,6 +4,11 @@ const STORAGE_KEY = "hanziDictationStatsV1";
 const STROKE_PROGRESS_KEY = "hanziStrokeProgressV1";
 const STROKE_ORDER_KEY = "hanziStrokeOrderV1";
 const SPEECH_SETTINGS_KEY = "hanziSpeechSettingsV1";
+const SYNC_KEY_STORAGE = "hanziSyncKeyV1";
+const AUTO_SYNC_STORAGE = "hanziAutoSyncV1";
+const LAST_SYNC_TIME_KEY = "hanziLastSyncTimeV1";
+
+let debounceSyncTimer = null;
 
 const state = {
     mode: "dictation",
@@ -49,6 +54,18 @@ const els = {
     modalBackdrop: document.getElementById("modalBackdrop"),
     settingsModal: document.getElementById("settingsModal"),
     testSpeechBtn: document.getElementById("testSpeechBtn"),
+    openSyncBtn: document.getElementById("openSyncBtn"),
+    closeSyncBtn: document.getElementById("closeSyncBtn"),
+    confirmSyncBtn: document.getElementById("confirmSyncBtn"),
+    syncModalBackdrop: document.getElementById("syncModalBackdrop"),
+    syncModal: document.getElementById("syncModal"),
+    syncKeyInput: document.getElementById("syncKeyInput"),
+    autoSyncCheckbox: document.getElementById("autoSyncCheckbox"),
+    pushSyncBtn: document.getElementById("pushSyncBtn"),
+    pullSyncBtn: document.getElementById("pullSyncBtn"),
+    syncStatusLabel: document.getElementById("syncStatusLabel"),
+    lastSyncTimeLabel: document.getElementById("lastSyncTimeLabel"),
+    syncOverviewNote: document.getElementById("syncOverviewNote"),
     startBtn: document.getElementById("startBtn"),
     recognitionStartBtn: document.getElementById("recognitionStartBtn"),
     choiceStartBtn: document.getElementById("choiceStartBtn"),
@@ -162,6 +179,7 @@ function loadStats() {
 
 function saveStats(stats) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+    triggerAutoSync();
 }
 
 function loadSpeechSettings() {
@@ -215,6 +233,186 @@ function closeSettingsModal() {
         els.openSettingsBtn.setAttribute("aria-expanded", "false");
     }
     window.speechSynthesis?.cancel?.();
+}
+
+function openSyncModal() {
+    if (!els.syncModal) return;
+    loadSyncConfigToUI();
+    els.syncModal.classList.remove("hidden");
+    if (els.openSyncBtn) {
+        els.openSyncBtn.setAttribute("aria-expanded", "true");
+    }
+}
+
+function closeSyncModal() {
+    if (!els.syncModal) return;
+    saveSyncConfigFromUI();
+    els.syncModal.classList.add("hidden");
+    if (els.openSyncBtn) {
+        els.openSyncBtn.setAttribute("aria-expanded", "false");
+    }
+}
+
+function loadSyncConfigToUI() {
+    try {
+        const savedKey = localStorage.getItem(SYNC_KEY_STORAGE) || "";
+        const autoSync = localStorage.getItem(AUTO_SYNC_STORAGE) === "true";
+        const lastSync = localStorage.getItem(LAST_SYNC_TIME_KEY) || "";
+
+        if (els.syncKeyInput) els.syncKeyInput.value = savedKey;
+        if (els.autoSyncCheckbox) els.autoSyncCheckbox.checked = autoSync;
+        if (els.lastSyncTimeLabel) els.lastSyncTimeLabel.textContent = lastSync || "未同步";
+    } catch (e) {
+        console.warn("读取同步配置失败：", e);
+    }
+}
+
+function saveSyncConfigFromUI() {
+    try {
+        if (els.syncKeyInput) {
+            localStorage.setItem(SYNC_KEY_STORAGE, els.syncKeyInput.value.trim());
+        }
+        if (els.autoSyncCheckbox) {
+            localStorage.setItem(AUTO_SYNC_STORAGE, els.autoSyncCheckbox.checked ? "true" : "false");
+        }
+        updateSyncOverviewBadge();
+    } catch (e) {
+        console.warn("保存同步配置失败：", e);
+    }
+}
+
+function updateSyncOverviewBadge() {
+    if (!els.syncOverviewNote) return;
+    const key = (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim();
+    if (key) {
+        const displayKey = key.length > 10 ? `${key.slice(0, 8)}...` : key;
+        els.syncOverviewNote.textContent = `已绑定云端同步 (${displayKey})`;
+    } else {
+        els.syncOverviewNote.textContent = "支持 Cloudflare 云端备份与多端同步";
+    }
+}
+
+function setSyncStatus(type, text) {
+    if (!els.syncStatusLabel) return;
+    els.syncStatusLabel.className = `sync-status-val ${type}`;
+    els.syncStatusLabel.textContent = text;
+}
+
+function setLastSyncTime(timeStr) {
+    try {
+        localStorage.setItem(LAST_SYNC_TIME_KEY, timeStr);
+    } catch (_) {}
+    if (els.lastSyncTimeLabel) {
+        els.lastSyncTimeLabel.textContent = timeStr || "未同步";
+    }
+}
+
+function triggerAutoSync() {
+    const key = (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim();
+    const autoSync = localStorage.getItem(AUTO_SYNC_STORAGE) === "true";
+    if (!autoSync || !key) return;
+
+    clearTimeout(debounceSyncTimer);
+    debounceSyncTimer = setTimeout(() => {
+        pushToCloud(true);
+    }, 2500);
+}
+
+async function pushToCloud(silent = false) {
+    const key = (els.syncKeyInput ? els.syncKeyInput.value.trim() : "") || (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim();
+    if (!key) {
+        if (!silent) alert("请先输入专属同步密钥 (Sync Key)！");
+        return;
+    }
+
+    setSyncStatus("syncing", "正在推送...");
+    try {
+        let strokeProg = "";
+        try {
+            strokeProg = localStorage.getItem(STROKE_PROGRESS_KEY) || "";
+        } catch (_) {}
+
+        let speechSettings = {};
+        try {
+            const raw = localStorage.getItem(SPEECH_SETTINGS_KEY);
+            if (raw) speechSettings = JSON.parse(raw);
+        } catch (_) {}
+
+        const res = await fetch(`/api/hanzi/sync?key=${encodeURIComponent(key)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                stats: loadStats(),
+                strokeProgress: strokeProg,
+                speechSettings: speechSettings,
+                syncKey: key
+            })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+            const now = new Date();
+            const nowStr = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+            setSyncStatus("success", `同步成功 (${now.toLocaleTimeString()})`);
+            setLastSyncTime(nowStr);
+            if (!silent) alert("☁️ 已成功将本地学习数据推送到云端备份！");
+        } else {
+            setSyncStatus("error", json.message || "同步失败");
+            if (!silent) alert("推送云端失败：" + (json.message || json.error || "未知错误"));
+        }
+    } catch (err) {
+        setSyncStatus("error", "网络或接口异常");
+        if (!silent) alert("推送失败，请检查网络连接或 Cloudflare 部署状态：" + err.message);
+    }
+}
+
+async function pullFromCloud(silent = false) {
+    const key = (els.syncKeyInput ? els.syncKeyInput.value.trim() : "") || (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim();
+    if (!key) {
+        if (!silent) alert("请先输入专属同步密钥 (Sync Key)！");
+        return;
+    }
+
+    setSyncStatus("syncing", "正在拉取...");
+    try {
+        const res = await fetch(`/api/hanzi/sync?key=${encodeURIComponent(key)}`);
+        const json = await res.json();
+
+        if (json.success && json.data) {
+            const cloudData = json.data;
+            if (cloudData.stats && typeof cloudData.stats === "object") {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData.stats));
+            }
+            if (cloudData.strokeProgress) {
+                localStorage.setItem(STROKE_PROGRESS_KEY, cloudData.strokeProgress);
+            }
+            if (cloudData.speechSettings && typeof cloudData.speechSettings === "object") {
+                localStorage.setItem(SPEECH_SETTINGS_KEY, JSON.stringify(cloudData.speechSettings));
+                loadSpeechSettings();
+            }
+
+            refreshHomeStats();
+            const now = new Date();
+            const nowStr = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+            setSyncStatus("success", `拉取成功 (${now.toLocaleTimeString()})`);
+            setLastSyncTime(nowStr);
+
+            if (!silent) {
+                const total = cloudData.stats?.totalPracticed || 0;
+                const wrong = Object.values(cloudData.stats?.characters || {}).filter(c => c.wrong > 0).length;
+                alert(`☁️ 已成功拉取云端数据！（累计练习 ${total} 次，错字本 ${wrong} 个）`);
+            }
+        } else if (json.success && !json.data) {
+            setSyncStatus("success", "云端暂无数据");
+            if (!silent) alert("该密钥在云端尚无记录，您可以先点击【推送到云端】进行初次备份！");
+        } else {
+            setSyncStatus("error", json.message || "拉取失败");
+            if (!silent) alert("拉取失败：" + (json.message || json.error || "未知错误"));
+        }
+    } catch (err) {
+        setSyncStatus("error", "网络或接口异常");
+        if (!silent) alert("拉取失败，请检查网络连接或 Cloudflare 部署状态：" + err.message);
+    }
 }
 
 function previewSpeech() {
@@ -1303,6 +1501,7 @@ function resetAllData() {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STROKE_PROGRESS_KEY);
     refreshHomeStats();
+    triggerAutoSync();
     alert("学习记录已经清空。");
 }
 
@@ -1410,10 +1609,51 @@ if (els.testSpeechBtn) {
     els.testSpeechBtn.addEventListener("click", previewSpeech);
 }
 
+if (els.openSyncBtn) {
+    els.openSyncBtn.addEventListener("click", openSyncModal);
+}
+if (els.closeSyncBtn) {
+    els.closeSyncBtn.addEventListener("click", closeSyncModal);
+}
+if (els.confirmSyncBtn) {
+    els.confirmSyncBtn.addEventListener("click", closeSyncModal);
+}
+if (els.syncModalBackdrop) {
+    els.syncModalBackdrop.addEventListener("click", closeSyncModal);
+}
+if (els.pushSyncBtn) {
+    els.pushSyncBtn.addEventListener("click", () => pushToCloud(false));
+}
+if (els.pullSyncBtn) {
+    els.pullSyncBtn.addEventListener("click", () => pullFromCloud(false));
+}
+if (els.syncKeyInput) {
+    els.syncKeyInput.addEventListener("change", saveSyncConfigFromUI);
+}
+if (els.autoSyncCheckbox) {
+    els.autoSyncCheckbox.addEventListener("change", saveSyncConfigFromUI);
+}
+
+function initSync() {
+    loadSyncConfigToUI();
+    updateSyncOverviewBadge();
+    const key = (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim();
+    const autoSync = localStorage.getItem(AUTO_SYNC_STORAGE) === "true";
+    if (key && autoSync) {
+        pullFromCloud(true);
+    }
+}
+
 document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && els.settingsModal && !els.settingsModal.classList.contains("hidden")) {
-        closeSettingsModal();
-        return;
+    if (event.key === "Escape") {
+        if (els.syncModal && !els.syncModal.classList.contains("hidden")) {
+            closeSyncModal();
+            return;
+        }
+        if (els.settingsModal && !els.settingsModal.classList.contains("hidden")) {
+            closeSettingsModal();
+            return;
+        }
     }
 
     const dictationActive =
@@ -1478,3 +1718,4 @@ if ("speechSynthesis" in window) {
 buildCategoryOptions();
 refreshHomeStats();
 loadSpeechSettings();
+initSync();
