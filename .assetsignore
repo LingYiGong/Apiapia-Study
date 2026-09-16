@@ -1,0 +1,10 @@
+.git
+.idea
+node_modules
+.wrangler
+backend
+package.json
+package-lock.json
+wrangler.toml
+*.md
+japanese/docs

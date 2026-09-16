@@ -1,7 +1,7 @@
 {
-  "name": "japanese-study",
+  "name": "study-hub",
   "version": "1.0.0",
-  "description": "基于艾宾浩斯记忆曲线的日语听力学习 Web 应用",
+  "description": "语言与识字学习中心 (日语、汉字、英语) - Cloudflare 全栈部署",
   "scripts": {
     "build": "echo 'Ready'",
     "dev": "wrangler dev",

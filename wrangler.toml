@@ -1,0 +1,13 @@
+name = "study-hub"
+main = "backend/worker.js"
+compatibility_date = "2024-09-01"
+
+# 静态资源目录：托管整个项目的静态网页（包含根目录 index.html、japanese、hanzi、english）
+[assets]
+directory = "."
+binding = "ASSETS"
+
+# Cloudflare KV 存储配置 (多端学习进度存储)
+[[kv_namespaces]]
+binding = "STUDY_KV"
+id = "ed094c7c103648d5839ccc31a54317f8"
