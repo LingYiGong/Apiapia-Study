@@ -1,0 +1,1195 @@
+const { createApp, ref, computed, onMounted, watch } = Vue;
+
+        const LOCAL_STORAGE_KEY = 'ja_vocab_list';
+
+        const app = createApp({
+            setup() {
+                // Main State
+                const currentTab = ref('practice');
+                const words = ref([]);
+                const toastMessage = ref('');
+                let toastTimer = null;
+
+                const showToast = (msg) => {
+                    if (typeof vant !== 'undefined' && vant.showToast) {
+                        vant.showToast({ message: msg, position: 'top', duration: 2200 });
+                    }
+                    toastMessage.value = msg;
+                    clearTimeout(toastTimer);
+                    toastTimer = setTimeout(() => {
+                        toastMessage.value = '';
+                    }, 3000);
+                };
+
+                // Form & Management State
+                const form = ref({ word: '', kana: '', meaning: '' });
+                const editingId = ref(null);
+                const showAddForm = ref(false);
+                const searchQuery = ref('');
+                const currentPage = ref(1);
+                const pageSize = 50;
+
+                // Practice State (Words)
+                const practiceState = ref('idle'); // 'idle', 'listening', 'reveal'
+                const todayQueue = ref([]);
+                const initialQueueLength = ref(0);
+
+                // Sentence Practice State
+                const LOCAL_STORAGE_SENTENCES_KEY = 'japanese_study_sentences_v1';
+                const sentences = ref([]);
+                const sentenceScope = ref('learned'); // 'learned', 'all'
+                const sentencePracticeState = ref('idle'); // 'idle', 'listening', 'reveal'
+                const sentenceQueue = ref([]);
+                const initialSentenceQueueLength = ref(0);
+
+                // Cloudflare Cloud Sync Config
+                const SYNC_KEY_STORAGE = 'japanese_study_sync_key_v1';
+                const AUTO_SYNC_STORAGE = 'japanese_study_auto_sync_v1';
+                const showSyncModal = ref(false);
+                const syncKey = ref(localStorage.getItem(SYNC_KEY_STORAGE) || '');
+                const autoSync = ref(localStorage.getItem(AUTO_SYNC_STORAGE) === 'true');
+                const syncStatus = ref('idle'); // 'idle', 'syncing', 'success', 'error'
+                const syncStatusText = ref('空闲');
+                const lastSyncTime = ref(localStorage.getItem('japanese_study_last_sync_time') || '');
+                let debounceSyncTimer = null;
+                
+                // Audio / Voice Engine Config
+                const isIOS = typeof navigator !== 'undefined' && (
+                    /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+                );
+
+                const AUDIO_CONFIG_KEY = 'japanese_study_audio_config_v1';
+                const showAudioSettings = ref(false);
+                const audioEngine = ref(isIOS ? 'tts' : 'online'); // iPad / iOS 优先推荐 Apple 原生 TTS，PC 推荐在线真人
+                const audioTarget = ref('kana'); // 'kana' (假名注音，精准避免多音字错误), 'word' (汉字原文)
+                const speechRate = ref(1.0); // 1.0, 1.2, 1.35, 1.5
+                const jaVoiceName = ref('');
+                const availableVoices = ref([]);
+
+                const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
+                let currentAudio = null;
+
+                const initVoices = () => {
+                    if (!synth) return;
+                    const allVoices = synth.getVoices() || [];
+                    const jaVoices = allVoices.filter(v => 
+                        (v.lang && (v.lang === 'ja-JP' || v.lang === 'ja' || v.lang.toLowerCase().replace('_', '-').startsWith('ja'))) ||
+                        /japanese|日本語|kyoko|otoya|siri|hattori/i.test(v.name)
+                    );
+                    availableVoices.value = jaVoices;
+
+                    if (jaVoices.length > 0) {
+                        if (!jaVoiceName.value || !jaVoices.some(v => v.name === jaVoiceName.value)) {
+                            const siri = jaVoices.find(v => /siri/i.test(v.name));
+                            const kyoko = jaVoices.find(v => /kyoko|京子/i.test(v.name));
+                            const natural = jaVoices.find(v => /natural|online/i.test(v.name));
+                            const google = jaVoices.find(v => /google/i.test(v.name));
+                            const otoya = jaVoices.find(v => /otoya|乙也/i.test(v.name));
+                            jaVoiceName.value = (siri || kyoko || natural || google || otoya || jaVoices[0]).name;
+                        }
+                    }
+                };
+
+                const getJapaneseVoice = () => {
+                    if (!synth) return null;
+                    const allVoices = synth.getVoices() || [];
+                    if (availableVoices.value.length === 0 && allVoices.length > 0) {
+                        initVoices();
+                    }
+                    const jaVoices = allVoices.filter(v => 
+                        (v.lang && (v.lang === 'ja-JP' || v.lang === 'ja' || v.lang.toLowerCase().replace('_', '-').startsWith('ja'))) ||
+                        /japanese|日本語|kyoko|otoya|siri|hattori/i.test(v.name)
+                    );
+                    if (jaVoiceName.value) {
+                        const found = jaVoices.find(v => v.name === jaVoiceName.value);
+                        if (found) return found;
+                    }
+                    const siri = jaVoices.find(v => /siri/i.test(v.name));
+                    const kyoko = jaVoices.find(v => /kyoko|京子/i.test(v.name));
+                    const natural = jaVoices.find(v => /natural|online/i.test(v.name));
+                    const google = jaVoices.find(v => /google/i.test(v.name));
+                    const otoya = jaVoices.find(v => /otoya|乙也/i.test(v.name));
+                    return siri || kyoko || natural || google || otoya || jaVoices[0] || null;
+                };
+
+                const loadAudioConfig = () => {
+                    try {
+                        const raw = localStorage.getItem(AUDIO_CONFIG_KEY);
+                        if (raw) {
+                            const parsed = JSON.parse(raw);
+                            if (parsed.audioEngine) audioEngine.value = parsed.audioEngine;
+                            if (parsed.audioTarget) audioTarget.value = parsed.audioTarget;
+                            if (parsed.speechRate !== undefined && parsed.speechRate !== null) {
+                                const r = Number(parsed.speechRate);
+                                if (!isNaN(r) && r >= 0.8 && r <= 1.5) {
+                                    speechRate.value = Math.round(r * 100) / 100;
+                                } else {
+                                    speechRate.value = 1.0;
+                                }
+                            }
+                            if (parsed.jaVoiceName) jaVoiceName.value = parsed.jaVoiceName;
+                        } else {
+                            if (isIOS) {
+                                audioEngine.value = 'tts';
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to load audio config', e);
+                    }
+                };
+
+                const saveAudioConfig = () => {
+                    try {
+                        const r = Number(speechRate.value);
+                        if (!isNaN(r) && r >= 0.8 && r <= 1.5) {
+                            speechRate.value = Math.round(r * 100) / 100;
+                        } else {
+                            speechRate.value = 1.0;
+                        }
+                        localStorage.setItem(AUDIO_CONFIG_KEY, JSON.stringify({
+                            audioEngine: audioEngine.value,
+                            audioTarget: audioTarget.value,
+                            speechRate: speechRate.value,
+                            jaVoiceName: jaVoiceName.value
+                        }));
+                    } catch (e) {
+                        console.error('Failed to save audio config', e);
+                    }
+                };
+
+                // Load Data with auto-initialization from built-in vocab
+                const loadData = () => {
+                    let loadedWords = [];
+                    try {
+                        const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+                        if (raw) {
+                            const parsed = JSON.parse(raw);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                loadedWords = parsed;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse localStorage data', e);
+                    }
+
+                    if (loadedWords.length > 0) {
+                        let hasChanges = false;
+                        // Auto-fill missing meanings and append new built-in vocabulary
+                        if (window.BUILTIN_VOCAB_ALL && Array.isArray(window.BUILTIN_VOCAB_ALL)) {
+                            const existingWordMap = new Map();
+                            loadedWords.forEach(w => {
+                                existingWordMap.set(`${w.word}__${w.kana}`, w);
+                                existingWordMap.set(w.word, w);
+                            });
+
+                            window.BUILTIN_VOCAB_ALL.forEach(item => {
+                                const exist = existingWordMap.get(`${item.word}__${item.kana}`) || existingWordMap.get(item.word);
+                                if (exist) {
+                                    if (!exist.meaning || exist.meaning.trim() === '') {
+                                        exist.meaning = item.meaning;
+                                        hasChanges = true;
+                                    }
+                                } else {
+                                    loadedWords.push({
+                                        ...item,
+                                        level: 0,
+                                        next_review_date: Date.now()
+                                    });
+                                    existingWordMap.set(`${item.word}__${item.kana}`, item);
+                                    existingWordMap.set(item.word, item);
+                                    hasChanges = true;
+                                }
+                            });
+                        }
+                        words.value = loadedWords;
+                        if (hasChanges) {
+                            saveData();
+                            console.log('Auto-merged new built-in vocabulary into user list.');
+                        }
+                        return;
+                    }
+
+                    // Auto-load built-in vocabulary if localStorage is empty
+                    if (window.BUILTIN_VOCAB_ALL && Array.isArray(window.BUILTIN_VOCAB_ALL) && window.BUILTIN_VOCAB_ALL.length > 0) {
+                        words.value = JSON.parse(JSON.stringify(window.BUILTIN_VOCAB_ALL));
+                        saveData();
+                        showToast(`已自动载入内置词库（共 ${words.value.length} 词）`);
+                    } else {
+                        words.value = [];
+                    }
+                };
+
+                // Save Data
+                const saveData = () => {
+                    try {
+                        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(words.value));
+                    } catch (e) {
+                        console.error('Failed to save words to localStorage', e);
+                        showToast('保存失败，可能浏览器存储空间已满');
+                    }
+                    triggerAutoSync();
+                };
+
+                // Cloudflare Cloud Sync Methods
+                const saveSyncConfig = () => {
+                    localStorage.setItem(SYNC_KEY_STORAGE, syncKey.value.trim());
+                    localStorage.setItem(AUTO_SYNC_STORAGE, autoSync.value ? 'true' : 'false');
+                    showToast('云同步配置已更新');
+                };
+
+                const triggerAutoSync = () => {
+                    if (!autoSync.value || !syncKey.value.trim()) return;
+                    clearTimeout(debounceSyncTimer);
+                    debounceSyncTimer = setTimeout(() => {
+                        pushToCloud(true);
+                    }, 2500);
+                };
+
+                const pushToCloud = async (silent = false) => {
+                    const key = syncKey.value.trim();
+                    if (!key) {
+                        if (!silent) alert('请先输入专属同步密钥 (Sync Key)！');
+                        return;
+                    }
+
+                    syncStatus.value = 'syncing';
+                    syncStatusText.value = '正在推送...';
+
+                    try {
+                        const res = await fetch(`/api/sync?key=${encodeURIComponent(key)}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                words: words.value,
+                                sentences: sentences.value,
+                                syncKey: key
+                            })
+                        });
+
+                        const json = await res.json();
+                        if (json.success) {
+                            syncStatus.value = 'success';
+                            const nowStr = new Date().toLocaleTimeString();
+                            syncStatusText.value = `同步成功 (${nowStr})`;
+                            lastSyncTime.value = new Date().toLocaleString();
+                            localStorage.setItem('japanese_study_last_sync_time', lastSyncTime.value);
+                            if (!silent) showToast('☁️ 已成功将本地学习进度推送到云端备份！');
+                        } else {
+                            syncStatus.value = 'error';
+                            syncStatusText.value = json.message || '同步失败';
+                            if (!silent) alert('推送云端失败：' + (json.message || json.error));
+                        }
+                    } catch (err) {
+                        syncStatus.value = 'error';
+                        syncStatusText.value = '网络或接口异常';
+                        if (!silent) alert('推送失败，请检查网络连接或 Cloudflare 部署状态：' + err.message);
+                    }
+                };
+
+                const pullFromCloud = async (silent = false) => {
+                    const key = syncKey.value.trim();
+                    if (!key) {
+                        if (!silent) alert('请先输入专属同步密钥 (Sync Key)！');
+                        return;
+                    }
+
+                    syncStatus.value = 'syncing';
+                    syncStatusText.value = '正在拉取...';
+
+                    try {
+                        const res = await fetch(`/api/sync?key=${encodeURIComponent(key)}`);
+                        const json = await res.json();
+
+                        if (json.success && json.data) {
+                            const cloudData = json.data;
+                            let wordsUpdated = false;
+                            let sentencesUpdated = false;
+
+                            if (Array.isArray(cloudData.words) && cloudData.words.length > 0) {
+                                words.value = cloudData.words;
+                                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(words.value));
+                                wordsUpdated = true;
+                            }
+                            if (Array.isArray(cloudData.sentences) && cloudData.sentences.length > 0) {
+                                sentences.value = cloudData.sentences;
+                                localStorage.setItem(LOCAL_STORAGE_SENTENCES_KEY, JSON.stringify(sentences.value));
+                                sentencesUpdated = true;
+                            }
+
+                            syncStatus.value = 'success';
+                            const nowStr = new Date().toLocaleTimeString();
+                            syncStatusText.value = `拉取成功 (${nowStr})`;
+                            lastSyncTime.value = new Date().toLocaleString();
+                            localStorage.setItem('japanese_study_last_sync_time', lastSyncTime.value);
+
+                            if (!silent) {
+                                showToast(`☁️ 已拉取云端数据（${words.value.length} 词，${sentences.value.length} 句）`);
+                            }
+                        } else if (json.success && !json.data) {
+                            syncStatus.value = 'idle';
+                            syncStatusText.value = '云端暂无数据';
+                            if (!silent) alert('该密钥在云端尚未有数据备份，请先在已有数据的设备上点击【推送到云端备份】。');
+                        } else {
+                            syncStatus.value = 'error';
+                            syncStatusText.value = json.message || '拉取失败';
+                            if (!silent) alert('拉取失败：' + (json.message || json.error));
+                        }
+                    } catch (err) {
+                        syncStatus.value = 'error';
+                        syncStatusText.value = '网络异常';
+                        if (!silent) alert('拉取失败，请检查网络或服务配置：' + err.message);
+                    }
+                };
+
+                onMounted(() => {
+                    initVoices();
+                    if (synth && synth.onvoiceschanged !== undefined) {
+                        synth.onvoiceschanged = initVoices;
+                    }
+                    setTimeout(initVoices, 250);
+                    setTimeout(initVoices, 800);
+                    setTimeout(initVoices, 1600);
+
+                    // iPad / iOS WebKit audio & speech gesture unlocker
+                    const unlockAudioAndTTS = () => {
+                        if (synth) {
+                            try {
+                                const dummy = new SpeechSynthesisUtterance('');
+                                dummy.volume = 0;
+                                synth.speak(dummy);
+                            } catch (e) {}
+                            initVoices();
+                        }
+                        try {
+                            if (!currentAudio) {
+                                currentAudio = new Audio();
+                            }
+                            currentAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+                            currentAudio.play().then(() => {
+                                currentAudio.pause();
+                                currentAudio.currentTime = 0;
+                            }).catch(() => {});
+                        } catch (e) {}
+                    };
+                    window.addEventListener('touchstart', unlockAudioAndTTS, { once: true, passive: true });
+                    window.addEventListener('click', unlockAudioAndTTS, { once: true, passive: true });
+
+                    loadAudioConfig();
+                    loadData();
+                    loadSentenceData();
+                    if (autoSync.value && syncKey.value.trim()) {
+                        pullFromCloud(true);
+                    }
+                });
+
+                // Computed stats (Words)
+                const todayDueCount = computed(() => {
+                    const now = Date.now();
+                    return words.value.filter(w => (w.next_review_date || 0) <= now).length;
+                });
+
+                const masteredCount = computed(() => {
+                    return words.value.filter(w => (w.level || 0) >= 3).length;
+                });
+
+                const learnedWordsCount = computed(() => {
+                    return words.value.filter(w => (w.level || 0) > 0).length;
+                });
+
+                const isWordLearned = (wordStr) => {
+                    if (!wordStr) return false;
+                    return words.value.some(w => (w.word === wordStr || w.kana === wordStr) && (w.level || 0) > 0);
+                };
+
+                // Sentence Computed Properties
+                const eligibleSentences = computed(() => {
+                    if (sentenceScope.value === 'all') {
+                        return sentences.value;
+                    }
+                    // 'learned' scope:
+                    const learnedSet = new Set();
+                    words.value.forEach(w => {
+                        if ((w.level || 0) > 0) {
+                            if (w.word) learnedSet.add(w.word);
+                            if (w.kana) learnedSet.add(w.kana);
+                        }
+                    });
+
+                    if (learnedSet.size === 0) {
+                        return sentences.value;
+                    }
+
+                    const matched = sentences.value.filter(s => {
+                        if (s.words && Array.isArray(s.words)) {
+                            if (s.words.some(sw => learnedSet.has(sw))) return true;
+                        }
+                        for (const lw of learnedSet) {
+                            if (lw.length >= 2 && s.japanese.includes(lw)) return true;
+                        }
+                        return false;
+                    });
+
+                    return matched.length > 0 ? matched : sentences.value;
+                });
+
+                const eligibleDueSentences = computed(() => {
+                    const now = Date.now();
+                    return eligibleSentences.value.filter(s => (s.next_review_date || 0) <= now);
+                });
+
+                const sentenceDueCount = computed(() => {
+                    const now = Date.now();
+                    return sentences.value.filter(s => (s.next_review_date || 0) <= now).length;
+                });
+
+                const sentenceMasteredCount = computed(() => {
+                    return sentences.value.filter(s => (s.level || 0) >= 3).length;
+                });
+
+                const currentPracticeSentence = computed(() => {
+                    return sentenceQueue.value.length > 0 ? sentenceQueue.value[0] : null;
+                });
+
+                // List Filtering & Pagination
+                const filteredWords = computed(() => {
+                    let result = words.value;
+
+                    // Search query filter
+                    const q = searchQuery.value.trim().toLowerCase();
+                    if (q) {
+                        result = result.filter(w => 
+                            (w.word && w.word.toLowerCase().includes(q)) ||
+                            (w.kana && w.kana.toLowerCase().includes(q)) ||
+                            (w.meaning && w.meaning.toLowerCase().includes(q))
+                        );
+                    }
+
+                    return result;
+                });
+
+                const totalPages = computed(() => {
+                    return Math.max(1, Math.ceil(filteredWords.value.length / pageSize));
+                });
+
+                const paginatedWords = computed(() => {
+                    const start = (currentPage.value - 1) * pageSize;
+                    return filteredWords.value.slice(start, start + pageSize);
+                });
+
+                // Tab change watch
+                watch(currentTab, (newTab) => {
+                    if (newTab === 'practice') {
+                        synth.cancel();
+                        practiceState.value = 'idle';
+                        todayQueue.value = [];
+                        initialQueueLength.value = 0;
+                    }
+                });
+
+                // Built-in import method
+                const importBuiltin = () => {
+                    const toImport = window.BUILTIN_VOCAB || window.BUILTIN_VOCAB_ALL || [];
+                    if (toImport.length === 0) {
+                        showToast('未找到内置词库数据文件');
+                        return;
+                    }
+
+                    if (words.value.length > 0) {
+                        const confirmAppend = confirm(`当前已有 ${words.value.length} 个词汇。\n点击【确定】进行合并追加（去重），点击【取消】放弃。`);
+                        if (!confirmAppend) return;
+
+                        // Merge & de-duplicate by word + kana, updating missing meanings
+                        const existingMap = new Map();
+                        words.value.forEach(w => existingMap.set(w.word + '::' + w.kana, w));
+                        let added = 0;
+                        let updated = 0;
+                        toImport.forEach(item => {
+                            const k = item.word + '::' + item.kana;
+                            if (!existingMap.has(k)) {
+                                const newWord = {
+                                    ...item,
+                                    id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 5),
+                                    next_review_date: Date.now()
+                                };
+                                words.value.push(newWord);
+                                existingMap.set(k, newWord);
+                                added++;
+                            } else {
+                                const exist = existingMap.get(k);
+                                if ((!exist.meaning || exist.meaning.trim() === '') && item.meaning) {
+                                    exist.meaning = item.meaning;
+                                    updated++;
+                                }
+                            }
+                        });
+                        saveData();
+                        showToast(`导入完成：新增 ${added} 词，补全释义 ${updated} 词！`);
+                    } else {
+                        words.value = JSON.parse(JSON.stringify(toImport));
+                        saveData();
+                        showToast(`成功载入内置词库（共 ${words.value.length} 词）！`);
+                    }
+                };
+
+                // File Upload (supports .txt with word(kana) format and .json)
+                const handleFileUpload = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        try {
+                            const text = evt.target.result;
+                            let imported = [];
+                            const now = Date.now();
+
+                            if (file.name.endsWith('.json')) {
+                                const parsed = JSON.parse(text);
+                                if (Array.isArray(parsed)) {
+                                    imported = parsed.map(item => ({
+                                        id: item.id || (now + '_' + Math.random().toString(36).substr(2, 5)),
+                                        word: item.word || '',
+                                        kana: item.kana || '',
+                                        meaning: item.meaning || '',
+                                        level: item.level || 0,
+                                        next_review_date: item.next_review_date || now
+                                    })).filter(i => i.word);
+                                }
+                            } else {
+                                // Parse text line by line
+                                const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                                lines.forEach((line, idx) => {
+                                    const m = line.match(/^(.+?)[(（](.+?)[)）]\s*(.*)$/);
+                                    if (m) {
+                                        imported.push({
+                                            id: 'import_' + now + '_' + idx,
+                                            word: m[1].trim(),
+                                            kana: m[2].trim(),
+                                            meaning: m[3] ? m[3].trim() : '',
+                                            level: 0,
+                                            next_review_date: now
+                                        });
+                                    }
+                                });
+                            }
+
+                            if (imported.length === 0) {
+                                alert('未能从文件中识别出有效词汇。请确保文件格式为「单词(假名)」或 JSON。');
+                                return;
+                            }
+
+                            // Merge into current words
+                            const existingKeys = new Set(words.value.map(w => w.word + '::' + w.kana));
+                            let added = 0;
+                            imported.forEach(w => {
+                                const k = w.word + '::' + w.kana;
+                                if (!existingKeys.has(k)) {
+                                    words.value.push(w);
+                                    existingKeys.add(k);
+                                    added++;
+                                }
+                            });
+                            saveData();
+                            showToast(`文件解析成功，已导入 ${added} 个新词汇！`);
+                        } catch (err) {
+                            console.error(err);
+                            alert('解析文件失败：' + err.message);
+                        }
+                    };
+                    reader.readAsText(file, 'UTF-8');
+                    e.target.value = ''; // reset file input
+                };
+
+                // Export Backup
+                const exportData = () => {
+                    if (words.value.length === 0) {
+                        showToast('当前词库为空，无需导出');
+                        return;
+                    }
+                    const blob = new Blob([JSON.stringify(words.value, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `japanese_study_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast('已导出词库备份文件');
+                };
+
+                // Clear All
+                const clearAllWords = () => {
+                    const doClear = () => {
+                        words.value = [];
+                        saveData();
+                        showToast('已清空词库');
+                    };
+                    if (typeof vant !== 'undefined' && vant.showConfirmDialog) {
+                        vant.showConfirmDialog({
+                            title: '清空确认',
+                            message: `确定要清空全部 ${words.value.length} 个词汇吗？此操作不可恢复。`,
+                            confirmButtonColor: '#e11d48'
+                        }).then(doClear).catch(() => {});
+                    } else if (confirm(`确定要清空全部 ${words.value.length} 个词汇吗？此操作不可恢复。`)) {
+                        doClear();
+                    }
+                };
+
+                // Add / Edit / Delete word
+                const saveWord = () => {
+                    if (!form.value.word.trim() || !form.value.kana.trim()) return;
+
+                    if (editingId.value) {
+                        const index = words.value.findIndex(w => w.id === editingId.value);
+                        if (index !== -1) {
+                            words.value[index] = {
+                                ...words.value[index],
+                                word: form.value.word.trim(),
+                                kana: form.value.kana.trim(),
+                                meaning: form.value.meaning.trim()
+                            };
+                            showToast('词汇修改已保存');
+                        }
+                    } else {
+                        words.value.unshift({
+                            id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 5),
+                            word: form.value.word.trim(),
+                            kana: form.value.kana.trim(),
+                            meaning: form.value.meaning.trim(),
+                            level: 0,
+                            next_review_date: Date.now()
+                        });
+                        showToast('新词汇添加成功');
+                    }
+                    
+                    saveData();
+                    cancelEdit();
+                };
+
+                const editWord = (word) => {
+                    editingId.value = word.id;
+                    form.value = { 
+                        word: word.word, 
+                        kana: word.kana, 
+                        meaning: word.meaning || ''
+                    };
+                    showAddForm.value = true;
+                    document.querySelector('main').scrollTop = 0;
+                };
+
+                const cancelEdit = () => {
+                    editingId.value = null;
+                    form.value = { word: '', kana: '', meaning: '' };
+                    showAddForm.value = false;
+                };
+
+                const deleteWord = (id) => {
+                    const doDelete = () => {
+                        words.value = words.value.filter(w => w.id !== id);
+                        saveData();
+                        showToast('词汇已删除');
+                    };
+                    if (typeof vant !== 'undefined' && vant.showConfirmDialog) {
+                        vant.showConfirmDialog({
+                            title: '删除确认',
+                            message: '确定要删除该词汇吗？',
+                            confirmButtonColor: '#e11d48'
+                        }).then(doDelete).catch(() => {});
+                    } else if (confirm('确定要删除该词汇吗？')) {
+                        doDelete();
+                    }
+                };
+
+                const promptEditMeaning = (word) => {
+                    const newMeaning = prompt(`请为「${word.word} (${word.kana})」输入中文释义：`, word.meaning || '');
+                    if (newMeaning !== null) {
+                        word.meaning = newMeaning.trim();
+                        const idx = words.value.findIndex(w => w.id === word.id);
+                        if (idx !== -1) {
+                            words.value[idx].meaning = word.meaning;
+                            saveData();
+                            showToast('释义已更新！');
+                        }
+                    }
+                };
+
+                const formatDate = (ts) => {
+                    if (!ts) return '未设置';
+                    const date = new Date(Number(ts));
+                    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                };
+
+                // Practice Mode Logic
+                const currentPracticeWord = computed(() => {
+                    return todayQueue.value.length > 0 ? todayQueue.value[0] : null;
+                });
+
+                const startPractice = (forceRandom = false) => {
+                    let queue = [];
+                    const now = Date.now();
+
+                    if (forceRandom) {
+                        queue = [...words.value];
+                        // Shuffle
+                        for (let i = queue.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [queue[i], queue[j]] = [queue[j], queue[i]];
+                        }
+                        queue = queue.slice(0, 30);
+                    } else {
+                        queue = words.value.filter(w => (w.next_review_date || 0) <= now);
+                        // Shuffle
+                        for (let i = queue.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [queue[i], queue[j]] = [queue[j], queue[i]];
+                        }
+                    }
+
+                    todayQueue.value = queue;
+                    initialQueueLength.value = queue.length;
+
+                    if (queue.length > 0) {
+                        practiceState.value = 'listening';
+                        speakCurrent();
+                    }
+                };
+
+                const cleanPronunciation = (str) => {
+                    if (!str) return '';
+                    return str
+                        .replace(/[~～・·…\.\(\)（）\/、，,。！？!?\-_—\s]/g, '')
+                        .trim();
+                };
+
+                const getWordAudioText = (item) => {
+                    if (!item) return '';
+                    if (typeof item === 'string') return cleanPronunciation(item);
+
+                    // If audioTarget is 'kana', prioritize kana for 100% accurate pronunciation without kanji polyphone guessing
+                    if (audioTarget.value === 'kana') {
+                        const cleanKana = cleanPronunciation(item.kana);
+                        if (cleanKana) return cleanKana;
+                    }
+                    return cleanPronunciation(item.word) || cleanPronunciation(item.kana);
+                };
+
+                const playOnlineAudio = (text, onFallback) => {
+                    try {
+                        if (synth && synth.speaking) {
+                            synth.cancel();
+                        }
+                        if (!currentAudio) {
+                            currentAudio = new Audio();
+                        }
+                        currentAudio.pause();
+
+                        const encoded = encodeURIComponent(text);
+                        const url = `https://dict.youdao.com/dictvoice?audio=${encoded}&le=jap`;
+                        currentAudio.src = url;
+                        currentAudio.playbackRate = Number(speechRate.value) || 1.0;
+
+                        let fallbackCalled = false;
+                        const triggerFallback = () => {
+                            if (!fallbackCalled) {
+                                fallbackCalled = true;
+                                if (onFallback) onFallback();
+                            }
+                        };
+                        currentAudio.onerror = () => {
+                            triggerFallback();
+                        };
+                        const playPromise = currentAudio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch((err) => {
+                                if (err.name !== 'AbortError') {
+                                    triggerFallback();
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        console.error('Online audio play failed:', e);
+                        if (onFallback) onFallback();
+                    }
+                };
+
+                let activeUtterance = null;
+                const speakTTS = (text) => {
+                    if (!synth) return;
+                    try {
+                        if (currentAudio) {
+                            currentAudio.pause();
+                            currentAudio.currentTime = 0;
+                        }
+                        if (synth.paused) {
+                            synth.resume();
+                        }
+
+                        const utter = new SpeechSynthesisUtterance(text);
+                        utter.lang = 'ja-JP';
+                        utter.rate = Number(speechRate.value) || 1.0;
+
+                        const selectedVoice = getJapaneseVoice();
+                        if (selectedVoice) {
+                            utter.voice = selectedVoice;
+                        }
+
+                        // Retain reference on global scope to prevent iOS Safari GC premature cleanup bug
+                        activeUtterance = utter;
+                        window._japaneseActiveUtterance = utter;
+                        utter.onend = () => {
+                            activeUtterance = null;
+                            window._japaneseActiveUtterance = null;
+                        };
+                        utter.onerror = (err) => {
+                            console.warn('SpeechSynthesis error:', err);
+                            activeUtterance = null;
+                            window._japaneseActiveUtterance = null;
+                        };
+
+                        // On iOS Safari, calling cancel() immediately before speak() drops the utterance.
+                        // Add tiny delay only if actively speaking.
+                        if (synth.speaking) {
+                            synth.cancel();
+                            setTimeout(() => {
+                                synth.speak(utter);
+                            }, 25);
+                        } else {
+                            synth.speak(utter);
+                        }
+                    } catch (e) {
+                        console.error('SpeechSynthesis error:', e);
+                    }
+                };
+
+                const playWord = (item) => {
+                    if (!item) return;
+                    const text = getWordAudioText(item);
+                    if (!text) return;
+
+                    if (audioEngine.value === 'online') {
+                        playOnlineAudio(text, () => {
+                            speakTTS(text);
+                        });
+                    } else {
+                        speakTTS(text);
+                    }
+                };
+
+                const playCurrent = () => {
+                    if (currentPracticeWord.value) {
+                        playWord(currentPracticeWord.value);
+                    }
+                };
+
+                const testAudio = (sample) => {
+                    playWord(sample);
+                    showToast('正在播放单词发音...');
+                };
+
+                const testSentenceAudio = (sample) => {
+                    playSentence(sample);
+                    showToast('正在播放句子发音...');
+                };
+
+                // Backward-compatibility aliases
+                const speakWord = (item) => playWord(item);
+                const speakCurrent = () => playCurrent();
+
+                const calculateNextReview = (level) => {
+                    const DAY = 24 * 60 * 60 * 1000;
+                    let daysToAdd = 0;
+                    switch(level) {
+                        case 0: daysToAdd = 0; break;
+                        case 1: daysToAdd = 1; break;
+                        case 2: daysToAdd = 3; break;
+                        case 3: daysToAdd = 7; break;
+                        case 4: daysToAdd = 14; break;
+                        default: daysToAdd = 30; break;
+                    }
+                    return Date.now() + (daysToAdd * DAY);
+                };
+
+                const handleKnown = () => {
+                    const current = currentPracticeWord.value;
+                    if (!current) return;
+
+                    const index = words.value.findIndex(w => w.id === current.id);
+                    if (index !== -1) {
+                        const newLevel = (words.value[index].level || 0) + 1;
+                        words.value[index].level = newLevel;
+                        words.value[index].next_review_date = calculateNextReview(newLevel);
+                        saveData();
+                    }
+
+                    todayQueue.value.shift();
+                    checkQueueStatus();
+                };
+
+                const handleUnknown = () => {
+                    practiceState.value = 'reveal';
+                    const current = currentPracticeWord.value;
+                    if (!current) return;
+
+                    const index = words.value.findIndex(w => w.id === current.id);
+                    if (index !== -1) {
+                        words.value[index].level = 0;
+                        saveData();
+                    }
+                };
+
+                const nextWord = () => {
+                    const current = todayQueue.value.shift();
+                    if (current) {
+                        todayQueue.value.push(current);
+                    }
+                    practiceState.value = 'listening';
+                    playCurrent();
+                };
+
+                const checkQueueStatus = () => {
+                    if (todayQueue.value.length === 0) {
+                        practiceState.value = 'idle';
+                    } else {
+                        practiceState.value = 'listening';
+                        playCurrent();
+                    }
+                };
+
+                // Sentence Methods
+                const loadSentenceData = () => {
+                    try {
+                        const raw = localStorage.getItem(LOCAL_STORAGE_SENTENCES_KEY);
+                        if (raw) {
+                            const parsed = JSON.parse(raw);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                if (window.BUILTIN_SENTENCES_ALL && Array.isArray(window.BUILTIN_SENTENCES_ALL)) {
+                                    const existingMap = new Map();
+                                    parsed.forEach(s => existingMap.set(s.japanese, s));
+                                    let newCount = 0;
+                                    window.BUILTIN_SENTENCES_ALL.forEach(builtinS => {
+                                        if (!existingMap.has(builtinS.japanese)) {
+                                            parsed.push({
+                                                ...builtinS,
+                                                level: 0,
+                                                next_review_date: Date.now()
+                                            });
+                                            existingMap.set(builtinS.japanese, builtinS);
+                                            newCount++;
+                                        }
+                                    });
+                                    if (newCount > 0) {
+                                        sentences.value = parsed;
+                                        saveSentenceData();
+                                        console.log(`Auto-merged ${newCount} new built-in sentences.`);
+                                        return;
+                                    }
+                                }
+                                sentences.value = parsed;
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse sentence data from localStorage', e);
+                    }
+
+                    if (window.BUILTIN_SENTENCES_ALL && Array.isArray(window.BUILTIN_SENTENCES_ALL)) {
+                        sentences.value = window.BUILTIN_SENTENCES_ALL.map(s => ({
+                            ...s,
+                            level: 0,
+                            next_review_date: Date.now()
+                        }));
+                        saveSentenceData();
+                    } else {
+                        sentences.value = [];
+                    }
+                };
+
+                const saveSentenceData = () => {
+                    try {
+                        localStorage.setItem(LOCAL_STORAGE_SENTENCES_KEY, JSON.stringify(sentences.value));
+                    } catch (e) {
+                        console.error('Failed to save sentences to localStorage', e);
+                    }
+                    triggerAutoSync();
+                };
+
+                const playSentence = (sentenceObj) => {
+                    if (!sentenceObj) return;
+                    let text = audioTarget.value === 'kana' ? (sentenceObj.kana || sentenceObj.japanese) : sentenceObj.japanese;
+                    text = text.replace(/[~～\-_—]/g, '').trim();
+                    if (!text) return;
+
+                    // Sentences must use TTS: dictionary voice APIs (Youdao) do not support whole sentences.
+                    // Native system Japanese voices provide natural, fluent sentence intonation on iPad, mobile, and desktop.
+                    speakTTS(text);
+                };
+
+                const playCurrentSentence = () => {
+                    if (currentPracticeSentence.value) {
+                        playSentence(currentPracticeSentence.value);
+                    }
+                };
+
+                const startSentencePractice = (forceAll = false) => {
+                    let queue = [];
+                    if (forceAll || eligibleDueSentences.value.length === 0) {
+                        queue = [...eligibleSentences.value];
+                        for (let i = queue.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [queue[i], queue[j]] = [queue[j], queue[i]];
+                        }
+                        queue = queue.slice(0, 15);
+                    } else {
+                        queue = [...eligibleDueSentences.value];
+                        for (let i = queue.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [queue[i], queue[j]] = [queue[j], queue[i]];
+                        }
+                    }
+
+                    sentenceQueue.value = queue;
+                    initialSentenceQueueLength.value = queue.length;
+
+                    if (queue.length > 0) {
+                        sentencePracticeState.value = 'listening';
+                        playCurrentSentence();
+                    } else {
+                        showToast('当前没有匹配的可练习句子');
+                    }
+                };
+
+                const handleSentenceKnown = () => {
+                    const current = currentPracticeSentence.value;
+                    if (!current) return;
+
+                    const index = sentences.value.findIndex(s => s.id === current.id);
+                    if (index !== -1) {
+                        const newLevel = (sentences.value[index].level || 0) + 1;
+                        sentences.value[index].level = newLevel;
+                        sentences.value[index].next_review_date = calculateNextReview(newLevel);
+                        saveSentenceData();
+                    }
+
+                    sentenceQueue.value.shift();
+                    checkSentenceQueueStatus();
+                };
+
+                const handleSentenceUnknown = () => {
+                    sentencePracticeState.value = 'reveal';
+                    const current = currentPracticeSentence.value;
+                    if (!current) return;
+
+                    const index = sentences.value.findIndex(s => s.id === current.id);
+                    if (index !== -1) {
+                        sentences.value[index].level = 0;
+                        saveSentenceData();
+                    }
+                };
+
+                const nextSentence = () => {
+                    const current = sentenceQueue.value.shift();
+                    if (current) {
+                        sentenceQueue.value.push(current);
+                    }
+                    sentencePracticeState.value = 'listening';
+                    playCurrentSentence();
+                };
+
+                const checkSentenceQueueStatus = () => {
+                    if (sentenceQueue.value.length === 0) {
+                        sentencePracticeState.value = 'idle';
+                        showToast('🎉 太棒了！本轮句子听力练习完成！');
+                    } else {
+                        sentencePracticeState.value = 'listening';
+                        playCurrentSentence();
+                    }
+                };
+
+                return {
+                    currentTab,
+                    words,
+                    toastMessage,
+                    showAddForm,
+                    form,
+                    editingId,
+                    searchQuery,
+                    currentPage,
+                    totalPages,
+                    filteredWords,
+                    paginatedWords,
+                    todayDueCount,
+                    masteredCount,
+                    practiceState,
+                    todayQueue,
+                    initialQueueLength,
+                    currentPracticeWord,
+
+                    // Cloudflare Cloud Sync
+                    showSyncModal,
+                    syncKey,
+                    autoSync,
+                    syncStatus,
+                    syncStatusText,
+                    lastSyncTime,
+                    saveSyncConfig,
+                    pushToCloud,
+                    pullFromCloud,
+                    
+                    // Audio & Voice Engine
+                    isIOS,
+                    showAudioSettings,
+                    audioEngine,
+                    audioTarget,
+                    speechRate,
+                    jaVoiceName,
+                    availableVoices,
+                    saveAudioConfig,
+                    playWord,
+                    playCurrent,
+                    testAudio,
+                    testSentenceAudio,
+                    speakWord,
+                    speakCurrent,
+
+                    // Sentence Practice
+                    sentences,
+                    sentenceScope,
+                    sentencePracticeState,
+                    sentenceQueue,
+                    initialSentenceQueueLength,
+                    currentPracticeSentence,
+                    eligibleSentences,
+                    eligibleDueSentences,
+                    sentenceDueCount,
+                    sentenceMasteredCount,
+                    learnedWordsCount,
+                    isWordLearned,
+                    startSentencePractice,
+                    playSentence,
+                    playCurrentSentence,
+                    handleSentenceKnown,
+                    handleSentenceUnknown,
+                    nextSentence,
+
+                    saveWord,
+                    editWord,
+                    cancelEdit,
+                    deleteWord,
+                    promptEditMeaning,
+                    formatDate,
+                    importBuiltin,
+                    handleFileUpload,
+                    exportData,
+                    clearAllWords,
+                    
+                    startPractice,
+                    handleKnown,
+                    handleUnknown,
+                    nextWord
+                };
+            }
+        });
+        if (typeof vant !== 'undefined') {
+            app.use(vant);
+        }
+        app.mount('#app');
