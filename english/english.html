@@ -24,40 +24,89 @@ body {
 ========================= */
 
 .header {
-    background: #ffffff;
-    padding: 20px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-    position: relative;
+    background: #4f46e5;
+    color: white;
+    padding: max(12px, env(safe-area-inset-top)) 16px 10px;
+    border-bottom: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 32px;
+    max-width: 768px;
+    margin: 0 auto;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1;
 }
 
 .back-home {
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 9999px;
+    background: rgba(67, 56, 202, 0.7);
+    border: 1px solid rgba(129, 140, 248, 0.4);
+    color: #e0e7ff;
+    font-size: 12px;
+    font-weight: 500;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     text-decoration: none;
-    color: #4f46e5;
-    background: #eef2ff;
-    padding: 6px 14px;
-    border-radius: 9999px;
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 12px;
+    margin: 0;
     transition: all 0.2s;
 }
 
 .back-home:hover {
-    background: #e0e7ff;
+    background: #4338ca;
 }
 
-.header h1 {
-    margin: 0 0 8px;
-    font-size: 28px;
+.header-badge {
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 9999px;
+    background: rgba(67, 56, 202, 0.7);
+    border: 1px solid rgba(129, 140, 248, 0.4);
+    font-size: 12px;
+    color: #e0e7ff;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
 }
 
-.header p {
-    margin: 0;
-    color: #777;
+.header-stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 28px;
+    max-width: 768px;
+    margin: 8px auto 0;
+    padding-top: 6px;
+    border-top: 1px solid rgba(99, 102, 241, 0.6);
+    font-size: 12px;
+    color: #e0e7ff;
+    font-weight: 500;
+    line-height: 1;
 }
 
 /* =========================
@@ -346,15 +395,23 @@ button:hover {
      顶部
 ========================= -->
 
-<div class="header">
-    <a href="../index.html" class="back-home">← 🏠 返回学习中心</a>
-    <h1>英语单词记忆卡片</h1>
-
-    <p>
-        点击卡片查看英文 · 判断自己是否认识
-    </p>
-
-</div>
+<header class="header">
+    <div class="header-row">
+        <div class="header-left">
+            <a href="../index.html" class="back-home" title="返回学习中心">← 🏠</a>
+            <h1 class="header-title"><span>🔤</span><span>英语核心动词卡</span></h1>
+        </div>
+        <div class="header-badge">
+            <span>⚡ 核心动词</span>
+        </div>
+    </div>
+    <div class="header-stats-row">
+        <span>全部: <b id="headTotal" style="color: #6ee7b7; font-weight: bold;">0</b> 词</span>
+        <span>已掌握: <b id="headKnown" style="color: #ffffff; font-weight: bold;">0</b></span>
+        <span>不认识: <b id="headUnknown" style="color: #fca5a5; font-weight: bold;">0</b></span>
+        <span>未学: <b id="headRemaining" style="color: #fde047; font-weight: bold;">0</b></span>
+    </div>
+</header>
 
 
 <!-- =========================
@@ -921,11 +978,16 @@ function updateStats() {
     ).textContent = unknown;
 
 
-    document.getElementById(
-        "remainingCount"
-    ).textContent = remaining;
+    document.getElementById("remainingCount").textContent = remaining;
 
-}
+    const headTotal = document.getElementById("headTotal");
+    const headKnown = document.getElementById("headKnown");
+    const headUnknown = document.getElementById("headUnknown");
+    const headRemaining = document.getElementById("headRemaining");
+    if (headTotal) headTotal.textContent = total;
+    if (headKnown) headKnown.textContent = known;
+    if (headUnknown) headUnknown.textContent = unknown;
+    if (headRemaining) headRemaining.textContent = remaining;
 
 
 /* =====================================================

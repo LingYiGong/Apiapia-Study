@@ -666,6 +666,26 @@ function refreshHomeStats() {
     if (els.wrongCount) els.wrongCount.textContent = wrongChars.length;
     if (els.totalPracticed) els.totalPracticed.textContent = stats.totalPracticed;
 
+    const statDue = document.getElementById("statDue");
+    const statMastered = document.getElementById("statMastered");
+    const statWrong = document.getElementById("statWrong");
+    const statTotal = document.getElementById("statTotal");
+    if (statDue) statDue.textContent = dueChars.length;
+    if (statMastered) statMastered.textContent = masteredChars.length;
+    if (statWrong) statWrong.textContent = wrongChars.length;
+    if (statTotal) statTotal.textContent = stats.totalPracticed;
+
+    const navDueBadge = document.getElementById("navDueBadge");
+    const navWrongBadge = document.getElementById("navWrongBadge");
+    if (navDueBadge) {
+        navDueBadge.textContent = dueChars.length > 99 ? '99+' : dueChars.length;
+        navDueBadge.classList.toggle("hidden", dueChars.length === 0);
+    }
+    if (navWrongBadge) {
+        navWrongBadge.textContent = wrongChars.length > 99 ? '99+' : wrongChars.length;
+        navWrongBadge.classList.toggle("hidden", wrongChars.length === 0);
+    }
+
     // 艾宾浩斯复习横幅状态提示
     if (els.ebbinghausBanner) {
         if (dueChars.length > 0) {
@@ -1527,6 +1547,11 @@ function showScreen(name) {
     els.storyScreen?.classList.toggle("hidden", name !== "story");
     els.strokeScreen?.classList.toggle("hidden", name !== "stroke");
     els.summaryScreen?.classList.toggle("hidden", name !== "summary");
+
+    const bottomNav = document.getElementById("hanziBottomNav");
+    if (bottomNav) {
+        bottomNav.classList.toggle("hidden", name !== "setup");
+    }
     window.scrollTo({top: 0, behavior: "smooth"});
 }
 
@@ -2045,3 +2070,46 @@ buildCategoryOptions();
 refreshHomeStats();
 loadSpeechSettings();
 initSync();
+
+function switchHomeTab(tabName) {
+    const tabPracticeView = document.getElementById("tabPracticeView");
+    const tabWrongView = document.getElementById("tabWrongView");
+    const tabStatsView = document.getElementById("tabStatsView");
+    const navTabPractice = document.getElementById("navTabPractice");
+    const navTabWrong = document.getElementById("navTabWrong");
+    const navTabStats = document.getElementById("navTabStats");
+
+    if (!tabPracticeView) return;
+
+    tabPracticeView.classList.toggle("hidden", tabName !== "practice");
+    tabWrongView?.classList.toggle("hidden", tabName !== "wrong");
+    tabStatsView?.classList.toggle("hidden", tabName !== "stats");
+
+    const updateBtn = (btn, isActive) => {
+        if (!btn) return;
+        btn.className = `flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative ${isActive ? 'text-indigo-600 font-bold' : 'text-gray-400 hover:text-gray-600 font-medium'}`;
+        const icon = btn.querySelector('.text-xl');
+        if (icon) icon.className = `text-xl transition-transform ${isActive ? 'scale-110' : 'opacity-70'}`;
+        const indicator = btn.querySelector('.nav-indicator');
+        if (indicator) indicator.className = `nav-indicator w-5 h-0.5 rounded-full mt-0.5 ${isActive ? 'bg-indigo-600' : 'bg-transparent'}`;
+    };
+
+    updateBtn(navTabPractice, tabName === "practice");
+    updateBtn(navTabWrong, tabName === "wrong");
+    updateBtn(navTabStats, tabName === "stats");
+}
+
+document.getElementById("navTabPractice")?.addEventListener("click", () => switchHomeTab("practice"));
+document.getElementById("navTabWrong")?.addEventListener("click", () => switchHomeTab("wrong"));
+document.getElementById("navTabStats")?.addEventListener("click", () => switchHomeTab("stats"));
+
+document.getElementById("practiceWrongFromTabBtn")?.addEventListener("click", () => {
+    const stats = loadStats();
+    const wrongChars = getWrongCharacters(stats);
+    if (wrongChars.length === 0) {
+        alert("错字本目前为空，太棒啦！");
+        return;
+    }
+    startSession(wrongChars);
+});
+

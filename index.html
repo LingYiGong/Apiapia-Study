@@ -21,27 +21,31 @@
 <body class="flex flex-col overflow-hidden">
     <div id="app" v-cloak class="flex flex-col max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto w-full bg-[#f7f8fa] shadow-2xl relative md:border-x border-gray-200">
 
-        <!-- 顶部导航栏 (iOS 安全区适配) -->
-        <header class="bg-indigo-600 text-white px-4 sm:px-6 pt-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 shadow-md z-10 flex-shrink-0">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-lg shadow-sm backdrop-blur-sm">
+        <!-- 顶部导航栏 (iOS 安全区适配，统一像素级高度) -->
+        <header class="bg-indigo-600 text-white px-4 sm:px-6 pt-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2.5 shadow-md z-10 flex-shrink-0">
+            <div class="flex items-center justify-between h-8">
+                <div class="flex items-center space-x-2">
+                    <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-base shadow-sm backdrop-blur-sm flex-shrink-0">
                         🎓
                     </div>
-                    <div>
-                        <h1 class="text-base sm:text-lg font-bold tracking-wide flex items-center space-x-1.5 leading-tight">
-                            <span>Study Hub</span>
-                            <span class="text-xs font-normal opacity-90 ml-1">学习中心</span>
-                        </h1>
-                        <p class="text-[11px] text-indigo-100/90 leading-none mt-0.5">语言与识字智能学习平台</p>
-                    </div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-wide flex items-center space-x-1.5 leading-none">
+                        <span>Study Hub</span>
+                        <span class="text-xs font-normal opacity-90 ml-1">学习中心</span>
+                    </h1>
                 </div>
 
                 <!-- 今日日期徽章 -->
-                <div class="flex items-center space-x-1 text-xs bg-indigo-700/70 border border-indigo-400/40 px-2.5 py-1 rounded-full text-indigo-100 font-medium shadow-sm select-none">
+                <div class="h-7 flex items-center space-x-1 text-xs bg-indigo-700/70 border border-indigo-400/40 px-2.5 rounded-full text-indigo-100 font-medium shadow-sm select-none">
                     <span>📅</span>
                     <span>{{ currentDateText }}</span>
                 </div>
+            </div>
+
+            <!-- 学习中心概览统计栏 (统一 App 头部高度与间距) -->
+            <div class="flex justify-between items-center h-7 mt-2 text-xs sm:text-sm opacity-95 border-t border-indigo-500/60 pt-1.5 font-medium leading-none">
+                <span>🎌 日语: <b class="text-emerald-300 font-bold">1780+</b> 词</span>
+                <span>✍️ 汉字: <b class="text-yellow-300 font-bold">240+</b> 字</span>
+                <span>🔤 英语: <b class="text-pink-300 font-bold">核心动词</b></span>
             </div>
         </header>
 
