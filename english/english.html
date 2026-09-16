@@ -1,1309 +1,323 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>英语单词记忆卡片</title>
-
-<style>
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: Arial, "Microsoft YaHei", sans-serif;
-    background: #f4f6f8;
-    color: #222;
-}
-
-/* =========================
-   顶部
-========================= */
-
-.header {
-    background: #4f46e5;
-    color: white;
-    padding: max(12px, env(safe-area-inset-top)) 16px 10px;
-    border-bottom: none;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 50;
-}
-
-.header-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 32px;
-    max-width: 768px;
-    margin: 0 auto;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.header-title {
-    font-size: 16px;
-    font-weight: bold;
-    color: white;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    line-height: 1;
-}
-
-.back-home {
-    height: 28px;
-    padding: 0 10px;
-    border-radius: 9999px;
-    background: rgba(67, 56, 202, 0.7);
-    border: 1px solid rgba(129, 140, 248, 0.4);
-    color: #e0e7ff;
-    font-size: 12px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    text-decoration: none;
-    margin: 0;
-    transition: all 0.2s;
-}
-
-.back-home:hover {
-    background: #4338ca;
-}
-
-.header-badge {
-    height: 28px;
-    padding: 0 10px;
-    border-radius: 9999px;
-    background: rgba(67, 56, 202, 0.7);
-    border: 1px solid rgba(129, 140, 248, 0.4);
-    font-size: 12px;
-    color: #e0e7ff;
-    display: flex;
-    align-items: center;
-    font-weight: 500;
-}
-
-.header-stats-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 28px;
-    max-width: 768px;
-    margin: 8px auto 0;
-    padding-top: 6px;
-    border-top: 1px solid rgba(99, 102, 241, 0.6);
-    font-size: 12px;
-    color: #e0e7ff;
-    font-weight: 500;
-    line-height: 1;
-}
-
-/* =========================
-   统计
-========================= */
-
-.stats {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    padding: 20px;
-    flex-wrap: wrap;
-}
-
-.stat {
-    background: white;
-    width: 150px;
-    padding: 15px;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.stat-number {
-    font-size: 28px;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.stat-title {
-    color: #777;
-}
-
-/* =========================
-   主区域
-========================= */
-
-.container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 10px 20px 40px;
-}
-
-/* =========================
-   单词卡片
-========================= */
-
-.card-area {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.card {
-    width: 100%;
-    max-width: 600px;
-    min-height: 320px;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.12);
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-    user-select: none;
-
-    transition: transform 0.2s;
-}
-
-.card:hover {
-    transform: translateY(-3px);
-}
-
-.card-number {
-    color: #999;
-    font-size: 15px;
-    margin-bottom: 20px;
-}
-
-.word {
-    font-size: 48px;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.meaning {
-    font-size: 24px;
-    color: #555;
-}
-
-.hint {
-    margin-top: 30px;
-    color: #aaa;
-    font-size: 14px;
-}
-
-/* =========================
-   按钮
-========================= */
-
-.buttons {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 20px;
-    flex-wrap: wrap;
-}
-
-button {
-    border: none;
-    border-radius: 10px;
-    padding: 13px 22px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-button:hover {
-    opacity: 0.85;
-}
-
-.btn-prev {
-    background: #e9ecef;
-}
-
-.btn-next {
-    background: #333;
-    color: white;
-}
-
-.btn-speak {
-    background: #e8f0ff;
-}
-
-.btn-known {
-    background: #dff5e5;
-    color: #176b35;
-}
-
-.btn-unknown {
-    background: #ffe1e1;
-    color: #a50000;
-}
-
-/* =========================
-   页面切换按钮
-========================= */
-
-.tabs {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 30px 0 15px;
-    flex-wrap: wrap;
-}
-
-.tab {
-    background: white;
-    border: 1px solid #ddd;
-}
-
-.tab.active {
-    background: #333;
-    color: white;
-}
-
-/* =========================
-   单词列表
-========================= */
-
-.word-list {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-}
-
-.word-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 13px 10px;
-    border-bottom: 1px solid #eee;
-
-    cursor: pointer;
-}
-
-.word-item:last-child {
-    border-bottom: none;
-}
-
-.word-item:hover {
-    background: #f5f5f5;
-}
-
-.word-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.word-index {
-    color: #999;
-    width: 40px;
-}
-
-.word-english {
-    font-weight: bold;
-    font-size: 18px;
-}
-
-.word-chinese {
-    color: #666;
-}
-
-.status-known {
-    color: #188038;
-    font-size: 14px;
-}
-
-.status-unknown {
-    color: #d93025;
-    font-size: 14px;
-}
-
-.status-none {
-    color: #999;
-    font-size: 14px;
-}
-
-/* =========================
-   底部
-========================= */
-
-.footer {
-    text-align: center;
-    margin-top: 25px;
-}
-
-.clear-btn {
-    background: #eee;
-    color: #555;
-}
-
-/* =========================
-   手机
-========================= */
-
-@media (max-width: 600px) {
-
-    .header h1 {
-        font-size: 23px;
-    }
-
-    .card {
-        min-height: 280px;
-    }
-
-    .word {
-        font-size: 38px;
-    }
-
-    .meaning {
-        font-size: 21px;
-    }
-
-    .stat {
-        width: 120px;
-    }
-
-    button {
-        padding: 11px 16px;
-    }
-}
-
-</style>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="apple-mobile-web-app-title" content="英语动词"/>
+    <meta name="theme-color" content="#4f46e5"/>
+    <title>英语核心动词卡片 · Study Hub</title>
+
+    <!-- 引入 Vant 4 样式与 Tailwind CSS (同 index / japanese / hanzi 完全一致) -->
+    <link rel="stylesheet" href="https://unpkg.com/vant@4/lib/index.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 自定义英语词卡模块样式 -->
+    <link rel="stylesheet" href="./english.css" />
+
+    <script>
+        // 动态适配移动端浏览器（Safari / Chrome）实际可视高度
+        (function() {
+            function updateAppHeight() {
+                var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                document.documentElement.style.setProperty('--app-height', h + 'px');
+            }
+            window.addEventListener('resize', updateAppHeight);
+            window.addEventListener('orientationchange', updateAppHeight);
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', updateAppHeight);
+            }
+            updateAppHeight();
+        })();
+    </script>
 </head>
+<body class="flex flex-col overflow-hidden bg-[#f7f8fa]">
+    <div id="app" class="flex flex-col max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto w-full bg-[#f7f8fa] shadow-2xl relative md:border-x border-gray-200 h-full overflow-hidden">
 
-<body>
-
-<!-- =========================
-     顶部
-========================= -->
-
-<header class="header">
-    <div class="header-row">
-        <div class="header-left">
-            <a href="../index.html" class="back-home" title="返回学习中心">← 🏠</a>
-            <h1 class="header-title"><span>🔤</span><span>英语核心动词卡</span></h1>
-        </div>
-        <div class="header-badge">
-            <span>⚡ 核心动词</span>
-        </div>
-    </div>
-    <div class="header-stats-row">
-        <span>全部: <b id="headTotal" style="color: #6ee7b7; font-weight: bold;">0</b> 词</span>
-        <span>已掌握: <b id="headKnown" style="color: #ffffff; font-weight: bold;">0</b></span>
-        <span>不认识: <b id="headUnknown" style="color: #fca5a5; font-weight: bold;">0</b></span>
-        <span>未学: <b id="headRemaining" style="color: #fde047; font-weight: bold;">0</b></span>
-    </div>
-</header>
-
-
-<!-- =========================
-     统计
-========================= -->
-
-<div class="stats">
-
-    <div class="stat">
-        <div class="stat-number" id="totalCount">0</div>
-        <div class="stat-title">全部</div>
-    </div>
-
-    <div class="stat">
-        <div class="stat-number" id="knownCount">0</div>
-        <div class="stat-title">认识</div>
-    </div>
-
-    <div class="stat">
-        <div class="stat-number" id="unknownCount">0</div>
-        <div class="stat-title">不认识</div>
-    </div>
-
-    <div class="stat">
-        <div class="stat-number" id="remainingCount">0</div>
-        <div class="stat-title">未学习</div>
-    </div>
-
-</div>
-
-
-<div class="container">
-
-
-    <!-- =========================
-         单词卡片
-    ========================= -->
-
-    <div class="card-area">
-
-        <div class="card" id="card">
-
-            <div class="card-number" id="cardNumber">
-                第 101 个
+        <!-- 顶部导航栏 (iOS 安全区适配，同 Japanese 和 Hanzi 像素级统一) -->
+        <header class="bg-indigo-600 text-white px-4 sm:px-6 pt-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2.5 shadow-md z-10 flex-shrink-0">
+            <div class="flex items-center justify-between h-8">
+                <div class="flex items-center space-x-2">
+                    <a href="../index.html" class="h-7 text-xs px-2.5 rounded-full bg-indigo-700/70 hover:bg-indigo-700 text-indigo-100 font-medium flex items-center space-x-1 border border-indigo-400/40 transition-all active:scale-95 shadow-sm" title="返回学习中心">
+                        <span>← 🏠</span>
+                    </a>
+                    <h1 class="text-base sm:text-lg font-bold tracking-wide flex items-center space-x-1.5 leading-none">
+                        <span>🔤</span>
+                        <span>英语核心动词卡</span>
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-1.5">
+                    <button onclick="speakWord()" type="button" class="h-7 px-2.5 text-xs bg-indigo-700/70 hover:bg-indigo-700 text-indigo-100 border border-indigo-400/40 rounded-full font-medium active:scale-95 shadow-sm flex items-center space-x-1" title="朗读发音">
+                        <span>🔊 发音</span>
+                    </button>
+                    <div class="h-7 px-2 text-xs bg-indigo-700/50 border border-indigo-400/30 rounded-full text-indigo-200 font-medium flex items-center">
+                        <span>⚡ 核心100动词</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="word" id="word">
-                能，可以
+            <!-- 顶部统计概览栏 (统一高度与间距) -->
+            <div class="flex justify-between items-center h-7 mt-2 text-xs sm:text-sm opacity-95 border-t border-indigo-500/60 pt-1.5 font-medium leading-none">
+                <span>全部: <b id="headTotal" class="text-emerald-300 font-bold ml-0.5">100</b> 词</span>
+                <span>已掌握: <b id="headKnown" class="text-white font-bold ml-0.5">0</b></span>
+                <span>需复习: <b id="headUnknown" class="text-rose-300 font-bold ml-0.5">0</b></span>
+                <span>未学: <b id="headRemaining" class="text-yellow-300 font-bold ml-0.5">0</b></span>
             </div>
-
-            <div class="meaning" id="meaning">
-                点击查看英文
-            </div>
-
-            <div class="hint">
-                点击卡片翻面
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         操作按钮
-    ========================= -->
-
-    <div class="buttons">
-
-        <button class="btn-prev" onclick="previousWord()">
-            ← 上一个
-        </button>
-
-        <button class="btn-speak" onclick="speakWord()">
-            🔊 发音
-        </button>
-
-        <button class="btn-known" onclick="markKnown()">
-            ✓ 认识
-        </button>
-
-        <button class="btn-unknown" onclick="markUnknown()">
-            ✕ 不认识
-        </button>
-
-        <button class="btn-next" onclick="nextWord()">
-            下一个 →
-        </button>
-
-    </div>
-
-
-    <!-- =========================
-         分类
-    ========================= -->
-
-    <div class="tabs">
-
-        <button
-            class="tab active"
-            id="tabAll"
-            onclick="showList('all')">
-            全部单词
-        </button>
-
-        <button
-            class="tab"
-            id="tabKnown"
-            onclick="showList('known')">
-            ✓ 认识
-        </button>
-
-        <button
-            class="tab"
-            id="tabUnknown"
-            onclick="showList('unknown')">
-            ✕ 不认识
-        </button>
-
-    </div>
-
-
-    <!-- =========================
-         单词列表
-    ========================= -->
-
-    <div class="word-list">
-
-        <h2 id="listTitle">
-            全部单词
-        </h2>
-
-        <div id="wordList"></div>
-
-    </div>
-
-
-    <!-- =========================
-         清除
-    ========================= -->
-
-    <div class="footer">
-
-        <button
-            class="clear-btn"
-            onclick="clearProgress()">
-            清除所有学习记录
-        </button>
-
-    </div>
-
-</div>
-
-
-<script>
-
-/* =====================================================
-   单词
-===================================================== */
-
-const words = [
-
-    { english: "can", chinese: "能，可以" },
-    { english: "will", chinese: "将，会" },
-    { english: "should", chinese: "应该" },
-    { english: "may", chinese: "可能，可以" },
-    { english: "must", chinese: "必须" },
-    { english: "would", chinese: "会，将会" },
-    { english: "could", chinese: "可以，能够" },
-    { english: "might", chinese: "可能" },
-    { english: "shall", chinese: "将，要" },
-    { english: "need", chinese: "需要" },
-
-    { english: "want", chinese: "想要" },
-    { english: "like", chinese: "喜欢" },
-    { english: "know", chinese: "知道，认识" },
-    { english: "think", chinese: "认为，想" },
-    { english: "feel", chinese: "感觉" },
-    { english: "see", chinese: "看见" },
-    { english: "look", chinese: "看" },
-    { english: "watch", chinese: "观看" },
-    { english: "hear", chinese: "听见" },
-    { english: "listen", chinese: "听" },
-
-    { english: "say", chinese: "说" },
-    { english: "tell", chinese: "告诉" },
-    { english: "speak", chinese: "说话" },
-    { english: "talk", chinese: "谈话" },
-    { english: "ask", chinese: "问" },
-    { english: "answer", chinese: "回答" },
-    { english: "give", chinese: "给" },
-    { english: "take", chinese: "拿，带" },
-    { english: "get", chinese: "得到，获得" },
-    { english: "make", chinese: "制作，使" },
-
-    { english: "do", chinese: "做" },
-    { english: "go", chinese: "去" },
-    { english: "come", chinese: "来" },
-    { english: "use", chinese: "使用" },
-    { english: "find", chinese: "找到" },
-    { english: "tell", chinese: "告诉" },
-    { english: "put", chinese: "放" },
-    { english: "keep", chinese: "保持" },
-    { english: "let", chinese: "让" },
-    { english: "help", chinese: "帮助" },
-
-    { english: "try", chinese: "尝试" },
-    { english: "start", chinese: "开始" },
-    { english: "begin", chinese: "开始" },
-    { english: "stop", chinese: "停止" },
-    { english: "move", chinese: "移动" },
-    { english: "live", chinese: "生活，居住" },
-    { english: "work", chinese: "工作" },
-    { english: "play", chinese: "玩，播放" },
-    { english: "run", chinese: "跑，运行" },
-    { english: "walk", chinese: "走路" },
-
-    { english: "eat", chinese: "吃" },
-    { english: "drink", chinese: "喝" },
-    { english: "buy", chinese: "买" },
-    { english: "pay", chinese: "支付" },
-    { english: "sell", chinese: "卖" },
-    { english: "bring", chinese: "带来" },
-    { english: "send", chinese: "发送" },
-    { english: "show", chinese: "展示" },
-    { english: "read", chinese: "阅读" },
-    { english: "write", chinese: "写" },
-
-    { english: "learn", chinese: "学习" },
-    { english: "study", chinese: "学习，研究" },
-    { english: "teach", chinese: "教" },
-    { english: "remember", chinese: "记得" },
-    { english: "forget", chinese: "忘记" },
-    { english: "understand", chinese: "理解" },
-    { english: "believe", chinese: "相信" },
-    { english: "hope", chinese: "希望" },
-    { english: "love", chinese: "爱" },
-    { english: "hate", chinese: "讨厌" },
-
-    { english: "open", chinese: "打开" },
-    { english: "close", chinese: "关闭" },
-    { english: "turn", chinese: "转动，转弯" },
-    { english: "change", chinese: "改变" },
-    { english: "move", chinese: "移动" },
-    { english: "stay", chinese: "停留" },
-    { english: "leave", chinese: "离开" },
-    { english: "return", chinese: "返回" },
-    { english: "wait", chinese: "等待" },
-    { english: "follow", chinese: "跟随" },
-
-    { english: "call", chinese: "打电话，叫" },
-    { english: "meet", chinese: "见面" },
-    { english: "pay", chinese: "支付" },
-    { english: "win", chinese: "赢" },
-    { english: "lose", chinese: "输，失去" },
-    { english: "remember", chinese: "记得" },
-    { english: "forget", chinese: "忘记" },
-    { english: "happen", chinese: "发生" },
-    { english: "seem", chinese: "似乎" },
-    { english: "become", chinese: "成为" },
-
-    { english: "keep", chinese: "保持" },
-    { english: "hold", chinese: "拿着，举行" },
-    { english: "bring", chinese: "带来" },
-    { english: "carry", chinese: "携带" },
-    { english: "build", chinese: "建造" },
-    { english: "break", chinese: "打破，弄坏" },
-    { english: "cut", chinese: "切，剪" },
-    { english: "draw", chinese: "画" },
-    { english: "drive", chinese: "驾驶" },
-    { english: "ride", chinese: "骑乘" },
-
-    { english: "stand", chinese: "站立" },
-    { english: "sit", chinese: "坐" },
-    { english: "sleep", chinese: "睡觉" },
-    { english: "wake", chinese: "醒来" },
-    { english: "remember", chinese: "记住" },
-    { english: "understand", chinese: "理解" },
-    { english: "belong", chinese: "属于" },
-    { english: "happen", chinese: "发生" },
-    { english: "continue", chinese: "继续" },
-    { english: "finish", chinese: "完成" }
-
-];
-
-
-/* =====================================================
-   数据
-===================================================== */
-
-/*
-   status:
-   null      = 还没有判断
-   known     = 认识
-   unknown   = 不认识
-*/
-
-let progress =
-    JSON.parse(localStorage.getItem("englishWordProgress")) || {};
-
-
-/* 当前单词 */
-
-let currentIndex = 0;
-
-
-/* 卡片是否翻面 */
-
-let flipped = false;
-
-
-/* 当前列表 */
-
-let currentList = "all";
-
-
-/* =====================================================
-   DOM
-===================================================== */
-
-const card = document.getElementById("card");
-
-const cardNumber =
-    document.getElementById("cardNumber");
-
-const wordElement =
-    document.getElementById("word");
-
-const meaningElement =
-    document.getElementById("meaning");
-
-const wordList =
-    document.getElementById("wordList");
-
-const listTitle =
-    document.getElementById("listTitle");
-
-
-/* =====================================================
-   卡片点击
-===================================================== */
-
-card.addEventListener("click", function() {
-
-    flipped = !flipped;
-
-    updateCard();
-
-});
-
-
-/* =====================================================
-   更新卡片
-===================================================== */
-
-function updateCard() {
-
-    const currentWord = words[currentIndex];
-
-    cardNumber.textContent =
-        "第 " + (currentIndex + 101) + " 个";
-
-    if (flipped) {
-
-        wordElement.textContent =
-            currentWord.english;
-
-        meaningElement.textContent =
-            currentWord.chinese;
-
-        speakWord();
-
-    } else {
-
-        wordElement.textContent =
-            currentWord.chinese;
-
-        meaningElement.textContent =
-            "点击查看英文";
-
-    }
-
-}
-
-
-/* =====================================================
-   发音
-===================================================== */
-
-function speakWord() {
-
-    const currentWord = words[currentIndex];
-
-    if (!currentWord) {
-        return;
-    }
-
-    const speech =
-        new SpeechSynthesisUtterance(
-            currentWord.english
-        );
-
-    speech.lang = "en-US";
-
-    speech.rate = 0.8;
-
-    window.speechSynthesis.cancel();
-
-    window.speechSynthesis.speak(speech);
-
-}
-
-
-/* =====================================================
-   下一个
-===================================================== */
-
-function nextWord() {
-
-    if (currentIndex < words.length - 1) {
-
-        currentIndex++;
-
-    } else {
-
-        currentIndex = 0;
-
-    }
-
-    flipped = false;
-
-    updateCard();
-
-}
-
-
-/* =====================================================
-   上一个
-===================================================== */
-
-function previousWord() {
-
-    if (currentIndex > 0) {
-
-        currentIndex--;
-
-    } else {
-
-        currentIndex = words.length - 1;
-
-    }
-
-    flipped = false;
-
-    updateCard();
-
-}
-
-
-/* =====================================================
-   认识
-===================================================== */
-
-function markKnown() {
-
-    progress[currentIndex] = "known";
-
-    saveProgress();
-
-    updateStats();
-
-    renderList();
-
-    /*
-       标记后自动进入下一个
-    */
-
-    nextWord();
-
-}
-
-
-/* =====================================================
-   不认识
-===================================================== */
-
-function markUnknown() {
-
-    progress[currentIndex] = "unknown";
-
-    saveProgress();
-
-    updateStats();
-
-    renderList();
-
-    /*
-       标记后自动进入下一个
-    */
-
-    nextWord();
-
-}
-
-
-/* =====================================================
-   保存
-===================================================== */
-
-function saveProgress() {
-
-    localStorage.setItem(
-        "englishWordProgress",
-        JSON.stringify(progress)
-    );
-
-}
-
-
-/* =====================================================
-   统计
-===================================================== */
-
-function updateStats() {
-
-    let known = 0;
-
-    let unknown = 0;
-
-    for (let i = 0; i < words.length; i++) {
-
-        if (progress[i] === "known") {
-
-            known++;
-
-        }
-
-        if (progress[i] === "unknown") {
-
-            unknown++;
-
-        }
-
-    }
-
-    const total = words.length;
-
-    const remaining =
-        total - known - unknown;
-
-
-    document.getElementById(
-        "totalCount"
-    ).textContent = total;
-
-
-    document.getElementById(
-        "knownCount"
-    ).textContent = known;
-
-
-    document.getElementById(
-        "unknownCount"
-    ).textContent = unknown;
-
-
-    document.getElementById("remainingCount").textContent = remaining;
-
-    const headTotal = document.getElementById("headTotal");
-    const headKnown = document.getElementById("headKnown");
-    const headUnknown = document.getElementById("headUnknown");
-    const headRemaining = document.getElementById("headRemaining");
-    if (headTotal) headTotal.textContent = total;
-    if (headKnown) headKnown.textContent = known;
-    if (headUnknown) headUnknown.textContent = unknown;
-    if (headRemaining) headRemaining.textContent = remaining;
-
-
-/* =====================================================
-   显示列表
-===================================================== */
-
-function showList(type) {
-
-    currentList = type;
-
-
-    document
-        .querySelectorAll(".tab")
-        .forEach(function(tab) {
-
-            tab.classList.remove("active");
-
-        });
-
-
-    if (type === "all") {
-
-        document
-            .getElementById("tabAll")
-            .classList.add("active");
-
-        listTitle.textContent =
-            "全部单词";
-
-    }
-
-
-    if (type === "known") {
-
-        document
-            .getElementById("tabKnown")
-            .classList.add("active");
-
-        listTitle.textContent =
-            "认识的单词";
-
-    }
-
-
-    if (type === "unknown") {
-
-        document
-            .getElementById("tabUnknown")
-            .classList.add("active");
-
-        listTitle.textContent =
-            "不认识的单词";
-
-    }
-
-
-    renderList();
-
-}
-
-
-/* =====================================================
-   渲染单词列表
-===================================================== */
-
-function renderList() {
-
-    wordList.innerHTML = "";
-
-
-    let count = 0;
-
-
-    words.forEach(function(item, index) {
-
-        const status =
-            progress[index];
-
-
-        /*
-           根据当前分类过滤
-        */
-
-        if (
-            currentList === "known"
-            &&
-            status !== "known"
-        ) {
-
-            return;
-
-        }
-
-
-        if (
-            currentList === "unknown"
-            &&
-            status !== "unknown"
-        ) {
-
-            return;
-
-        }
-
-
-        count++;
-
-
-        const itemElement =
-            document.createElement("div");
-
-        itemElement.className =
-            "word-item";
-
-
-        /*
-           点击单词
-           直接跳转到这个单词
-        */
-
-        itemElement.onclick =
-            function() {
-
-                currentIndex = index;
-
-                flipped = false;
-
-                updateCard();
-
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth"
-                });
-
-            };
-
-
-        let statusHTML = "";
-
-
-        if (status === "known") {
-
-            statusHTML =
-                '<span class="status-known">✓ 认识</span>';
-
-        }
-
-        else if (status === "unknown") {
-
-            statusHTML =
-                '<span class="status-unknown">✕ 不认识</span>';
-
-        }
-
-        else {
-
-            statusHTML =
-                '<span class="status-none">未判断</span>';
-
-        }
-
-
-        itemElement.innerHTML = `
-
-            <div class="word-left">
-
-                <div class="word-index">
-                    ${index + 101}
+        </header>
+
+        <!-- 主体滚动内容区 -->
+        <main class="flex-1 min-h-0 overflow-y-auto relative bg-gray-50 p-3 sm:p-4">
+
+            <!-- ================= TAB 1: 闪卡记忆视图 ================= -->
+            <div id="tabCardView" class="h-full flex flex-col justify-between space-y-3">
+                
+                <!-- 顶部进度条与当前序号 -->
+                <div class="bg-white p-3 rounded-2xl border border-gray-200/80 shadow-sm flex items-center justify-between">
+                    <div class="text-xs font-bold text-gray-800 flex items-center space-x-1.5">
+                        <span id="cardNumberBadge" class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-mono font-bold text-[11px]">
+                            Word #101
+                        </span>
+                        <span class="text-gray-400 text-[11px]">翻牌闪卡记忆</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span id="cardStatusBadge" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-gray-100 text-gray-500">
+                            未判断
+                        </span>
+                        <span class="text-xs text-gray-400 font-mono font-bold" id="progressNumber">
+                            1 / 100
+                        </span>
+                    </div>
                 </div>
 
-                <div>
+                <!-- 进度指示条 -->
+                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                    <div id="cardProgressBar" class="h-full bg-indigo-600 rounded-full transition-all duration-300" style="width: 1%"></div>
+                </div>
 
-                    <div class="word-english">
-                        ${item.english}
+                <!-- 核心双面翻转闪卡 -->
+                <div class="flex-1 min-h-0 flex flex-col justify-center py-2 card-perspective cursor-pointer select-none" onclick="toggleFlip()">
+                    <div id="flipCardInner" class="flip-card-inner relative w-full h-[260px] sm:h-[300px]">
+                        
+                        <!-- 卡片正面 (中文提示) -->
+                        <div class="card-front absolute inset-0 bg-white rounded-3xl border border-gray-200/90 shadow-sm hover:shadow-md p-6 flex flex-col justify-between items-center text-center transition-all">
+                            <div class="w-full flex justify-between items-center text-xs text-gray-400 font-medium">
+                                <span>💡 点击卡片看英文释义</span>
+                                <span>正面 (中文)</span>
+                            </div>
+
+                            <div class="my-auto space-y-2">
+                                <div id="wordFront" class="text-3xl sm:text-4xl font-black text-gray-900 tracking-wide">
+                                    能，可以
+                                </div>
+                                <div class="text-xs font-medium text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full inline-block">
+                                    点击翻面揭晓英文
+                                </div>
+                            </div>
+
+                            <div class="text-[11px] text-gray-400 flex items-center space-x-1">
+                                <span>🔄 轻触任意处翻转</span>
+                            </div>
+                        </div>
+
+                        <!-- 卡片背面 (英文与朗读) -->
+                        <div class="card-back absolute inset-0 bg-gradient-to-b from-indigo-50/70 to-white rounded-3xl border-2 border-indigo-300 shadow-md p-6 flex flex-col justify-between items-center text-center transition-all">
+                            <div class="w-full flex justify-between items-center text-xs text-indigo-500 font-medium">
+                                <span class="flex items-center space-x-1">
+                                    <span>🔊 自动朗读发音</span>
+                                </span>
+                                <span>背面 (英文)</span>
+                            </div>
+
+                            <div class="my-auto space-y-2.5">
+                                <div id="wordBack" class="text-4xl sm:text-5xl font-black text-indigo-600 tracking-tight font-sans">
+                                    can
+                                </div>
+                                <div id="meaningBack" class="text-base sm:text-lg font-bold text-gray-700">
+                                    能，可以
+                                </div>
+                            </div>
+
+                            <div class="w-full flex justify-center">
+                                <button onclick="event.stopPropagation(); speakWord()" class="px-3.5 py-1 rounded-full bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-bold active:scale-95 transition-all flex items-center space-x-1">
+                                    <span>🔊 重新播放发音</span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 掌握判断与切换控制底栏 -->
+                <div class="space-y-2.5 pt-1">
+                    <!-- 掌握度决策按钮 -->
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button onclick="markUnknown()" type="button" class="py-3 px-4 rounded-2xl bg-gradient-to-b from-rose-500 to-rose-600 active:scale-95 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center space-x-1.5">
+                            <span>❌</span>
+                            <span>没记住 / 不认识</span>
+                        </button>
+                        <button onclick="markKnown()" type="button" class="py-3 px-4 rounded-2xl bg-gradient-to-b from-emerald-500 to-emerald-600 active:scale-95 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center space-x-1.5">
+                            <span>✅</span>
+                            <span>已掌握 / 认识</span>
+                        </button>
                     </div>
 
-                    <div class="word-chinese">
-                        ${item.chinese}
+                    <!-- 翻页控制按钮 -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="previousWord()" type="button" class="py-2.5 px-2 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 active:scale-95 text-gray-700 font-bold text-xs shadow-sm transition-all">
+                            ← 上一个
+                        </button>
+                        <button onclick="toggleFlip()" type="button" class="py-2.5 px-2 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold text-xs shadow-sm active:scale-95 transition-all">
+                            🔄 翻转卡片
+                        </button>
+                        <button onclick="nextWord()" type="button" class="py-2.5 px-2 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 active:scale-95 text-gray-700 font-bold text-xs shadow-sm transition-all">
+                            下一个 →
+                        </button>
                     </div>
 
+                    <p class="text-[11px] text-gray-400 text-center">
+                        键盘支持：← / → 翻页 · 空格键翻转卡片 · 1 不认识 · 2 认识
+                    </p>
                 </div>
 
             </div>
 
-            ${statusHTML}
 
-        `;
+            <!-- ================= TAB 2: 词库列表视图 ================= -->
+            <div id="tabListView" class="space-y-3 hidden pb-6">
+                
+                <!-- 筛选标签胶囊 -->
+                <div class="bg-white p-2.5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center justify-between space-x-1.5">
+                    <button onclick="showList('all')" id="tabBtnAll" class="flex-1 py-1.5 text-xs font-bold rounded-xl transition-all text-white bg-indigo-600 shadow-sm">
+                        全部 (100)
+                    </button>
+                    <button onclick="showList('known')" id="tabBtnKnown" class="flex-1 py-1.5 text-xs font-bold rounded-xl transition-all text-gray-600 hover:text-gray-900 bg-gray-50">
+                        ✓ 认识 (<span id="filterKnownCount">0</span>)
+                    </button>
+                    <button onclick="showList('unknown')" id="tabBtnUnknown" class="flex-1 py-1.5 text-xs font-bold rounded-xl transition-all text-gray-600 hover:text-gray-900 bg-gray-50">
+                        ✕ 不认识 (<span id="filterUnknownCount">0</span>)
+                    </button>
+                </div>
 
-
-        wordList.appendChild(
-            itemElement
-        );
-
-    });
-
-
-    /*
-       没有单词
-    */
-
-    if (count === 0) {
-
-        wordList.innerHTML = `
-
-            <div style="
-                text-align:center;
-                padding:30px;
-                color:#999;
-            ">
-
-                这里还没有单词
+                <!-- 词库卡片列表 -->
+                <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                        <h2 id="listTitle" class="text-xs font-bold text-gray-700">全部核心动词</h2>
+                        <span class="text-[11px] text-gray-400">轻点单词可直接切入卡片学习</span>
+                    </div>
+                    <div id="wordList" class="divide-y divide-gray-100 max-h-[calc(100vh-280px)] overflow-y-auto">
+                        <!-- 动态渲染词汇列表 -->
+                    </div>
+                </div>
 
             </div>
 
-        `;
 
-    }
+            <!-- ================= TAB 3: 学习统计与管理视图 ================= -->
+            <div id="tabStatsView" class="space-y-3 hidden pb-6">
+                
+                <!-- 掌握度进度圆环卡片 -->
+                <div class="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm text-center space-y-3">
+                    <h3 class="text-sm font-bold text-gray-800 flex items-center justify-center space-x-1.5">
+                        <span>📊</span>
+                        <span>学习进度看板</span>
+                    </h3>
 
-}
+                    <div id="scoreRing" class="score-ring">
+                        <div class="score-ring-content">
+                            <strong id="scoreText" class="text-2xl font-black text-indigo-600 block">0%</strong>
+                            <span class="text-[11px] text-gray-400">掌握率</span>
+                        </div>
+                    </div>
 
+                    <p id="statsSummaryMessage" class="text-xs text-gray-500 leading-relaxed max-w-xs mx-auto">
+                        核心高频生活动词掌握情况
+                    </p>
 
-/* =====================================================
-   清除学习记录
-===================================================== */
+                    <!-- 4 大指标格 -->
+                    <div class="grid grid-cols-2 gap-2.5 pt-2 text-left">
+                        <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl text-center">
+                            <div class="text-[11px] text-indigo-700 font-semibold">总词汇数</div>
+                            <div id="statTotalBox" class="text-xl font-black text-indigo-600 mt-0.5">100</div>
+                        </div>
+                        <div class="p-3 bg-emerald-50/70 border border-emerald-100 rounded-xl text-center">
+                            <div class="text-[11px] text-emerald-700 font-semibold">已掌握 (认识)</div>
+                            <div id="statKnownBox" class="text-xl font-black text-emerald-600 mt-0.5">0</div>
+                        </div>
+                        <div class="p-3 bg-rose-50/70 border border-rose-100 rounded-xl text-center">
+                            <div class="text-[11px] text-rose-700 font-semibold">需复习 (不认识)</div>
+                            <div id="statUnknownBox" class="text-xl font-black text-rose-600 mt-0.5">0</div>
+                        </div>
+                        <div class="p-3 bg-amber-50/70 border border-amber-100 rounded-xl text-center">
+                            <div class="text-[11px] text-amber-700 font-semibold">待记忆 (未学)</div>
+                            <div id="statRemainingBox" class="text-xl font-black text-amber-600 mt-0.5">0</div>
+                        </div>
+                    </div>
+                </div>
 
-function clearProgress() {
+                <!-- 学习建议卡片 -->
+                <div class="p-3.5 bg-white border border-gray-200/80 rounded-2xl flex items-start space-x-3 text-xs text-gray-600 shadow-sm">
+                    <span class="text-2xl flex-shrink-0">💡</span>
+                    <div class="space-y-1">
+                        <div class="font-bold text-gray-800 text-xs">动词闪卡记忆法</div>
+                        <p class="text-gray-500 text-[11px] leading-relaxed">
+                            建议先看中文释义，在大脑中尝试拼读和回想英文；再轻触卡片翻面核对发音。标记“不认识”的单词将在列表页专门归类复习。
+                        </p>
+                    </div>
+                </div>
 
-    const result =
-        confirm(
-            "确定要清除所有学习记录吗？"
-        );
+                <!-- 清空学习记录操作 -->
+                <div class="pt-2 text-center">
+                    <button onclick="clearProgress()" type="button" class="text-xs text-gray-400 hover:text-rose-500 underline py-1 transition-colors">
+                        清空本模块全部学习记录
+                    </button>
+                </div>
 
+            </div>
 
-    if (!result) {
+        </main>
 
-        return;
+        <!-- App-like 统一底部导航栏 (同 Japanese 和 Hanzi 像素级对齐) -->
+        <nav id="englishBottomNav" class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-gray-200/80 pb-[env(safe-area-inset-bottom)] z-20 select-none shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            <div class="grid grid-cols-3 h-14 items-center">
+                <!-- 词卡记忆 -->
+                <button id="navTabCard" type="button" onclick="switchTab('card')"
+                        class="flex flex-col items-center justify-center py-1 text-indigo-600 font-bold transition-all active:scale-95 touch-manipulation relative">
+                    <div class="relative flex items-center justify-center">
+                        <span class="text-xl scale-110">🔤</span>
+                    </div>
+                    <span class="text-[11px] mt-0.5 tracking-tight">词卡记忆</span>
+                    <span class="nav-indicator w-5 h-0.5 bg-indigo-600 rounded-full mt-0.5"></span>
+                </button>
 
-    }
+                <!-- 词库列表 -->
+                <button id="navTabList" type="button" onclick="switchTab('list')"
+                        class="flex flex-col items-center justify-center py-1 text-gray-400 hover:text-gray-600 font-medium transition-all active:scale-95 touch-manipulation relative">
+                    <div class="relative flex items-center justify-center">
+                        <span class="text-xl opacity-70">📋</span>
+                        <span id="navUnknownBadge" class="hidden absolute -top-1 -right-3.5 px-1.5 min-w-[16px] h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
+                            0
+                        </span>
+                    </div>
+                    <span class="text-[11px] mt-0.5 tracking-tight">词库列表</span>
+                    <span class="nav-indicator w-5 h-0.5 bg-transparent rounded-full mt-0.5"></span>
+                </button>
 
+                <!-- 进度统计 -->
+                <button id="navTabStats" type="button" onclick="switchTab('stats')"
+                        class="flex flex-col items-center justify-center py-1 text-gray-400 hover:text-gray-600 font-medium transition-all active:scale-95 touch-manipulation relative">
+                    <div class="relative flex items-center justify-center">
+                        <span class="text-xl opacity-70">📊</span>
+                    </div>
+                    <span class="text-[11px] mt-0.5 tracking-tight">进度统计</span>
+                    <span class="nav-indicator w-5 h-0.5 bg-transparent rounded-full mt-0.5"></span>
+                </button>
+            </div>
+        </nav>
 
-    progress = {};
+    </div>
 
-
-    localStorage.removeItem(
-        "englishWordProgress"
-    );
-
-
-    updateStats();
-
-    renderList();
-
-    alert("学习记录已经清除");
-
-}
-
-
-/* =====================================================
-   键盘操作
-===================================================== */
-
-document.addEventListener(
-    "keydown",
-    function(event) {
-
-        /*
-           左箭头
-        */
-
-        if (event.key === "ArrowLeft") {
-
-            previousWord();
-
-        }
-
-
-        /*
-           右箭头
-        */
-
-        if (event.key === "ArrowRight") {
-
-            nextWord();
-
-        }
-
-
-        /*
-           空格
-        */
-
-        if (event.code === "Space") {
-
-            event.preventDefault();
-
-            flipped = !flipped;
-
-            updateCard();
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   初始化
-===================================================== */
-
-updateCard();
-
-updateStats();
-
-renderList();
-
-</script>
-
+    <!-- 逻辑脚本引入 -->
+    <script src="./english.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,89 @@
+/* ==========================================================================
+   English Study Module - Vant 4 & Mobile Styles
+   ========================================================================== */
+
+:root {
+    --app-height: 100dvh;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    height: 100dvh;
+    height: var(--app-height, 100dvh);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    -webkit-text-size-adjust: 100%;
+    background-color: #f7f8fa;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+#app {
+    height: 100%;
+    height: 100dvh;
+    height: var(--app-height, 100dvh);
+}
+
+/* 闪卡 3D 翻牌效果 */
+.card-perspective {
+    perspective: 1000px;
+}
+
+.flip-card-inner {
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.flip-card-inner.is-flipped {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.card-back {
+    transform: rotateY(180deg);
+}
+
+/* 进度统计环 */
+.score-ring {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 14px auto;
+    display: grid;
+    place-items: center;
+    background: conic-gradient(#4f46e5 0%, #e5e7eb 0);
+    position: relative;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.12);
+}
+
+.score-ring::after {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    background: white;
+    border-radius: 50%;
+}
+
+.score-ring-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+/* 隐藏滚动条但允许平滑滚动 */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
