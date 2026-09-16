@@ -266,12 +266,6 @@
             </div>
         </van-popup>
 
-        <!-- Navigation Tabs -->
-        <van-tabs v-model:active="currentTab" color="#4f46e5" line-width="36px" class="flex-shrink-0 border-b bg-white select-none">
-            <van-tab name="practice" :badge="todayDueCount > 0 ? (todayDueCount > 99 ? '99+' : todayDueCount) : ''" title="🎧 单词听力"></van-tab>
-            <van-tab name="sentence" :badge="sentenceDueCount > 0 ? (sentenceDueCount > 99 ? '99+' : sentenceDueCount) : ''" title="💬 句子听力"></van-tab>
-            <van-tab name="manage" title="📚 词库管理"></van-tab>
-        </van-tabs>
 
         <!-- Main Content Area -->
         <main class="flex-1 min-h-0 overflow-y-auto relative bg-gray-50">
@@ -513,8 +507,8 @@
 
                     </div>
 
-                    <!-- Bottom Controls with Safe Area -->
-                    <div class="flex-shrink-0 pt-1 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                    <!-- Bottom Controls -->
+                    <div class="flex-shrink-0 pt-1 pb-2">
                         <transition name="fade" mode="out-in">
                             <!-- Listening State Buttons -->
                             <div v-if="practiceState === 'listening'" class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full">
@@ -767,8 +761,8 @@
 
                     </div>
 
-                    <!-- Bottom Controls with Safe Area -->
-                    <div class="flex-shrink-0 pt-1 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                    <!-- Bottom Controls -->
+                    <div class="flex-shrink-0 pt-1 pb-2">
                         <transition name="fade" mode="out-in">
                             <!-- Listening State Buttons -->
                             <div v-if="sentencePracticeState === 'listening'" class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full">
@@ -823,6 +817,55 @@
 
             </div>
         </main>
+
+        <!-- App-like Bottom Navigation Bar -->
+        <nav class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-gray-200/80 pb-[env(safe-area-inset-bottom)] z-20 select-none shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            <div class="grid grid-cols-3 h-14 items-center">
+                <!-- 单词听力 -->
+                <button @click="currentTab = 'practice'"
+                        class="flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative"
+                        :class="currentTab === 'practice' ? 'text-indigo-600 font-bold' : 'text-gray-400 hover:text-gray-600 font-medium'">
+                    <div class="relative flex items-center justify-center">
+                        <span class="text-xl transition-transform" :class="currentTab === 'practice' ? 'scale-110' : 'opacity-70'">🎧</span>
+                        <span v-if="todayDueCount > 0" 
+                              class="absolute -top-1 -right-3.5 px-1.5 py-0.2 min-w-[16px] h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm animate-pulse">
+                            {{ todayDueCount > 99 ? '99+' : todayDueCount }}
+                        </span>
+                    </div>
+                    <span class="text-[11px] mt-0.5 tracking-tight">单词听力</span>
+                    <span v-if="currentTab === 'practice'" class="w-5 h-0.5 bg-indigo-600 rounded-full mt-0.5"></span>
+                    <span v-else class="w-5 h-0.5 bg-transparent rounded-full mt-0.5"></span>
+                </button>
+
+                <!-- 句子听力 -->
+                <button @click="currentTab = 'sentence'"
+                        class="flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative"
+                        :class="currentTab === 'sentence' ? 'text-indigo-600 font-bold' : 'text-gray-400 hover:text-gray-600 font-medium'">
+                    <div class="relative flex items-center justify-center">
+                        <span class="text-xl transition-transform" :class="currentTab === 'sentence' ? 'scale-110' : 'opacity-70'">💬</span>
+                        <span v-if="sentenceDueCount > 0" 
+                              class="absolute -top-1 -right-3.5 px-1.5 py-0.2 min-w-[16px] h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm animate-pulse">
+                            {{ sentenceDueCount > 99 ? '99+' : sentenceDueCount }}
+                        </span>
+                    </div>
+                    <span class="text-[11px] mt-0.5 tracking-tight">句子听力</span>
+                    <span v-if="currentTab === 'sentence'" class="w-5 h-0.5 bg-indigo-600 rounded-full mt-0.5"></span>
+                    <span v-else class="w-5 h-0.5 bg-transparent rounded-full mt-0.5"></span>
+                </button>
+
+                <!-- 词库管理 -->
+                <button @click="currentTab = 'manage'"
+                        class="flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative"
+                        :class="currentTab === 'manage' ? 'text-indigo-600 font-bold' : 'text-gray-400 hover:text-gray-600 font-medium'">
+                    <div class="relative flex items-center justify-center">
+                        <span class="text-xl transition-transform" :class="currentTab === 'manage' ? 'scale-110' : 'opacity-70'">📚</span>
+                    </div>
+                    <span class="text-[11px] mt-0.5 tracking-tight">词库管理</span>
+                    <span v-if="currentTab === 'manage'" class="w-5 h-0.5 bg-indigo-600 rounded-full mt-0.5"></span>
+                    <span v-else class="w-5 h-0.5 bg-transparent rounded-full mt-0.5"></span>
+                </button>
+            </div>
+        </nav>
     </div>
 
         <!-- 核心业务逻辑脚本 -->
