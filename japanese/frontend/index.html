@@ -18,9 +18,24 @@
     <script src="sentence_data.js"></script>
     <!-- 自定义及主题定制样式 -->
     <link rel="stylesheet" href="style.css" />
+    <script>
+        // 动态适配移动端浏览器（Safari / Chrome）地址栏展开/收起时的实际可视高度
+        (function() {
+            function updateAppHeight() {
+                var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                document.documentElement.style.setProperty('--app-height', h + 'px');
+            }
+            window.addEventListener('resize', updateAppHeight);
+            window.addEventListener('orientationchange', updateAppHeight);
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', updateAppHeight);
+            }
+            updateAppHeight();
+        })();
+    </script>
 </head>
-<body class="min-h-screen h-[100dvh] flex flex-col overflow-hidden">
-    <div id="app" v-cloak class="h-full h-[100dvh] flex flex-col max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto w-full bg-[#f7f8fa] shadow-2xl relative md:border-x border-gray-200">
+<body class="flex flex-col overflow-hidden">
+    <div id="app" v-cloak class="flex flex-col max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto w-full bg-[#f7f8fa] shadow-2xl relative md:border-x border-gray-200">
 
         <!-- Header with iOS Safe Area support -->
         <header class="bg-indigo-600 text-white px-4 sm:px-6 pt-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 shadow-md z-10 flex-shrink-0">
@@ -259,7 +274,7 @@
         </van-tabs>
 
         <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto relative bg-gray-50">
+        <main class="flex-1 min-h-0 overflow-y-auto relative bg-gray-50">
             
             <!-- Management View -->
             <div v-show="currentTab === 'manage'" class="p-3.5 flex flex-col space-y-3 pb-8">

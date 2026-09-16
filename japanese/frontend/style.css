@@ -1,0 +1,19 @@
+:root {
+    --app-height: 100dvh;
+}
+
+html, body {
+    height: 100%;
+    height: 100dvh;
+    height: var(--app-height, 100dvh);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    -webkit-text-size-adjust: 100%;
+}
+
+#app {
+    height: 100%;
+    height: 100dvh;
+    height: var(--app-height, 100dvh);
+}
