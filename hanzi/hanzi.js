@@ -66,6 +66,12 @@ const els = {
     syncStatusLabel: document.getElementById("syncStatusLabel"),
     lastSyncTimeLabel: document.getElementById("lastSyncTimeLabel"),
     syncOverviewNote: document.getElementById("syncOverviewNote"),
+    ebbinghausBanner: document.getElementById("ebbinghausBanner"),
+    ebBannerTitle: document.getElementById("ebBannerTitle"),
+    ebBannerDesc: document.getElementById("ebBannerDesc"),
+    quickDueBtn: document.getElementById("quickDueBtn"),
+    dueCount: document.getElementById("dueCount"),
+    masteredCount: document.getElementById("masteredCount"),
     startBtn: document.getElementById("startBtn"),
     recognitionStartBtn: document.getElementById("recognitionStartBtn"),
     choiceStartBtn: document.getElementById("choiceStartBtn"),
@@ -99,6 +105,9 @@ const els = {
     correctBtn: document.getElementById("correctBtn"),
     wrongBtn: document.getElementById("wrongBtn"),
     quitBtn: document.getElementById("quitBtn"),
+    dictationLevelBadge: document.getElementById("dictationLevelBadge"),
+    dictationEbHint: document.getElementById("dictationEbHint"),
+    dictationEbPredictText: document.getElementById("dictationEbPredictText"),
 
     recognitionCurrentNumber: document.getElementById("recognitionCurrentNumber"),
     recognitionTotalNumber: document.getElementById("recognitionTotalNumber"),
@@ -113,6 +122,9 @@ const els = {
     recognitionWrongBtn: document.getElementById("recognitionWrongBtn"),
     recognitionCorrectBtn: document.getElementById("recognitionCorrectBtn"),
     quitRecognitionBtn: document.getElementById("quitRecognitionBtn"),
+    recognitionLevelBadge: document.getElementById("recognitionLevelBadge"),
+    recognitionEbHint: document.getElementById("recognitionEbHint"),
+    recognitionEbPredictText: document.getElementById("recognitionEbPredictText"),
 
     choiceScreen: document.getElementById("choiceScreen"),
     choiceCurrentNumber: document.getElementById("choiceCurrentNumber"),
@@ -121,6 +133,7 @@ const els = {
     choiceSpeakBtn: document.getElementById("choiceSpeakBtn"),
     choiceOptions: document.getElementById("choiceOptions"),
     choiceFeedback: document.getElementById("choiceFeedback"),
+    choiceLevelBadge: document.getElementById("choiceLevelBadge"),
     quitChoiceBtn: document.getElementById("quitChoiceBtn"),
 
     storyScreen: document.getElementById("storyScreen"),
@@ -149,28 +162,153 @@ const els = {
     summaryMessage: document.getElementById("summaryMessage"),
     resultList: document.getElementById("resultList"),
     practiceWrongBtn: document.getElementById("practiceWrongBtn"),
+    continueDueBtn: document.getElementById("continueDueBtn"),
     backHomeBtn: document.getElementById("backHomeBtn")
 };
 
+const DAY = 24 * 60 * 60 * 1000;
+
+function calculateNextReview(level) {
+    let daysToAdd = 0;
+    switch (Number(level) || 0) {
+        case 0: daysToAdd = 0; break;       // 今日/即时复习
+        case 1: daysToAdd = 1; break;       // 1 天后
+        case 2: daysToAdd = 3; break;       // 3 天后
+        case 3: daysToAdd = 7; break;       // 7 天后 (已掌握阶段)
+        case 4: daysToAdd = 14; break;      // 14 天后
+        case 5: daysToAdd = 30; break;      // 30 天后
+        default: daysToAdd = 60; break;     // 60 天后
+    }
+    return Date.now() + daysToAdd * DAY;
+}
+
+function getNextReviewDays(level) {
+    switch (Number(level) || 0) {
+        case 0: return "今日";
+        case 1: return "1天后";
+        case 2: return "3天后";
+        case 3: return "7天后";
+        case 4: return "14天后";
+        case 5: return "30天后";
+        default: return "60天后";
+    }
+}
+
+function formatDateDisplay(ts) {
+    if (!ts) return "今日待复习";
+    if (ts <= Date.now()) return "今日待复习";
+    const d = new Date(Number(ts));
+    const diffDays = Math.ceil((ts - Date.now()) / DAY);
+    return `${diffDays}天后 (${d.getMonth() + 1}/${d.getDate()})`;
+}
+
+function updateLevelBadge(badgeEl, char) {
+    if (!badgeEl) return;
+    const stats = loadStats();
+    const cs = getCharStats(stats, char);
+    const level = cs.level || 0;
+    const isMastered = level >= 3;
+    const isDue = (cs.nextReviewDate || 0) <= Date.now();
+
+    badgeEl.textContent = `Lv.${level}${isMastered ? " 🌟" : ""}`;
+    badgeEl.className = `level-badge ${isMastered ? "level-mastered" : (isDue ? "level-due" : "")}`;
+    badgeEl.title = `艾宾浩斯等级 Lv.${level}${isMastered ? " (已掌握)" : ""}，下次复习: ${formatDateDisplay(cs.nextReviewDate)}`;
+}
+
 function getDefaultStats() {
+    const characters = {};
+    const now = Date.now();
+    // 所有汉字均已学习过，初始全部设为 Lv.1 且进入今日待复习队列
+    if (typeof HANZI_DATA !== "undefined" && Array.isArray(HANZI_DATA)) {
+        HANZI_DATA.forEach(item => {
+            characters[item.char] = {
+                practiced: 0,
+                correct: 0,
+                wrong: 0,
+                streak: 0,
+                lastPracticed: null,
+                level: 1,
+                nextReviewDate: now
+            };
+        });
+    }
     return {
         totalPracticed: 0,
         totalCorrect: 0,
-        characters: {}
+        characters
     };
+}
+
+function ensureAllCharactersLearned(stats) {
+    if (!stats.characters) stats.characters = {};
+    let changed = false;
+    const now = Date.now();
+
+    if (typeof HANZI_DATA !== "undefined" && Array.isArray(HANZI_DATA)) {
+        HANZI_DATA.forEach(item => {
+            const char = item.char;
+            if (!stats.characters[char]) {
+                stats.characters[char] = {
+                    practiced: 0,
+                    correct: 0,
+                    wrong: 0,
+                    streak: 0,
+                    lastPracticed: null,
+                    level: 1, // 已学习过，初始从 Lv.1 开始
+                    nextReviewDate: now
+                };
+                changed = true;
+            } else {
+                const c = stats.characters[char];
+                if (c.level === undefined || c.level === null) {
+                    if (c.wrong > 0 && c.streak === 0) {
+                        c.level = 0;
+                        c.nextReviewDate = now;
+                    } else if (c.streak >= 5) {
+                        c.level = 4;
+                        c.nextReviewDate = now + 14 * DAY;
+                    } else if (c.streak >= 3) {
+                        c.level = 3;
+                        c.nextReviewDate = now + 7 * DAY;
+                    } else if (c.streak >= 1) {
+                        c.level = 2;
+                        c.nextReviewDate = now + 3 * DAY;
+                    } else {
+                        c.level = 1;
+                        c.nextReviewDate = now;
+                    }
+                    changed = true;
+                }
+                if (c.nextReviewDate === undefined || c.nextReviewDate === null) {
+                    c.nextReviewDate = now;
+                    changed = true;
+                }
+            }
+        });
+    }
+
+    if (changed) {
+        saveStats(stats);
+    }
+    return stats;
 }
 
 function loadStats() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return getDefaultStats();
+        if (!raw) {
+            const def = getDefaultStats();
+            saveStats(def);
+            return def;
+        }
 
         const parsed = JSON.parse(raw);
-        return {
+        const stats = {
             totalPracticed: Number(parsed.totalPracticed) || 0,
             totalCorrect: Number(parsed.totalCorrect) || 0,
             characters: parsed.characters || {}
         };
+        return ensureAllCharactersLearned(stats);
     } catch (error) {
         console.warn("读取学习记录失败：", error);
         return getDefaultStats();
@@ -448,13 +586,15 @@ function previewSpeech() {
 }
 
 function getCharStats(stats, char) {
-    const saved = stats.characters[char] || {};
+    const saved = (stats && stats.characters && stats.characters[char]) || {};
     return {
         practiced: 0,
         correct: 0,
         wrong: 0,
         streak: 0,
         lastPracticed: null,
+        level: 1,
+        nextReviewDate: Date.now(),
         ...saved
     };
 }
@@ -467,18 +607,27 @@ function updateStatsForAnswer(item, isCorrect) {
     charStats.practiced += 1;
     charStats.lastPracticed = new Date().toISOString();
 
+    const oldLevel = Number(charStats.level) || 0;
+    let newLevel = oldLevel;
+
     if (isCorrect) {
         stats.totalCorrect += 1;
         charStats.correct += 1;
         charStats.streak += 1;
-
+        newLevel = oldLevel + 1;
+        charStats.level = newLevel;
+        charStats.nextReviewDate = calculateNextReview(newLevel);
     } else {
         charStats.wrong += 1;
         charStats.streak = 0;
+        newLevel = 0;
+        charStats.level = 0;
+        charStats.nextReviewDate = Date.now(); // 设为今日待复习
     }
 
     stats.characters[item.char] = charStats;
     saveStats(stats);
+    return { oldLevel, newLevel, nextReviewDate: charStats.nextReviewDate };
 }
 
 function getWrongCharacters(stats = loadStats()) {
@@ -491,47 +640,100 @@ function getWrongCharacters(stats = loadStats()) {
         .sort((a, b) => b.wrongScore - a.wrongScore);
 }
 
+function getDueCharacters(stats = loadStats()) {
+    const now = Date.now();
+    return HANZI_DATA.filter(item => {
+        const cs = getCharStats(stats, item.char);
+        return (cs.nextReviewDate || 0) <= now;
+    });
+}
+
+function getMasteredCharacters(stats = loadStats()) {
+    return HANZI_DATA.filter(item => {
+        const cs = getCharStats(stats, item.char);
+        return (cs.level || 0) >= 3;
+    });
+}
+
 function refreshHomeStats() {
     const stats = loadStats();
     const wrongChars = getWrongCharacters(stats);
+    const dueChars = getDueCharacters(stats);
+    const masteredChars = getMasteredCharacters(stats);
 
-    els.totalPracticed.textContent = stats.totalPracticed;
-    els.totalCorrect.textContent = stats.totalCorrect;
-    els.wrongCount.textContent = wrongChars.length;
+    if (els.dueCount) els.dueCount.textContent = dueChars.length;
+    if (els.masteredCount) els.masteredCount.textContent = masteredChars.length;
+    if (els.wrongCount) els.wrongCount.textContent = wrongChars.length;
+    if (els.totalPracticed) els.totalPracticed.textContent = stats.totalPracticed;
+
+    // 艾宾浩斯复习横幅状态提示
+    if (els.ebbinghausBanner) {
+        if (dueChars.length > 0) {
+            if (els.ebBannerTitle) els.ebBannerTitle.textContent = `⏰ 今日艾宾浩斯待复习：${dueChars.length} 个汉字`;
+            if (els.ebBannerDesc) els.ebBannerDesc.textContent = `遗忘曲线提醒：今日有 ${dueChars.length} 个汉字到达最佳复习点，及时复习可大幅提升长期记忆！`;
+            if (els.quickDueBtn) {
+                els.quickDueBtn.classList.remove("hidden");
+                els.quickDueBtn.textContent = `⚡ 立即复习 (${dueChars.length})`;
+            }
+        } else {
+            if (els.ebBannerTitle) els.ebBannerTitle.textContent = `🎉 今日复习已全部完成！`;
+            if (els.ebBannerDesc) els.ebBannerDesc.textContent = `所有 ${HANZI_DATA.length} 个汉字均在艾宾浩斯记忆保护期内，保持良好记忆节奏！`;
+            if (els.quickDueBtn) {
+                els.quickDueBtn.classList.add("hidden");
+            }
+        }
+    }
 
     els.wrongbookListSetup.innerHTML = "";
 
     if (wrongChars.length === 0) {
         els.wrongbookSetup.classList.add("hidden");
-        return;
+    } else {
+        els.wrongbookSetup.classList.remove("hidden");
+        wrongChars.slice(0, 30).forEach(item => {
+            const chip = document.createElement("span");
+            chip.className = "wrong-item";
+            const charStats = getCharStats(stats, item.char);
+            chip.textContent = `${item.char} (Lv.${charStats.level || 0})`;
+            const wrongRate = charStats.practiced
+                ? Math.round((charStats.wrong / charStats.practiced) * 100)
+                : 0;
+            chip.title = `累计错误 ${charStats.wrong} 次，错误率 ${wrongRate}%`;
+            els.wrongbookListSetup.appendChild(chip);
+        });
     }
 
-    els.wrongbookSetup.classList.remove("hidden");
-
-    wrongChars.slice(0, 30).forEach(item => {
-        const chip = document.createElement("span");
-        chip.className = "wrong-item";
-        chip.textContent = item.char;
-        const charStats = getCharStats(stats, item.char);
-        const wrongRate = charStats.practiced
-            ? Math.round((charStats.wrong / charStats.practiced) * 100)
-            : 0;
-        chip.title = `累计错误 ${charStats.wrong} 次，错误率 ${wrongRate}%`;
-        els.wrongbookListSetup.appendChild(chip);
-    });
+    buildCategoryOptions();
 }
 
 function buildCategoryOptions() {
+    const stats = loadStats();
+    const dueChars = getDueCharacters(stats);
+    const wrongChars = getWrongCharacters(stats);
     const categories = [...new Set(HANZI_DATA.map(item => item.category))];
+
+    const prevValue = els.categorySelect ? els.categorySelect.value : "";
+
     const options = [
-        {value: "all", label: `全部汉字（${HANZI_DATA.length}个）`},
-        {value: "wrong", label: "只练错字本"},
+        {
+            value: "due",
+            label: `🌟 今日待复习（${dueChars.length}个）${dueChars.length > 0 ? " [艾宾浩斯推荐]" : " [已完成]"}`
+        },
+        {
+            value: "all",
+            label: `🌐 全部汉字轮练（${HANZI_DATA.length}个）`
+        },
+        {
+            value: "wrong",
+            label: `📕 错字本专项（${wrongChars.length}个）`
+        },
         ...categories.map(category => ({
             value: category,
-            label: `${category}（${HANZI_DATA.filter(item => item.category === category).length}个）`
+            label: `📂 ${category}（${HANZI_DATA.filter(item => item.category === category).length}个）`
         }))
     ];
 
+    if (!els.categorySelect) return;
     els.categorySelect.innerHTML = "";
     options.forEach(option => {
         const node = document.createElement("option");
@@ -539,6 +741,14 @@ function buildCategoryOptions() {
         node.textContent = option.label;
         els.categorySelect.appendChild(node);
     });
+
+    if (prevValue && options.some(o => o.value === prevValue)) {
+        els.categorySelect.value = prevValue;
+    } else if (dueChars.length > 0) {
+        els.categorySelect.value = "due";
+    } else {
+        els.categorySelect.value = "all";
+    }
 }
 
 function shuffle(array) {
@@ -555,18 +765,27 @@ function shuffle(array) {
 function createSession() {
     const selectedCategory = els.categorySelect.value;
     const requestedCount = Number(els.countSelect.value);
+    const stats = loadStats();
 
     let pool;
 
-    if (selectedCategory === "wrong") {
-        const stats = loadStats();
+    if (selectedCategory === "due") {
+        pool = getDueCharacters(stats);
+        if (pool.length === 0) {
+            alert("🎉 今日艾宾浩斯待复习汉字已全部完成！已为您切换至全部汉字练习。");
+            pool = [...HANZI_DATA];
+        }
+    } else if (selectedCategory === "wrong") {
         pool = getWrongCharacters(stats);
         if (pool.length === 0) {
-            alert("错字本还是空的，先完成一轮普通听写吧！");
-            return null;
+            alert("错字本还是空的，太棒了！已为您切换至今日待复习。");
+            pool = getDueCharacters(stats);
+            if (pool.length === 0) pool = [...HANZI_DATA];
         }
     } else if (selectedCategory === "all") {
-        pool = [...HANZI_DATA];
+        const due = getDueCharacters(stats);
+        const nonDue = HANZI_DATA.filter(item => !due.some(d => d.char === item.char));
+        pool = [...shuffle(due), ...shuffle(nonDue)];
     } else {
         pool = HANZI_DATA.filter(item => item.category === selectedCategory);
     }
@@ -606,6 +825,8 @@ function renderQuestion() {
     els.progressBar.style.width =
         `${((state.currentIndex + 1) / state.session.length) * 100}%`;
     els.questionPinyin.textContent = PINYIN_MAP[item.char] || "";
+
+    updateLevelBadge(els.dictationLevelBadge, item.char);
 
     els.answerPanel.classList.add("hidden");
     els.showAnswerBtn.classList.remove("hidden");
@@ -758,43 +979,44 @@ function clearAnswerStroke() {
     state.answerStrokeWriter?.pauseAnimation?.();
     state.answerStrokeWriter = null;
     els.answerStrokeWriter.replaceChildren();
+    els.replayAnswerStrokeBtn.disabled = true;
+    els.answerStrokeStatus.textContent = "正在准备笔画演示……";
+    els.answerStrokeStatus.classList.remove("hidden");
 }
 
 function renderAnswerStroke(char) {
     clearAnswerStroke();
-    const renderToken = state.answerStrokeRenderToken;
-    els.answerStrokeStatus.textContent = "正在准备笔顺演示……";
-    els.answerStrokeStatus.classList.remove("hidden");
-    els.replayAnswerStrokeBtn.disabled = true;
 
     if (typeof HanziWriter === "undefined") {
         els.answerStrokeStatus.textContent = "笔画组件加载失败，请检查网络后刷新页面。";
         return;
     }
 
-    const size = Math.round(els.answerStrokeWriter.parentElement.getBoundingClientRect().width);
-    const writer = HanziWriter.create(els.answerStrokeWriter, char, {
+    const renderToken = ++state.answerStrokeRenderToken;
+    const size = Math.round(els.answerStrokeWriter.getBoundingClientRect().width);
+
+    state.answerStrokeWriter = HanziWriter.create(els.answerStrokeWriter, char, {
         width: size,
         height: size,
-        padding: Math.round(size * 0.09),
+        padding: Math.round(size * 0.08),
         showOutline: true,
         showCharacter: false,
         strokeColor: "#20242c",
         outlineColor: "#d7dbe3",
-        strokeAnimationSpeed: 0.65,
-        delayBetweenStrokes: 650,
+        strokeAnimationSpeed: 0.8,
+        delayBetweenStrokes: 400,
+        delayBetweenLoops: 1200,
         onLoadCharDataSuccess: () => {
             if (renderToken !== state.answerStrokeRenderToken) return;
             els.answerStrokeStatus.classList.add("hidden");
             els.replayAnswerStrokeBtn.disabled = false;
-            writer.animateCharacter();
+            state.answerStrokeWriter.animateCharacter();
         },
         onLoadCharDataError: () => {
             if (renderToken !== state.answerStrokeRenderToken) return;
             els.answerStrokeStatus.textContent = `暂时无法加载“${char}”的笔画数据。`;
         }
     });
-    state.answerStrokeWriter = writer;
 }
 
 function replayAnswerStroke() {
@@ -824,6 +1046,16 @@ function renderReview() {
     }
     const pinyin = PINYIN_MAP[item.char] || "";
     els.answerHint.textContent = `${pinyin} · ${item.hint}`;
+
+    // 艾宾浩斯排期预测提示
+    const stats = loadStats();
+    const cs = getCharStats(stats, item.char);
+    const curLevel = cs.level || 0;
+    const nextDays = getNextReviewDays(curLevel + 1);
+    if (els.dictationEbPredictText) {
+        els.dictationEbPredictText.textContent = `✅ 写对了将升至 Lv.${curLevel + 1}（${nextDays}复习） · ❌ 记错了重置为 Lv.0 并本轮追加重练`;
+    }
+
     els.answerPanel.classList.remove("hidden");
     els.showAnswerBtn.classList.add("hidden");
     els.writingArea.classList.add("hidden");
@@ -841,6 +1073,11 @@ function recordAnswer(isCorrect) {
     });
 
     updateStatsForAnswer(item, isCorrect);
+
+    // 回答错误追加到本轮末尾重练，巩固记忆
+    if (!isCorrect) {
+        state.session.push(item);
+    }
 
     if (state.currentIndex < state.session.length - 1) {
         state.currentIndex += 1;
@@ -880,6 +1117,17 @@ function renderRecognitionQuestion() {
     els.recognitionTapTip.textContent = "🔊 点一下听读音";
     els.recognitionPinyin.textContent = "";
     els.recognitionHint.textContent = "";
+
+    updateLevelBadge(els.recognitionLevelBadge, item.char);
+
+    const stats = loadStats();
+    const cs = getCharStats(stats, item.char);
+    const curLevel = cs.level || 0;
+    const nextDays = getNextReviewDays(curLevel + 1);
+    if (els.recognitionEbPredictText) {
+        els.recognitionEbPredictText.textContent = `✅ 读对了将升至 Lv.${curLevel + 1}（${nextDays}复习） · ❌ 没读出重置为 Lv.0 并本轮追加重练`;
+    }
+
     els.recognitionReveal.classList.add("hidden");
 }
 
@@ -931,6 +1179,12 @@ function recordRecognitionAnswer(isCorrect) {
         isCorrect
     });
 
+    updateStatsForAnswer(item, isCorrect);
+
+    if (!isCorrect) {
+        state.recognitionSession.push(item);
+    }
+
     if (state.recognitionIndex < state.recognitionSession.length - 1) {
         state.recognitionIndex += 1;
         renderRecognitionQuestion();
@@ -969,11 +1223,13 @@ function finishRecognition() {
     els.resultList.innerHTML = "";
     els.resultList.classList.remove("dictation-results");
 
+    const stats = loadStats();
     state.recognitionAnswers.forEach(answer => {
         const chip = document.createElement("span");
         chip.className = `result-chip ${answer.isCorrect ? "correct" : "wrong"}`;
-        chip.textContent = answer.item.char;
-        chip.title = answer.isCorrect ? "会读" : "还不会读";
+        const cs = getCharStats(stats, answer.item.char);
+        chip.textContent = `${answer.item.char} (Lv.${cs.level})`;
+        chip.title = `${answer.isCorrect ? "会读" : "还不会读"} · 当前 Lv.${cs.level}，下次复习: ${formatDateDisplay(cs.nextReviewDate)}`;
         els.resultList.appendChild(chip);
     });
 
@@ -983,7 +1239,18 @@ function finishRecognition() {
             ? "本轮全部会读"
             : `再练不会的字（${unfamiliarAnswers.length}个）`;
 
+    if (els.continueDueBtn) {
+        const dueCount = getDueCharacters(stats).length;
+        if (dueCount > 0) {
+            els.continueDueBtn.classList.remove("hidden");
+            els.continueDueBtn.textContent = `⚡ 继续复习今日待复习汉字（还剩 ${dueCount} 个）`;
+        } else {
+            els.continueDueBtn.classList.add("hidden");
+        }
+    }
+
     showScreen("summary");
+    refreshHomeStats();
 }
 
 function getChoiceOptions(item) {
@@ -1015,21 +1282,27 @@ function renderChoiceQuestion() {
 
     state.choiceHadMistake = false;
     state.choiceLocked = false;
-    els.choiceCurrentNumber.textContent = state.choiceIndex + 1;
-    els.choiceTotalNumber.textContent = state.choiceSession.length;
-    els.choiceProgressBar.style.width =
-        `${((state.choiceIndex + 1) / state.choiceSession.length) * 100}%`;
-    els.choiceFeedback.classList.add("hidden");
-    els.choiceOptions.innerHTML = "";
-
-    getChoiceOptions(item).forEach(option => {
-        const button = document.createElement("button");
-        button.className = "choice-option";
-        button.textContent = option.char;
-        button.setAttribute("aria-label", `选择汉字${option.char}`);
-        button.addEventListener("click", () => chooseCharacter(option, button));
-        els.choiceOptions.appendChild(button);
-    });
+    if (els.choiceCurrentNumber) els.choiceCurrentNumber.textContent = state.choiceIndex + 1;
+    if (els.choiceTotalNumber) els.choiceTotalNumber.textContent = state.choiceSession.length;
+    if (els.choiceProgressBar) {
+        els.choiceProgressBar.style.width =
+            `${((state.choiceIndex + 1) / state.choiceSession.length) * 100}%`;
+    }
+    if (els.choiceLevelBadge) {
+        updateLevelBadge(els.choiceLevelBadge, item.char);
+    }
+    els.choiceFeedback?.classList.add("hidden");
+    if (els.choiceOptions) {
+        els.choiceOptions.innerHTML = "";
+        getChoiceOptions(item).forEach(option => {
+            const button = document.createElement("button");
+            button.className = "choice-option";
+            button.textContent = option.char;
+            button.setAttribute("aria-label", `选择汉字${option.char}`);
+            button.addEventListener("click", () => chooseCharacter(option, button));
+            els.choiceOptions.appendChild(button);
+        });
+    }
 
     setTimeout(speakChoiceCurrent, 300);
 }
@@ -1077,6 +1350,9 @@ function chooseCharacter(option, button) {
     const item = state.choiceSession[state.choiceIndex];
 
     if (option.char !== item.char) {
+        if (!state.choiceHadMistake) {
+            state.choiceSession.push(item);
+        }
         state.choiceHadMistake = true;
         button.classList.add("wrong-choice");
         button.setAttribute("aria-label", `选择汉字${option.char}，回答错误`);
@@ -1087,10 +1363,10 @@ function chooseCharacter(option, button) {
 
     state.choiceLocked = true;
     button.classList.add("correct-choice");
-    els.choiceOptions.querySelectorAll("button").forEach(node => {
+    els.choiceOptions?.querySelectorAll("button").forEach(node => {
         node.disabled = true;
     });
-    els.choiceFeedback.classList.remove("hidden");
+    els.choiceFeedback?.classList.remove("hidden");
     const isFirstTryCorrect = !state.choiceHadMistake;
     state.choiceAnswers.push({item, isCorrect: isFirstTryCorrect});
     updateStatsForAnswer(item, isFirstTryCorrect);
@@ -1120,17 +1396,30 @@ function finishChoice() {
         : `完成啦！有 ${correctCount} 个字一次选对，没选对的再听听就会了。`;
     els.resultList.innerHTML = "";
     els.resultList.classList.remove("dictation-results");
+    const stats = loadStats();
     state.choiceAnswers.forEach(answer => {
         const chip = document.createElement("span");
         chip.className = `result-chip ${answer.isCorrect ? "correct" : "wrong"}`;
-        chip.textContent = answer.item.char;
-        chip.title = answer.isCorrect ? "一次选对" : "再次尝试后选对";
+        const cs = getCharStats(stats, answer.item.char);
+        chip.textContent = `${answer.item.char} (Lv.${cs.level})`;
+        chip.title = `${answer.isCorrect ? "一次选对" : "再次尝试后选对"} · 当前 Lv.${cs.level}，下次复习: ${formatDateDisplay(cs.nextReviewDate)}`;
         els.resultList.appendChild(chip);
     });
     els.practiceWrongBtn.disabled = wrongAnswers.length === 0;
     els.practiceWrongBtn.textContent = wrongAnswers.length
         ? `再练本轮易错字（${wrongAnswers.length}个）`
         : "本轮全部一次选对";
+
+    if (els.continueDueBtn) {
+        const dueCount = getDueCharacters(stats).length;
+        if (dueCount > 0) {
+            els.continueDueBtn.classList.remove("hidden");
+            els.continueDueBtn.textContent = `⚡ 继续复习今日待复习汉字（还剩 ${dueCount} 个）`;
+        } else {
+            els.continueDueBtn.classList.add("hidden");
+        }
+    }
+
     showScreen("summary");
     refreshHomeStats();
 }
@@ -1165,6 +1454,7 @@ function finishSession() {
 
     els.resultList.classList.add("dictation-results");
 
+    const stats = loadStats();
     state.answers.forEach(answer => {
         const card = document.createElement("div");
         card.className = `dictation-result ${answer.isCorrect ? "correct" : "wrong"}`;
@@ -1202,7 +1492,9 @@ function finishSession() {
         comparison.append(writtenBox, standardBox);
         const verdict = document.createElement("div");
         verdict.className = "result-verdict";
-        verdict.textContent = answer.isCorrect ? "✅ 写对了" : "❌ 写错了";
+        const cs = getCharStats(stats, answer.item.char);
+        const reviewText = cs.nextReviewDate ? formatDateDisplay(cs.nextReviewDate) : "待定";
+        verdict.innerHTML = `<span>${answer.isCorrect ? "✅ 写对了" : "❌ 写错了"}</span> <span class="level-badge ${cs.level >= 3 ? "level-mastered" : (cs.nextReviewDate <= Date.now() ? "level-due" : "")}" style="margin-left: 8px;">Lv.${cs.level}</span><span style="font-size: 0.82rem; color: #64748b; margin-left: 6px;">下次: ${reviewText}</span>`;
         card.append(comparison, verdict);
         els.resultList.appendChild(card);
     });
@@ -1213,18 +1505,28 @@ function finishSession() {
             ? "本轮没有错字"
             : `再练本轮错字（${wrongAnswers.length}个）`;
 
+    if (els.continueDueBtn) {
+        const dueCount = getDueCharacters(stats).length;
+        if (dueCount > 0) {
+            els.continueDueBtn.classList.remove("hidden");
+            els.continueDueBtn.textContent = `⚡ 继续复习今日待复习汉字（还剩 ${dueCount} 个）`;
+        } else {
+            els.continueDueBtn.classList.add("hidden");
+        }
+    }
+
     showScreen("summary");
     refreshHomeStats();
 }
 
 function showScreen(name) {
-    els.setupScreen.classList.toggle("hidden", name !== "setup");
-    els.dictationScreen.classList.toggle("hidden", name !== "dictation");
-    els.recognitionScreen.classList.toggle("hidden", name !== "recognition");
-    els.choiceScreen.classList.toggle("hidden", name !== "choice");
-    els.storyScreen.classList.toggle("hidden", name !== "story");
-    els.strokeScreen.classList.toggle("hidden", name !== "stroke");
-    els.summaryScreen.classList.toggle("hidden", name !== "summary");
+    els.setupScreen?.classList.toggle("hidden", name !== "setup");
+    els.dictationScreen?.classList.toggle("hidden", name !== "dictation");
+    els.recognitionScreen?.classList.toggle("hidden", name !== "recognition");
+    els.choiceScreen?.classList.toggle("hidden", name !== "choice");
+    els.storyScreen?.classList.toggle("hidden", name !== "story");
+    els.strokeScreen?.classList.toggle("hidden", name !== "stroke");
+    els.summaryScreen?.classList.toggle("hidden", name !== "summary");
     window.scrollTo({top: 0, behavior: "smooth"});
 }
 
@@ -1584,6 +1886,30 @@ els.practiceWrongBtn.addEventListener("click", () => {
         startSession(wrongItems);
     }
 });
+
+if (els.quickDueBtn) {
+    els.quickDueBtn.addEventListener("click", () => {
+        if (els.categorySelect) {
+            els.categorySelect.value = "due";
+        }
+        startSession();
+    });
+}
+
+if (els.continueDueBtn) {
+    els.continueDueBtn.addEventListener("click", () => {
+        if (els.categorySelect) {
+            els.categorySelect.value = "due";
+        }
+        if (state.mode === "recognition") {
+            startRecognition();
+        } else if (state.mode === "choice") {
+            startChoice();
+        } else {
+            startSession();
+        }
+    });
+}
 
 els.resetDataBtn.addEventListener("click", resetAllData);
 

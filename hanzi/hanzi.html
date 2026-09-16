@@ -33,6 +33,18 @@
             <p>听、说、读、写，多种模式轻松学习汉字；选择适合的内容和模式，开始今天的练习。</p>
         </div>
 
+        <!-- 艾宾浩斯记忆曲线今日复习提示卡 -->
+        <div id="ebbinghausBanner" class="ebbinghaus-banner">
+            <div class="eb-banner-icon">🧠</div>
+            <div class="eb-banner-info">
+                <div class="eb-banner-title" id="ebBannerTitle">今日艾宾浩斯复习</div>
+                <div class="eb-banner-desc" id="ebBannerDesc">正在检测记忆遗忘曲线……</div>
+            </div>
+            <button id="quickDueBtn" type="button" class="eb-banner-btn">
+                ⚡ 立即复习
+            </button>
+        </div>
+
         <div class="home-section-title">
             <span>📝</span>
             <div><strong>练习设置</strong><small>选择练习范围与每轮字数</small></div>
@@ -84,21 +96,25 @@
 
         <div class="home-section-title">
             <span>📊</span>
-            <div><strong>学习概览</strong><small id="syncOverviewNote">支持 Cloudflare 云端备份与多端同步</small></div>
+            <div><strong>学习概览 · 艾宾浩斯遗忘曲线</strong><small id="syncOverviewNote">支持 Cloudflare 云端备份与多端同步</small></div>
         </div>
 
         <div class="quick-stats">
-            <div class="stat-box">
-                <strong id="totalPracticed">0</strong>
-                <span>累计练习</span>
+            <div class="stat-box highlight-due">
+                <strong id="dueCount">0</strong>
+                <span>今日待复习</span>
             </div>
-            <div class="stat-box">
-                <strong id="totalCorrect">0</strong>
-                <span>累计写对</span>
+            <div class="stat-box highlight-mastered">
+                <strong id="masteredCount">0</strong>
+                <span>已掌握 (Lv.3+)</span>
             </div>
             <div class="stat-box">
                 <strong id="wrongCount">0</strong>
                 <span>错字数量</span>
+            </div>
+            <div class="stat-box">
+                <strong id="totalPracticed">0</strong>
+                <span>累计练习</span>
             </div>
         </div>
 
@@ -122,6 +138,7 @@
             <div class="progress-text">
                 听音选字：第 <span id="choiceCurrentNumber">1</span> /
                 <span id="choiceTotalNumber">8</span> 题
+                <span id="choiceLevelBadge" class="level-badge">Lv.1</span>
             </div>
             <button id="quitChoiceBtn" class="secondary-btn">退出本轮</button>
         </div>
@@ -146,6 +163,7 @@
             <div class="progress-text">
                 <span id="dictationStageLabel">听写</span>：第 <span id="currentNumber">1</span> / <span
                     id="totalNumber">8</span> 题
+                <span id="dictationLevelBadge" class="level-badge">Lv.1</span>
             </div>
             <button id="quitBtn" class="secondary-btn">退出本轮</button>
         </div>
@@ -186,7 +204,7 @@
         </button>
 
         <div id="answerPanel" class="answer-panel hidden">
-            <p class="tip" style="margin-top: 0;">请判断这个字是正确还是错误，判断后进入下一题。</p>
+            <p class="tip" style="margin-top: 0;">请核对笔顺与字形，判断后进入下一题。</p>
             <div class="comparison">
                 <div class="comparison-box">
                     <strong>孩子写的</strong>
@@ -207,9 +225,14 @@
             </div>
             <div id="answerHint" class="answer-hint"></div>
 
+            <div id="dictationEbHint" class="eb-prediction-box">
+                <span class="eb-predict-icon">🧠 艾宾浩斯排期：</span>
+                <span id="dictationEbPredictText">✅ 正确升至 Lv.2（3天后复习） · ❌ 错误重置为 Lv.0</span>
+            </div>
+
             <div class="action-row">
-                <button id="wrongBtn" class="danger-btn">❌ 错误</button>
-                <button id="correctBtn" class="success-btn">✅ 正确</button>
+                <button id="wrongBtn" class="danger-btn">❌ 记错/写错 (末尾重练)</button>
+                <button id="correctBtn" class="success-btn">✅ 写对啦 (Lv+1 顺延)</button>
             </div>
         </div>
     </section>
@@ -219,6 +242,7 @@
             <div class="progress-text">
                 看字认读：第 <span id="recognitionCurrentNumber">1</span> /
                 <span id="recognitionTotalNumber">8</span> 题
+                <span id="recognitionLevelBadge" class="level-badge">Lv.1</span>
             </div>
             <button id="quitRecognitionBtn" class="secondary-btn">退出本轮</button>
         </div>
@@ -248,12 +272,17 @@
                     🔊 再听一次
                 </button>
 
+                <div id="recognitionEbHint" class="eb-prediction-box" style="margin-bottom: 12px;">
+                    <span class="eb-predict-icon">🧠 艾宾浩斯排期：</span>
+                    <span id="recognitionEbPredictText">✅ 会读升级顺延复习 · ❌ 不会读重置并本轮重练</span>
+                </div>
+
                 <div class="action-row">
                     <button id="recognitionWrongBtn" class="danger-btn">
-                        还不会读
+                        ❌ 还不会读 (末尾重练)
                     </button>
                     <button id="recognitionCorrectBtn" class="success-btn">
-                        我会读
+                        ✅ 我会读 (Lv+1 顺延)
                     </button>
                 </div>
             </div>
@@ -326,8 +355,9 @@
         <div id="resultList" class="result-list"></div>
 
         <div class="summary-actions">
+            <button id="continueDueBtn" class="primary-btn hidden">⚡ 继续复习今日待复习汉字</button>
             <button id="practiceWrongBtn" class="warning-btn">再练本轮错字</button>
-            <button id="backHomeBtn" class="primary-btn">返回首页</button>
+            <button id="backHomeBtn" class="secondary-btn">返回首页</button>
         </div>
     </section>
 
