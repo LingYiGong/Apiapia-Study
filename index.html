@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="学习中心">
+    <meta name="theme-color" content="#4f46e5">
+    <title>学习中心 · Study Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-bg: #eef2ff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --page-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 20px 30px -10px rgba(79, 70, 229, 0.15), 0 10px 15px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--page-bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.05) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(14, 165, 233, 0.06) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+
+        .nav-container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .brand-logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+        }
+
+        .brand-text h1 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #1e293b, #4f46e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: block;
+            margin-top: -2px;
+        }
+
+        .nav-date {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 主体内容 */
+        .main-wrapper {
+            flex: 1;
+            max-width: 1120px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        /* 欢迎标语 */
+        .hero-section {
+            text-align: center;
+            max-width: 680px;
+            margin: 0 auto 44px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 5px 14px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            border: 1px solid #c7d2fe;
+        }
+
+        .hero-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.25;
+            color: #0f172a;
+            margin-bottom: 14px;
+        }
+
+        .hero-desc {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* 模块卡片网格 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 26px;
+            margin-bottom: 48px;
+        }
+
+        .study-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .study-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(99, 102, 241, 0.35);
+        }
+
+        /* 顶部装饰发光条 */
+        .card-top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .japanese-bar { background: linear-gradient(90deg, #4f46e5, #06b6d4); }
+        .hanzi-bar { background: linear-gradient(90deg, #10b981, #f59e0b); }
+        .english-bar { background: linear-gradient(90deg, #ec4899, #8b5cf6); }
+
+        /* 卡片头部 */
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .card-icon-box {
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .japanese-icon { background: #eef2ff; }
+        .hanzi-icon { background: #ecfdf5; }
+        .english-icon { background: #fdf2f8; }
+
+        .recent-tag {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            background: #f1f5f9;
+            color: #475569;
+            display: none;
+        }
+
+        .study-card.is-recent .recent-tag {
+            display: inline-block;
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        /* 标题与描述 */
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-desc {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        /* 标签栏 */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 22px;
+        }
+
+        .tag {
+            font-size: 0.76rem;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 6px;
+        }
+
+        .tag-indigo { background: #e0e7ff; color: #3730a3; }
+        .tag-emerald { background: #d1fae5; color: #065f46; }
+        .tag-amber { background: #fef3c7; color: #92400e; }
+        .tag-rose { background: #ffe4e6; color: #9f1239; }
+        .tag-purple { background: #ede9fe; color: #5b21b6; }
+        .tag-sky { background: #e0f2fe; color: #0369a1; }
+
+        /* 特色功能列表 */
+        .features-list {
+            list-style: none;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .features-list li {
+            font-size: 0.86rem;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .features-list li .bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #94a3b8;
+        }
+
+        .japanese-card .features-list li .bullet { background: #6366f1; }
+        .hanzi-card .features-list li .bullet { background: #10b981; }
+        .english-card .features-list li .bullet { background: #ec4899; }
+
+        /* 底部操作按钮 */
+        .card-action {
+            margin-top: auto;
+        }
+
+        .btn-enter {
+            width: 100%;
+            padding: 13px 18px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .japanese-btn {
+            background: #4f46e5;
+            color: white;
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.28);
+        }
+        .japanese-btn:hover { background: #4338ca; }
+
+        .hanzi-btn {
+            background: #059669;
+            color: white;
+            box-shadow: 0 4px 14px rgba(5, 150, 105, 0.28);
+        }
+        .hanzi-btn:hover { background: #047857; }
+
+        .english-btn {
+            background: #db2777;
+            color: white;
+            box-shadow: 0 4px 14px rgba(219, 39, 119, 0.28);
+        }
+        .english-btn:hover { background: #be185d; }
+
+        /* 下方特色与提示横幅 */
+        .tips-banner {
+            background: white;
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+            padding: 22px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tips-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .tips-icon {
+            font-size: 32px;
+            line-height: 1;
+        }
+
+        .tips-content h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .tips-content p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 0.82rem;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 960px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+                gap: 22px;
+            }
+            .hero-title {
+                font-size: 1.85rem;
+            }
+            .main-wrapper {
+                padding: 28px 18px 40px;
+            }
+            .tips-banner {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="brand">
+                <div class="brand-logo">🎓</div>
+                <div class="brand-text">
+                    <h1>Study Hub</h1>
+                    <span>语言与识字学习中心</span>
+                </div>
+            </a>
+            <div class="nav-date" id="currentDateDisplay">
+                <span>📅</span>
+                <span id="dateText">今日练习</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 核心主体内容 -->
+    <main class="main-wrapper">
+
+        <!-- 欢迎标语 -->
+        <section class="hero-section">
+            <div class="hero-badge">
+                <span>✨</span>
+                <span>全模块即开即练 · 支持移动端与离线使用</span>
+            </div>
+            <h2 class="hero-title">今天你想学习什么？</h2>
+            <p class="hero-desc">
+                根据需要选择对应的语言或技能板块。结合艾宾浩斯记忆曲线与多感官听写，打造沉浸高效的自学节奏。
+            </p>
+        </section>
+
+        <!-- 三大学习入口卡片 -->
+        <div class="grid-container">
+
+            <!-- 1. 日语学习 -->
+            <div class="study-card japanese-card" id="card-japanese">
+                <div class="card-top-bar japanese-bar"></div>
+                <div class="card-header">
+                    <div class="card-icon-box japanese-icon">🎌</div>
+                    <span class="recent-tag" id="tag-japanese">上次学习</span>
+                </div>
+                <h3 class="card-title">日语听力与词汇</h3>
+                <p class="card-desc">
+                    基于艾宾浩斯（SM-2）间隔重复算法与“听力优先”理念设计，包含海量核心词库与实用例句。
+                </p>
+
+                <div class="tags-container">
+                    <span class="tag tag-indigo">SM-2 算法</span>
+                    <span class="tag tag-sky">听力盲测</span>
+                    <span class="tag tag-indigo">1780+ 词汇</span>
+                    <span class="tag tag-purple">云端多端同步</span>
+                </div>
+
+                <ul class="features-list">
+                    <li><span class="bullet"></span> 纯听力盲测模式 & 假名释义解析</li>
+                    <li><span class="bullet"></span> 120 句日常高频对话与 IT 面试清单</li>
+                    <li><span class="bullet"></span> Cloudflare KV 手机电脑无缝同步</li>
+                </ul>
+
+                <div class="card-action">
+                    <a href="japanese/frontend/index.html" class="btn-enter japanese-btn" onclick="recordLastVisit('japanese')">
+                        <span>进入日语学习</span>
+                        <span>→</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. 汉字学习 -->
+            <div class="study-card hanzi-card" id="card-hanzi">
+                <div class="card-top-bar hanzi-bar"></div>
+                <div class="card-header">
+                    <div class="card-icon-box hanzi-icon">✍️</div>
+                    <span class="recent-tag" id="tag-hanzi">上次学习</span>
+                </div>
+                <h3 class="card-title">汉字听写与笔顺</h3>
+                <p class="card-desc">
+                    面向汉字启蒙与日常听写的辅助小工具。包含自然、生活、动植物分类字库与趣味笔顺临摹。
+                </p>
+
+                <div class="tags-container">
+                    <span class="tag tag-emerald">多维听写</span>
+                    <span class="tag tag-amber">笔顺临摹</span>
+                    <span class="tag tag-emerald">错题记忆</span>
+                    <span class="tag tag-amber">语音播报</span>
+                </div>
+
+                <ul class="features-list">
+                    <li><span class="bullet"></span> 汉字+提示词语音朗读，语速可调</li>
+                    <li><span class="bullet"></span> 笔画临摹与书写动画演示</li>
+                    <li><span class="bullet"></span> 错字专属复习本与认读闯关</li>
+                </ul>
+
+                <div class="card-action">
+                    <a href="hanzi/hanzi.html" class="btn-enter hanzi-btn" onclick="recordLastVisit('hanzi')">
+                        <span>进入汉字听写</span>
+                        <span>→</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. 英语学习 -->
+            <div class="study-card english-card" id="card-english">
+                <div class="card-top-bar english-bar"></div>
+                <div class="card-header">
+                    <div class="card-icon-box english-icon">🔤</div>
+                    <span class="recent-tag" id="tag-english">上次学习</span>
+                </div>
+                <h3 class="card-title">英语单词记忆卡</h3>
+                <p class="card-desc">
+                    极简高效的英语核心动词与高频生活词卡，双面翻牌互动，随时随地开启碎片化记忆与复习。
+                </p>
+
+                <div class="tags-container">
+                    <span class="tag tag-rose">核心高频动词</span>
+                    <span class="tag tag-purple">双面翻牌</span>
+                    <span class="tag tag-rose">掌握度标记</span>
+                    <span class="tag tag-purple">即开即练</span>
+                </div>
+
+                <ul class="features-list">
+                    <li><span class="bullet"></span> 经典闪卡交互，点击快速看释义</li>
+                    <li><span class="bullet"></span> “认识 / 不认识” 标记与记忆打卡</li>
+                    <li><span class="bullet"></span> 纯轻量静态设计，秒级即开即学</li>
+                </ul>
+
+                <div class="card-action">
+                    <a href="english/english.html" class="btn-enter english-btn" onclick="recordLastVisit('english')">
+                        <span>进入英语词卡</span>
+                        <span>→</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 底部快捷提示横幅 -->
+        <div class="tips-banner">
+            <div class="tips-left">
+                <div class="tips-icon">📱</div>
+                <div class="tips-content">
+                    <h4>支持添加到手机主屏幕使用</h4>
+                    <p>使用手机浏览器（Safari / Chrome）打开本站，点击“添加到主屏幕”，即可如同独立 App 一样全屏沉浸式刷题。</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 底部信息 -->
+    <footer class="footer">
+        <p>Study Hub · 个人综合学习平台 · 自主学习与科学记忆</p>
+    </footer>
+
+    <script>
+        // 显示今日日期
+        (function initDate() {
+            try {
+                const now = new Date();
+                const options = { month: 'long', day: 'numeric', weekday: 'short' };
+                const dateStr = now.toLocaleDateString('zh-CN', options);
+                const el = document.getElementById('dateText');
+                if (el) el.textContent = dateStr;
+            } catch (e) {}
+        })();
+
+        // 记录并高亮“上次学习”的模块
+        function recordLastVisit(moduleKey) {
+            try {
+                localStorage.setItem('study_hub_last_module', moduleKey);
+            } catch (e) {}
+        }
+
+        (function showLastVisit() {
+            try {
+                const last = localStorage.getItem('study_hub_last_module');
+                if (last) {
+                    const card = document.getElementById('card-' + last);
+                    if (card) {
+                        card.classList.add('is-recent');
+                    }
+                }
+            } catch (e) {}
+        })();
+
+        // 支持整张卡片点击进入
+        document.querySelectorAll('.study-card').forEach(card => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('a')) return;
+                const link = card.querySelector('.btn-enter');
+                if (link) link.click();
+            });
+        });
+    </script>
+</body>
+</html>

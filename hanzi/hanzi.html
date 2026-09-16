@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+    <meta name="theme-color" content="#f5f7fb"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+    <title>汉字听写小助手</title>
+    <link rel="stylesheet" href="./hanzi.css"/>
+</head>
+<body>
+<main class="app">
+    <section id="setupScreen" class="card home-card">
+        <div class="home-intro">
+            <div style="margin-bottom: 12px;">
+                <a href="../index.html" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #4338ca; background: #eef2ff; padding: 6px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; border: 1px solid #c7d2fe; transition: all 0.2s;">
+                    ← 🏠 返回学习中心
+                </a>
+            </div>
+            <div class="home-intro-title">
+                <h1>🔊 汉字听写小助手</h1>
+                <span class="version-badge">版本 v1.13.0</span>
+            </div>
+            <p>听、说、读、写，多种模式轻松学习汉字；选择适合的内容和模式，开始今天的练习。</p>
+        </div>
+
+        <div class="home-section-title">
+            <span>⚙️</span>
+            <div><strong>练习设置</strong><small>设置练习内容与朗读方式</small></div>
+        </div>
+
+        <div class="setup-grid">
+            <div class="field">
+                <label for="categorySelect">练习范围</label>
+                <select id="categorySelect"></select>
+            </div>
+
+            <div class="field">
+                <label for="countSelect">每轮字数</label>
+                <select id="countSelect">
+                    <option value="10" selected>10 个字</option>
+                    <option value="20">20 个字</option>
+                    <option value="30">30 个字</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="speechMode">朗读方式</label>
+                <select id="speechMode">
+                    <option value="hint" selected>汉字 + 提示词</option>
+                    <option value="char">只读汉字</option>
+                    <option value="twice">汉字读两遍</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="speechRate">朗读速度</label>
+                <select id="speechRate">
+                    <option value="0.65">很慢</option>
+                    <option value="0.78" selected>较慢</option>
+                    <option value="0.9">正常</option>
+                </select>
+            </div>
+
+            <div class="switch-row">
+                <div class="switch-copy">
+                    <strong>优先复习错字</strong>
+                    <span>抽题时增加以前写错过的字</span>
+                </div>
+                <label class="switch">
+                    <input id="preferWrong" type="checkbox" checked/>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="home-section-title">
+            <span>🎯</span>
+            <div><strong>选择练习模式</strong><small>点击一种方式开始学习</small></div>
+        </div>
+
+        <div class="mode-buttons">
+            <button id="startBtn" class="mode-card mode-dictation">
+                <span class="mode-icon">🔊</span>
+                <span class="mode-copy"><strong>听写练习</strong><small>听音写字，即时判断</small></span>
+            </button>
+            <button id="recognitionStartBtn" class="mode-card mode-recognition">
+                <span class="mode-icon">👀</span>
+                <span class="mode-copy"><strong>看字认读</strong><small>看汉字，练习读音</small></span>
+            </button>
+            <button id="choiceStartBtn" class="mode-card mode-choice">
+                <span class="mode-icon">🎧</span>
+                <span class="mode-copy"><strong>听音选字</strong><small>听读音，选择汉字</small></span>
+            </button>
+            <button id="storyStartBtn" class="mode-card mode-story">
+                <span class="mode-icon">📖</span>
+                <span class="mode-copy"><strong>随机阅读</strong><small>阅读随机组合短文</small></span>
+            </button>
+            <button id="strokeStartBtn" class="mode-card mode-stroke">
+                <span class="mode-icon">✍️</span>
+                <span class="mode-copy"><strong>笔画练习</strong><small>观察正确书写顺序</small></span>
+            </button>
+        </div>
+
+        <div class="home-section-title">
+            <span>📊</span>
+            <div><strong>学习概览</strong><small>学习记录仅保存在当前浏览器</small></div>
+        </div>
+
+        <div class="quick-stats">
+            <div class="stat-box">
+                <strong id="totalPracticed">0</strong>
+                <span>累计练习</span>
+            </div>
+            <div class="stat-box">
+                <strong id="totalCorrect">0</strong>
+                <span>累计写对</span>
+            </div>
+            <div class="stat-box">
+                <strong id="wrongCount">0</strong>
+                <span>错字数量</span>
+            </div>
+        </div>
+
+        <div id="wrongbookSetup" class="wrongbook hidden">
+            <h3>📕 目前的错字本</h3>
+            <div id="wrongbookListSetup" class="wrongbook-list"></div>
+        </div>
+
+        <div class="notice">
+            <strong>💡 使用提示</strong>
+            <span>听写时每写完一个字立即核对；没听清可以重复播放。</span>
+        </div>
+
+        <div class="footer-actions">
+            <button id="resetDataBtn" class="text-btn">清空全部学习记录</button>
+        </div>
+    </section>
+
+    <section id="choiceScreen" class="card hidden">
+        <div class="dictation-top">
+            <div class="progress-text">
+                听音选字：第 <span id="choiceCurrentNumber">1</span> /
+                <span id="choiceTotalNumber">8</span> 题
+            </div>
+            <button id="quitChoiceBtn" class="secondary-btn">退出本轮</button>
+        </div>
+
+        <div class="progress-track">
+            <div id="choiceProgressBar" class="progress-bar"></div>
+        </div>
+
+        <div class="choice-area">
+            <p class="recognition-instruction">仔细听读音，选出你听到的汉字。</p>
+            <button id="choiceSpeakBtn" class="choice-speaker">🔊 再听一次</button>
+            <div id="choiceOptions" class="choice-options"></div>
+            <button id="choiceFeedback" class="choice-feedback hidden" aria-live="polite">
+                ✅ 选对啦！
+                <small>点这里进入下一题</small>
+            </button>
+        </div>
+    </section>
+
+    <section id="dictationScreen" class="card hidden">
+        <div class="dictation-top">
+            <div class="progress-text">
+                <span id="dictationStageLabel">听写</span>：第 <span id="currentNumber">1</span> / <span
+                    id="totalNumber">8</span> 题
+            </div>
+            <button id="quitBtn" class="secondary-btn">退出本轮</button>
+        </div>
+
+        <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <div class="listen-area">
+            <div class="listen-prompt-row">
+                <div class="question-pinyin-wrap">
+                    <span class="question-pinyin-label">本题拼音</span>
+                    <div id="questionPinyin" class="question-pinyin" aria-live="polite"></div>
+                </div>
+                <button id="speakBtn" class="speaker-btn" aria-label="播放本题读音" title="播放本题读音">
+                    <span aria-hidden="true">🔊</span>
+                </button>
+            </div>
+            <p class="tip">
+                请根据声音和拼音，用手指或 Apple Pencil 在下面写字。<br/>
+                没听清可以重复播放。
+            </p>
+        </div>
+
+        <div id="writingArea" class="writing-area">
+            <p class="writing-label">在田字格里写下来</p>
+            <div id="writingBoard" class="writing-board">
+                <canvas id="writingCanvas" aria-label="汉字手写区"></canvas>
+            </div>
+            <div class="writing-tools">
+                <button id="undoStrokeBtn" class="secondary-btn">↩️ 撤销一笔</button>
+                <button id="clearWritingBtn" class="secondary-btn">🗑️ 清空重写</button>
+            </div>
+        </div>
+
+        <button id="showAnswerBtn" class="primary-btn show-answer-btn">
+            写好了，核对本题
+        </button>
+
+        <div id="answerPanel" class="answer-panel hidden">
+            <p class="tip" style="margin-top: 0;">请判断这个字是正确还是错误，判断后进入下一题。</p>
+            <div class="comparison">
+                <div class="comparison-box">
+                    <strong>孩子写的</strong>
+                    <img id="currentWritingPreview" class="written-preview hidden" alt="本题手写内容"/>
+                </div>
+                <div class="comparison-box answer-stroke-box">
+                    <strong>正确答案（笔顺）</strong>
+                    <div class="answer-stroke-grid">
+                        <div id="answerStrokeWriter" class="answer-stroke-writer"></div>
+                        <div id="answerStrokeStatus" class="stroke-status" aria-live="polite">
+                            正在准备笔顺演示……
+                        </div>
+                    </div>
+                    <button id="replayAnswerStrokeBtn" class="secondary-btn" disabled>
+                        ▶️ 再看一遍
+                    </button>
+                </div>
+            </div>
+            <div id="answerHint" class="answer-hint"></div>
+
+            <div class="action-row">
+                <button id="wrongBtn" class="danger-btn">❌ 错误</button>
+                <button id="correctBtn" class="success-btn">✅ 正确</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="recognitionScreen" class="card hidden">
+        <div class="dictation-top">
+            <div class="progress-text">
+                看字认读：第 <span id="recognitionCurrentNumber">1</span> /
+                <span id="recognitionTotalNumber">8</span> 题
+            </div>
+            <button id="quitRecognitionBtn" class="secondary-btn">退出本轮</button>
+        </div>
+
+        <div class="progress-track">
+            <div id="recognitionProgressBar" class="progress-bar"></div>
+        </div>
+
+        <div class="recognition-area">
+            <p class="recognition-instruction">
+                先看着汉字自己读一遍，再点击汉字听标准读音。
+            </p>
+
+            <button id="recognitionCharBtn" class="recognition-char-card"
+                    aria-label="点击汉字播放读音">
+                <span id="recognitionChar" class="recognition-char"></span>
+                <span id="recognitionTapTip" class="recognition-tap-tip">
+            🔊 点一下听读音
+          </span>
+            </button>
+
+            <div id="recognitionReveal" class="recognition-reveal hidden">
+                <div id="recognitionPinyin" class="recognition-pinyin"></div>
+                <div id="recognitionHint" class="recognition-hint"></div>
+
+                <button id="recognitionReplayBtn" class="secondary-btn recognition-replay">
+                    🔊 再听一次
+                </button>
+
+                <div class="action-row">
+                    <button id="recognitionWrongBtn" class="danger-btn">
+                        还不会读
+                    </button>
+                    <button id="recognitionCorrectBtn" class="success-btn">
+                        我会读
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="storyScreen" class="card hidden">
+        <div class="dictation-top">
+            <div class="progress-text">📖 随机阅读练习</div>
+            <button id="quitStoryBtn" class="secondary-btn">返回首页</button>
+        </div>
+
+        <div class="story-area">
+            <p class="recognition-instruction">先自己读一遍，遇到不会的字可以打开拼音或听朗读。</p>
+            <div class="story-paper">
+                <p id="storyText" class="story-text"></p>
+                <div id="storyPinyin" class="story-pinyin hidden"></div>
+            </div>
+            <div class="story-actions">
+                <button id="storyPinyinBtn" class="secondary-btn">显示拼音</button>
+                <button id="storySpeakBtn" class="reading-start-btn secondary-btn">🔊 听朗读</button>
+                <button id="storyNextBtn" class="success-btn">🔄 换一篇</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="strokeScreen" class="card hidden">
+        <div class="dictation-top">
+            <div class="progress-text">
+                笔画练习：第 <span id="strokeCurrentNumber">1</span> /
+                <span id="strokeTotalNumber">1</span> 个字
+            </div>
+            <button id="quitStrokeBtn" class="secondary-btn">返回首页</button>
+        </div>
+
+        <div class="progress-track">
+            <div id="strokeProgressBar" class="progress-bar"></div>
+        </div>
+
+        <div class="stroke-practice-area">
+            <div class="stroke-heading">
+                <strong id="strokePinyin" class="stroke-pinyin"></strong>
+                <span id="strokeHint" class="stroke-hint"></span>
+            </div>
+
+            <div id="strokeGrid" class="stroke-grid" aria-label="汉字笔顺动画">
+                <div id="strokeWriter" class="stroke-writer"></div>
+                <div id="strokeStatus" class="stroke-status" aria-live="polite">正在准备笔画动画……</div>
+            </div>
+
+            <div class="stroke-navigation">
+                <button id="previousStrokeBtn" class="secondary-btn">← 上一字</button>
+                <button id="nextStrokeBtn" class="success-btn">下一字 →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="summaryScreen" class="card hidden">
+        <h2 class="summary-title">🎉 本轮完成</h2>
+
+        <div id="scoreRing" class="score-ring">
+            <div class="score-ring-content">
+                <strong id="scoreText">0%</strong>
+                <span>正确率</span>
+            </div>
+        </div>
+
+        <p id="summaryMessage" class="summary-message"></p>
+
+        <div id="resultList" class="result-list"></div>
+
+        <div class="summary-actions">
+            <button id="practiceWrongBtn" class="warning-btn">再练本轮错字</button>
+            <button id="backHomeBtn" class="primary-btn">返回首页</button>
+        </div>
+    </section>
+</main>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js" defer></script>
+<script src="./hanzi-data.js" defer></script>
+<script src="./hanzi.js" defer></script>
+</html>

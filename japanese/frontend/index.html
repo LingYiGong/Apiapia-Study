@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="日语听力">
+    <meta name="theme-color" content="#4f46e5">
+    <title>日语听力学习</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <!-- 引入内置词库与句子库数据 -->
+    <script src="vocab_data.js"></script>
+    <script src="sentence_data.js"></script>
+    <style>
+        [v-cloak] { display: none; }
+        body { 
+            -webkit-tap-highlight-color: transparent; 
+            touch-action: manipulation;
+        }
+        
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
+        
+        .slide-up-enter-active, .slide-up-leave-active { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .slide-up-enter-from { opacity: 0; transform: translateY(16px); }
+        .slide-up-leave-to { opacity: 0; transform: translateY(-16px); }
+    </style>
+</head>
+<body class="bg-slate-100 text-gray-800 min-h-screen h-[100dvh] flex flex-col overflow-hidden font-sans">
+    <div id="app" v-cloak class="h-full h-[100dvh] flex flex-col max-w-md sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto w-full bg-white shadow-2xl relative md:border-x border-gray-200">
+        
+        <!-- Toast Notification -->
+        <transition name="fade">
+            <div v-if="toastMessage" class="absolute top-16 left-4 right-4 z-50 bg-gray-900/95 backdrop-blur text-white px-4 py-3 rounded-2xl shadow-2xl text-center text-sm font-medium flex items-center justify-center space-x-2">
+                <span>{{ toastMessage }}</span>
+            </div>
+        </transition>
+
+        <!-- Header with iOS Safe Area support -->
+        <header class="bg-indigo-600 text-white px-4 sm:px-6 pt-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 shadow-md z-10 flex-shrink-0">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <a href="../../index.html" class="text-xs px-2.5 py-1 rounded-full bg-indigo-700/70 hover:bg-indigo-700 text-indigo-100 font-medium flex items-center space-x-1 border border-indigo-400/40 transition-all active:scale-95 shadow-sm" title="返回学习中心">
+                        <span>← 🏠</span>
+                    </a>
+                    <h1 class="text-lg sm:text-2xl font-bold tracking-wide flex items-center space-x-1.5">
+                        <span>🎌</span>
+                        <span>日语听力学习</span>
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button @click="showSyncModal = true" class="text-xs sm:text-sm px-3 py-1 rounded-full font-medium flex items-center space-x-1 transition-all border shadow-sm active:scale-95"
+                            :class="syncStatus === 'syncing' ? 'bg-amber-500 text-white border-amber-400 animate-pulse' : (syncKey ? 'bg-indigo-500/80 hover:bg-indigo-500 text-white border-indigo-400/40' : 'bg-indigo-700/60 hover:bg-indigo-700 text-indigo-200 border-indigo-500/50')"
+                            title="Cloudflare 多端云同步">
+                        <span>☁️ {{ syncStatus === 'syncing' ? '同步中' : '云同步' }}</span>
+                    </button>
+                    <button @click="showAudioSettings = true" class="text-xs sm:text-sm px-3 py-1 rounded-full bg-indigo-500/80 hover:bg-indigo-500 font-medium flex items-center space-x-1 transition-colors border border-indigo-400/40 active:scale-95" title="发音与语音设置">
+                        <span>🔊 发音</span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex justify-between items-center mt-2.5 text-xs sm:text-sm opacity-95 border-t border-indigo-500/60 pt-2 font-medium">
+                <span>已学词汇: <b class="text-emerald-300 font-bold">{{ learnedWordsCount }}</b> / {{ words.length }}</span>
+                <span>待复习: 词<b class="text-yellow-300 font-bold ml-0.5">{{ todayDueCount }}</b> | 句<b class="text-yellow-300 font-bold ml-0.5">{{ sentenceDueCount }}</b></span>
+                <span>已掌握: <b class="text-white font-bold">{{ masteredCount }}</b> 词</span>
+            </div>
+        </header>
+
+        <!-- Audio Settings Modal -->
+        <div v-if="showAudioSettings" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between border-b pb-3">
+                    <h3 class="text-base font-bold text-gray-800 flex items-center space-x-1.5">
+                        <span>🔊 日语发音与语音设置</span>
+                    </h3>
+                    <button @click="showAudioSettings = false" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg text-base">✕</button>
+                </div>
+
+                <!-- Engine Selection -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">发音音源引擎</label>
+                    <div class="space-y-2">
+                        <label class="flex items-start p-2.5 rounded-xl border cursor-pointer transition-colors"
+                               :class="audioEngine === 'online' ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-200 hover:bg-gray-50'">
+                            <input type="radio" v-model="audioEngine" value="online" @change="saveAudioConfig" class="mt-0.5 text-indigo-600 mr-2.5">
+                            <div>
+                                <div class="text-xs font-semibold text-gray-800 flex items-center space-x-1">
+                                    <span>🌐 在线真实标准日语音频</span>
+                                    <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.2 rounded font-medium">推荐</span>
+                                </div>
+                                <p class="text-[11px] text-gray-500 mt-0.5">原生东京都真人发音，音质清晰纯正，完美支持全平台，解决汉字发音错乱问题。</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start p-2.5 rounded-xl border cursor-pointer transition-colors"
+                               :class="audioEngine === 'tts' ? 'border-indigo-600 bg-indigo-50/50' : 'border-gray-200 hover:bg-gray-50'">
+                            <input type="radio" v-model="audioEngine" value="tts" @change="saveAudioConfig" class="mt-0.5 text-indigo-600 mr-2.5">
+                            <div class="flex-1">
+                                <div class="text-xs font-semibold text-gray-800">💻 浏览器 / 系统本地 TTS 合成</div>
+                                <p class="text-[11px] text-gray-500 mt-0.5">调用系统本地语音引擎（支持离线）。</p>
+                                
+                                <div v-if="audioEngine === 'tts'" class="mt-2 pt-2 border-t border-gray-200">
+                                    <label class="block text-[11px] text-gray-600 mb-1">选择日语语音包：</label>
+                                    <select v-if="availableVoices.length > 0" v-model="jaVoiceName" @change="saveAudioConfig" class="w-full text-xs border rounded-lg p-1.5 bg-white text-gray-700">
+                                        <option v-for="v in availableVoices" :key="v.name" :value="v.name">
+                                            {{ v.name }}
+                                        </option>
+                                    </select>
+                                    <div v-else class="text-[11px] text-amber-700 bg-amber-50 p-2 rounded-lg leading-relaxed mt-1">
+                                        ⚠️ 未在您的系统检测到日语 TTS 语音包（Windows 默认会退回中文语音朗读导致发音严重错误），强烈建议切换使用上方的【在线真实标准日语音频】！
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Pronunciation Base -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">发音基准（解决多音字读错）</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center p-2 rounded-lg border text-xs cursor-pointer"
+                               :class="audioTarget === 'kana' ? 'border-indigo-600 bg-indigo-50/50 font-medium text-indigo-700' : 'border-gray-200 text-gray-600'">
+                            <input type="radio" v-model="audioTarget" value="kana" @change="saveAudioConfig" class="mr-2 text-indigo-600">
+                            <span>假名注音优先 (推荐)</span>
+                        </label>
+                        <label class="flex items-center p-2 rounded-lg border text-xs cursor-pointer"
+                               :class="audioTarget === 'word' ? 'border-indigo-600 bg-indigo-50/50 font-medium text-indigo-700' : 'border-gray-200 text-gray-600'">
+                            <input type="radio" v-model="audioTarget" value="word" @change="saveAudioConfig" class="mr-2 text-indigo-600">
+                            <span>汉字原文发音</span>
+                        </label>
+                    </div>
+                    <p class="text-[11px] text-gray-400 mt-1">※ 假名注音为一字一音，可彻底避免如「方（かた）」被误读为「ほう」、「角（かど）」被误读为「つの」等问题。</p>
+                </div>
+
+                <!-- Speed Control -->
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="text-xs font-semibold text-gray-700">朗读语速: {{ speechRate }}x</label>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button v-for="rate in [1.0, 1.2, 1.35, 1.5]" :key="rate"
+                                @click="speechRate = rate; saveAudioConfig()"
+                                :class="['flex-1 py-1 text-xs rounded-lg border font-medium transition-colors',
+                                         speechRate === rate ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-gray-50 text-gray-700 hover:bg-gray-100']">
+                            {{ rate }}x
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Test Audio Button -->
+                <div class="pt-2 border-t flex space-x-2">
+                    <button @click="testAudio('こんにちは')" class="flex-1 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1 transition-colors">
+                        <span>🔊 试听「こんにちは」</span>
+                    </button>
+                    <button @click="testAudio({ word: 'お茶', kana: 'おちゃ' })" class="flex-1 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1 transition-colors">
+                        <span>🔊 试听「お茶」</span>
+                    </button>
+                </div>
+
+                <div class="text-center pt-1">
+                    <button @click="showAudioSettings = false" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-colors">
+                        完成设置并关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cloud Sync Modal -->
+        <div v-if="showSyncModal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between border-b pb-3">
+                    <h3 class="text-base font-bold text-gray-800 flex items-center space-x-1.5">
+                        <span>☁️ Cloudflare 云端多端同步</span>
+                    </h3>
+                    <button @click="showSyncModal = false" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg text-base">✕</button>
+                </div>
+
+                <!-- Sync Key Input -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">专属同步密钥 (Sync Key)</label>
+                    <input v-model="syncKey" @change="saveSyncConfig" type="text" placeholder="输入任意个性化密码 (例: mypass888)"
+                           class="w-full px-3 py-2 text-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 font-mono">
+                    <p class="text-[11px] text-gray-500 mt-1.5 leading-relaxed">
+                        💡 <b>多端同步原理</b>：在手机与电脑中输入相同的密钥，学习进度即可通过 Cloudflare 边缘 KV 数据库自动打通！
+                    </p>
+                </div>
+
+                <!-- Auto Sync Toggle -->
+                <div class="p-3 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-semibold text-gray-800">自动实时同步</div>
+                        <div class="text-[11px] text-gray-500 mt-0.5">打开页面自动拉取，练习打卡后自动推送保存</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" v-model="autoSync" @change="saveSyncConfig" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    </label>
+                </div>
+
+                <!-- Sync Action Buttons -->
+                <div class="space-y-2 pt-1">
+                    <button @click="pushToCloud(false)" :disabled="syncStatus === 'syncing'" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center justify-center space-x-1.5">
+                        <span>⬆️ 立即将本地进度推送到云端备份</span>
+                    </button>
+                    <button @click="pullFromCloud(false)" :disabled="syncStatus === 'syncing'" class="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 disabled:opacity-50 text-indigo-700 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center space-x-1.5">
+                        <span>⬇️ 立即从云端拉取最新进度覆盖本地</span>
+                    </button>
+                </div>
+
+                <!-- Status & Info Box -->
+                <div class="text-[11px] text-gray-600 bg-gray-50 p-2.5 rounded-xl space-y-1 border border-gray-100">
+                    <div class="flex justify-between">
+                        <span>同步状态：</span>
+                        <span :class="syncStatus === 'success' ? 'text-emerald-600 font-semibold' : (syncStatus === 'error' ? 'text-rose-600 font-semibold' : (syncStatus === 'syncing' ? 'text-amber-600 font-semibold' : 'text-gray-600'))">
+                            {{ syncStatusText }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>上次同步时间：</span>
+                        <span class="text-gray-500 font-mono">{{ lastSyncTime || '未同步' }}</span>
+                    </div>
+                </div>
+
+                <div class="text-center pt-1">
+                    <button @click="showSyncModal = false" class="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-semibold transition-colors">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex border-b bg-gray-50 flex-shrink-0">
+            <button @click="currentTab = 'practice'" 
+                    :class="['flex-1 py-3 sm:py-3.5 text-center font-medium text-xs sm:text-sm md:text-base transition-all flex items-center justify-center space-x-1 sm:space-x-1.5 touch-manipulation', 
+                             currentTab === 'practice' ? 'text-indigo-600 border-b-2 border-indigo-600 bg-white font-semibold' : 'text-gray-500 hover:text-gray-700']">
+                <span class="text-sm sm:text-base">🎧</span>
+                <span>单词听力</span>
+                <span v-if="todayDueCount > 0" class="ml-1 px-1.5 py-0.2 text-[10px] sm:text-xs rounded-full bg-rose-500 text-white font-bold">
+                    {{ todayDueCount > 99 ? '99+' : todayDueCount }}
+                </span>
+            </button>
+            <button @click="currentTab = 'sentence'" 
+                    :class="['flex-1 py-3 sm:py-3.5 text-center font-medium text-xs sm:text-sm md:text-base transition-all flex items-center justify-center space-x-1 sm:space-x-1.5 touch-manipulation', 
+                             currentTab === 'sentence' ? 'text-indigo-600 border-b-2 border-indigo-600 bg-white font-semibold' : 'text-gray-500 hover:text-gray-700']">
+                <span class="text-sm sm:text-base">💬</span>
+                <span>句子听力</span>
+                <span v-if="sentenceDueCount > 0" class="ml-1 px-1.5 py-0.2 text-[10px] sm:text-xs rounded-full bg-rose-500 text-white font-bold">
+                    {{ sentenceDueCount > 99 ? '99+' : sentenceDueCount }}
+                </span>
+            </button>
+            <button @click="currentTab = 'manage'" 
+                    :class="['flex-1 py-3 sm:py-3.5 text-center font-medium text-xs sm:text-sm md:text-base transition-all flex items-center justify-center space-x-1 sm:space-x-1.5 touch-manipulation', 
+                             currentTab === 'manage' ? 'text-indigo-600 border-b-2 border-indigo-600 bg-white font-semibold' : 'text-gray-500 hover:text-gray-700']">
+                <span class="text-sm sm:text-base">📚</span>
+                <span>词库管理</span>
+            </button>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto relative bg-gray-50">
+            
+            <!-- Management View -->
+            <div v-show="currentTab === 'manage'" class="p-3.5 flex flex-col space-y-3 pb-8">
+                
+                <!-- Import & Manage Toolbar Card -->
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-sm font-bold text-gray-700 flex items-center space-x-1">
+                            <span>📦 词库操作</span>
+                        </h2>
+                        <span class="text-xs text-gray-400">已载入 {{ words.length }} 词</span>
+                    </div>
+
+                    <!-- Preset Import Buttons -->
+                    <div class="mb-2.5">
+                        <button @click="importBuiltin()" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold py-2.5 px-3 rounded-xl border border-indigo-200 transition-colors text-center flex items-center justify-center space-x-1.5 shadow-sm">
+                            <span>📦 载入 / 重置内置词库 (1786词)</span>
+                        </button>
+                    </div>
+
+                    <!-- File Import / Export / Clear -->
+                    <div class="flex space-x-2 text-xs">
+                        <label class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 px-2 rounded-lg border text-center cursor-pointer transition-colors flex items-center justify-center space-x-1">
+                            <span>📂 上传文件导入</span>
+                            <input type="file" accept=".txt,.json" @change="handleFileUpload" class="hidden">
+                        </label>
+                        <button @click="exportData" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 px-3 rounded-lg border transition-colors">
+                            💾 备份
+                        </button>
+                        <button @click="clearAllWords" class="bg-rose-50 hover:bg-rose-100 text-rose-600 py-1.5 px-3 rounded-lg border border-rose-200 transition-colors">
+                            🗑️ 清空
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add/Edit Word Card (Collapsible) -->
+                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-2 cursor-pointer" @click="showAddForm = !showAddForm">
+                        <h2 class="text-sm font-semibold text-gray-800 flex items-center space-x-1">
+                            <span>{{ editingId ? '✏️ 编辑词汇' : '➕ 添加新词' }}</span>
+                        </h2>
+                        <button class="text-xs text-indigo-600 font-medium">
+                            {{ editingId ? '编辑中' : (showAddForm ? '收起 ▲' : '展开 ▼') }}
+                        </button>
+                    </div>
+
+                    <form v-show="showAddForm || editingId" @submit.prevent="saveWord" class="space-y-2.5 pt-1">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[11px] text-gray-500 font-medium block mb-1">日文 (Kanji/Kana) *</label>
+                                <input v-model="form.word" type="text" placeholder="例: お茶" required
+                                       class="w-full px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-gray-500 font-medium block mb-1">注音 (Furigana) *</label>
+                                <input v-model="form.kana" type="text" placeholder="例: おちゃ" required
+                                       class="w-full px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-gray-500 font-medium block mb-1">中文释义 (可选)</label>
+                            <input v-model="form.meaning" type="text" placeholder="例: 茶，绿茶"
+                                   class="w-full px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="flex space-x-2 pt-1">
+                            <button type="submit" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 active:bg-indigo-800 transition-colors shadow-sm">
+                                {{ editingId ? '保存修改' : '确认添加' }}
+                            </button>
+                            <button v-if="editingId" @click="cancelEdit" type="button" class="px-4 bg-gray-200 text-gray-700 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors">
+                                取消
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Word List Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3.5 flex flex-col">
+                    <!-- Filters & Search -->
+                    <div class="space-y-2 mb-3">
+                        <div class="relative">
+                            <input v-model="searchQuery" type="text" placeholder="🔍 搜索日文、注音或释义..."
+                                   class="w-full pl-8 pr-8 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50">
+                            <span class="absolute left-2.5 top-2.5 text-gray-400 text-xs">🔍</span>
+                            <button v-if="searchQuery" @click="searchQuery = ''" class="absolute right-2.5 top-2 text-gray-400 hover:text-gray-600 text-sm">✕</button>
+                        </div>
+
+                        <!-- Count Label -->
+                        <div class="flex items-center justify-between text-xs pt-0.5 px-1 text-gray-500">
+                            <span>全部词汇</span>
+                            <span class="text-gray-400">共 {{ filteredWords.length }} 词</span>
+                        </div>
+                    </div>
+
+                    <!-- Word List Items -->
+                    <div v-if="filteredWords.length === 0" class="text-center text-gray-400 py-12">
+                        <div class="text-3xl mb-2">📭</div>
+                        <p class="text-sm">未找到匹配词汇</p>
+                    </div>
+                    <ul v-else class="divide-y divide-gray-100">
+                        <li v-for="word in paginatedWords" :key="word.id" class="py-2.5 px-1 flex justify-between items-center hover:bg-gray-50/80 transition-colors rounded-lg">
+                            <div class="flex-1 min-w-0 pr-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-base font-semibold text-gray-900 truncate">{{ word.word }}</span>
+                                    <button @click="playWord(word)" class="text-gray-400 hover:text-indigo-600 p-0.5 rounded transition-colors" title="发音">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"></path></svg>
+                                    </button>
+                                    <span :class="['text-[10px] px-1.5 py-0.5 rounded-full font-medium', word.level > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800']">
+                                        Lv {{ word.level }}
+                                    </span>
+                                </div>
+                                <div class="text-xs text-gray-500 truncate mt-0.5">
+                                    <span class="font-medium text-indigo-700">{{ word.kana }}</span>
+                                    <span class="mx-1 text-gray-300">|</span>
+                                    <span :class="word.meaning ? 'text-gray-600' : 'text-gray-300 italic'">{{ word.meaning || '（暂无释义）' }}</span>
+                                </div>
+                                <div class="text-[10px] text-gray-400 mt-0.5 flex space-x-2">
+                                    <span>下次: {{ formatDate(word.next_review_date) }}</span>
+                                    <span v-if="word.next_review_date <= Date.now()" class="text-rose-500 font-semibold">● 待复习</span>
+                                </div>
+                            </div>
+                            <div class="flex space-x-1 flex-shrink-0">
+                                <button @click="editWord(word)" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="编辑">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </button>
+                                <button @click="deleteWord(word.id)" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors" title="删除">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <!-- Pagination Controls -->
+                    <div v-if="totalPages > 1" class="flex justify-between items-center pt-3 border-t border-gray-100 text-xs text-gray-500 mt-2">
+                        <button :disabled="currentPage <= 1" @click="currentPage--"
+                                :class="['px-3 py-1.5 rounded-lg border font-medium transition-colors', currentPage <= 1 ? 'opacity-40 cursor-not-allowed bg-gray-50' : 'hover:bg-gray-100 bg-white']">
+                            ◀ 上一页
+                        </button>
+                        <span>第 {{ currentPage }} / {{ totalPages }} 页</span>
+                        <button :disabled="currentPage >= totalPages" @click="currentPage++"
+                                :class="['px-3 py-1.5 rounded-lg border font-medium transition-colors', currentPage >= totalPages ? 'opacity-40 cursor-not-allowed bg-gray-50' : 'hover:bg-gray-100 bg-white']">
+                            下一页 ▶
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Practice View -->
+            <div v-show="currentTab === 'practice'" class="h-full flex flex-col p-4">
+                
+                <!-- Start Screen -->
+                <div v-if="practiceState === 'idle'" class="h-full flex flex-col items-center justify-center">
+                    
+                    <!-- No words due -->
+                    <div v-if="todayDueCount === 0" class="text-center px-4">
+                        <div class="text-6xl mb-4 animate-bounce">🎉</div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">
+                            {{ words.length === 0 ? '词库为空' : '今日练习已完成！' }}
+                        </h2>
+                        <p class="text-sm text-gray-500 max-w-xs mx-auto mb-6">
+                            {{ words.length === 0 ? '请切换至「词库管理」导入内置词库' : '所有待复习词汇已全部掌握！明天继续保持！' }}
+                        </p>
+                        
+                        <div class="flex flex-col space-y-2.5 w-full max-w-xs">
+                            <button v-if="words.length > 0" @click="startPractice(true)" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2.5 px-4 rounded-xl text-sm font-semibold border border-indigo-200 transition-colors">
+                                🔄 随机强化练习任意 30 词
+                            </button>
+                            <button v-if="words.length === 0" @click="currentTab = 'manage'" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-xl text-sm font-semibold shadow-md hover:bg-indigo-700 transition-colors">
+                                📚 前往词库一键导入
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Has words due -->
+                    <div v-else class="text-center">
+                        <h2 class="text-2xl font-extrabold text-gray-800 mb-6">
+                            今日待复习: <span class="text-indigo-600">{{ todayDueCount }}</span> 词
+                        </h2>
+                        
+                        <!-- Big Start Button -->
+                        <button @click="startPractice(false)" class="bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white w-48 h-48 rounded-full text-2xl font-bold shadow-2xl hover:scale-105 active:scale-95 transition-all flex flex-col items-center justify-center mx-auto ring-8 ring-indigo-50">
+                            <svg class="w-14 h-14 mb-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>开始听力练习</span>
+                        </button>
+                        
+                        <p class="text-xs text-gray-400 mt-6 max-w-xs mx-auto">
+                            点击开始进入盲听练习
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Practice Active Screen -->
+                <div v-else class="h-full flex flex-col relative">
+                    
+                    <!-- Progress & Header -->
+                    <div class="text-center text-xs text-gray-500 mb-3 flex-shrink-0">
+                        <div class="flex justify-between items-center mb-1 px-1">
+                            <span class="font-medium text-gray-600">单词听力</span>
+                            <span class="font-bold text-indigo-600">
+                                {{ initialQueueLength - todayQueue.length + 1 }} / {{ initialQueueLength }}
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                            <div class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300" 
+                                 :style="{ width: initialQueueLength > 0 ? `${((initialQueueLength - todayQueue.length) / initialQueueLength) * 100}%` : '0%' }"></div>
+                        </div>
+                    </div>
+
+                    <!-- Display Area -->
+                    <div class="flex-1 bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 p-5 sm:p-8 flex flex-col items-center justify-center mb-3 sm:mb-4 relative overflow-hidden">
+                        
+                        <transition name="slide-up" mode="out-in">
+                            <div :key="(currentPracticeWord?.id || '') + practiceState" class="w-full h-full flex flex-col items-center justify-center">
+                                
+                                <!-- State 1: Listening Test -->
+                                <div v-if="practiceState === 'listening'" class="flex flex-col items-center w-full">
+                                    <button @click="playCurrent" class="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center hover:bg-indigo-100 active:scale-95 shadow-inner transition-all group touch-manipulation">
+                                        <svg class="w-12 h-12 sm:w-16 sm:h-16 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                                    </button>
+                                    <p class="mt-4 sm:mt-6 text-gray-700 font-bold text-base sm:text-lg md:text-xl">👂 请仔细听发音</p>
+                                    <p class="mt-1 text-xs sm:text-sm text-gray-400">点击喇叭可重播</p>
+                                </div>
+
+                                <!-- State 2: Answer Reveal -->
+                                <div v-else-if="practiceState === 'reveal' && currentPracticeWord" class="flex flex-col items-center w-full text-center px-2">
+                                    <div class="text-3xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-2 sm:mb-3 tracking-wide select-text">{{ currentPracticeWord.word }}</div>
+                                    <div class="text-lg sm:text-2xl md:text-3xl font-semibold text-indigo-600 mb-3 sm:mb-5 select-text">{{ currentPracticeWord.kana }}</div>
+                                    
+                                    <div class="text-sm sm:text-base md:text-lg text-gray-700 px-5 py-2.5 sm:py-3.5 bg-gray-50 border rounded-2xl max-w-full font-medium leading-relaxed shadow-sm select-text">
+                                        {{ currentPracticeWord.meaning || '（暂无中文释义）' }}
+                                    </div>
+
+                                    <div class="flex items-center space-x-3 mt-4 sm:mt-6">
+                                        <button @click="playCurrent" class="px-3.5 py-1.5 sm:py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-xl text-xs sm:text-sm font-semibold flex items-center space-x-1 transition-colors active:scale-95 touch-manipulation">
+                                            <span>🔊 重新朗读</span>
+                                        </button>
+                                        <button @click="promptEditMeaning(currentPracticeWord)" class="px-3.5 py-1.5 sm:py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-xs sm:text-sm font-semibold transition-colors active:scale-95 touch-manipulation">
+                                            <span>✏️ 补充释义</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </transition>
+
+                    </div>
+
+                    <!-- Bottom Controls with Safe Area -->
+                    <div class="flex-shrink-0 h-28 sm:h-32 md:h-36 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+                        <transition name="fade" mode="out-in">
+                            <!-- Listening State Buttons -->
+                            <div v-if="practiceState === 'listening'" class="flex space-x-3 h-full">
+                                <button @click="handleUnknown" class="flex-1 bg-gradient-to-b from-rose-500 to-rose-600 text-white rounded-2xl sm:rounded-3xl text-lg sm:text-2xl font-bold shadow-lg hover:from-rose-600 hover:to-rose-700 active:scale-[0.98] transition-all flex flex-col items-center justify-center pb-1 touch-manipulation">
+                                    <span class="text-2xl sm:text-3xl mb-0.5 sm:mb-1">❌</span>
+                                    <span>没理解</span>
+                                    <span class="text-[10px] sm:text-xs font-normal opacity-80 mt-0.5">重置回末尾</span>
+                                </button>
+                                <button @click="handleKnown" class="flex-1 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-2xl sm:rounded-3xl text-lg sm:text-2xl font-bold shadow-lg hover:from-emerald-600 hover:to-emerald-700 active:scale-[0.98] transition-all flex flex-col items-center justify-center pb-1 touch-manipulation">
+                                    <span class="text-2xl sm:text-3xl mb-0.5 sm:mb-1">✅</span>
+                                    <span>认识 / 理解</span>
+                                    <span class="text-[10px] sm:text-xs font-normal opacity-80 mt-0.5">Lv+1 并推迟复习</span>
+                                </button>
+                            </div>
+
+                            <!-- Reveal State Next Button -->
+                            <div v-else-if="practiceState === 'reveal'" class="h-full">
+                                <button @click="nextWord" class="w-full h-full bg-indigo-600 text-white rounded-2xl sm:rounded-3xl text-xl sm:text-2xl md:text-3xl font-bold shadow-xl hover:bg-indigo-700 active:scale-[0.98] transition-all flex items-center justify-center space-x-2 touch-manipulation">
+                                    <span>下一个 (Next)</span>
+                                    <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                            </div>
+                        </transition>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Sentence Practice View -->
+            <div v-show="currentTab === 'sentence'" class="h-full flex flex-col p-4">
+                
+                <!-- State 0: Idle / Setup Screen -->
+                <div v-if="sentencePracticeState === 'idle'" class="flex-1 flex flex-col justify-between py-1 overflow-y-auto">
+                    
+                    <div class="space-y-3">
+                        <!-- Top Info Card -->
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <h2 class="text-base font-bold text-gray-800 flex items-center space-x-1.5">
+                                    <span>💬 句子听力理解练习</span>
+                                </h2>
+                                <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold">
+                                    {{ eligibleSentences.length }} 句可用
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-500 leading-relaxed">
+                                聆听地道的日语句子录音，结合已学单词考察理解能力。同样运用艾宾浩斯记忆曲线智能安排复习。
+                            </p>
+
+                            <!-- Scope Selector -->
+                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                <label class="block text-xs font-semibold text-gray-700 mb-2">选择练习范围：</label>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <button @click="sentenceScope = 'learned'" 
+                                            :class="['p-2.5 rounded-xl border text-left transition-all', 
+                                                     sentenceScope === 'learned' ? 'border-indigo-600 bg-indigo-50/70 font-semibold text-indigo-700 shadow-sm' : 'border-gray-200 bg-gray-50/60 text-gray-600 hover:bg-gray-100']">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-bold">🌟 基于已学词汇</span>
+                                            <span class="text-[9px] px-1 py-0.2 rounded bg-indigo-200 text-indigo-800 font-normal">推荐</span>
+                                        </div>
+                                        <p class="text-[10px] font-normal opacity-80 mt-1">关联您在「单词听力」中认识的词汇</p>
+                                    </button>
+
+                                    <button @click="sentenceScope = 'all'" 
+                                            :class="['p-2.5 rounded-xl border text-left transition-all', 
+                                                     sentenceScope === 'all' ? 'border-indigo-600 bg-indigo-50/70 font-semibold text-indigo-700 shadow-sm' : 'border-gray-200 bg-gray-50/60 text-gray-600 hover:bg-gray-100']">
+                                        <div class="font-bold">🌐 全部句子库</div>
+                                        <p class="text-[10px] font-normal opacity-80 mt-1">共 {{ sentences.length }} 篇实用例句随机抽练</p>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Learned status tips -->
+                            <div v-if="sentenceScope === 'learned' && learnedWordsCount === 0" class="mt-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800">
+                                <div class="font-semibold flex items-center space-x-1">
+                                    <span>💡 温馨提示</span>
+                                </div>
+                                <p class="text-[11px] opacity-90 mt-0.5 leading-relaxed">
+                                    您当前尚未在「单词听力」中标记已掌握的词汇。系统当前随机为您呈现基础例句；当您听力练习并标记【认识】单词后，这里将精准锁定为您包含该词的专属例句！
+                                </p>
+                            </div>
+                            <div v-else-if="sentenceScope === 'learned'" class="mt-3 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between">
+                                <span>🎯 已锁定 <b>{{ learnedWordsCount }}</b> 个已学词汇</span>
+                                <span class="text-[11px] bg-emerald-100 px-2 py-0.5 rounded font-medium">匹配到 {{ eligibleSentences.length }} 句</span>
+                            </div>
+
+                        </div>
+
+                        <!-- Stats Box -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-sm text-center">
+                                <div class="text-xs text-gray-400">待复习句子</div>
+                                <div class="text-2xl font-black text-rose-600 mt-1">{{ sentenceDueCount }}</div>
+                            </div>
+                            <div class="bg-white p-3.5 rounded-2xl border border-gray-100 shadow-sm text-center">
+                                <div class="text-xs text-gray-400">已掌握句子 (Lv≥3)</div>
+                                <div class="text-2xl font-black text-emerald-600 mt-1">{{ sentenceMasteredCount }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Start Button Actions -->
+                    <div class="space-y-2 mt-4">
+                        <button @click="startSentencePractice(false)" 
+                                :disabled="eligibleSentences.length === 0"
+                                class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-2xl text-base font-bold shadow-lg shadow-indigo-200 active:scale-95 transition-all flex items-center justify-center space-x-2">
+                            <span>🎧</span>
+                            <span>开始句子听力 ({{ eligibleDueSentences.length > 0 ? eligibleDueSentences.length + ' 句待复习' : '随机抽取练习' }})</span>
+                        </button>
+
+                        <button v-if="eligibleDueSentences.length === 0 && eligibleSentences.length > 0" 
+                                @click="startSentencePractice(true)" 
+                                class="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-semibold transition-colors">
+                            ⚡ 今日无到期句子，点击开始【随机 15 句强化抽练】
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- State 1 & 2: Active Listening & Reveal Card -->
+                <div v-else class="flex-1 flex flex-col justify-between h-full py-1">
+                    
+                    <!-- Progress Header -->
+                    <div class="flex items-center justify-between mb-2 px-1">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold text-gray-600">
+                                进度: {{ initialSentenceQueueLength - sentenceQueue.length + 1 }} / {{ initialSentenceQueueLength }}
+                            </span>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                                  :class="(currentPracticeSentence?.level || 0) > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">
+                                Lv {{ currentPracticeSentence?.level || 0 }}
+                            </span>
+                        </div>
+                        <button @click="sentencePracticeState = 'idle'" class="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded">
+                            ✕ 结束练习
+                        </button>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-200 rounded-full h-1.5 mb-3 overflow-hidden">
+                        <div class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300"
+                             :style="{ width: ((initialSentenceQueueLength - sentenceQueue.length + 1) / initialSentenceQueueLength * 100) + '%' }">
+                        </div>
+                    </div>
+
+                    <!-- Sentence Card Container -->
+                    <div class="flex-1 bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 p-5 sm:p-8 flex flex-col items-center justify-center mb-3 sm:mb-4 relative overflow-hidden">
+                        
+                        <transition name="slide-up" mode="out-in">
+                            <div :key="(currentPracticeSentence?.id || '') + sentencePracticeState" class="w-full h-full flex flex-col items-center justify-center">
+                                
+                                <!-- Phase 1: Blind Listening -->
+                                <div v-if="sentencePracticeState === 'listening'" class="flex flex-col items-center w-full text-center">
+                                    <button @click="playCurrentSentence" 
+                                            class="w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center hover:bg-indigo-100 active:scale-95 shadow-inner transition-all group touch-manipulation">
+                                        <svg class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                                    </button>
+                                    <p class="mt-4 sm:mt-6 text-gray-800 font-bold text-base sm:text-lg md:text-xl">👂 请仔细听这段句子录音</p>
+                                    <p class="mt-1 text-xs sm:text-sm text-gray-400">看能否辨析出里面的单词与完整句意</p>
+                                    <button @click="playCurrentSentence" class="mt-3.5 px-4 py-1.5 sm:py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs sm:text-sm font-semibold flex items-center space-x-1.5 transition-colors active:scale-95 touch-manipulation">
+                                        <span>🔊 重复播放音频</span>
+                                    </button>
+                                </div>
+
+                                <!-- Phase 2: Answer Reveal -->
+                                <div v-else-if="sentencePracticeState === 'reveal' && currentPracticeSentence" class="flex flex-col items-center w-full text-center px-1">
+                                    
+                                    <!-- Japanese Sentence -->
+                                    <div class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 leading-relaxed tracking-wide select-text">
+                                        {{ currentPracticeSentence.japanese }}
+                                    </div>
+                                    
+                                    <!-- Kana reading -->
+                                    <div class="text-xs sm:text-sm md:text-base font-medium text-indigo-600 mb-3 sm:mb-4 leading-relaxed select-text">
+                                        {{ currentPracticeSentence.kana }}
+                                    </div>
+                                    
+                                    <!-- Chinese Meaning -->
+                                    <div class="text-sm sm:text-base md:text-lg font-semibold text-gray-800 px-4 py-3 bg-gray-50 border rounded-2xl w-full mb-3.5 shadow-sm select-text">
+                                        {{ currentPracticeSentence.chinese }}
+                                    </div>
+
+                                    <!-- Featured Vocab in Sentence -->
+                                    <div v-if="currentPracticeSentence.words && currentPracticeSentence.words.length > 0" class="w-full text-left bg-indigo-50/50 p-3 rounded-2xl border border-indigo-100 mb-2.5">
+                                        <div class="text-[11px] sm:text-xs font-semibold text-gray-500 mb-2 flex items-center space-x-1">
+                                            <span>🔑 本句重点词汇（点击可单独听词）：</span>
+                                        </div>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span v-for="w in currentPracticeSentence.words" :key="w"
+                                                  @click="playWord(w)"
+                                                  :class="['text-xs sm:text-sm px-2.5 py-1 rounded-xl font-medium cursor-pointer transition-all flex items-center space-x-1 active:scale-95 touch-manipulation',
+                                                           isWordLearned(w) ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 shadow-sm' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200']"
+                                                  :title="'点击朗读词汇：' + w">
+                                                <span>{{ w }}</span>
+                                                <span v-if="isWordLearned(w)" class="text-[10px] bg-emerald-200/80 px-1 rounded text-emerald-800 font-bold">已学</span>
+                                                <span class="text-[11px] opacity-70">🔊</span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Replay action -->
+                                    <button @click="playCurrentSentence" class="px-4 py-1.5 sm:py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs sm:text-sm font-semibold flex items-center space-x-1.5 transition-colors mt-1 active:scale-95 touch-manipulation">
+                                        <span>🔊 重播整个句子</span>
+                                    </button>
+
+                                </div>
+
+                            </div>
+                        </transition>
+
+                    </div>
+
+                    <!-- Bottom Controls with Safe Area -->
+                    <div class="flex-shrink-0 h-28 sm:h-32 md:h-36 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+                        <transition name="fade" mode="out-in">
+                            <!-- Listening State Buttons -->
+                            <div v-if="sentencePracticeState === 'listening'" class="flex space-x-3 h-full">
+                                <button @click="handleSentenceUnknown" class="flex-1 bg-gradient-to-b from-rose-500 to-rose-600 text-white rounded-2xl sm:rounded-3xl text-lg sm:text-2xl font-bold shadow-lg hover:from-rose-600 hover:to-rose-700 active:scale-[0.98] transition-all flex flex-col items-center justify-center pb-1 touch-manipulation">
+                                    <span class="text-2xl sm:text-3xl mb-0.5 sm:mb-1">❌</span>
+                                    <span>没理解</span>
+                                    <span class="text-[10px] sm:text-xs font-normal opacity-80 mt-0.5">查看句子与翻译</span>
+                                </button>
+                                <button @click="handleSentenceKnown" class="flex-1 bg-gradient-to-b from-emerald-500 to-emerald-600 text-white rounded-2xl sm:rounded-3xl text-lg sm:text-2xl font-bold shadow-lg hover:from-emerald-600 hover:to-emerald-700 active:scale-[0.98] transition-all flex flex-col items-center justify-center pb-1 touch-manipulation">
+                                    <span class="text-2xl sm:text-3xl mb-0.5 sm:mb-1">✅</span>
+                                    <span>理解 / 听懂</span>
+                                    <span class="text-[10px] sm:text-xs font-normal opacity-80 mt-0.5">Lv+1 直接下一个</span>
+                                </button>
+                            </div>
+
+                            <!-- Reveal State Next Button -->
+                            <div v-else-if="sentencePracticeState === 'reveal'" class="h-full">
+                                <button @click="nextSentence" class="w-full h-full bg-indigo-600 text-white rounded-2xl sm:rounded-3xl text-xl sm:text-2xl md:text-3xl font-bold shadow-xl hover:bg-indigo-700 active:scale-[0.98] transition-all flex items-center justify-center space-x-2 touch-manipulation">
+                                    <span>下一个 (Next)</span>
+                                    <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                            </div>
+                        </transition>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted, watch } = Vue;
+
+        const LOCAL_STORAGE_KEY = 'ja_vocab_list';
+
+        createApp({
+            setup() {
+                // Main State
+                const currentTab = ref('practice');
+                const words = ref([]);
+                const toastMessage = ref('');
+                let toastTimer = null;
+
+                const showToast = (msg) => {
+                    toastMessage.value = msg;
+                    clearTimeout(toastTimer);
+                    toastTimer = setTimeout(() => {
+                        toastMessage.value = '';
+                    }, 3000);
+                };
+
+                // Form & Management State
+                const form = ref({ word: '', kana: '', meaning: '' });
+                const editingId = ref(null);
+                const showAddForm = ref(false);
+                const searchQuery = ref('');
+                const currentPage = ref(1);
+                const pageSize = 50;
+
+                // Practice State (Words)
+                const practiceState = ref('idle'); // 'idle', 'listening', 'reveal'
+                const todayQueue = ref([]);
+                const initialQueueLength = ref(0);
+
+                // Sentence Practice State
+                const LOCAL_STORAGE_SENTENCES_KEY = 'japanese_study_sentences_v1';
+                const sentences = ref([]);
+                const sentenceScope = ref('learned'); // 'learned', 'all'
+                const sentencePracticeState = ref('idle'); // 'idle', 'listening', 'reveal'
+                const sentenceQueue = ref([]);
+                const initialSentenceQueueLength = ref(0);
+
+                // Cloudflare Cloud Sync Config
+                const SYNC_KEY_STORAGE = 'japanese_study_sync_key_v1';
+                const AUTO_SYNC_STORAGE = 'japanese_study_auto_sync_v1';
+                const showSyncModal = ref(false);
+                const syncKey = ref(localStorage.getItem(SYNC_KEY_STORAGE) || '');
+                const autoSync = ref(localStorage.getItem(AUTO_SYNC_STORAGE) === 'true');
+                const syncStatus = ref('idle'); // 'idle', 'syncing', 'success', 'error'
+                const syncStatusText = ref('空闲');
+                const lastSyncTime = ref(localStorage.getItem('japanese_study_last_sync_time') || '');
+                let debounceSyncTimer = null;
+                
+                // Audio / Voice Engine Config
+                const AUDIO_CONFIG_KEY = 'japanese_study_audio_config_v1';
+                const showAudioSettings = ref(false);
+                const audioEngine = ref('online'); // 'online' (推荐真人日语音频), 'tts' (系统语音)
+                const audioTarget = ref('kana'); // 'kana' (假名注音，精准避免多音字错误), 'word' (汉字原文)
+                const speechRate = ref(1.0); // 1.0, 1.2, 1.35, 1.5
+                const jaVoiceName = ref('');
+                const availableVoices = ref([]);
+
+                const synth = window.speechSynthesis;
+                let currentAudio = null;
+
+                const initVoices = () => {
+                    if (!synth) return;
+                    const allVoices = synth.getVoices() || [];
+                    const jaVoices = allVoices.filter(v => 
+                        (v.lang && (v.lang === 'ja-JP' || v.lang === 'ja' || v.lang.toLowerCase().startsWith('ja'))) ||
+                        /japanese|日本語/i.test(v.name)
+                    );
+                    availableVoices.value = jaVoices;
+
+                    if (jaVoices.length > 0) {
+                        if (!jaVoiceName.value || !jaVoices.some(v => v.name === jaVoiceName.value)) {
+                            const natural = jaVoices.find(v => /natural|online/i.test(v.name));
+                            const google = jaVoices.find(v => /google/i.test(v.name));
+                            jaVoiceName.value = (natural || google || jaVoices[0]).name;
+                        }
+                    }
+                };
+
+                const loadAudioConfig = () => {
+                    try {
+                        const raw = localStorage.getItem(AUDIO_CONFIG_KEY);
+                        if (raw) {
+                            const parsed = JSON.parse(raw);
+                            if (parsed.audioEngine) audioEngine.value = parsed.audioEngine;
+                            if (parsed.audioTarget) audioTarget.value = parsed.audioTarget;
+                            if (parsed.speechRate) {
+                                const r = Number(parsed.speechRate);
+                                speechRate.value = [1.0, 1.2, 1.35, 1.5].includes(r) ? r : 1.0;
+                            }
+                            if (parsed.jaVoiceName) jaVoiceName.value = parsed.jaVoiceName;
+                        }
+                    } catch (e) {
+                        console.error('Failed to load audio config', e);
+                    }
+                };
+
+                const saveAudioConfig = () => {
+                    try {
+                        localStorage.setItem(AUDIO_CONFIG_KEY, JSON.stringify({
+                            audioEngine: audioEngine.value,
+                            audioTarget: audioTarget.value,
+                            speechRate: speechRate.value,
+                            jaVoiceName: jaVoiceName.value
+                        }));
+                    } catch (e) {
+                        console.error('Failed to save audio config', e);
+                    }
+                };
+
+                // Load Data with auto-initialization from built-in vocab
+                const loadData = () => {
+                    let loadedWords = [];
+                    try {
+                        const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+                        if (raw) {
+                            const parsed = JSON.parse(raw);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                loadedWords = parsed;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse localStorage data', e);
+                    }
+
+                    if (loadedWords.length > 0) {
+                        let hasChanges = false;
+                        // Auto-fill missing meanings and append new built-in vocabulary
+                        if (window.BUILTIN_VOCAB_ALL && Array.isArray(window.BUILTIN_VOCAB_ALL)) {
+                            const existingWordMap = new Map();
+                            loadedWords.forEach(w => {
+                                existingWordMap.set(`${w.word}__${w.kana}`, w);
+                                existingWordMap.set(w.word, w);
+                            });
+
+                            window.BUILTIN_VOCAB_ALL.forEach(item => {
+                                const exist = existingWordMap.get(`${item.word}__${item.kana}`) || existingWordMap.get(item.word);
+                                if (exist) {
+                                    if (!exist.meaning || exist.meaning.trim() === '') {
+                                        exist.meaning = item.meaning;
+                                        hasChanges = true;
+                                    }
+                                } else {
+                                    loadedWords.push({
+                                        ...item,
+                                        level: 0,
+                                        next_review_date: Date.now()
+                                    });
+                                    existingWordMap.set(`${item.word}__${item.kana}`, item);
+                                    existingWordMap.set(item.word, item);
+                                    hasChanges = true;
+                                }
+                            });
+                        }
+                        words.value = loadedWords;
+                        if (hasChanges) {
+                            saveData();
+                            console.log('Auto-merged new built-in vocabulary into user list.');
+                        }
+                        return;
+                    }
+
+                    // Auto-load built-in vocabulary if localStorage is empty
+                    if (window.BUILTIN_VOCAB_ALL && Array.isArray(window.BUILTIN_VOCAB_ALL) && window.BUILTIN_VOCAB_ALL.length > 0) {
+                        words.value = JSON.parse(JSON.stringify(window.BUILTIN_VOCAB_ALL));
+                        saveData();
+                        showToast(`已自动载入内置词库（共 ${words.value.length} 词）`);
+                    } else {
+                        words.value = [];
+                    }
+                };
+
+                // Save Data
+                const saveData = () => {
+                    try {
+                        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(words.value));
+                    } catch (e) {
+                        console.error('Failed to save words to localStorage', e);
+                        showToast('保存失败，可能浏览器存储空间已满');
+                    }
+                    triggerAutoSync();
+                };
+
+                // Cloudflare Cloud Sync Methods
+                const saveSyncConfig = () => {
+                    localStorage.setItem(SYNC_KEY_STORAGE, syncKey.value.trim());
+                    localStorage.setItem(AUTO_SYNC_STORAGE, autoSync.value ? 'true' : 'false');
+                    showToast('云同步配置已更新');
+                };
+
+                const triggerAutoSync = () => {
+                    if (!autoSync.value || !syncKey.value.trim()) return;
+                    clearTimeout(debounceSyncTimer);
+                    debounceSyncTimer = setTimeout(() => {
+                        pushToCloud(true);
+                    }, 2500);
+                };
+
+                const pushToCloud = async (silent = false) => {
+                    const key = syncKey.value.trim();
+                    if (!key) {
+                        if (!silent) alert('请先输入专属同步密钥 (Sync Key)！');
+                        return;
+                    }
+
+                    syncStatus.value = 'syncing';
+                    syncStatusText.value = '正在推送...';
+
+                    try {
+                        const res = await fetch(`/api/sync?key=${encodeURIComponent(key)}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                words: words.value,
+                                sentences: sentences.value,
+                                syncKey: key
+                            })
+                        });
+
+                        const json = await res.json();
+                        if (json.success) {
+                            syncStatus.value = 'success';
+                            const nowStr = new Date().toLocaleTimeString();
+                            syncStatusText.value = `同步成功 (${nowStr})`;
+                            lastSyncTime.value = new Date().toLocaleString();
+                            localStorage.setItem('japanese_study_last_sync_time', lastSyncTime.value);
+                            if (!silent) showToast('☁️ 已成功将本地学习进度推送到云端备份！');
+                        } else {
+                            syncStatus.value = 'error';
+                            syncStatusText.value = json.message || '同步失败';
+                            if (!silent) alert('推送云端失败：' + (json.message || json.error));
+                        }
+                    } catch (err) {
+                        syncStatus.value = 'error';
+                        syncStatusText.value = '网络或接口异常';
+                        if (!silent) alert('推送失败，请检查网络连接或 Cloudflare 部署状态：' + err.message);
+                    }
+                };
+
+                const pullFromCloud = async (silent = false) => {
+                    const key = syncKey.value.trim();
+                    if (!key) {
+                        if (!silent) alert('请先输入专属同步密钥 (Sync Key)！');
+                        return;
+                    }
+
+                    syncStatus.value = 'syncing';
+                    syncStatusText.value = '正在拉取...';
+
+                    try {
+                        const res = await fetch(`/api/sync?key=${encodeURIComponent(key)}`);
+                        const json = await res.json();
+
+                        if (json.success && json.data) {
+                            const cloudData = json.data;
+                            let wordsUpdated = false;
+                            let sentencesUpdated = false;
+
+                            if (Array.isArray(cloudData.words) && cloudData.words.length > 0) {
+                                words.value = cloudData.words;
+                                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(words.value));
+                                wordsUpdated = true;
+                            }
+                            if (Array.isArray(cloudData.sentences) && cloudData.sentences.length > 0) {
+                                sentences.value = cloudData.sentences;
+                                localStorage.setItem(LOCAL_STORAGE_SENTENCES_KEY, JSON.stringify(sentences.value));
+                                sentencesUpdated = true;
+                            }
+
+                            syncStatus.value = 'success';
+                            const nowStr = new Date().toLocaleTimeString();
+                            syncStatusText.value = `拉取成功 (${nowStr})`;
+                            lastSyncTime.value = new Date().toLocaleString();
+                            localStorage.setItem('japanese_study_last_sync_time', lastSyncTime.value);
+
+                            if (!silent) {
+                                showToast(`☁️ 已拉取云端数据（${words.value.length} 词，${sentences.value.length} 句）`);
+                            }
+                        } else if (json.success && !json.data) {
+                            syncStatus.value = 'idle';
+                            syncStatusText.value = '云端暂无数据';
+                            if (!silent) alert('该密钥在云端尚未有数据备份，请先在已有数据的设备上点击【推送到云端备份】。');
+                        } else {
+                            syncStatus.value = 'error';
+                            syncStatusText.value = json.message || '拉取失败';
+                            if (!silent) alert('拉取失败：' + (json.message || json.error));
+                        }
+                    } catch (err) {
+                        syncStatus.value = 'error';
+                        syncStatusText.value = '网络异常';
+                        if (!silent) alert('拉取失败，请检查网络或服务配置：' + err.message);
+                    }
+                };
+
+                onMounted(() => {
+                    initVoices();
+                    if (synth && synth.onvoiceschanged !== undefined) {
+                        synth.onvoiceschanged = initVoices;
+                    }
+                    loadAudioConfig();
+                    loadData();
+                    loadSentenceData();
+                    if (autoSync.value && syncKey.value.trim()) {
+                        pullFromCloud(true);
+                    }
+                });
+
+                // Computed stats (Words)
+                const todayDueCount = computed(() => {
+                    const now = Date.now();
+                    return words.value.filter(w => (w.next_review_date || 0) <= now).length;
+                });
+
+                const masteredCount = computed(() => {
+                    return words.value.filter(w => (w.level || 0) >= 3).length;
+                });
+
+                const learnedWordsCount = computed(() => {
+                    return words.value.filter(w => (w.level || 0) > 0).length;
+                });
+
+                const isWordLearned = (wordStr) => {
+                    if (!wordStr) return false;
+                    return words.value.some(w => (w.word === wordStr || w.kana === wordStr) && (w.level || 0) > 0);
+                };
+
+                // Sentence Computed Properties
+                const eligibleSentences = computed(() => {
+                    if (sentenceScope.value === 'all') {
+                        return sentences.value;
+                    }
+                    // 'learned' scope:
+                    const learnedSet = new Set();
+                    words.value.forEach(w => {
+                        if ((w.level || 0) > 0) {
+                            if (w.word) learnedSet.add(w.word);
+                            if (w.kana) learnedSet.add(w.kana);
+                        }
+                    });
+
+                    if (learnedSet.size === 0) {
+                        return sentences.value;
+                    }
+
+                    const matched = sentences.value.filter(s => {
+                        if (s.words && Array.isArray(s.words)) {
+                            if (s.words.some(sw => learnedSet.has(sw))) return true;
+                        }
+                        for (const lw of learnedSet) {
+                            if (lw.length >= 2 && s.japanese.includes(lw)) return true;
+                        }
+                        return false;
+                    });
+
+                    return matched.length > 0 ? matched : sentences.value;
+                });
+
+                const eligibleDueSentences = computed(() => {
+                    const now = Date.now();
+                    return eligibleSentences.value.filter(s => (s.next_review_date || 0) <= now);
+                });
+
+                const sentenceDueCount = computed(() => {
+                    const now = Date.now();
+                    return sentences.value.filter(s => (s.next_review_date || 0) <= now).length;
+                });
+
+                const sentenceMasteredCount = computed(() => {
+                    return sentences.value.filter(s => (s.level || 0) >= 3).length;
+                });
+
+                const currentPracticeSentence = computed(() => {
+                    return sentenceQueue.value.length > 0 ? sentenceQueue.value[0] : null;
+                });
+
+                // List Filtering & Pagination
+                const filteredWords = computed(() => {
+                    let result = words.value;
+
+                    // Search query filter
+                    const q = searchQuery.value.trim().toLowerCase();
+                    if (q) {
+                        result = result.filter(w => 
+                            (w.word && w.word.toLowerCase().includes(q)) ||
+                            (w.kana && w.kana.toLowerCase().includes(q)) ||
+                            (w.meaning && w.meaning.toLowerCase().includes(q))
+                        );
+                    }
+
+                    return result;
+                });
+
+                const totalPages = computed(() => {
+                    return Math.max(1, Math.ceil(filteredWords.value.length / pageSize));
+                });
+
+                const paginatedWords = computed(() => {
+                    const start = (currentPage.value - 1) * pageSize;
+                    return filteredWords.value.slice(start, start + pageSize);
+                });
+
+                // Tab change watch
+                watch(currentTab, (newTab) => {
+                    if (newTab === 'practice') {
+                        synth.cancel();
+                        practiceState.value = 'idle';
+                        todayQueue.value = [];
+                        initialQueueLength.value = 0;
+                    }
+                });
+
+                // Built-in import method
+                const importBuiltin = () => {
+                    const toImport = window.BUILTIN_VOCAB || window.BUILTIN_VOCAB_ALL || [];
+                    if (toImport.length === 0) {
+                        showToast('未找到内置词库数据文件');
+                        return;
+                    }
+
+                    if (words.value.length > 0) {
+                        const confirmAppend = confirm(`当前已有 ${words.value.length} 个词汇。\n点击【确定】进行合并追加（去重），点击【取消】放弃。`);
+                        if (!confirmAppend) return;
+
+                        // Merge & de-duplicate by word + kana, updating missing meanings
+                        const existingMap = new Map();
+                        words.value.forEach(w => existingMap.set(w.word + '::' + w.kana, w));
+                        let added = 0;
+                        let updated = 0;
+                        toImport.forEach(item => {
+                            const k = item.word + '::' + item.kana;
+                            if (!existingMap.has(k)) {
+                                const newWord = {
+                                    ...item,
+                                    id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 5),
+                                    next_review_date: Date.now()
+                                };
+                                words.value.push(newWord);
+                                existingMap.set(k, newWord);
+                                added++;
+                            } else {
+                                const exist = existingMap.get(k);
+                                if ((!exist.meaning || exist.meaning.trim() === '') && item.meaning) {
+                                    exist.meaning = item.meaning;
+                                    updated++;
+                                }
+                            }
+                        });
+                        saveData();
+                        showToast(`导入完成：新增 ${added} 词，补全释义 ${updated} 词！`);
+                    } else {
+                        words.value = JSON.parse(JSON.stringify(toImport));
+                        saveData();
+                        showToast(`成功载入内置词库（共 ${words.value.length} 词）！`);
+                    }
+                };
+
+                // File Upload (supports .txt with word(kana) format and .json)
+                const handleFileUpload = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        try {
+                            const text = evt.target.result;
+                            let imported = [];
+                            const now = Date.now();
+
+                            if (file.name.endsWith('.json')) {
+                                const parsed = JSON.parse(text);
+                                if (Array.isArray(parsed)) {
+                                    imported = parsed.map(item => ({
+                                        id: item.id || (now + '_' + Math.random().toString(36).substr(2, 5)),
+                                        word: item.word || '',
+                                        kana: item.kana || '',
+                                        meaning: item.meaning || '',
+                                        level: item.level || 0,
+                                        next_review_date: item.next_review_date || now
+                                    })).filter(i => i.word);
+                                }
+                            } else {
+                                // Parse text line by line
+                                const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                                lines.forEach((line, idx) => {
+                                    const m = line.match(/^(.+?)[(（](.+?)[)）]\s*(.*)$/);
+                                    if (m) {
+                                        imported.push({
+                                            id: 'import_' + now + '_' + idx,
+                                            word: m[1].trim(),
+                                            kana: m[2].trim(),
+                                            meaning: m[3] ? m[3].trim() : '',
+                                            level: 0,
+                                            next_review_date: now
+                                        });
+                                    }
+                                });
+                            }
+
+                            if (imported.length === 0) {
+                                alert('未能从文件中识别出有效词汇。请确保文件格式为「单词(假名)」或 JSON。');
+                                return;
+                            }
+
+                            // Merge into current words
+                            const existingKeys = new Set(words.value.map(w => w.word + '::' + w.kana));
+                            let added = 0;
+                            imported.forEach(w => {
+                                const k = w.word + '::' + w.kana;
+                                if (!existingKeys.has(k)) {
+                                    words.value.push(w);
+                                    existingKeys.add(k);
+                                    added++;
+                                }
+                            });
+                            saveData();
+                            showToast(`文件解析成功，已导入 ${added} 个新词汇！`);
+                        } catch (err) {
+                            console.error(err);
+                            alert('解析文件失败：' + err.message);
+                        }
+                    };
+                    reader.readAsText(file, 'UTF-8');
+                    e.target.value = ''; // reset file input
+                };
+
+                // Export Backup
+                const exportData = () => {
+                    if (words.value.length === 0) {
+                        showToast('当前词库为空，无需导出');
+                        return;
+                    }
+                    const blob = new Blob([JSON.stringify(words.value, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `japanese_study_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast('已导出词库备份文件');
+                };
+
+                // Clear All
+                const clearAllWords = () => {
+                    if (confirm(`确定要清空全部 ${words.value.length} 个词汇吗？此操作不可恢复。`)) {
+                        words.value = [];
+                        saveData();
+                        showToast('已清空词库');
+                    }
+                };
+
+                // Add / Edit / Delete word
+                const saveWord = () => {
+                    if (!form.value.word.trim() || !form.value.kana.trim()) return;
+
+                    if (editingId.value) {
+                        const index = words.value.findIndex(w => w.id === editingId.value);
+                        if (index !== -1) {
+                            words.value[index] = {
+                                ...words.value[index],
+                                word: form.value.word.trim(),
+                                kana: form.value.kana.trim(),
+                                meaning: form.value.meaning.trim()
+                            };
+                            showToast('词汇修改已保存');
+                        }
+                    } else {
+                        words.value.unshift({
+                            id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 5),
+                            word: form.value.word.trim(),
+                            kana: form.value.kana.trim(),
+                            meaning: form.value.meaning.trim(),
+                            level: 0,
+                            next_review_date: Date.now()
+                        });
+                        showToast('新词汇添加成功');
+                    }
+                    
+                    saveData();
+                    cancelEdit();
+                };
+
+                const editWord = (word) => {
+                    editingId.value = word.id;
+                    form.value = { 
+                        word: word.word, 
+                        kana: word.kana, 
+                        meaning: word.meaning || ''
+                    };
+                    showAddForm.value = true;
+                    document.querySelector('main').scrollTop = 0;
+                };
+
+                const cancelEdit = () => {
+                    editingId.value = null;
+                    form.value = { word: '', kana: '', meaning: '' };
+                    showAddForm.value = false;
+                };
+
+                const deleteWord = (id) => {
+                    if (confirm('确定要删除该词汇吗？')) {
+                        words.value = words.value.filter(w => w.id !== id);
+                        saveData();
+                        showToast('词汇已删除');
+                    }
+                };
+
+                const promptEditMeaning = (word) => {
+                    const newMeaning = prompt(`请为「${word.word} (${word.kana})」输入中文释义：`, word.meaning || '');
+                    if (newMeaning !== null) {
+                        word.meaning = newMeaning.trim();
+                        const idx = words.value.findIndex(w => w.id === word.id);
+                        if (idx !== -1) {
+                            words.value[idx].meaning = word.meaning;
+                            saveData();
+                            showToast('释义已更新！');
+                        }
+                    }
+                };
+
+                const formatDate = (ts) => {
+                    if (!ts) return '未设置';
+                    const date = new Date(Number(ts));
+                    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                };
+
+                // Practice Mode Logic
+                const currentPracticeWord = computed(() => {
+                    return todayQueue.value.length > 0 ? todayQueue.value[0] : null;
+                });
+
+                const startPractice = (forceRandom = false) => {
+                    let queue = [];
+                    const now = Date.now();
+
+                    if (forceRandom) {
+                        queue = [...words.value];
+                        // Shuffle
+                        for (let i = queue.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [queue[i], queue[j]] = [queue[j], queue[i]];
+                        }
+                        queue = queue.slice(0, 30);
+                    } else {
+                        queue = words.value.filter(w => (w.next_review_date || 0) <= now);
+                        // Shuffle
+                        for (let i = queue.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [queue[i], queue[j]] = [queue[j], queue[i]];
+                        }
+                    }
+
+                    todayQueue.value = queue;
+                    initialQueueLength.value = queue.length;
+
+                    if (queue.length > 0) {
+                        practiceState.value = 'listening';
+                        setTimeout(() => speakCurrent(), 120);
+                    }
+                };
+
+                const cleanPronunciation = (str) => {
+                    if (!str) return '';
+                    return str
+                        .replace(/[~～・·…\.\(\)（）\/、，,。！？!?\-_—\s]/g, '')
+                        .trim();
+                };
+
+                const getWordAudioText = (item) => {
+                    if (!item) return '';
+                    if (typeof item === 'string') return cleanPronunciation(item);
+
+                    // If audioTarget is 'kana', prioritize kana for 100% accurate pronunciation without kanji polyphone guessing
+                    if (audioTarget.value === 'kana') {
+                        const cleanKana = cleanPronunciation(item.kana);
+                        if (cleanKana) return cleanKana;
+                    }
+                    return cleanPronunciation(item.word) || cleanPronunciation(item.kana);
+                };
+
+                const playOnlineAudio = (text, onFallback) => {
+                    try {
+                        if (currentAudio) {
+                            currentAudio.pause();
+                            currentAudio.currentTime = 0;
+                            currentAudio = null;
+                        }
+                        if (synth && synth.speaking) {
+                            synth.cancel();
+                        }
+                        const encoded = encodeURIComponent(text);
+                        const url = `https://dict.youdao.com/dictvoice?audio=${encoded}&le=jap`;
+                        currentAudio = new Audio(url);
+                        currentAudio.playbackRate = Number(speechRate.value) || 1.0;
+                        let fallbackCalled = false;
+                        const triggerFallback = () => {
+                            if (!fallbackCalled) {
+                                fallbackCalled = true;
+                                if (onFallback) onFallback();
+                            }
+                        };
+                        currentAudio.onerror = () => {
+                            triggerFallback();
+                        };
+                        const playPromise = currentAudio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch((err) => {
+                                if (err.name !== 'AbortError') {
+                                    triggerFallback();
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        console.error('Online audio play failed:', e);
+                        if (onFallback) onFallback();
+                    }
+                };
+
+                const speakTTS = (text) => {
+                    if (!synth) return;
+                    try {
+                        if (currentAudio) {
+                            currentAudio.pause();
+                            currentAudio.currentTime = 0;
+                            currentAudio = null;
+                        }
+                        synth.cancel();
+                        const utter = new SpeechSynthesisUtterance(text);
+                        utter.lang = 'ja-JP';
+                        utter.rate = Number(speechRate.value) || 1.0;
+
+                        const jaVoices = availableVoices.value;
+                        let selectedVoice = null;
+                        if (jaVoiceName.value) {
+                            selectedVoice = jaVoices.find(v => v.name === jaVoiceName.value);
+                        }
+                        if (!selectedVoice && jaVoices.length > 0) {
+                            const natural = jaVoices.find(v => /natural|online/i.test(v.name));
+                            const google = jaVoices.find(v => /google/i.test(v.name));
+                            selectedVoice = natural || google || jaVoices[0];
+                        }
+
+                        if (selectedVoice) {
+                            utter.voice = selectedVoice;
+                        } else {
+                            console.warn('No Japanese voice available for TTS.');
+                        }
+
+                        synth.speak(utter);
+                    } catch (e) {
+                        console.error('SpeechSynthesis error:', e);
+                    }
+                };
+
+                const playWord = (item) => {
+                    if (!item) return;
+                    const text = getWordAudioText(item);
+                    if (!text) return;
+
+                    if (audioEngine.value === 'online') {
+                        playOnlineAudio(text, () => {
+                            speakTTS(text);
+                        });
+                    } else {
+                        speakTTS(text);
+                    }
+                };
+
+                const playCurrent = () => {
+                    if (currentPracticeWord.value) {
+                        playWord(currentPracticeWord.value);
+                    }
+                };
+
+                const testAudio = (sample) => {
+                    playWord(sample);
+                    showToast('正在播放发音试听...');
+                };
+
+                // Backward-compatibility aliases
+                const speakWord = (item) => playWord(item);
+                const speakCurrent = () => playCurrent();
+
+                const calculateNextReview = (level) => {
+                    const DAY = 24 * 60 * 60 * 1000;
+                    let daysToAdd = 0;
+                    switch(level) {
+                        case 0: daysToAdd = 0; break;
+                        case 1: daysToAdd = 1; break;
+                        case 2: daysToAdd = 3; break;
+                        case 3: daysToAdd = 7; break;
+                        case 4: daysToAdd = 14; break;
+                        default: daysToAdd = 30; break;
+                    }
+                    return Date.now() + (daysToAdd * DAY);
+                };
+
+                const handleKnown = () => {
+                    const current = currentPracticeWord.value;
+                    if (!current) return;
+
+                    const index = words.value.findIndex(w => w.id === current.id);
+                    if (index !== -1) {
+                        const newLevel = (words.value[index].level || 0) + 1;
+                        words.value[index].level = newLevel;
+                        words.value[index].next_review_date = calculateNextReview(newLevel);
+                        saveData();
+                    }
+
+                    todayQueue.value.shift();
+                    checkQueueStatus();
+                };
+
+                const handleUnknown = () => {
+                    practiceState.value = 'reveal';
+                    const current = currentPracticeWord.value;
+                    if (!current) return;
+
+                    const index = words.value.findIndex(w => w.id === current.id);
+                    if (index !== -1) {
+                        words.value[index].level = 0;
+                        saveData();
+                    }
+                };
+
+                const nextWord = () => {
+                    const current = todayQueue.value.shift();
+                    if (current) {
+                        todayQueue.value.push(current);
+                    }
+                    practiceState.value = 'listening';
+                    setTimeout(() => playCurrent(), 120);
+                };
+
+                const checkQueueStatus = () => {
+                    if (todayQueue.value.length === 0) {
+                        practiceState.value = 'idle';
+                    } else {
+                        practiceState.value = 'listening';
+                        setTimeout(() => playCurrent(), 120);
+                    }
+                };
+
+                // Sentence Methods
+                const loadSentenceData = () => {
+                    try {
+                        const raw = localStorage.getItem(LOCAL_STORAGE_SENTENCES_KEY);
+                        if (raw) {
+                            const parsed = JSON.parse(raw);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                if (window.BUILTIN_SENTENCES_ALL && Array.isArray(window.BUILTIN_SENTENCES_ALL)) {
+                                    const existingMap = new Map();
+                                    parsed.forEach(s => existingMap.set(s.japanese, s));
+                                    let newCount = 0;
+                                    window.BUILTIN_SENTENCES_ALL.forEach(builtinS => {
+                                        if (!existingMap.has(builtinS.japanese)) {
+                                            parsed.push({
+                                                ...builtinS,
+                                                level: 0,
+                                                next_review_date: Date.now()
+                                            });
+                                            existingMap.set(builtinS.japanese, builtinS);
+                                            newCount++;
+                                        }
+                                    });
+                                    if (newCount > 0) {
+                                        sentences.value = parsed;
+                                        saveSentenceData();
+                                        console.log(`Auto-merged ${newCount} new built-in sentences.`);
+                                        return;
+                                    }
+                                }
+                                sentences.value = parsed;
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse sentence data from localStorage', e);
+                    }
+
+                    if (window.BUILTIN_SENTENCES_ALL && Array.isArray(window.BUILTIN_SENTENCES_ALL)) {
+                        sentences.value = window.BUILTIN_SENTENCES_ALL.map(s => ({
+                            ...s,
+                            level: 0,
+                            next_review_date: Date.now()
+                        }));
+                        saveSentenceData();
+                    } else {
+                        sentences.value = [];
+                    }
+                };
+
+                const saveSentenceData = () => {
+                    try {
+                        localStorage.setItem(LOCAL_STORAGE_SENTENCES_KEY, JSON.stringify(sentences.value));
+                    } catch (e) {
+                        console.error('Failed to save sentences to localStorage', e);
+                    }
+                    triggerAutoSync();
+                };
+
+                const playSentence = (sentenceObj) => {
+                    if (!sentenceObj) return;
+                    let text = audioTarget.value === 'kana' ? (sentenceObj.kana || sentenceObj.japanese) : sentenceObj.japanese;
+                    text = text.replace(/[~～\-_—]/g, '').trim();
+                    if (!text) return;
+
+                    if (audioEngine.value === 'online') {
+                        playOnlineAudio(text, () => {
+                            speakTTS(text);
+                        });
+                    } else {
+                        speakTTS(text);
+                    }
+                };
+
+                const playCurrentSentence = () => {
+                    if (currentPracticeSentence.value) {
+                        playSentence(currentPracticeSentence.value);
+                    }
+                };
+
+                const startSentencePractice = (forceAll = false) => {
+                    let queue = [];
+                    if (forceAll || eligibleDueSentences.value.length === 0) {
+                        queue = [...eligibleSentences.value];
+                        for (let i = queue.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [queue[i], queue[j]] = [queue[j], queue[i]];
+                        }
+                        queue = queue.slice(0, 15);
+                    } else {
+                        queue = [...eligibleDueSentences.value];
+                        for (let i = queue.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [queue[i], queue[j]] = [queue[j], queue[i]];
+                        }
+                    }
+
+                    sentenceQueue.value = queue;
+                    initialSentenceQueueLength.value = queue.length;
+
+                    if (queue.length > 0) {
+                        sentencePracticeState.value = 'listening';
+                        setTimeout(() => playCurrentSentence(), 150);
+                    } else {
+                        showToast('当前没有匹配的可练习句子');
+                    }
+                };
+
+                const handleSentenceKnown = () => {
+                    const current = currentPracticeSentence.value;
+                    if (!current) return;
+
+                    const index = sentences.value.findIndex(s => s.id === current.id);
+                    if (index !== -1) {
+                        const newLevel = (sentences.value[index].level || 0) + 1;
+                        sentences.value[index].level = newLevel;
+                        sentences.value[index].next_review_date = calculateNextReview(newLevel);
+                        saveSentenceData();
+                    }
+
+                    sentenceQueue.value.shift();
+                    checkSentenceQueueStatus();
+                };
+
+                const handleSentenceUnknown = () => {
+                    sentencePracticeState.value = 'reveal';
+                    const current = currentPracticeSentence.value;
+                    if (!current) return;
+
+                    const index = sentences.value.findIndex(s => s.id === current.id);
+                    if (index !== -1) {
+                        sentences.value[index].level = 0;
+                        saveSentenceData();
+                    }
+                };
+
+                const nextSentence = () => {
+                    const current = sentenceQueue.value.shift();
+                    if (current) {
+                        sentenceQueue.value.push(current);
+                    }
+                    sentencePracticeState.value = 'listening';
+                    setTimeout(() => playCurrentSentence(), 150);
+                };
+
+                const checkSentenceQueueStatus = () => {
+                    if (sentenceQueue.value.length === 0) {
+                        sentencePracticeState.value = 'idle';
+                        showToast('🎉 太棒了！本轮句子听力练习完成！');
+                    } else {
+                        sentencePracticeState.value = 'listening';
+                        setTimeout(() => playCurrentSentence(), 150);
+                    }
+                };
+
+                return {
+                    currentTab,
+                    words,
+                    toastMessage,
+                    showAddForm,
+                    form,
+                    editingId,
+                    searchQuery,
+                    currentPage,
+                    totalPages,
+                    filteredWords,
+                    paginatedWords,
+                    todayDueCount,
+                    masteredCount,
+                    practiceState,
+                    todayQueue,
+                    initialQueueLength,
+                    currentPracticeWord,
+
+                    // Cloudflare Cloud Sync
+                    showSyncModal,
+                    syncKey,
+                    autoSync,
+                    syncStatus,
+                    syncStatusText,
+                    lastSyncTime,
+                    saveSyncConfig,
+                    pushToCloud,
+                    pullFromCloud,
+                    
+                    // Audio & Voice Engine
+                    showAudioSettings,
+                    audioEngine,
+                    audioTarget,
+                    speechRate,
+                    jaVoiceName,
+                    availableVoices,
+                    saveAudioConfig,
+                    playWord,
+                    playCurrent,
+                    testAudio,
+                    speakWord,
+                    speakCurrent,
+
+                    // Sentence Practice
+                    sentences,
+                    sentenceScope,
+                    sentencePracticeState,
+                    sentenceQueue,
+                    initialSentenceQueueLength,
+                    currentPracticeSentence,
+                    eligibleSentences,
+                    eligibleDueSentences,
+                    sentenceDueCount,
+                    sentenceMasteredCount,
+                    learnedWordsCount,
+                    isWordLearned,
+                    startSentencePractice,
+                    playSentence,
+                    playCurrentSentence,
+                    handleSentenceKnown,
+                    handleSentenceUnknown,
+                    nextSentence,
+
+                    saveWord,
+                    editWord,
+                    cancelEdit,
+                    deleteWord,
+                    promptEditMeaning,
+                    formatDate,
+                    importBuiltin,
+                    handleFileUpload,
+                    exportData,
+                    clearAllWords,
+                    
+                    startPractice,
+                    handleKnown,
+                    handleUnknown,
+                    nextWord
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

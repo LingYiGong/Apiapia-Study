@@ -1,0 +1,13 @@
+{
+  "name": "japanese-study",
+  "version": "1.0.0",
+  "description": "基于艾宾浩斯记忆曲线的日语听力学习 Web 应用",
+  "scripts": {
+    "build": "echo 'Ready'",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^3.109.2"
+  }
+}

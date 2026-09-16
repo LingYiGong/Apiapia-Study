@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>英语单词记忆卡片</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, "Microsoft YaHei", sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+/* =========================
+   顶部
+========================= */
+
+.header {
+    background: #ffffff;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    position: relative;
+}
+
+.back-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: #4f46e5;
+    background: #eef2ff;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+}
+
+.back-home:hover {
+    background: #e0e7ff;
+}
+
+.header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.header p {
+    margin: 0;
+    color: #777;
+}
+
+/* =========================
+   统计
+========================= */
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+.stat {
+    background: white;
+    width: 150px;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.stat-title {
+    color: #777;
+}
+
+/* =========================
+   主区域
+========================= */
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 20px 40px;
+}
+
+/* =========================
+   单词卡片
+========================= */
+
+.card-area {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.card {
+    width: 100%;
+    max-width: 600px;
+    min-height: 320px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    user-select: none;
+
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+}
+
+.card-number {
+    color: #999;
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+.word {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.meaning {
+    font-size: 24px;
+    color: #555;
+}
+
+.hint {
+    margin-top: 30px;
+    color: #aaa;
+    font-size: 14px;
+}
+
+/* =========================
+   按钮
+========================= */
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 13px 22px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+.btn-prev {
+    background: #e9ecef;
+}
+
+.btn-next {
+    background: #333;
+    color: white;
+}
+
+.btn-speak {
+    background: #e8f0ff;
+}
+
+.btn-known {
+    background: #dff5e5;
+    color: #176b35;
+}
+
+.btn-unknown {
+    background: #ffe1e1;
+    color: #a50000;
+}
+
+/* =========================
+   页面切换按钮
+========================= */
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 30px 0 15px;
+    flex-wrap: wrap;
+}
+
+.tab {
+    background: white;
+    border: 1px solid #ddd;
+}
+
+.tab.active {
+    background: #333;
+    color: white;
+}
+
+/* =========================
+   单词列表
+========================= */
+
+.word-list {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+.word-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 13px 10px;
+    border-bottom: 1px solid #eee;
+
+    cursor: pointer;
+}
+
+.word-item:last-child {
+    border-bottom: none;
+}
+
+.word-item:hover {
+    background: #f5f5f5;
+}
+
+.word-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.word-index {
+    color: #999;
+    width: 40px;
+}
+
+.word-english {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.word-chinese {
+    color: #666;
+}
+
+.status-known {
+    color: #188038;
+    font-size: 14px;
+}
+
+.status-unknown {
+    color: #d93025;
+    font-size: 14px;
+}
+
+.status-none {
+    color: #999;
+    font-size: 14px;
+}
+
+/* =========================
+   底部
+========================= */
+
+.footer {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.clear-btn {
+    background: #eee;
+    color: #555;
+}
+
+/* =========================
+   手机
+========================= */
+
+@media (max-width: 600px) {
+
+    .header h1 {
+        font-size: 23px;
+    }
+
+    .card {
+        min-height: 280px;
+    }
+
+    .word {
+        font-size: 38px;
+    }
+
+    .meaning {
+        font-size: 21px;
+    }
+
+    .stat {
+        width: 120px;
+    }
+
+    button {
+        padding: 11px 16px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     顶部
+========================= -->
+
+<div class="header">
+    <a href="../index.html" class="back-home">← 🏠 返回学习中心</a>
+    <h1>英语单词记忆卡片</h1>
+
+    <p>
+        点击卡片查看英文 · 判断自己是否认识
+    </p>
+
+</div>
+
+
+<!-- =========================
+     统计
+========================= -->
+
+<div class="stats">
+
+    <div class="stat">
+        <div class="stat-number" id="totalCount">0</div>
+        <div class="stat-title">全部</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-number" id="knownCount">0</div>
+        <div class="stat-title">认识</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-number" id="unknownCount">0</div>
+        <div class="stat-title">不认识</div>
+    </div>
+
+    <div class="stat">
+        <div class="stat-number" id="remainingCount">0</div>
+        <div class="stat-title">未学习</div>
+    </div>
+
+</div>
+
+
+<div class="container">
+
+
+    <!-- =========================
+         单词卡片
+    ========================= -->
+
+    <div class="card-area">
+
+        <div class="card" id="card">
+
+            <div class="card-number" id="cardNumber">
+                第 101 个
+            </div>
+
+            <div class="word" id="word">
+                能，可以
+            </div>
+
+            <div class="meaning" id="meaning">
+                点击查看英文
+            </div>
+
+            <div class="hint">
+                点击卡片翻面
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         操作按钮
+    ========================= -->
+
+    <div class="buttons">
+
+        <button class="btn-prev" onclick="previousWord()">
+            ← 上一个
+        </button>
+
+        <button class="btn-speak" onclick="speakWord()">
+            🔊 发音
+        </button>
+
+        <button class="btn-known" onclick="markKnown()">
+            ✓ 认识
+        </button>
+
+        <button class="btn-unknown" onclick="markUnknown()">
+            ✕ 不认识
+        </button>
+
+        <button class="btn-next" onclick="nextWord()">
+            下一个 →
+        </button>
+
+    </div>
+
+
+    <!-- =========================
+         分类
+    ========================= -->
+
+    <div class="tabs">
+
+        <button
+            class="tab active"
+            id="tabAll"
+            onclick="showList('all')">
+            全部单词
+        </button>
+
+        <button
+            class="tab"
+            id="tabKnown"
+            onclick="showList('known')">
+            ✓ 认识
+        </button>
+
+        <button
+            class="tab"
+            id="tabUnknown"
+            onclick="showList('unknown')">
+            ✕ 不认识
+        </button>
+
+    </div>
+
+
+    <!-- =========================
+         单词列表
+    ========================= -->
+
+    <div class="word-list">
+
+        <h2 id="listTitle">
+            全部单词
+        </h2>
+
+        <div id="wordList"></div>
+
+    </div>
+
+
+    <!-- =========================
+         清除
+    ========================= -->
+
+    <div class="footer">
+
+        <button
+            class="clear-btn"
+            onclick="clearProgress()">
+            清除所有学习记录
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   单词
+===================================================== */
+
+const words = [
+
+    { english: "can", chinese: "能，可以" },
+    { english: "will", chinese: "将，会" },
+    { english: "should", chinese: "应该" },
+    { english: "may", chinese: "可能，可以" },
+    { english: "must", chinese: "必须" },
+    { english: "would", chinese: "会，将会" },
+    { english: "could", chinese: "可以，能够" },
+    { english: "might", chinese: "可能" },
+    { english: "shall", chinese: "将，要" },
+    { english: "need", chinese: "需要" },
+
+    { english: "want", chinese: "想要" },
+    { english: "like", chinese: "喜欢" },
+    { english: "know", chinese: "知道，认识" },
+    { english: "think", chinese: "认为，想" },
+    { english: "feel", chinese: "感觉" },
+    { english: "see", chinese: "看见" },
+    { english: "look", chinese: "看" },
+    { english: "watch", chinese: "观看" },
+    { english: "hear", chinese: "听见" },
+    { english: "listen", chinese: "听" },
+
+    { english: "say", chinese: "说" },
+    { english: "tell", chinese: "告诉" },
+    { english: "speak", chinese: "说话" },
+    { english: "talk", chinese: "谈话" },
+    { english: "ask", chinese: "问" },
+    { english: "answer", chinese: "回答" },
+    { english: "give", chinese: "给" },
+    { english: "take", chinese: "拿，带" },
+    { english: "get", chinese: "得到，获得" },
+    { english: "make", chinese: "制作，使" },
+
+    { english: "do", chinese: "做" },
+    { english: "go", chinese: "去" },
+    { english: "come", chinese: "来" },
+    { english: "use", chinese: "使用" },
+    { english: "find", chinese: "找到" },
+    { english: "tell", chinese: "告诉" },
+    { english: "put", chinese: "放" },
+    { english: "keep", chinese: "保持" },
+    { english: "let", chinese: "让" },
+    { english: "help", chinese: "帮助" },
+
+    { english: "try", chinese: "尝试" },
+    { english: "start", chinese: "开始" },
+    { english: "begin", chinese: "开始" },
+    { english: "stop", chinese: "停止" },
+    { english: "move", chinese: "移动" },
+    { english: "live", chinese: "生活，居住" },
+    { english: "work", chinese: "工作" },
+    { english: "play", chinese: "玩，播放" },
+    { english: "run", chinese: "跑，运行" },
+    { english: "walk", chinese: "走路" },
+
+    { english: "eat", chinese: "吃" },
+    { english: "drink", chinese: "喝" },
+    { english: "buy", chinese: "买" },
+    { english: "pay", chinese: "支付" },
+    { english: "sell", chinese: "卖" },
+    { english: "bring", chinese: "带来" },
+    { english: "send", chinese: "发送" },
+    { english: "show", chinese: "展示" },
+    { english: "read", chinese: "阅读" },
+    { english: "write", chinese: "写" },
+
+    { english: "learn", chinese: "学习" },
+    { english: "study", chinese: "学习，研究" },
+    { english: "teach", chinese: "教" },
+    { english: "remember", chinese: "记得" },
+    { english: "forget", chinese: "忘记" },
+    { english: "understand", chinese: "理解" },
+    { english: "believe", chinese: "相信" },
+    { english: "hope", chinese: "希望" },
+    { english: "love", chinese: "爱" },
+    { english: "hate", chinese: "讨厌" },
+
+    { english: "open", chinese: "打开" },
+    { english: "close", chinese: "关闭" },
+    { english: "turn", chinese: "转动，转弯" },
+    { english: "change", chinese: "改变" },
+    { english: "move", chinese: "移动" },
+    { english: "stay", chinese: "停留" },
+    { english: "leave", chinese: "离开" },
+    { english: "return", chinese: "返回" },
+    { english: "wait", chinese: "等待" },
+    { english: "follow", chinese: "跟随" },
+
+    { english: "call", chinese: "打电话，叫" },
+    { english: "meet", chinese: "见面" },
+    { english: "pay", chinese: "支付" },
+    { english: "win", chinese: "赢" },
+    { english: "lose", chinese: "输，失去" },
+    { english: "remember", chinese: "记得" },
+    { english: "forget", chinese: "忘记" },
+    { english: "happen", chinese: "发生" },
+    { english: "seem", chinese: "似乎" },
+    { english: "become", chinese: "成为" },
+
+    { english: "keep", chinese: "保持" },
+    { english: "hold", chinese: "拿着，举行" },
+    { english: "bring", chinese: "带来" },
+    { english: "carry", chinese: "携带" },
+    { english: "build", chinese: "建造" },
+    { english: "break", chinese: "打破，弄坏" },
+    { english: "cut", chinese: "切，剪" },
+    { english: "draw", chinese: "画" },
+    { english: "drive", chinese: "驾驶" },
+    { english: "ride", chinese: "骑乘" },
+
+    { english: "stand", chinese: "站立" },
+    { english: "sit", chinese: "坐" },
+    { english: "sleep", chinese: "睡觉" },
+    { english: "wake", chinese: "醒来" },
+    { english: "remember", chinese: "记住" },
+    { english: "understand", chinese: "理解" },
+    { english: "belong", chinese: "属于" },
+    { english: "happen", chinese: "发生" },
+    { english: "continue", chinese: "继续" },
+    { english: "finish", chinese: "完成" }
+
+];
+
+
+/* =====================================================
+   数据
+===================================================== */
+
+/*
+   status:
+   null      = 还没有判断
+   known     = 认识
+   unknown   = 不认识
+*/
+
+let progress =
+    JSON.parse(localStorage.getItem("englishWordProgress")) || {};
+
+
+/* 当前单词 */
+
+let currentIndex = 0;
+
+
+/* 卡片是否翻面 */
+
+let flipped = false;
+
+
+/* 当前列表 */
+
+let currentList = "all";
+
+
+/* =====================================================
+   DOM
+===================================================== */
+
+const card = document.getElementById("card");
+
+const cardNumber =
+    document.getElementById("cardNumber");
+
+const wordElement =
+    document.getElementById("word");
+
+const meaningElement =
+    document.getElementById("meaning");
+
+const wordList =
+    document.getElementById("wordList");
+
+const listTitle =
+    document.getElementById("listTitle");
+
+
+/* =====================================================
+   卡片点击
+===================================================== */
+
+card.addEventListener("click", function() {
+
+    flipped = !flipped;
+
+    updateCard();
+
+});
+
+
+/* =====================================================
+   更新卡片
+===================================================== */
+
+function updateCard() {
+
+    const currentWord = words[currentIndex];
+
+    cardNumber.textContent =
+        "第 " + (currentIndex + 101) + " 个";
+
+    if (flipped) {
+
+        wordElement.textContent =
+            currentWord.english;
+
+        meaningElement.textContent =
+            currentWord.chinese;
+
+        speakWord();
+
+    } else {
+
+        wordElement.textContent =
+            currentWord.chinese;
+
+        meaningElement.textContent =
+            "点击查看英文";
+
+    }
+
+}
+
+
+/* =====================================================
+   发音
+===================================================== */
+
+function speakWord() {
+
+    const currentWord = words[currentIndex];
+
+    if (!currentWord) {
+        return;
+    }
+
+    const speech =
+        new SpeechSynthesisUtterance(
+            currentWord.english
+        );
+
+    speech.lang = "en-US";
+
+    speech.rate = 0.8;
+
+    window.speechSynthesis.cancel();
+
+    window.speechSynthesis.speak(speech);
+
+}
+
+
+/* =====================================================
+   下一个
+===================================================== */
+
+function nextWord() {
+
+    if (currentIndex < words.length - 1) {
+
+        currentIndex++;
+
+    } else {
+
+        currentIndex = 0;
+
+    }
+
+    flipped = false;
+
+    updateCard();
+
+}
+
+
+/* =====================================================
+   上一个
+===================================================== */
+
+function previousWord() {
+
+    if (currentIndex > 0) {
+
+        currentIndex--;
+
+    } else {
+
+        currentIndex = words.length - 1;
+
+    }
+
+    flipped = false;
+
+    updateCard();
+
+}
+
+
+/* =====================================================
+   认识
+===================================================== */
+
+function markKnown() {
+
+    progress[currentIndex] = "known";
+
+    saveProgress();
+
+    updateStats();
+
+    renderList();
+
+    /*
+       标记后自动进入下一个
+    */
+
+    nextWord();
+
+}
+
+
+/* =====================================================
+   不认识
+===================================================== */
+
+function markUnknown() {
+
+    progress[currentIndex] = "unknown";
+
+    saveProgress();
+
+    updateStats();
+
+    renderList();
+
+    /*
+       标记后自动进入下一个
+    */
+
+    nextWord();
+
+}
+
+
+/* =====================================================
+   保存
+===================================================== */
+
+function saveProgress() {
+
+    localStorage.setItem(
+        "englishWordProgress",
+        JSON.stringify(progress)
+    );
+
+}
+
+
+/* =====================================================
+   统计
+===================================================== */
+
+function updateStats() {
+
+    let known = 0;
+
+    let unknown = 0;
+
+    for (let i = 0; i < words.length; i++) {
+
+        if (progress[i] === "known") {
+
+            known++;
+
+        }
+
+        if (progress[i] === "unknown") {
+
+            unknown++;
+
+        }
+
+    }
+
+    const total = words.length;
+
+    const remaining =
+        total - known - unknown;
+
+
+    document.getElementById(
+        "totalCount"
+    ).textContent = total;
+
+
+    document.getElementById(
+        "knownCount"
+    ).textContent = known;
+
+
+    document.getElementById(
+        "unknownCount"
+    ).textContent = unknown;
+
+
+    document.getElementById(
+        "remainingCount"
+    ).textContent = remaining;
+
+}
+
+
+/* =====================================================
+   显示列表
+===================================================== */
+
+function showList(type) {
+
+    currentList = type;
+
+
+    document
+        .querySelectorAll(".tab")
+        .forEach(function(tab) {
+
+            tab.classList.remove("active");
+
+        });
+
+
+    if (type === "all") {
+
+        document
+            .getElementById("tabAll")
+            .classList.add("active");
+
+        listTitle.textContent =
+            "全部单词";
+
+    }
+
+
+    if (type === "known") {
+
+        document
+            .getElementById("tabKnown")
+            .classList.add("active");
+
+        listTitle.textContent =
+            "认识的单词";
+
+    }
+
+
+    if (type === "unknown") {
+
+        document
+            .getElementById("tabUnknown")
+            .classList.add("active");
+
+        listTitle.textContent =
+            "不认识的单词";
+
+    }
+
+
+    renderList();
+
+}
+
+
+/* =====================================================
+   渲染单词列表
+===================================================== */
+
+function renderList() {
+
+    wordList.innerHTML = "";
+
+
+    let count = 0;
+
+
+    words.forEach(function(item, index) {
+
+        const status =
+            progress[index];
+
+
+        /*
+           根据当前分类过滤
+        */
+
+        if (
+            currentList === "known"
+            &&
+            status !== "known"
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            currentList === "unknown"
+            &&
+            status !== "unknown"
+        ) {
+
+            return;
+
+        }
+
+
+        count++;
+
+
+        const itemElement =
+            document.createElement("div");
+
+        itemElement.className =
+            "word-item";
+
+
+        /*
+           点击单词
+           直接跳转到这个单词
+        */
+
+        itemElement.onclick =
+            function() {
+
+                currentIndex = index;
+
+                flipped = false;
+
+                updateCard();
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+
+            };
+
+
+        let statusHTML = "";
+
+
+        if (status === "known") {
+
+            statusHTML =
+                '<span class="status-known">✓ 认识</span>';
+
+        }
+
+        else if (status === "unknown") {
+
+            statusHTML =
+                '<span class="status-unknown">✕ 不认识</span>';
+
+        }
+
+        else {
+
+            statusHTML =
+                '<span class="status-none">未判断</span>';
+
+        }
+
+
+        itemElement.innerHTML = `
+
+            <div class="word-left">
+
+                <div class="word-index">
+                    ${index + 101}
+                </div>
+
+                <div>
+
+                    <div class="word-english">
+                        ${item.english}
+                    </div>
+
+                    <div class="word-chinese">
+                        ${item.chinese}
+                    </div>
+
+                </div>
+
+            </div>
+
+            ${statusHTML}
+
+        `;
+
+
+        wordList.appendChild(
+            itemElement
+        );
+
+    });
+
+
+    /*
+       没有单词
+    */
+
+    if (count === 0) {
+
+        wordList.innerHTML = `
+
+            <div style="
+                text-align:center;
+                padding:30px;
+                color:#999;
+            ">
+
+                这里还没有单词
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =====================================================
+   清除学习记录
+===================================================== */
+
+function clearProgress() {
+
+    const result =
+        confirm(
+            "确定要清除所有学习记录吗？"
+        );
+
+
+    if (!result) {
+
+        return;
+
+    }
+
+
+    progress = {};
+
+
+    localStorage.removeItem(
+        "englishWordProgress"
+    );
+
+
+    updateStats();
+
+    renderList();
+
+    alert("学习记录已经清除");
+
+}
+
+
+/* =====================================================
+   键盘操作
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        /*
+           左箭头
+        */
+
+        if (event.key === "ArrowLeft") {
+
+            previousWord();
+
+        }
+
+
+        /*
+           右箭头
+        */
+
+        if (event.key === "ArrowRight") {
+
+            nextWord();
+
+        }
+
+
+        /*
+           空格
+        */
+
+        if (event.code === "Space") {
+
+            event.preventDefault();
+
+            flipped = !flipped;
+
+            updateCard();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   初始化
+===================================================== */
+
+updateCard();
+
+updateStats();
+
+renderList();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1413 @@
+"use strict";
+
+const STORAGE_KEY = "hanziDictationStatsV1";
+const STROKE_PROGRESS_KEY = "hanziStrokeProgressV1";
+const STROKE_ORDER_KEY = "hanziStrokeOrderV1";
+
+const state = {
+    mode: "dictation",
+    session: [],
+    currentIndex: 0,
+    writings: [],
+    answers: [],
+    recognitionSession: [],
+    recognitionIndex: 0,
+    recognitionAnswers: [],
+    choiceSession: [],
+    choiceIndex: 0,
+    choiceAnswers: [],
+    choiceHadMistake: false,
+    choiceLocked: false,
+    speechRate: 0.78,
+    speechMode: "hint",
+    strokes: [],
+    activeStroke: null,
+    currentWriting: "",
+    answerStrokeWriter: null,
+    answerStrokeRenderToken: 0,
+    currentStory: "",
+    strokeSession: [],
+    strokeIndex: 0,
+    strokeWriter: null,
+    strokeRenderToken: 0,
+    strokeStartToken: 0
+};
+
+const els = {
+    setupScreen: document.getElementById("setupScreen"),
+    dictationScreen: document.getElementById("dictationScreen"),
+    recognitionScreen: document.getElementById("recognitionScreen"),
+    summaryScreen: document.getElementById("summaryScreen"),
+    categorySelect: document.getElementById("categorySelect"),
+    countSelect: document.getElementById("countSelect"),
+    speechMode: document.getElementById("speechMode"),
+    speechRate: document.getElementById("speechRate"),
+    preferWrong: document.getElementById("preferWrong"),
+    startBtn: document.getElementById("startBtn"),
+    recognitionStartBtn: document.getElementById("recognitionStartBtn"),
+    choiceStartBtn: document.getElementById("choiceStartBtn"),
+    storyStartBtn: document.getElementById("storyStartBtn"),
+    strokeStartBtn: document.getElementById("strokeStartBtn"),
+    resetDataBtn: document.getElementById("resetDataBtn"),
+    totalPracticed: document.getElementById("totalPracticed"),
+    totalCorrect: document.getElementById("totalCorrect"),
+    wrongCount: document.getElementById("wrongCount"),
+    wrongbookSetup: document.getElementById("wrongbookSetup"),
+    wrongbookListSetup: document.getElementById("wrongbookListSetup"),
+
+    currentNumber: document.getElementById("currentNumber"),
+    totalNumber: document.getElementById("totalNumber"),
+    dictationStageLabel: document.getElementById("dictationStageLabel"),
+    progressBar: document.getElementById("progressBar"),
+    questionPinyin: document.getElementById("questionPinyin"),
+    speakBtn: document.getElementById("speakBtn"),
+    writingArea: document.getElementById("writingArea"),
+    writingBoard: document.getElementById("writingBoard"),
+    writingCanvas: document.getElementById("writingCanvas"),
+    undoStrokeBtn: document.getElementById("undoStrokeBtn"),
+    clearWritingBtn: document.getElementById("clearWritingBtn"),
+    showAnswerBtn: document.getElementById("showAnswerBtn"),
+    answerPanel: document.getElementById("answerPanel"),
+    answerHint: document.getElementById("answerHint"),
+    currentWritingPreview: document.getElementById("currentWritingPreview"),
+    answerStrokeWriter: document.getElementById("answerStrokeWriter"),
+    answerStrokeStatus: document.getElementById("answerStrokeStatus"),
+    replayAnswerStrokeBtn: document.getElementById("replayAnswerStrokeBtn"),
+    correctBtn: document.getElementById("correctBtn"),
+    wrongBtn: document.getElementById("wrongBtn"),
+    quitBtn: document.getElementById("quitBtn"),
+
+    recognitionCurrentNumber: document.getElementById("recognitionCurrentNumber"),
+    recognitionTotalNumber: document.getElementById("recognitionTotalNumber"),
+    recognitionProgressBar: document.getElementById("recognitionProgressBar"),
+    recognitionCharBtn: document.getElementById("recognitionCharBtn"),
+    recognitionChar: document.getElementById("recognitionChar"),
+    recognitionTapTip: document.getElementById("recognitionTapTip"),
+    recognitionReveal: document.getElementById("recognitionReveal"),
+    recognitionPinyin: document.getElementById("recognitionPinyin"),
+    recognitionHint: document.getElementById("recognitionHint"),
+    recognitionReplayBtn: document.getElementById("recognitionReplayBtn"),
+    recognitionWrongBtn: document.getElementById("recognitionWrongBtn"),
+    recognitionCorrectBtn: document.getElementById("recognitionCorrectBtn"),
+    quitRecognitionBtn: document.getElementById("quitRecognitionBtn"),
+
+    choiceScreen: document.getElementById("choiceScreen"),
+    choiceCurrentNumber: document.getElementById("choiceCurrentNumber"),
+    choiceTotalNumber: document.getElementById("choiceTotalNumber"),
+    choiceProgressBar: document.getElementById("choiceProgressBar"),
+    choiceSpeakBtn: document.getElementById("choiceSpeakBtn"),
+    choiceOptions: document.getElementById("choiceOptions"),
+    choiceFeedback: document.getElementById("choiceFeedback"),
+    quitChoiceBtn: document.getElementById("quitChoiceBtn"),
+
+    storyScreen: document.getElementById("storyScreen"),
+    storyText: document.getElementById("storyText"),
+    storyPinyin: document.getElementById("storyPinyin"),
+    storyPinyinBtn: document.getElementById("storyPinyinBtn"),
+    storySpeakBtn: document.getElementById("storySpeakBtn"),
+    storyNextBtn: document.getElementById("storyNextBtn"),
+    quitStoryBtn: document.getElementById("quitStoryBtn"),
+
+    strokeScreen: document.getElementById("strokeScreen"),
+    strokeCurrentNumber: document.getElementById("strokeCurrentNumber"),
+    strokeTotalNumber: document.getElementById("strokeTotalNumber"),
+    strokeProgressBar: document.getElementById("strokeProgressBar"),
+    strokePinyin: document.getElementById("strokePinyin"),
+    strokeHint: document.getElementById("strokeHint"),
+    strokeGrid: document.getElementById("strokeGrid"),
+    strokeWriter: document.getElementById("strokeWriter"),
+    strokeStatus: document.getElementById("strokeStatus"),
+    previousStrokeBtn: document.getElementById("previousStrokeBtn"),
+    nextStrokeBtn: document.getElementById("nextStrokeBtn"),
+    quitStrokeBtn: document.getElementById("quitStrokeBtn"),
+
+    scoreRing: document.getElementById("scoreRing"),
+    scoreText: document.getElementById("scoreText"),
+    summaryMessage: document.getElementById("summaryMessage"),
+    resultList: document.getElementById("resultList"),
+    practiceWrongBtn: document.getElementById("practiceWrongBtn"),
+    backHomeBtn: document.getElementById("backHomeBtn")
+};
+
+function getDefaultStats() {
+    return {
+        totalPracticed: 0,
+        totalCorrect: 0,
+        characters: {}
+    };
+}
+
+function loadStats() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return getDefaultStats();
+
+        const parsed = JSON.parse(raw);
+        return {
+            totalPracticed: Number(parsed.totalPracticed) || 0,
+            totalCorrect: Number(parsed.totalCorrect) || 0,
+            characters: parsed.characters || {}
+        };
+    } catch (error) {
+        console.warn("读取学习记录失败：", error);
+        return getDefaultStats();
+    }
+}
+
+function saveStats(stats) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+}
+
+function getCharStats(stats, char) {
+    const saved = stats.characters[char] || {};
+    return {
+        practiced: 0,
+        correct: 0,
+        wrong: 0,
+        streak: 0,
+        lastPracticed: null,
+        ...saved
+    };
+}
+
+function updateStatsForAnswer(item, isCorrect) {
+    const stats = loadStats();
+    const charStats = getCharStats(stats, item.char);
+
+    stats.totalPracticed += 1;
+    charStats.practiced += 1;
+    charStats.lastPracticed = new Date().toISOString();
+
+    if (isCorrect) {
+        stats.totalCorrect += 1;
+        charStats.correct += 1;
+        charStats.streak += 1;
+
+    } else {
+        charStats.wrong += 1;
+        charStats.streak = 0;
+    }
+
+    stats.characters[item.char] = charStats;
+    saveStats(stats);
+}
+
+function getWrongCharacters(stats = loadStats()) {
+    return HANZI_DATA
+        .map(item => ({
+            ...item,
+            wrongScore: getCharStats(stats, item.char).wrong
+        }))
+        .filter(item => item.wrongScore > 0)
+        .sort((a, b) => b.wrongScore - a.wrongScore);
+}
+
+// 艾宾浩斯式的简化遗忘模型：记忆强度随连续答对次数增长，
+// 距离上次练习越久，遗忘风险越高（0～1）。
+function getForgettingRisk(charStats, now = Date.now()) {
+    if (!charStats.lastPracticed) return 1;
+    const lastPracticedTime = new Date(charStats.lastPracticed).getTime();
+    if (!Number.isFinite(lastPracticedTime)) return 1;
+    const elapsedDays = Math.max(
+        0,
+        (now - lastPracticedTime) / 86400000
+    );
+    const strengthDays = Math.max(1, Math.pow(2, Math.min(charStats.streak, 6)));
+    return 1 - Math.exp(-elapsedDays / strengthDays);
+}
+
+function getReviewWeight(charStats) {
+    if (charStats.practiced === 0) return 2.2;
+    const wrongRate = charStats.wrong / charStats.practiced;
+    const forgettingRisk = getForgettingRisk(charStats);
+    return 1 + wrongRate * 7 + forgettingRisk * 5 + (charStats.wrong > 0 ? 1 : 0);
+}
+
+function refreshHomeStats() {
+    const stats = loadStats();
+    const wrongChars = getWrongCharacters(stats);
+
+    els.totalPracticed.textContent = stats.totalPracticed;
+    els.totalCorrect.textContent = stats.totalCorrect;
+    els.wrongCount.textContent = wrongChars.length;
+
+    els.wrongbookListSetup.innerHTML = "";
+
+    if (wrongChars.length === 0) {
+        els.wrongbookSetup.classList.add("hidden");
+        return;
+    }
+
+    els.wrongbookSetup.classList.remove("hidden");
+
+    wrongChars.slice(0, 30).forEach(item => {
+        const chip = document.createElement("span");
+        chip.className = "wrong-item";
+        chip.textContent = item.char;
+        const charStats = getCharStats(stats, item.char);
+        const wrongRate = charStats.practiced
+            ? Math.round((charStats.wrong / charStats.practiced) * 100)
+            : 0;
+        chip.title = `累计错误 ${charStats.wrong} 次，错误率 ${wrongRate}%`;
+        els.wrongbookListSetup.appendChild(chip);
+    });
+}
+
+function buildCategoryOptions() {
+    const categories = [...new Set(HANZI_DATA.map(item => item.category))];
+    const options = [
+        {value: "all", label: `全部汉字（${HANZI_DATA.length}个）`},
+        {value: "wrong", label: "只练错字本"},
+        ...categories.map(category => ({
+            value: category,
+            label: `${category}（${HANZI_DATA.filter(item => item.category === category).length}个）`
+        }))
+    ];
+
+    els.categorySelect.innerHTML = "";
+    options.forEach(option => {
+        const node = document.createElement("option");
+        node.value = option.value;
+        node.textContent = option.label;
+        els.categorySelect.appendChild(node);
+    });
+}
+
+function shuffle(array) {
+    const copy = [...array];
+
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+
+    return copy;
+}
+
+function weightedSampleWithoutReplacement(items, count, weightFn) {
+    const pool = [...items];
+    const result = [];
+
+    while (pool.length > 0 && result.length < count) {
+        const weights = pool.map(item => Math.max(0.01, weightFn(item)));
+        const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+        let random = Math.random() * totalWeight;
+        let selectedIndex = 0;
+
+        for (let i = 0; i < weights.length; i += 1) {
+            random -= weights[i];
+            if (random <= 0) {
+                selectedIndex = i;
+                break;
+            }
+        }
+
+        result.push(pool.splice(selectedIndex, 1)[0]);
+    }
+
+    return result;
+}
+
+function createSession() {
+    const selectedCategory = els.categorySelect.value;
+    const requestedCount = Number(els.countSelect.value);
+    const stats = loadStats();
+
+    let pool;
+
+    if (selectedCategory === "wrong") {
+        pool = getWrongCharacters(stats);
+        if (pool.length === 0) {
+            alert("错字本还是空的，先完成一轮普通听写吧！");
+            return null;
+        }
+    } else if (selectedCategory === "all") {
+        pool = [...HANZI_DATA];
+    } else {
+        pool = HANZI_DATA.filter(item => item.category === selectedCategory);
+    }
+
+    const count = Math.min(requestedCount, pool.length);
+
+    if (els.preferWrong.checked && selectedCategory !== "wrong") {
+        return weightedSampleWithoutReplacement(pool, count, item => {
+            const charStats = getCharStats(stats, item.char);
+            return getReviewWeight(charStats);
+        });
+    }
+
+    return shuffle(pool).slice(0, count);
+}
+
+function startSession(customItems = null) {
+    const items = customItems || createSession();
+    if (!items || items.length === 0) return;
+
+    state.mode = "dictation";
+    state.session = shuffle(items);
+    state.currentIndex = 0;
+    state.writings = [];
+    state.answers = [];
+    state.speechRate = Number(els.speechRate.value);
+    state.speechMode = els.speechMode.value;
+
+    showScreen("dictation");
+    renderQuestion();
+
+    setTimeout(() => speakCurrent(), 350);
+}
+
+function renderQuestion() {
+    const item = state.session[state.currentIndex];
+    if (!item) return;
+
+    clearAnswerStroke();
+    els.speakBtn.closest(".listen-area").classList.remove("hidden");
+    els.currentNumber.textContent = state.currentIndex + 1;
+    els.totalNumber.textContent = state.session.length;
+    els.dictationStageLabel.textContent = "听写";
+    els.progressBar.style.width =
+        `${((state.currentIndex + 1) / state.session.length) * 100}%`;
+    els.questionPinyin.textContent = PINYIN_MAP[item.char] || "";
+
+    els.answerPanel.classList.add("hidden");
+    els.showAnswerBtn.classList.remove("hidden");
+    els.showAnswerBtn.textContent = "写好了，核对本题";
+    els.writingArea.classList.remove("hidden");
+    els.answerHint.textContent = "";
+    els.currentWritingPreview.removeAttribute("src");
+    els.currentWritingPreview.classList.add("hidden");
+    resetWriting();
+}
+
+function resizeWritingCanvas() {
+    const rect = els.writingBoard.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    const ratio = Math.min(window.devicePixelRatio || 1, 3);
+    els.writingCanvas.width = Math.round(rect.width * ratio);
+    els.writingCanvas.height = Math.round(rect.height * ratio);
+    const context = els.writingCanvas.getContext("2d");
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    redrawWriting();
+}
+
+function redrawWriting() {
+    const context = els.writingCanvas.getContext("2d");
+    const rect = els.writingCanvas.getBoundingClientRect();
+    context.clearRect(0, 0, rect.width, rect.height);
+    context.strokeStyle = "#20242c";
+    context.lineCap = "round";
+    context.lineJoin = "round";
+
+    state.strokes.forEach(stroke => {
+        if (stroke.length === 0) return;
+        context.beginPath();
+        context.moveTo(stroke[0].x, stroke[0].y);
+        stroke.slice(1).forEach(point => context.lineTo(point.x, point.y));
+        if (stroke.length === 1) context.lineTo(stroke[0].x + 0.1, stroke[0].y + 0.1);
+        context.lineWidth = stroke[0].width;
+        context.stroke();
+    });
+}
+
+function getWritingPoint(event) {
+    const rect = els.writingCanvas.getBoundingClientRect();
+    const pressure = event.pressure > 0 ? event.pressure : 0.5;
+    return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+        width: 5 + pressure * 5
+    };
+}
+
+function beginStroke(event) {
+    if (!els.answerPanel.classList.contains("hidden")) return;
+    event.preventDefault();
+    els.writingCanvas.setPointerCapture(event.pointerId);
+    state.activeStroke = [getWritingPoint(event)];
+    state.strokes.push(state.activeStroke);
+    redrawWriting();
+}
+
+function continueStroke(event) {
+    if (!state.activeStroke) return;
+    event.preventDefault();
+    const events = event.getCoalescedEvents?.() || [event];
+    events.forEach(pointEvent => state.activeStroke.push(getWritingPoint(pointEvent)));
+    redrawWriting();
+}
+
+function endStroke(event) {
+    if (!state.activeStroke) return;
+    event.preventDefault();
+    state.activeStroke = null;
+}
+
+function resetWriting() {
+    state.strokes = [];
+    state.activeStroke = null;
+    state.currentWriting = "";
+    requestAnimationFrame(resizeWritingCanvas);
+}
+
+function undoStroke() {
+    if (!els.answerPanel.classList.contains("hidden")) return;
+    state.strokes.pop();
+    redrawWriting();
+}
+
+function captureWriting() {
+    state.currentWriting = state.strokes.length > 0
+        ? els.writingCanvas.toDataURL("image/png")
+        : "";
+    return state.currentWriting;
+}
+
+function getChineseVoice() {
+    const voices = window.speechSynthesis?.getVoices?.() || [];
+
+    return (
+        voices.find(voice => /^zh-CN/i.test(voice.lang)) ||
+        voices.find(voice => /^zh/i.test(voice.lang)) ||
+        voices[0] ||
+        null
+    );
+}
+
+function speakCurrent() {
+    const item = state.session[state.currentIndex];
+
+    if (!item || !("speechSynthesis" in window)) {
+        alert("当前浏览器不支持语音朗读。建议使用 Chrome、Edge、Safari 或手机自带浏览器。");
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    let text;
+    if (state.speechMode === "char") {
+        text = item.char;
+    } else if (state.speechMode === "twice") {
+        text = `${item.char}。${item.char}。`;
+    } else {
+        text = `${item.char}。${item.hint}。`;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "zh-CN";
+    utterance.rate = state.speechRate;
+    utterance.pitch = 1.02;
+    utterance.volume = 1;
+
+    const voice = getChineseVoice();
+    if (voice) utterance.voice = voice;
+
+    utterance.onerror = event => {
+        console.warn("语音播放失败：", event.error);
+    };
+
+    window.speechSynthesis.speak(utterance);
+}
+
+function submitWriting() {
+    const writing = captureWriting();
+    state.writings[state.currentIndex] = writing;
+    renderReview();
+}
+
+function clearAnswerStroke() {
+    state.answerStrokeRenderToken += 1;
+    state.answerStrokeWriter?.pauseAnimation?.();
+    state.answerStrokeWriter = null;
+    els.answerStrokeWriter.replaceChildren();
+}
+
+function renderAnswerStroke(char) {
+    clearAnswerStroke();
+    const renderToken = state.answerStrokeRenderToken;
+    els.answerStrokeStatus.textContent = "正在准备笔顺演示……";
+    els.answerStrokeStatus.classList.remove("hidden");
+    els.replayAnswerStrokeBtn.disabled = true;
+
+    if (typeof HanziWriter === "undefined") {
+        els.answerStrokeStatus.textContent = "笔画组件加载失败，请检查网络后刷新页面。";
+        return;
+    }
+
+    const size = Math.round(els.answerStrokeWriter.parentElement.getBoundingClientRect().width);
+    const writer = HanziWriter.create(els.answerStrokeWriter, char, {
+        width: size,
+        height: size,
+        padding: Math.round(size * 0.09),
+        showOutline: true,
+        showCharacter: false,
+        strokeColor: "#20242c",
+        outlineColor: "#d7dbe3",
+        strokeAnimationSpeed: 0.65,
+        delayBetweenStrokes: 650,
+        onLoadCharDataSuccess: () => {
+            if (renderToken !== state.answerStrokeRenderToken) return;
+            els.answerStrokeStatus.classList.add("hidden");
+            els.replayAnswerStrokeBtn.disabled = false;
+            writer.animateCharacter();
+        },
+        onLoadCharDataError: () => {
+            if (renderToken !== state.answerStrokeRenderToken) return;
+            els.answerStrokeStatus.textContent = `暂时无法加载“${char}”的笔画数据。`;
+        }
+    });
+    state.answerStrokeWriter = writer;
+}
+
+function replayAnswerStroke() {
+    if (!state.answerStrokeWriter) return;
+    state.answerStrokeWriter.cancelQuiz?.();
+    state.answerStrokeWriter.animateCharacter();
+}
+
+function renderReview() {
+    window.speechSynthesis?.cancel?.();
+    const item = state.session[state.currentIndex];
+    const writing = state.writings[state.currentIndex];
+    els.dictationStageLabel.textContent = "判断";
+    els.currentNumber.textContent = state.currentIndex + 1;
+    els.totalNumber.textContent = state.session.length;
+    els.progressBar.style.width =
+        `${((state.currentIndex + 1) / state.session.length) * 100}%`;
+    els.questionPinyin.textContent = PINYIN_MAP[item.char] || "";
+    if (writing) {
+        els.currentWritingPreview.src = writing;
+        els.currentWritingPreview.alt = `手写的“${item.char}”`;
+        els.currentWritingPreview.classList.remove("hidden");
+    } else {
+        els.currentWritingPreview.removeAttribute("src");
+        els.currentWritingPreview.alt = "本题没有手写内容";
+        els.currentWritingPreview.classList.add("hidden");
+    }
+    const pinyin = PINYIN_MAP[item.char] || "";
+    els.answerHint.textContent = `${pinyin} · ${item.hint}`;
+    els.answerPanel.classList.remove("hidden");
+    els.showAnswerBtn.classList.add("hidden");
+    els.writingArea.classList.add("hidden");
+    els.speakBtn.closest(".listen-area").classList.add("hidden");
+    renderAnswerStroke(item.char);
+}
+
+function recordAnswer(isCorrect) {
+    const item = state.session[state.currentIndex];
+
+    state.answers.push({
+        item,
+        isCorrect,
+        writing: state.writings[state.currentIndex]
+    });
+
+    updateStatsForAnswer(item, isCorrect);
+
+    if (state.currentIndex < state.session.length - 1) {
+        state.currentIndex += 1;
+        renderQuestion();
+        setTimeout(() => speakCurrent(), 260);
+    } else {
+        finishSession();
+    }
+}
+
+
+function startRecognition(customItems = null) {
+    const items = customItems || createSession();
+    if (!items || items.length === 0) return;
+
+    state.mode = "recognition";
+    state.recognitionSession = shuffle(items);
+    state.recognitionIndex = 0;
+    state.recognitionAnswers = [];
+    state.speechRate = Number(els.speechRate.value);
+    state.speechMode = els.speechMode.value;
+
+    showScreen("recognition");
+    renderRecognitionQuestion();
+}
+
+function renderRecognitionQuestion() {
+    const item = state.recognitionSession[state.recognitionIndex];
+    if (!item) return;
+
+    els.recognitionCurrentNumber.textContent = state.recognitionIndex + 1;
+    els.recognitionTotalNumber.textContent = state.recognitionSession.length;
+    els.recognitionProgressBar.style.width =
+        `${((state.recognitionIndex + 1) / state.recognitionSession.length) * 100}%`;
+
+    els.recognitionChar.textContent = item.char;
+    els.recognitionTapTip.textContent = "🔊 点一下听读音";
+    els.recognitionPinyin.textContent = "";
+    els.recognitionHint.textContent = "";
+    els.recognitionReveal.classList.add("hidden");
+}
+
+function speakRecognitionCurrent() {
+    const item = state.recognitionSession[state.recognitionIndex];
+
+    if (!item || !("speechSynthesis" in window)) {
+        alert("当前浏览器不支持语音朗读。建议使用 Chrome、Edge、Safari 或手机自带浏览器。");
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    let text;
+    if (state.speechMode === "char") {
+        text = item.char;
+    } else if (state.speechMode === "twice") {
+        text = `${item.char}。${item.char}。`;
+    } else {
+        text = `${item.char}。${item.hint}。`;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "zh-CN";
+    utterance.rate = state.speechRate;
+    utterance.pitch = 1.02;
+    utterance.volume = 1;
+
+    const voice = getChineseVoice();
+    if (voice) utterance.voice = voice;
+
+    utterance.onerror = event => {
+        console.warn("语音播放失败：", event.error);
+    };
+
+    window.speechSynthesis.speak(utterance);
+
+    els.recognitionPinyin.textContent = PINYIN_MAP[item.char] || "";
+    els.recognitionHint.textContent = item.hint;
+    els.recognitionTapTip.textContent = "🔊 再点可以重听";
+    els.recognitionReveal.classList.remove("hidden");
+}
+
+function recordRecognitionAnswer(isCorrect) {
+    const item = state.recognitionSession[state.recognitionIndex];
+
+    state.recognitionAnswers.push({
+        item,
+        isCorrect
+    });
+
+    if (state.recognitionIndex < state.recognitionSession.length - 1) {
+        state.recognitionIndex += 1;
+        renderRecognitionQuestion();
+    } else {
+        finishRecognition();
+    }
+}
+
+function finishRecognition() {
+    window.speechSynthesis?.cancel?.();
+
+    const correctCount =
+        state.recognitionAnswers.filter(answer => answer.isCorrect).length;
+    const total = state.recognitionAnswers.length;
+    const percentage =
+        total === 0 ? 0 : Math.round((correctCount / total) * 100);
+    const unfamiliarAnswers =
+        state.recognitionAnswers.filter(answer => !answer.isCorrect);
+
+    els.scoreText.textContent = `${percentage}%`;
+    els.scoreRing.style.background =
+        `conic-gradient(var(--primary) ${percentage}%, #e7ebf3 ${percentage}%)`;
+
+    let message;
+    if (percentage === 100) {
+        message = `太棒了！这 ${total} 个字都会读！`;
+    } else if (percentage >= 80) {
+        message = `认读得很好！会读 ${correctCount} 个，再练一下不熟悉的字。`;
+    } else if (percentage >= 60) {
+        message = `已经会读 ${correctCount} 个。点击下面的按钮，可以再练不会的字。`;
+    } else {
+        message = `今天认识了更多汉字。多看几遍、多听几遍，很快就会读了。`;
+    }
+
+    els.summaryMessage.textContent = message;
+    els.resultList.innerHTML = "";
+    els.resultList.classList.remove("dictation-results");
+
+    state.recognitionAnswers.forEach(answer => {
+        const chip = document.createElement("span");
+        chip.className = `result-chip ${answer.isCorrect ? "correct" : "wrong"}`;
+        chip.textContent = answer.item.char;
+        chip.title = answer.isCorrect ? "会读" : "还不会读";
+        els.resultList.appendChild(chip);
+    });
+
+    els.practiceWrongBtn.disabled = unfamiliarAnswers.length === 0;
+    els.practiceWrongBtn.textContent =
+        unfamiliarAnswers.length === 0
+            ? "本轮全部会读"
+            : `再练不会的字（${unfamiliarAnswers.length}个）`;
+
+    showScreen("summary");
+}
+
+function getChoiceOptions(item) {
+    const sameCategory = shuffle(HANZI_DATA.filter(candidate =>
+        candidate.char !== item.char && candidate.category === item.category
+    ));
+    const otherItems = shuffle(HANZI_DATA.filter(candidate =>
+        candidate.char !== item.char && candidate.category !== item.category
+    ));
+    return shuffle([item, ...sameCategory, ...otherItems].slice(0, 3));
+}
+
+function startChoice(customItems = null) {
+    const items = customItems || createSession();
+    if (!items || items.length === 0) return;
+
+    state.mode = "choice";
+    state.choiceSession = shuffle(items);
+    state.choiceIndex = 0;
+    state.choiceAnswers = [];
+    state.speechRate = Number(els.speechRate.value);
+    showScreen("choice");
+    renderChoiceQuestion();
+}
+
+function renderChoiceQuestion() {
+    const item = state.choiceSession[state.choiceIndex];
+    if (!item) return;
+
+    state.choiceHadMistake = false;
+    state.choiceLocked = false;
+    els.choiceCurrentNumber.textContent = state.choiceIndex + 1;
+    els.choiceTotalNumber.textContent = state.choiceSession.length;
+    els.choiceProgressBar.style.width =
+        `${((state.choiceIndex + 1) / state.choiceSession.length) * 100}%`;
+    els.choiceFeedback.classList.add("hidden");
+    els.choiceOptions.innerHTML = "";
+
+    getChoiceOptions(item).forEach(option => {
+        const button = document.createElement("button");
+        button.className = "choice-option";
+        button.textContent = option.char;
+        button.setAttribute("aria-label", `选择汉字${option.char}`);
+        button.addEventListener("click", () => chooseCharacter(option, button));
+        els.choiceOptions.appendChild(button);
+    });
+
+    setTimeout(speakChoiceCurrent, 300);
+}
+
+function speakChoiceCurrent() {
+    const item = state.choiceSession[state.choiceIndex];
+    if (!item || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(`${item.char}。${item.hint}。`);
+    utterance.lang = "zh-CN";
+    utterance.rate = state.speechRate;
+    utterance.pitch = 1.02;
+    const voice = getChineseVoice();
+    if (voice) utterance.voice = voice;
+    window.speechSynthesis.speak(utterance);
+}
+
+function playErrorSound() {
+    try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        const context = new AudioContextClass();
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        const startAt = context.currentTime + 0.01;
+        oscillator.type = "square";
+        oscillator.frequency.setValueAtTime(260, startAt);
+        oscillator.frequency.setValueAtTime(180, startAt + 0.14);
+        gain.gain.setValueAtTime(0.0001, context.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.48, startAt + 0.015);
+        gain.gain.setValueAtTime(0.48, startAt + 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.3);
+        oscillator.connect(gain).connect(context.destination);
+        context.resume?.();
+        oscillator.start(startAt);
+        oscillator.stop(startAt + 0.31);
+        oscillator.addEventListener("ended", () => context.close());
+    } catch (error) {
+        console.warn("提示音播放失败：", error);
+    }
+}
+
+function chooseCharacter(option, button) {
+    if (state.choiceLocked) return;
+    const item = state.choiceSession[state.choiceIndex];
+
+    if (option.char !== item.char) {
+        state.choiceHadMistake = true;
+        button.classList.add("wrong-choice");
+        button.setAttribute("aria-label", `选择汉字${option.char}，回答错误`);
+        button.disabled = true;
+        playErrorSound();
+        return;
+    }
+
+    state.choiceLocked = true;
+    button.classList.add("correct-choice");
+    els.choiceOptions.querySelectorAll("button").forEach(node => {
+        node.disabled = true;
+    });
+    els.choiceFeedback.classList.remove("hidden");
+    const isFirstTryCorrect = !state.choiceHadMistake;
+    state.choiceAnswers.push({item, isCorrect: isFirstTryCorrect});
+    updateStatsForAnswer(item, isFirstTryCorrect);
+}
+
+function nextChoiceQuestion() {
+    if (!state.choiceLocked) return;
+    if (state.choiceIndex < state.choiceSession.length - 1) {
+        state.choiceIndex += 1;
+        renderChoiceQuestion();
+    } else {
+        finishChoice();
+    }
+}
+
+function finishChoice() {
+    window.speechSynthesis?.cancel?.();
+    const correctCount = state.choiceAnswers.filter(answer => answer.isCorrect).length;
+    const total = state.choiceAnswers.length;
+    const percentage = total ? Math.round(correctCount / total * 100) : 0;
+    const wrongAnswers = state.choiceAnswers.filter(answer => !answer.isCorrect);
+    els.scoreText.textContent = `${percentage}%`;
+    els.scoreRing.style.background =
+        `conic-gradient(var(--primary) ${percentage}%, #e7ebf3 ${percentage}%)`;
+    els.summaryMessage.textContent = percentage === 100
+        ? `太棒了！${total} 个字全部一次选对！`
+        : `完成啦！有 ${correctCount} 个字一次选对，没选对的再听听就会了。`;
+    els.resultList.innerHTML = "";
+    els.resultList.classList.remove("dictation-results");
+    state.choiceAnswers.forEach(answer => {
+        const chip = document.createElement("span");
+        chip.className = `result-chip ${answer.isCorrect ? "correct" : "wrong"}`;
+        chip.textContent = answer.item.char;
+        chip.title = answer.isCorrect ? "一次选对" : "再次尝试后选对";
+        els.resultList.appendChild(chip);
+    });
+    els.practiceWrongBtn.disabled = wrongAnswers.length === 0;
+    els.practiceWrongBtn.textContent = wrongAnswers.length
+        ? `再练本轮易错字（${wrongAnswers.length}个）`
+        : "本轮全部一次选对";
+    showScreen("summary");
+    refreshHomeStats();
+}
+
+function finishSession() {
+    window.speechSynthesis?.cancel?.();
+    clearAnswerStroke();
+
+    const correctCount = state.answers.filter(answer => answer.isCorrect).length;
+    const total = state.answers.length;
+    const percentage = total === 0 ? 0 : Math.round((correctCount / total) * 100);
+    const wrongAnswers = state.answers.filter(answer => !answer.isCorrect);
+
+    state.mode = "dictation";
+    els.scoreText.textContent = `${percentage}%`;
+    els.scoreRing.style.background =
+        `conic-gradient(var(--primary) ${percentage}%, #e7ebf3 ${percentage}%)`;
+
+    let message;
+    if (percentage === 100) {
+        message = `太棒了！今天 ${total} 个字全部写对了！`;
+    } else if (percentage >= 80) {
+        message = `表现很好！写对了 ${correctCount} 个，再复习一下错字就更棒了。`;
+    } else if (percentage >= 60) {
+        message = `已经写对了 ${correctCount} 个。慢慢来，错字多练几次就会记住。`;
+    } else {
+        message = `今天完成了 ${total} 个字的练习。先把错字再听一遍，不着急。`;
+    }
+
+    els.summaryMessage.textContent = message;
+    els.resultList.innerHTML = "";
+
+    els.resultList.classList.add("dictation-results");
+
+    state.answers.forEach(answer => {
+        const card = document.createElement("div");
+        card.className = `dictation-result ${answer.isCorrect ? "correct" : "wrong"}`;
+
+        const comparison = document.createElement("div");
+        comparison.className = "comparison";
+
+        const writtenBox = document.createElement("div");
+        writtenBox.className = "comparison-box";
+        const writtenLabel = document.createElement("strong");
+        writtenLabel.textContent = "孩子写的";
+        writtenBox.appendChild(writtenLabel);
+        if (answer.writing) {
+            const image = document.createElement("img");
+            image.className = "written-preview";
+            image.src = answer.writing;
+            image.alt = `手写的“${answer.item.char}”`;
+            writtenBox.appendChild(image);
+        } else {
+            const empty = document.createElement("div");
+            empty.className = "result-standard";
+            empty.textContent = "未写";
+            writtenBox.appendChild(empty);
+        }
+
+        const standardBox = document.createElement("div");
+        standardBox.className = "comparison-box";
+        const standardLabel = document.createElement("strong");
+        standardLabel.textContent = "正确答案";
+        const standard = document.createElement("div");
+        standard.className = "result-standard";
+        standard.textContent = answer.item.char;
+        standardBox.append(standardLabel, standard);
+
+        comparison.append(writtenBox, standardBox);
+        const verdict = document.createElement("div");
+        verdict.className = "result-verdict";
+        verdict.textContent = answer.isCorrect ? "✅ 写对了" : "❌ 写错了";
+        card.append(comparison, verdict);
+        els.resultList.appendChild(card);
+    });
+
+    els.practiceWrongBtn.disabled = wrongAnswers.length === 0;
+    els.practiceWrongBtn.textContent =
+        wrongAnswers.length === 0
+            ? "本轮没有错字"
+            : `再练本轮错字（${wrongAnswers.length}个）`;
+
+    showScreen("summary");
+    refreshHomeStats();
+}
+
+function showScreen(name) {
+    els.setupScreen.classList.toggle("hidden", name !== "setup");
+    els.dictationScreen.classList.toggle("hidden", name !== "dictation");
+    els.recognitionScreen.classList.toggle("hidden", name !== "recognition");
+    els.choiceScreen.classList.toggle("hidden", name !== "choice");
+    els.storyScreen.classList.toggle("hidden", name !== "story");
+    els.strokeScreen.classList.toggle("hidden", name !== "stroke");
+    els.summaryScreen.classList.toggle("hidden", name !== "summary");
+    window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function getCachedStrokeOrder() {
+    try {
+        const cache = JSON.parse(localStorage.getItem(STROKE_ORDER_KEY));
+        const sourceChars = HANZI_DATA.map(item => item.char);
+        if (
+            cache?.source === sourceChars.join("") &&
+            Array.isArray(cache.characters) &&
+            cache.characters.length === sourceChars.length
+        ) {
+            const itemByChar = new Map(HANZI_DATA.map(item => [item.char, item]));
+            return cache.characters.map(char => itemByChar.get(char)).filter(Boolean);
+        }
+    } catch (error) {
+        console.warn("读取笔画顺序缓存失败：", error);
+    }
+    return null;
+}
+
+async function createStrokeSession() {
+    const cachedItems = getCachedStrokeOrder();
+    if (cachedItems) return cachedItems;
+
+    const itemsWithCounts = await Promise.all(HANZI_DATA.map(async (item, sourceIndex) => {
+        try {
+            const characterData = await HanziWriter.loadCharacterData(item.char);
+            return {item, sourceIndex, strokeCount: characterData.strokes.length};
+        } catch (error) {
+            console.warn(`无法读取“${item.char}”的笔画数：`, error);
+            return {item, sourceIndex, strokeCount: Number.MAX_SAFE_INTEGER};
+        }
+    }));
+
+    itemsWithCounts.sort((a, b) =>
+        a.strokeCount - b.strokeCount || a.sourceIndex - b.sourceIndex
+    );
+    const items = itemsWithCounts.map(entry => entry.item);
+
+    const allCountsLoaded = itemsWithCounts.every(
+        entry => entry.strokeCount !== Number.MAX_SAFE_INTEGER
+    );
+    if (allCountsLoaded) {
+        try {
+            localStorage.setItem(STROKE_ORDER_KEY, JSON.stringify({
+                source: HANZI_DATA.map(item => item.char).join(""),
+                characters: items.map(item => item.char)
+            }));
+        } catch (error) {
+            console.warn("保存笔画顺序缓存失败：", error);
+        }
+    }
+
+    return items;
+}
+
+async function startStrokePractice() {
+    const startToken = ++state.strokeStartToken;
+    showScreen("stroke");
+    els.strokeCurrentNumber.textContent = "…";
+    els.strokeTotalNumber.textContent = HANZI_DATA.length;
+    els.strokeProgressBar.style.width = "0%";
+    els.strokePinyin.textContent = "";
+    els.strokeHint.textContent = "";
+    els.strokeWriter.replaceChildren();
+    els.strokeStatus.textContent = "正在按笔画数从少到多排序……";
+    els.strokeStatus.classList.remove("hidden");
+    els.previousStrokeBtn.disabled = true;
+    els.nextStrokeBtn.disabled = true;
+
+    if (typeof HanziWriter === "undefined") {
+        els.strokeStatus.textContent = "笔画组件加载失败，请检查网络后刷新页面。";
+        return;
+    }
+
+    const items = await createStrokeSession();
+    if (startToken !== state.strokeStartToken) return;
+
+    state.strokeSession = items;
+    let savedChar = "";
+    try {
+        savedChar = localStorage.getItem(STROKE_PROGRESS_KEY) || "";
+    } catch (error) {
+        console.warn("读取笔画学习进度失败：", error);
+    }
+    const savedIndex = items.findIndex(item => item.char === savedChar);
+    state.strokeIndex = savedIndex >= 0 ? savedIndex : 0;
+    renderStrokeCharacter();
+}
+
+function renderStrokeCharacter() {
+    const item = state.strokeSession[state.strokeIndex];
+    if (!item) return;
+
+    const renderToken = ++state.strokeRenderToken;
+    state.strokeWriter?.pauseAnimation?.();
+    state.strokeWriter = null;
+    els.strokeWriter.replaceChildren();
+    els.strokeStatus.textContent = "正在准备笔画动画……";
+    els.strokeStatus.classList.remove("hidden");
+
+    els.strokeCurrentNumber.textContent = state.strokeIndex + 1;
+    els.strokeTotalNumber.textContent = state.strokeSession.length;
+    els.strokeProgressBar.style.width =
+        `${((state.strokeIndex + 1) / state.strokeSession.length) * 100}%`;
+    els.strokePinyin.textContent = PINYIN_MAP[item.char] || "";
+    els.strokeHint.textContent = `${item.char} · ${item.hint}`;
+    els.previousStrokeBtn.disabled = state.strokeIndex === 0;
+    els.nextStrokeBtn.disabled = false;
+    els.nextStrokeBtn.textContent = state.strokeIndex === state.strokeSession.length - 1
+        ? "回到第一字 ↺"
+        : "下一字 →";
+    speakStrokeCharacter(item.char);
+
+    if (typeof HanziWriter === "undefined") {
+        els.strokeStatus.textContent = "笔画组件加载失败，请检查网络后刷新页面。";
+        return;
+    }
+
+    const size = Math.round(els.strokeGrid.getBoundingClientRect().width);
+    state.strokeWriter = HanziWriter.create(els.strokeWriter, item.char, {
+        width: size,
+        height: size,
+        padding: Math.round(size * 0.09),
+        showOutline: true,
+        showCharacter: false,
+        strokeColor: "#20242c",
+        outlineColor: "#d7dbe3",
+        strokeAnimationSpeed: 0.65,
+        delayBetweenStrokes: 650,
+        delayBetweenLoops: 1800,
+        onLoadCharDataSuccess: () => {
+            if (renderToken !== state.strokeRenderToken) return;
+            els.strokeStatus.classList.add("hidden");
+            state.strokeWriter.loopCharacterAnimation();
+        },
+        onLoadCharDataError: () => {
+            if (renderToken !== state.strokeRenderToken) return;
+            els.strokeStatus.textContent = `暂时无法加载“${item.char}”的笔画数据。`;
+        }
+    });
+    try {
+        localStorage.setItem(STROKE_PROGRESS_KEY, item.char);
+    } catch (error) {
+        console.warn("保存笔画学习进度失败：", error);
+    }
+}
+
+function speakStrokeCharacter(char) {
+    if (!char || !("speechSynthesis" in window)) return;
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(char);
+    utterance.lang = "zh-CN";
+    utterance.rate = Number(els.speechRate.value) || 0.78;
+    utterance.pitch = 1.02;
+    utterance.volume = 1;
+
+    const voice = getChineseVoice();
+    if (voice) utterance.voice = voice;
+    utterance.onerror = event => {
+        console.warn("笔画练习读音失败：", event.error);
+    };
+    window.speechSynthesis.speak(utterance);
+}
+
+function showPreviousStrokeCharacter() {
+    if (state.strokeIndex === 0) return;
+    state.strokeIndex -= 1;
+    renderStrokeCharacter();
+}
+
+function showNextStrokeCharacter() {
+    state.strokeIndex = state.strokeIndex === state.strokeSession.length - 1
+        ? 0
+        : state.strokeIndex + 1;
+    renderStrokeCharacter();
+}
+
+function quitStrokePractice() {
+    state.strokeStartToken += 1;
+    state.strokeRenderToken += 1;
+    state.strokeWriter?.pauseAnimation?.();
+    state.strokeWriter = null;
+    window.speechSynthesis?.cancel?.();
+    showScreen("setup");
+}
+
+function makeRandomStory() {
+    let story = "";
+    let attempts = 0;
+
+    do {
+        story = STORY_SENTENCES[Math.floor(Math.random() * STORY_SENTENCES.length)];
+        attempts += 1;
+    } while (story === state.currentStory && attempts < 5);
+
+    return story;
+}
+
+function renderRandomStory() {
+    window.speechSynthesis?.cancel?.();
+    state.currentStory = makeRandomStory();
+    els.storyText.textContent = state.currentStory;
+    els.storyPinyin.textContent = Array.from(state.currentStory)
+        .map(char => PINYIN_MAP[char] || char)
+        .join(" ");
+    els.storyPinyin.classList.add("hidden");
+    els.storyPinyinBtn.textContent = "显示拼音";
+}
+
+function startStory() {
+    renderRandomStory();
+    showScreen("story");
+}
+
+function toggleStoryPinyin() {
+    const willShow = els.storyPinyin.classList.contains("hidden");
+    els.storyPinyin.classList.toggle("hidden", !willShow);
+    els.storyPinyinBtn.textContent = willShow ? "隐藏拼音" : "显示拼音";
+}
+
+function speakStory() {
+    if (!("speechSynthesis" in window)) {
+        alert("当前浏览器不支持语音朗读。建议使用 Chrome、Edge、Safari 或手机自带浏览器。");
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(state.currentStory);
+    utterance.lang = "zh-CN";
+    utterance.rate = Number(els.speechRate.value) || 0.78;
+    utterance.pitch = 1.02;
+    const voice = getChineseVoice();
+    if (voice) utterance.voice = voice;
+    window.speechSynthesis.speak(utterance);
+}
+
+function quitSession() {
+    const confirmed = confirm("确定要退出本轮听写吗？已经判定过的题目会保留记录。");
+    if (!confirmed) return;
+
+    window.speechSynthesis?.cancel?.();
+    clearAnswerStroke();
+    showScreen("setup");
+    refreshHomeStats();
+}
+
+
+function quitRecognition() {
+    const confirmed = confirm("确定要退出本轮认读练习吗？");
+    if (!confirmed) return;
+
+    window.speechSynthesis?.cancel?.();
+    showScreen("setup");
+    refreshHomeStats();
+}
+
+function quitChoice() {
+    if (!confirm("确定要退出本轮选字游戏吗？")) return;
+    window.speechSynthesis?.cancel?.();
+    showScreen("setup");
+    refreshHomeStats();
+}
+
+function resetAllData() {
+    const confirmed = confirm(
+        "确定要清空全部学习记录吗？错字本和累计成绩都会被删除，此操作不能恢复。"
+    );
+
+    if (!confirmed) return;
+
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STROKE_PROGRESS_KEY);
+    refreshHomeStats();
+    alert("学习记录已经清空。");
+}
+
+els.startBtn.addEventListener("click", () => startSession());
+els.recognitionStartBtn.addEventListener("click", () => startRecognition());
+els.choiceStartBtn.addEventListener("click", () => startChoice());
+els.storyStartBtn.addEventListener("click", startStory);
+els.strokeStartBtn.addEventListener("click", startStrokePractice);
+
+els.speakBtn.addEventListener("click", speakCurrent);
+els.writingCanvas.addEventListener("pointerdown", beginStroke);
+els.writingCanvas.addEventListener("pointermove", continueStroke);
+els.writingCanvas.addEventListener("pointerup", endStroke);
+els.writingCanvas.addEventListener("pointercancel", endStroke);
+els.undoStrokeBtn.addEventListener("click", undoStroke);
+els.clearWritingBtn.addEventListener("click", resetWriting);
+window.addEventListener("resize", resizeWritingCanvas);
+els.showAnswerBtn.addEventListener("click", submitWriting);
+els.replayAnswerStrokeBtn.addEventListener("click", replayAnswerStroke);
+els.correctBtn.addEventListener("click", () => recordAnswer(true));
+els.wrongBtn.addEventListener("click", () => recordAnswer(false));
+els.quitBtn.addEventListener("click", quitSession);
+
+els.recognitionCharBtn.addEventListener("click", speakRecognitionCurrent);
+els.recognitionReplayBtn.addEventListener("click", speakRecognitionCurrent);
+els.recognitionCorrectBtn.addEventListener(
+    "click",
+    () => recordRecognitionAnswer(true)
+);
+els.recognitionWrongBtn.addEventListener(
+    "click",
+    () => recordRecognitionAnswer(false)
+);
+els.quitRecognitionBtn.addEventListener("click", quitRecognition);
+els.choiceSpeakBtn.addEventListener("click", speakChoiceCurrent);
+els.choiceFeedback.addEventListener("click", nextChoiceQuestion);
+els.quitChoiceBtn.addEventListener("click", quitChoice);
+els.storyPinyinBtn.addEventListener("click", toggleStoryPinyin);
+els.storySpeakBtn.addEventListener("click", speakStory);
+els.storyNextBtn.addEventListener("click", renderRandomStory);
+els.quitStoryBtn.addEventListener("click", () => {
+    window.speechSynthesis?.cancel?.();
+    showScreen("setup");
+});
+els.previousStrokeBtn.addEventListener("click", showPreviousStrokeCharacter);
+els.nextStrokeBtn.addEventListener("click", showNextStrokeCharacter);
+els.quitStrokeBtn.addEventListener("click", quitStrokePractice);
+
+els.backHomeBtn.addEventListener("click", () => {
+    window.speechSynthesis?.cancel?.();
+    showScreen("setup");
+    refreshHomeStats();
+});
+
+els.practiceWrongBtn.addEventListener("click", () => {
+    if (state.mode === "recognition") {
+        const unfamiliarItems = state.recognitionAnswers
+            .filter(answer => !answer.isCorrect)
+            .map(answer => answer.item);
+
+        if (unfamiliarItems.length > 0) {
+            startRecognition(unfamiliarItems);
+        }
+        return;
+    }
+
+    if (state.mode === "choice") {
+        const wrongItems = state.choiceAnswers
+            .filter(answer => !answer.isCorrect)
+            .map(answer => answer.item);
+        if (wrongItems.length > 0) startChoice(wrongItems);
+        return;
+    }
+
+    const wrongItems = state.answers
+        .filter(answer => !answer.isCorrect)
+        .map(answer => answer.item);
+
+    if (wrongItems.length > 0) {
+        startSession(wrongItems);
+    }
+});
+
+els.resetDataBtn.addEventListener("click", resetAllData);
+
+document.addEventListener("keydown", event => {
+    const dictationActive =
+        !els.dictationScreen.classList.contains("hidden");
+    const recognitionActive =
+        !els.recognitionScreen.classList.contains("hidden");
+    const choiceActive = !els.choiceScreen.classList.contains("hidden");
+    const storyActive = !els.storyScreen.classList.contains("hidden");
+    const strokeActive = !els.strokeScreen.classList.contains("hidden");
+
+    if (!dictationActive && !recognitionActive && !choiceActive && !storyActive && !strokeActive) return;
+
+    if (event.code === "Space" && !strokeActive) {
+        event.preventDefault();
+
+        if (dictationActive) {
+            speakCurrent();
+        } else if (recognitionActive) {
+            speakRecognitionCurrent();
+        } else if (choiceActive) {
+            speakChoiceCurrent();
+        } else if (storyActive) {
+            speakStory();
+        }
+    }
+
+    if (dictationActive) {
+        if (
+            event.key === "Enter" &&
+            !els.showAnswerBtn.classList.contains("hidden")
+        ) {
+            submitWriting();
+        }
+
+        if (!els.answerPanel.classList.contains("hidden")) {
+            if (event.key === "ArrowLeft") recordAnswer(false);
+            if (event.key === "ArrowRight") recordAnswer(true);
+        }
+    }
+
+    if (
+        recognitionActive &&
+        !els.recognitionReveal.classList.contains("hidden")
+    ) {
+        if (event.key === "ArrowLeft") recordRecognitionAnswer(false);
+        if (event.key === "ArrowRight") recordRecognitionAnswer(true);
+    }
+
+    if (strokeActive) {
+        if (event.key === "ArrowLeft") showPreviousStrokeCharacter();
+        if (event.key === "ArrowRight") showNextStrokeCharacter();
+    }
+});
+
+if ("speechSynthesis" in window) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+    };
+}
+
+buildCategoryOptions();
+refreshHomeStats();

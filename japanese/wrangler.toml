@@ -1,0 +1,13 @@
+name = "japanese-study"
+main = "backend/worker.js"
+compatibility_date = "2024-09-01"
+
+# 静态资源目录（只上传 frontend/ 目录下的前端网页文件）
+[assets]
+directory = "./frontend"
+binding = "ASSETS"
+
+# Cloudflare KV 存储配置 (多端进度永久绑定)
+[[kv_namespaces]]
+binding = "STUDY_KV"
+id = "ed094c7c103648d5839ccc31a54317f8"
