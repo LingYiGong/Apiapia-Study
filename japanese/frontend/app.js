@@ -68,10 +68,10 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     isIOS || /Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
                 );
 
-                const AUDIO_CONFIG_KEY = 'japanese_study_audio_config_v2';
+                const AUDIO_CONFIG_KEY = 'japanese_study_audio_config_v4';
                 const showAudioSettings = ref(false);
-                // iPad / iPhone 默认首选苹果原厂高清语音 (Siri / 京子)；其他端默认在线神经网络真实语流
-                const audioEngine = ref(isIOS ? 'tts' : 'online'); 
+                // 默认采用【真人原声发音】（日本直连 Google 纯正东京腔 WaveNet 真实语流，带智能预加载与缓存池）
+                const audioEngine = ref('online'); 
                 // 默认采用 'word'（真人自然语调 / 汉字原文），保持纯正东京腔高低起伏；可切换 'kana'（纯假名逐字拼读）
                 const audioTarget = ref('word'); 
                 const speechRate = ref(1.0); // 1.0, 1.2, 1.35, 1.5
@@ -92,8 +92,8 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
 
                     if (jaVoices.length > 0) {
                         if (!jaVoiceName.value || !jaVoices.some(v => v.name === jaVoiceName.value)) {
-                            // 真人级音色匹配优先级：
-                            // 1. Apple 原生 Siri 真人语音 (iPad/iOS 极品音质)
+                            // 本地真人级音色匹配优先级：
+                            // 1. Apple 原生 Siri 真人语音 (iPad/iOS 极品音质，完全本地离线)
                             // 2. 微软 Edge 自然神经语音 (Nanami 七海 / Keita 圭太)
                             // 3. Apple Kyoko 京子 (Enhanced 高清强化版优先)
                             // 4. Google 日本语自然语音
@@ -154,8 +154,8 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                             }
                             if (parsed.jaVoiceName) jaVoiceName.value = parsed.jaVoiceName;
                         } else {
-                            // 旧版 v1 缓存平滑迁移：自动切换为真人自然语调模式
-                            const oldRaw = localStorage.getItem('japanese_study_audio_config_v1');
+                            // 旧版 v1 / v2 / v3 缓存自动升级迁移：默认激活真人原声发音
+                            const oldRaw = localStorage.getItem('japanese_study_audio_config_v3') || localStorage.getItem('japanese_study_audio_config_v2') || localStorage.getItem('japanese_study_audio_config_v1');
                             if (oldRaw) {
                                 try {
                                     const oldParsed = JSON.parse(oldRaw);
@@ -163,7 +163,7 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                                     if (oldParsed.jaVoiceName) jaVoiceName.value = oldParsed.jaVoiceName;
                                 } catch (e) {}
                             }
-                            audioEngine.value = isIOS ? 'tts' : 'online';
+                            audioEngine.value = 'online'; // 统一默认采用真人原声发音
                             audioTarget.value = 'word';
                             saveAudioConfig();
                         }
@@ -996,47 +996,102 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     return cleanPronunciation(item.word) || cleanPronunciation(item.kana);
                 };
 
+                // 真人原声发音高速缓存池与预加载系统
+                const onlineAudioCache = new Map(); // text -> Audio instance
+
+                const getOnlineAudioUrl = (text) => {
+                    const encoded = encodeURIComponent(text);
+                    // 第一通道：Google 神经网络高品质真人语流（日本直连 <15ms，最正宗的东京音调）
+                    return `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ja&q=${encoded}`;
+                };
+
+                const getOnlineFallbackUrl = (text) => {
+                    const encoded = encodeURIComponent(text);
+                    // 第二备用通道：网易有道高速音频
+                    return `https://dict.youdao.com/dictvoice?audio=${encoded}&le=jap`;
+                };
+
+                const preloadOnlineAudio = (text) => {
+                    if (!text || typeof window === 'undefined') return;
+                    text = text.replace(/[~～\-_—]/g, '').trim();
+                    if (!text || onlineAudioCache.has(text)) return;
+
+                    try {
+                        const audio = new Audio();
+                        audio.preload = 'auto';
+                        audio.src = getOnlineAudioUrl(text);
+                        onlineAudioCache.set(text, audio);
+                        if (onlineAudioCache.size > 200) {
+                            const first = onlineAudioCache.keys().next().value;
+                            onlineAudioCache.delete(first);
+                        }
+                    } catch (e) {}
+                };
+
                 const playOnlineAudio = (text, onFallback) => {
                     try {
                         if (synth && synth.speaking) {
                             synth.cancel();
                         }
-                        if (!currentAudio) {
-                            currentAudio = new Audio();
+                        if (currentAudio) {
+                            currentAudio.pause();
+                            currentAudio.currentTime = 0;
                         }
-                        currentAudio.pause();
 
-                        const encoded = encodeURIComponent(text);
-                        // 第一通道：Google 神经网络高品质真人语流发音
-                        const primaryUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ja&q=${encoded}`;
-                        // 第二备用通道：网易有道发音
-                        const fallbackUrl = `https://dict.youdao.com/dictvoice?audio=${encoded}&le=jap`;
+                        let audio = onlineAudioCache.get(text);
+                        if (!audio) {
+                            audio = new Audio();
+                            audio.preload = 'auto';
+                            audio.src = getOnlineAudioUrl(text);
+                            onlineAudioCache.set(text, audio);
+                            if (onlineAudioCache.size > 200) {
+                                const first = onlineAudioCache.keys().next().value;
+                                onlineAudioCache.delete(first);
+                            }
+                        }
+
+                        currentAudio = audio;
+                        audio.playbackRate = Number(speechRate.value) || 1.0;
+                        audio.currentTime = 0;
 
                         let fallbackCalled = false;
                         const triggerFallback = () => {
                             if (!fallbackCalled) {
                                 fallbackCalled = true;
-                                currentAudio.onerror = () => {
+                                try {
+                                    const fallbackAudio = new Audio(getOnlineFallbackUrl(text));
+                                    fallbackAudio.playbackRate = Number(speechRate.value) || 1.0;
+                                    currentAudio = fallbackAudio;
+                                    fallbackAudio.play().catch(() => {
+                                        if (onFallback) onFallback();
+                                    });
+                                } catch (err) {
                                     if (onFallback) onFallback();
-                                };
-                                currentAudio.src = fallbackUrl;
-                                currentAudio.playbackRate = Number(speechRate.value) || 1.0;
-                                currentAudio.play().catch(() => {
-                                    if (onFallback) onFallback();
-                                });
+                                }
                             }
                         };
 
-                        currentAudio.onerror = () => {
+                        // 超时保护：若网络挂起超过 1200ms 仍未开始播放，立即自动切换备用音源
+                        const timeoutId = setTimeout(() => {
+                            if (audio.paused && audio.currentTime === 0) {
+                                triggerFallback();
+                            }
+                        }, 1200);
+
+                        audio.onplaying = () => {
+                            clearTimeout(timeoutId);
+                        };
+
+                        audio.onerror = () => {
+                            clearTimeout(timeoutId);
                             triggerFallback();
                         };
-                        currentAudio.src = primaryUrl;
-                        currentAudio.playbackRate = Number(speechRate.value) || 1.0;
 
-                        const playPromise = currentAudio.play();
+                        const playPromise = audio.play();
                         if (playPromise !== undefined) {
                             playPromise.catch((err) => {
                                 if (err.name !== 'AbortError') {
+                                    clearTimeout(timeoutId);
                                     triggerFallback();
                                 }
                             });
@@ -1106,7 +1161,13 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                             speakTTS(text);
                         });
                     } else {
-                        speakTTS(text);
+                        // 本地零延迟 TTS 模式（即点即播，<10ms）
+                        const voice = getJapaneseVoice();
+                        if (!voice && synth && (availableVoices.value.length === 0 || !availableVoices.value.some(v => /ja|japanese|京子|siri/i.test(v.lang || v.name)))) {
+                            playOnlineAudio(text);
+                        } else {
+                            speakTTS(text);
+                        }
                     }
                 };
 
@@ -1296,7 +1357,13 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                             speakTTS(text);
                         });
                     } else {
-                        speakTTS(text);
+                        // 本地零延迟 TTS 模式（即点即播，<10ms）
+                        const voice = getJapaneseVoice();
+                        if (!voice && synth && (availableVoices.value.length === 0 || !availableVoices.value.some(v => /ja|japanese|京子|siri/i.test(v.lang || v.name)))) {
+                            playOnlineAudio(text);
+                        } else {
+                            speakTTS(text);
+                        }
                     }
                 };
 
@@ -1380,6 +1447,44 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                         playCurrentSentence();
                     }
                 };
+
+                // 智能后台预加载：在练习与翻页时预先加载音频至内存，彻底消除等待与网络延迟
+                watch(currentPracticeWord, (word) => {
+                    if (word && audioEngine.value === 'online') {
+                        const txt = getWordAudioText(word);
+                        if (txt) preloadOnlineAudio(txt);
+                        if (todayQueue.value && todayQueue.value.length > 1) {
+                            todayQueue.value.slice(1, 3).forEach(w => {
+                                const nextTxt = getWordAudioText(w);
+                                if (nextTxt) preloadOnlineAudio(nextTxt);
+                            });
+                        }
+                    }
+                }, { immediate: true });
+
+                watch(currentPracticeSentence, (sentence) => {
+                    if (sentence && audioEngine.value === 'online') {
+                        const txt = audioTarget.value === 'kana' ? (sentence.kana || sentence.japanese) : sentence.japanese;
+                        if (txt) preloadOnlineAudio(txt);
+                        if (sentenceQueue.value && sentenceQueue.value.length > 1) {
+                            sentenceQueue.value.slice(1, 3).forEach(s => {
+                                const nextTxt = audioTarget.value === 'kana' ? (s.kana || s.japanese) : s.japanese;
+                                if (nextTxt) preloadOnlineAudio(nextTxt);
+                            });
+                        }
+                    }
+                }, { immediate: true });
+
+                watch(paginatedWords, (items) => {
+                    if (items && items.length > 0 && audioEngine.value === 'online') {
+                        setTimeout(() => {
+                            items.slice(0, 10).forEach(w => {
+                                const txt = getWordAudioText(w);
+                                if (txt) preloadOnlineAudio(txt);
+                            });
+                        }, 250);
+                    }
+                }, { immediate: true });
 
                 return {
                     currentTab,

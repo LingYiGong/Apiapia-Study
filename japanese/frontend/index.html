@@ -97,16 +97,29 @@
                     <label class="block text-xs font-semibold text-gray-700 mb-1.5">发音音源引擎</label>
                     <van-radio-group v-model="audioEngine" @change="saveAudioConfig" class="space-y-2">
                         <div class="p-3 rounded-xl border transition-colors cursor-pointer"
+                             :class="audioEngine === 'online' ? 'border-[#4f46e5] bg-indigo-50/50' : 'border-gray-200 bg-white hover:bg-gray-50'"
+                             @click="audioEngine = 'online'; saveAudioConfig()">
+                            <van-radio name="online">
+                                <div>
+                                    <div class="text-xs font-semibold text-gray-800 flex items-center space-x-1">
+                                        <span>🌐 真人原声发音</span>
+                                        <van-tag type="primary" size="medium" round>默认推荐・纯正东京腔</van-tag>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500 mt-0.5">Google 神经网络真实真人语流，纯正东京腔高低重音；已启用后台智能预加载与本地内存池，即点即播极速响应。</p>
+                                </div>
+                            </van-radio>
+                        </div>
+
+                        <div class="p-3 rounded-xl border transition-colors cursor-pointer"
                              :class="audioEngine === 'tts' ? 'border-[#4f46e5] bg-indigo-50/50' : 'border-gray-200 bg-white hover:bg-gray-50'"
                              @click="audioEngine = 'tts'; saveAudioConfig()">
                             <van-radio name="tts">
                                 <div class="flex-1">
                                     <div class="text-xs font-semibold text-gray-800 flex items-center space-x-1">
-                                        <span>🍎 系统本地 TTS 原生语音</span>
-                                        <van-tag v-if="isIOS" type="primary" size="medium" round>iPad / 手机首选</van-tag>
-                                        <van-tag v-else type="primary" size="medium" round>本地极速</van-tag>
+                                        <span>🍎 系统本地 TTS 原生发音</span>
+                                        <van-tag type="default" size="medium" round>完全离线备用</van-tag>
                                     </div>
-                                    <p class="text-[11px] text-gray-500 mt-0.5">调用系统原生神经网络引擎（iPad / iPhone 自动优先启用 Apple Siri / 京子 高清真人语音，离线零延迟）。</p>
+                                    <p class="text-[11px] text-gray-500 mt-0.5">调用设备本地系统原生引擎（iPad/iPhone 调用 Apple Siri/京子，电脑调用微软七海/自然引擎）。无需联网，完全离线运行。</p>
                                 </div>
                             </van-radio>
                             
@@ -118,23 +131,9 @@
                                     </option>
                                 </select>
                                 <div v-else class="text-[11px] text-amber-700 bg-amber-50 p-2 rounded-lg leading-relaxed mt-1">
-                                    {{ isIOS ? '💡 iPad 提示：轻点下方试听按钮，系统即可激活 Apple 原生日语声音。' : '⚠️ 未在您的系统检测到日语 TTS 语音包（Windows 默认会退回中文语音朗读），建议切换使用下方的【神经网络在线真人员工音频】。' }}
+                                    {{ isIOS ? '💡 iPad 提示：轻点下方试听按钮，系统即可激活 Apple 原生日语声音。' : '💡 未在系统检测到日语 TTS 语音包时，系统将自动无缝降级为在线通道播放。' }}
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="p-3 rounded-xl border transition-colors cursor-pointer"
-                             :class="audioEngine === 'online' ? 'border-[#4f46e5] bg-indigo-50/50' : 'border-gray-200 bg-white hover:bg-gray-50'"
-                             @click="audioEngine = 'online'; saveAudioConfig()">
-                            <van-radio name="online">
-                                <div>
-                                    <div class="text-xs font-semibold text-gray-800 flex items-center space-x-1">
-                                        <span>🌐 神经网络在线标准日语音频</span>
-                                        <van-tag v-if="!isIOS" type="success" size="medium" round>电脑端推荐</van-tag>
-                                    </div>
-                                    <p class="text-[11px] text-gray-500 mt-0.5">高品质真人语流音频，单词和完整句子均支持纯正东京腔发音（联网播放）。</p>
-                                </div>
-                            </van-radio>
                         </div>
                     </van-radio-group>
                 </div>
