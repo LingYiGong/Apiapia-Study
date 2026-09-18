@@ -278,15 +278,18 @@
                 <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between mb-2">
                         <h2 class="text-sm font-bold text-gray-700 flex items-center space-x-1">
-                            <span>📦 词库操作</span>
+                            <span>📦 词库与句子库管理</span>
                         </h2>
-                        <span class="text-xs text-gray-400">已载入 {{ words.length }} 词</span>
+                        <span class="text-xs text-gray-400">词 {{ words.length }} | 句 {{ sentences.length }}</span>
                     </div>
 
                     <!-- Preset Import Buttons -->
-                    <div class="mb-2">
+                    <div class="grid grid-cols-2 gap-2 mb-2">
                         <van-button type="primary" plain round block size="small" @click="importBuiltin()">
-                            📦 载入 / 重置内置词库 (1786词)
+                            📦 补全内置词库 (1912词)
+                        </van-button>
+                        <van-button type="primary" plain round block size="small" @click="resetSentences()">
+                            📖 补全内置句子 (226句)
                         </van-button>
                     </div>
 
@@ -294,114 +297,209 @@
                     <div class="grid grid-cols-3 gap-2">
                         <label class="w-full">
                             <van-button round block size="small" class="!w-full !px-1">
-                                <span>📂 上传导入</span>
+                                <span>📂 导入备份</span>
                             </van-button>
                             <input type="file" accept=".txt,.json" @change="handleFileUpload" class="hidden">
                         </label>
                         <van-button round block size="small" @click="exportData">
-                            💾 备份
+                            💾 完整备份
                         </van-button>
                         <van-button type="danger" plain round block size="small" @click="clearAllWords">
-                            🗑️ 清空
+                            🗑️ 清空词库
                         </van-button>
                     </div>
                 </div>
 
-                <!-- Add/Edit Word Card (Collapsible) -->
-                <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-center mb-2 cursor-pointer" @click="showAddForm = !showAddForm">
-                        <h2 class="text-sm font-semibold text-gray-800 flex items-center space-x-1">
-                            <span>{{ editingId ? '✏️ 编辑词汇' : '➕ 添加新词' }}</span>
-                        </h2>
-                        <van-button size="mini" round plain type="primary">
-                            {{ editingId ? '编辑中' : (showAddForm ? '收起 ▲' : '展开 ▼') }}
-                        </van-button>
-                    </div>
-
-                    <form v-show="showAddForm || editingId" @submit.prevent="saveWord" class="space-y-3 pt-1">
-                        <van-cell-group inset class="!m-0 !border !border-gray-200 overflow-hidden">
-                            <van-field
-                                v-model="form.word"
-                                label="日文"
-                                placeholder="例: お茶"
-                                required
-                                clearable />
-                            <van-field
-                                v-model="form.kana"
-                                label="注音"
-                                placeholder="例: おちゃ"
-                                required
-                                clearable />
-                            <van-field
-                                v-model="form.meaning"
-                                label="释义"
-                                placeholder="例: 茶，绿茶 (可选)"
-                                clearable />
-                        </van-cell-group>
-                        <div class="flex space-x-2 pt-1">
-                            <van-button type="primary" round block size="small" native-type="submit" class="flex-1">
-                                {{ editingId ? '保存修改' : '确认添加' }}
-                            </van-button>
-                            <van-button v-if="editingId" round size="small" @click="cancelEdit">
-                                取消
-                            </van-button>
-                        </div>
-                    </form>
+                <!-- Sub-Tab Segmented Switch: Words vs Sentences -->
+                <div class="flex p-1 bg-gray-200/80 rounded-xl select-none">
+                    <button @click="manageSubTab = 'words'" 
+                            class="flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1"
+                            :class="manageSubTab === 'words' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'">
+                        <span>📖 词汇列表</span>
+                        <span class="text-[10px] px-1.5 py-0.2 rounded-full" :class="manageSubTab === 'words' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'bg-gray-300/70 text-gray-600'">{{ words.length }}</span>
+                    </button>
+                    <button @click="manageSubTab = 'sentences'" 
+                            class="flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all flex items-center justify-center space-x-1"
+                            :class="manageSubTab === 'sentences' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'">
+                        <span>💬 句子列表</span>
+                        <span class="text-[10px] px-1.5 py-0.2 rounded-full" :class="manageSubTab === 'sentences' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'bg-gray-300/70 text-gray-600'">{{ sentences.length }}</span>
+                    </button>
                 </div>
 
-                <!-- Word List Card -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3.5 flex flex-col">
-                    <!-- Filters & Search -->
-                    <div class="space-y-2 mb-3">
-                        <van-search v-model="searchQuery" placeholder="搜索日文、注音或释义..." shape="round" class="!p-0" />
-
-                        <!-- Count Label -->
-                        <div class="flex items-center justify-between text-xs pt-0.5 px-1 text-gray-500">
-                            <span>全部词汇</span>
-                            <span class="text-gray-400">共 {{ filteredWords.length }} 词</span>
+                <!-- Word Management Section (shown when manageSubTab === 'words') -->
+                <div v-show="manageSubTab === 'words'" class="space-y-3">
+                    <!-- Add/Edit Word Card (Collapsible) -->
+                    <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-2 cursor-pointer" @click="showAddForm = !showAddForm">
+                            <h2 class="text-sm font-semibold text-gray-800 flex items-center space-x-1">
+                                <span>{{ editingId ? '✏️ 编辑词汇' : '➕ 添加新词' }}</span>
+                            </h2>
+                            <van-button size="mini" round plain type="primary">
+                                {{ editingId ? '编辑中' : (showAddForm ? '收起 ▲' : '展开 ▼') }}
+                            </van-button>
                         </div>
+
+                        <form v-show="showAddForm || editingId" @submit.prevent="saveWord" class="space-y-3 pt-1">
+                            <van-cell-group inset class="!m-0 !border !border-gray-200 overflow-hidden">
+                                <van-field
+                                    v-model="form.word"
+                                    label="日文"
+                                    placeholder="例: お茶"
+                                    required
+                                    clearable />
+                                <van-field
+                                    v-model="form.kana"
+                                    label="注音"
+                                    placeholder="例: おちゃ"
+                                    required
+                                    clearable />
+                                <van-field
+                                    v-model="form.meaning"
+                                    label="释义"
+                                    placeholder="例: 茶，绿茶 (可选)"
+                                    clearable />
+                            </van-cell-group>
+                            <div class="flex space-x-2 pt-1">
+                                <van-button type="primary" round block size="small" native-type="submit" class="flex-1">
+                                    {{ editingId ? '保存修改' : '确认添加' }}
+                                </van-button>
+                                <van-button v-if="editingId" round size="small" @click="cancelEdit">
+                                    取消
+                                </van-button>
+                            </div>
+                        </form>
                     </div>
 
-                    <!-- Word List Items -->
-                    <div v-if="filteredWords.length === 0" class="text-center text-gray-400 py-12">
-                        <div class="text-3xl mb-2">📭</div>
-                        <p class="text-sm">未找到匹配词汇</p>
-                    </div>
-                    <ul v-else class="divide-y divide-gray-100">
-                        <li v-for="word in paginatedWords" :key="word.id" class="py-2.5 px-1 flex justify-between items-center hover:bg-gray-50/80 transition-colors rounded-lg">
-                            <div class="flex-1 min-w-0 pr-2">
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-base font-semibold text-gray-900 truncate">{{ word.word }}</span>
-                                    <van-button size="mini" round plain @click="playWord(word)" class="!p-1 !text-gray-500 !border-gray-200" title="发音">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"></path></svg>
+                    <!-- Word List Card -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3.5 flex flex-col">
+                        <!-- Filters & Search -->
+                        <div class="space-y-2 mb-3">
+                            <van-search v-model="searchQuery" placeholder="搜索日文、注音或释义..." shape="round" class="!p-0" />
+
+                            <!-- Count Label -->
+                            <div class="flex items-center justify-between text-xs pt-0.5 px-1 text-gray-500">
+                                <span>全部词汇</span>
+                                <span class="text-gray-400">共 {{ filteredWords.length }} 词</span>
+                            </div>
+                        </div>
+
+                        <!-- Word List Items -->
+                        <div v-if="filteredWords.length === 0" class="text-center text-gray-400 py-12">
+                            <div class="text-3xl mb-2">📭</div>
+                            <p class="text-sm">未找到匹配词汇</p>
+                        </div>
+                        <ul v-else class="divide-y divide-gray-100">
+                            <li v-for="word in paginatedWords" :key="word.id" class="py-2.5 px-1 flex justify-between items-center hover:bg-gray-50/80 transition-colors rounded-lg">
+                                <div class="flex-1 min-w-0 pr-2">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-base font-semibold text-gray-900 truncate">{{ word.word }}</span>
+                                        <van-button size="mini" round plain @click="playWord(word)" class="!p-1 !text-gray-500 !border-gray-200" title="发音">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"></path></svg>
+                                        </van-button>
+                                        <span :class="['text-[10px] px-1.5 py-0.5 rounded-full font-medium', word.level > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800']">
+                                            Lv {{ word.level }}
+                                        </span>
+                                    </div>
+                                    <div class="text-xs text-gray-500 truncate mt-0.5">
+                                        <span class="font-medium text-indigo-700">{{ word.kana }}</span>
+                                        <span class="mx-1 text-gray-300">|</span>
+                                        <span :class="word.meaning ? 'text-gray-600' : 'text-gray-300 italic'">{{ word.meaning || '（暂无释义）' }}</span>
+                                    </div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5 flex space-x-2">
+                                        <span>下次: {{ formatDate(word.next_review_date) }}</span>
+                                        <span v-if="word.next_review_date <= Date.now()" class="text-rose-500 font-semibold">● 待复习</span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-1 flex-shrink-0">
+                                    <van-button size="mini" round plain @click="editWord(word)" class="!p-1.5 !text-indigo-600 !border-indigo-200" title="编辑">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                     </van-button>
-                                    <span :class="['text-[10px] px-1.5 py-0.5 rounded-full font-medium', word.level > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800']">
-                                        Lv {{ word.level }}
+                                    <van-button size="mini" type="danger" round plain @click="deleteWord(word.id)" class="!p-1.5" title="删除">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </van-button>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <!-- Pagination Controls -->
+                        <div v-if="totalPages > 1" class="mt-3 pt-2 border-t space-y-1.5">
+                            <van-pagination 
+                                v-model="currentPage" 
+                                :page-count="totalPages" 
+                                :total-items="filteredWords.length" 
+                                :items-per-page="pageSize" 
+                                mode="simple" />
+                            <div class="text-center text-[11px] text-gray-400">
+                                第 {{ currentPage }} / {{ totalPages }} 页（每页 {{ pageSize }} 词，共 {{ filteredWords.length }} 词）
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sentence Management Section (shown when manageSubTab === 'sentences') -->
+                <div v-show="manageSubTab === 'sentences'" class="space-y-3">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3.5 flex flex-col">
+                        <!-- Filters & Search -->
+                        <div class="space-y-2 mb-3">
+                            <van-search v-model="sentenceSearchQuery" placeholder="搜索句子日文、假名、释义或包含单词..." shape="round" class="!p-0" />
+
+                            <!-- Count Label -->
+                            <div class="flex items-center justify-between text-xs pt-0.5 px-1 text-gray-500">
+                                <span>全部实用例句</span>
+                                <span class="text-gray-400">共 {{ filteredSentencesList.length }} 句</span>
+                            </div>
+                        </div>
+
+                        <!-- Sentence List Items -->
+                        <div v-if="filteredSentencesList.length === 0" class="text-center text-gray-400 py-12">
+                            <div class="text-3xl mb-2">📭</div>
+                            <p class="text-sm">未找到匹配的例句</p>
+                        </div>
+                        <ul v-else class="divide-y divide-gray-100">
+                            <li v-for="sentence in paginatedSentences" :key="sentence.id" class="py-3 px-1 hover:bg-gray-50/80 transition-colors rounded-lg space-y-1.5">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1 pr-2">
+                                        <div class="text-sm font-bold text-gray-900 leading-snug">
+                                            {{ sentence.japanese }}
+                                        </div>
+                                        <div class="text-xs text-indigo-600 mt-0.5">
+                                            {{ sentence.kana }}
+                                        </div>
+                                        <div class="text-xs text-gray-600 mt-1">
+                                            {{ sentence.chinese }}
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-1.5 flex-shrink-0">
+                                        <span :class="['text-[10px] px-1.5 py-0.5 rounded-full font-medium', (sentence.level || 0) > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800']">
+                                            Lv {{ sentence.level || 0 }}
+                                        </span>
+                                        <van-button size="mini" round plain @click="playSentence(sentence)" class="!p-1.5 !text-indigo-600 !border-indigo-200" title="朗读句子">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"></path></svg>
+                                        </van-button>
+                                    </div>
+                                </div>
+                                <!-- Associated Words Tags -->
+                                <div v-if="sentence.words && sentence.words.length > 0" class="flex flex-wrap gap-1 pt-0.5">
+                                    <span v-for="w in sentence.words" :key="w" class="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-100 px-1.5 py-0.2 rounded-md">
+                                        {{ w }}
                                     </span>
                                 </div>
-                                <div class="text-xs text-gray-500 truncate mt-0.5">
-                                    <span class="font-medium text-indigo-700">{{ word.kana }}</span>
-                                    <span class="mx-1 text-gray-300">|</span>
-                                    <span :class="word.meaning ? 'text-gray-600' : 'text-gray-300 italic'">{{ word.meaning || '（暂无释义）' }}</span>
-                                </div>
-                                <div class="text-[10px] text-gray-400 mt-0.5 flex space-x-2">
-                                    <span>下次: {{ formatDate(word.next_review_date) }}</span>
-                                    <span v-if="word.next_review_date <= Date.now()" class="text-rose-500 font-semibold">● 待复习</span>
-                                </div>
-                            </div>
-                            <div class="flex space-x-1 flex-shrink-0">
-                                <van-button size="mini" round plain @click="editWord(word)" class="!p-1.5 !text-indigo-600 !border-indigo-200" title="编辑">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </van-button>
-                                <van-button size="mini" type="danger" round plain @click="deleteWord(word.id)" class="!p-1.5" title="删除">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </van-button>
-                            </div>
-                        </li>
-                    </ul>
+                            </li>
+                        </ul>
 
-                    <!-- Pagination Controls -->
-                    <van-pagination v-if="totalPages > 1" v-model="currentPage" :total-items="filteredWords.length" :items-per-page="pageSize" mode="simple" class="mt-3 pt-2 border-t" />
+                        <!-- Sentence Pagination Controls -->
+                        <div v-if="sentenceTotalPages > 1" class="mt-3 pt-2 border-t space-y-1.5">
+                            <van-pagination 
+                                v-model="sentenceCurrentPage" 
+                                :page-count="sentenceTotalPages" 
+                                :total-items="filteredSentencesList.length" 
+                                :items-per-page="sentencePageSize" 
+                                mode="simple" />
+                            <div class="text-center text-[11px] text-gray-400">
+                                第 {{ sentenceCurrentPage }} / {{ sentenceTotalPages }} 页（每页 {{ sentencePageSize }} 句，共 {{ filteredSentencesList.length }} 句）
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>

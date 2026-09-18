@@ -42,6 +42,12 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                 const sentenceQueue = ref([]);
                 const initialSentenceQueueLength = ref(0);
 
+                // Management Sub-Tab & Sentence Browser
+                const manageSubTab = ref('words'); // 'words' | 'sentences'
+                const sentenceSearchQuery = ref('');
+                const sentenceCurrentPage = ref(1);
+                const sentencePageSize = 20;
+
                 // Cloudflare Cloud Sync Config
                 const SYNC_KEY_STORAGE = 'japanese_study_sync_key_v1';
                 const AUTO_SYNC_STORAGE = 'japanese_study_auto_sync_v1';
@@ -202,45 +208,51 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
 
                     if (loadedWords.length > 0) {
                         let hasChanges = false;
-                        // Auto-fill missing meanings and append new built-in vocabulary
-                        if (window.BUILTIN_VOCAB_ALL && Array.isArray(window.BUILTIN_VOCAB_ALL)) {
-                            const idMap = new Map();
-                            loadedWords.forEach(w => {
-                                if (w.id) idMap.set(w.id, w);
-                                existingWordMap.set(`${w.word}__${w.kana}`, w);
-                                existingWordMap.set(w.word, w);
-                            });
+                        // Auto-fill missing meanings and append new built-in vocabulary while strictly preserving user learning history
+                        try {
+                            if (window.BUILTIN_VOCAB_ALL && Array.isArray(window.BUILTIN_VOCAB_ALL)) {
+                                const idMap = new Map();
+                                const existingWordMap = new Map();
+                                loadedWords.forEach(w => {
+                                    if (w.id) idMap.set(w.id, w);
+                                    existingWordMap.set(`${w.word}__${w.kana}`, w);
+                                    existingWordMap.set(w.word, w);
+                                });
 
-                            window.BUILTIN_VOCAB_ALL.forEach(item => {
-                                const exist = (item.id && idMap.get(item.id)) || existingWordMap.get(`${item.word}__${item.kana}`) || existingWordMap.get(item.word);
-                                if (exist) {
-                                    if (!exist.meaning || exist.meaning.trim() === '') {
-                                        exist.meaning = item.meaning;
+                                window.BUILTIN_VOCAB_ALL.forEach(item => {
+                                    const exist = (item.id && idMap.get(item.id)) || existingWordMap.get(`${item.word}__${item.kana}`) || existingWordMap.get(item.word);
+                                    if (exist) {
+                                        if (!exist.meaning || exist.meaning.trim() === '') {
+                                            exist.meaning = item.meaning;
+                                            hasChanges = true;
+                                        }
+                                        if (exist.id === item.id) {
+                                            if (exist.kana !== item.kana) {
+                                                exist.kana = item.kana;
+                                                hasChanges = true;
+                                            }
+                                            if (exist.word !== item.word) {
+                                                exist.word = item.word;
+                                                hasChanges = true;
+                                            }
+                                        }
+                                    } else {
+                                        loadedWords.push({
+                                            ...item,
+                                            level: 0,
+                                            next_review_date: Date.now()
+                                        });
+                                        if (item.id) idMap.set(item.id, item);
+                                        existingWordMap.set(`${item.word}__${item.kana}`, item);
+                                        existingWordMap.set(item.word, item);
                                         hasChanges = true;
                                     }
-                                    if (exist.id === item.id) {
-                                        if (exist.kana !== item.kana) {
-                                            exist.kana = item.kana;
-                                            hasChanges = true;
-                                        }
-                                        if (exist.word !== item.word) {
-                                            exist.word = item.word;
-                                            hasChanges = true;
-                                        }
-                                    }
-                                } else {
-                                    loadedWords.push({
-                                        ...item,
-                                        level: 0,
-                                        next_review_date: Date.now()
-                                    });
-                                    if (item.id) idMap.set(item.id, item);
-                                    existingWordMap.set(`${item.word}__${item.kana}`, item);
-                                    existingWordMap.set(item.word, item);
-                                    hasChanges = true;
-                                }
-                            });
+                                });
+                            }
+                        } catch (mergeErr) {
+                            console.error('Error auto-merging vocabulary:', mergeErr);
                         }
+
                         words.value = loadedWords;
                         if (hasChanges) {
                             saveData();
@@ -345,13 +357,47 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                             let wordsUpdated = false;
                             let sentencesUpdated = false;
 
+                            // 智能合并学习进度：取本地与云端中的最高复习等级，杜绝任何历史丢失或倒退
                             if (Array.isArray(cloudData.words) && cloudData.words.length > 0) {
-                                words.value = cloudData.words;
+                                if (words.value && words.value.length > 0) {
+                                    const localWordMap = new Map();
+                                    words.value.forEach(w => {
+                                        if (w.id) localWordMap.set(w.id, w);
+                                        localWordMap.set(`${w.word}__${w.kana}`, w);
+                                    });
+                                    const mergedWords = cloudData.words.map(cw => {
+                                        const lw = (cw.id && localWordMap.get(cw.id)) || localWordMap.get(`${cw.word}__${cw.kana}`);
+                                        if (lw && (lw.level || 0) > (cw.level || 0)) {
+                                            return { ...cw, level: lw.level, next_review_date: lw.next_review_date };
+                                        }
+                                        return cw;
+                                    });
+                                    words.value = mergedWords;
+                                } else {
+                                    words.value = cloudData.words;
+                                }
                                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(words.value));
                                 wordsUpdated = true;
                             }
+
                             if (Array.isArray(cloudData.sentences) && cloudData.sentences.length > 0) {
-                                sentences.value = cloudData.sentences;
+                                if (sentences.value && sentences.value.length > 0) {
+                                    const localSentenceMap = new Map();
+                                    sentences.value.forEach(s => {
+                                        if (s.id) localSentenceMap.set(s.id, s);
+                                        if (s.japanese) localSentenceMap.set(s.japanese, s);
+                                    });
+                                    const mergedSentences = cloudData.sentences.map(cs => {
+                                        const ls = (cs.id && localSentenceMap.get(cs.id)) || (cs.japanese && localSentenceMap.get(cs.japanese));
+                                        if (ls && (ls.level || 0) > (cs.level || 0)) {
+                                            return { ...cs, level: ls.level, next_review_date: ls.next_review_date };
+                                        }
+                                        return cs;
+                                    });
+                                    sentences.value = mergedSentences;
+                                } else {
+                                    sentences.value = cloudData.sentences;
+                                }
                                 localStorage.setItem(LOCAL_STORAGE_SENTENCES_KEY, JSON.stringify(sentences.value));
                                 sentencesUpdated = true;
                             }
@@ -363,7 +409,7 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                             localStorage.setItem('japanese_study_last_sync_time', lastSyncTime.value);
 
                             if (!silent) {
-                                showToast(`☁️ 已拉取云端数据（${words.value.length} 词，${sentences.value.length} 句）`);
+                                showToast(`☁️ 已同步最新数据（${words.value.length} 词，${sentences.value.length} 句）`);
                             }
                         } else if (json.success && !json.data) {
                             syncStatus.value = 'idle';
@@ -414,9 +460,34 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     window.addEventListener('touchstart', unlockAudioAndTTS, { once: true, passive: true });
                     window.addEventListener('click', unlockAudioAndTTS, { once: true, passive: true });
 
-                    loadAudioConfig();
-                    loadData();
-                    loadSentenceData();
+                    // 移动端/iPad 切应用或锁屏时，自动立即将待同步学习进度刷入云端
+                    document.addEventListener('visibilitychange', () => {
+                        if (document.visibilityState === 'hidden') {
+                            if (autoSync.value && syncKey.value.trim()) {
+                                clearTimeout(debounceSyncTimer);
+                                pushToCloud(true);
+                            }
+                        }
+                    });
+
+                    try {
+                        loadAudioConfig();
+                    } catch (e) {
+                        console.error('Failed to load audio config', e);
+                    }
+
+                    try {
+                        loadData();
+                    } catch (e) {
+                        console.error('Failed to load words data', e);
+                    }
+
+                    try {
+                        loadSentenceData();
+                    } catch (e) {
+                        console.error('Failed to load sentence data', e);
+                    }
+
                     if (autoSync.value && syncKey.value.trim()) {
                         pullFromCloud(true);
                     }
@@ -516,7 +587,37 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     return filteredWords.value.slice(start, start + pageSize);
                 });
 
-                // Tab change watch
+                // Sentence Browser Computed & Pagination
+                const filteredSentencesList = computed(() => {
+                    if (!sentences.value) return [];
+                    const q = sentenceSearchQuery.value.trim().toLowerCase();
+                    if (!q) return sentences.value;
+                    return sentences.value.filter(s => 
+                        (s.japanese && s.japanese.toLowerCase().includes(q)) ||
+                        (s.kana && s.kana.toLowerCase().includes(q)) ||
+                        (s.chinese && s.chinese.toLowerCase().includes(q)) ||
+                        (s.words && Array.isArray(s.words) && s.words.some(w => w.toLowerCase().includes(q)))
+                    );
+                });
+
+                const sentenceTotalPages = computed(() => {
+                    return Math.max(1, Math.ceil(filteredSentencesList.value.length / sentencePageSize));
+                });
+
+                const paginatedSentences = computed(() => {
+                    const start = (sentenceCurrentPage.value - 1) * sentencePageSize;
+                    return filteredSentencesList.value.slice(start, start + sentencePageSize);
+                });
+
+                // Tab & Search change watch
+                watch(searchQuery, () => {
+                    currentPage.value = 1;
+                });
+
+                watch(sentenceSearchQuery, () => {
+                    sentenceCurrentPage.value = 1;
+                });
+
                 watch(currentTab, (newTab) => {
                     if (newTab === 'practice') {
                         synth.cancel();
@@ -580,13 +681,31 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     reader.onload = (evt) => {
                         try {
                             const text = evt.target.result;
-                            let imported = [];
                             const now = Date.now();
 
                             if (file.name.endsWith('.json')) {
                                 const parsed = JSON.parse(text);
+
+                                // 完整进度备份文件格式 ({ words: [...], sentences: [...] })
+                                if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && (parsed.words || parsed.sentences)) {
+                                    let restoredWords = 0;
+                                    let restoredSentences = 0;
+                                    if (Array.isArray(parsed.words) && parsed.words.length > 0) {
+                                        words.value = parsed.words;
+                                        saveData();
+                                        restoredWords = parsed.words.length;
+                                    }
+                                    if (Array.isArray(parsed.sentences) && parsed.sentences.length > 0) {
+                                        sentences.value = parsed.sentences;
+                                        saveSentenceData();
+                                        restoredSentences = parsed.sentences.length;
+                                    }
+                                    showToast(`备份恢复成功！恢复 ${restoredWords} 词，${restoredSentences} 句！`);
+                                    return;
+                                }
+
                                 if (Array.isArray(parsed)) {
-                                    imported = parsed.map(item => ({
+                                    const imported = parsed.map(item => ({
                                         id: item.id || (now + '_' + Math.random().toString(36).substr(2, 5)),
                                         word: item.word || '',
                                         kana: item.kana || '',
@@ -594,24 +713,44 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                                         level: item.level || 0,
                                         next_review_date: item.next_review_date || now
                                     })).filter(i => i.word);
-                                }
-                            } else {
-                                // Parse text line by line
-                                const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-                                lines.forEach((line, idx) => {
-                                    const m = line.match(/^(.+?)[(（](.+?)[)）]\s*(.*)$/);
-                                    if (m) {
-                                        imported.push({
-                                            id: 'import_' + now + '_' + idx,
-                                            word: m[1].trim(),
-                                            kana: m[2].trim(),
-                                            meaning: m[3] ? m[3].trim() : '',
-                                            level: 0,
-                                            next_review_date: now
-                                        });
+
+                                    if (imported.length === 0) {
+                                        alert('未能从 JSON 数组中识别出有效词汇。');
+                                        return;
                                     }
-                                });
+
+                                    const existingKeys = new Set(words.value.map(w => w.word + '::' + w.kana));
+                                    let added = 0;
+                                    imported.forEach(w => {
+                                        const k = w.word + '::' + w.kana;
+                                        if (!existingKeys.has(k)) {
+                                            words.value.push(w);
+                                            existingKeys.add(k);
+                                            added++;
+                                        }
+                                    });
+                                    saveData();
+                                    showToast(`文件解析成功，已导入 ${added} 个新词汇！`);
+                                    return;
+                                }
                             }
+
+                            // Parse text line by line
+                            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                            let imported = [];
+                            lines.forEach((line, idx) => {
+                                const m = line.match(/^(.+?)[(（](.+?)[)）]\s*(.*)$/);
+                                if (m) {
+                                    imported.push({
+                                        id: 'import_' + now + '_' + idx,
+                                        word: m[1].trim(),
+                                        kana: m[2].trim(),
+                                        meaning: m[3] ? m[3].trim() : '',
+                                        level: 0,
+                                        next_review_date: now
+                                    });
+                                }
+                            });
 
                             if (imported.length === 0) {
                                 alert('未能从文件中识别出有效词汇。请确保文件格式为「单词(假名)」或 JSON。');
@@ -640,20 +779,45 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     e.target.value = ''; // reset file input
                 };
 
-                // Export Backup
+                // Export Full Backup (Words + Sentences + Progress)
                 const exportData = () => {
-                    if (words.value.length === 0) {
-                        showToast('当前词库为空，无需导出');
-                        return;
-                    }
-                    const blob = new Blob([JSON.stringify(words.value, null, 2)], { type: 'application/json' });
+                    const backupPayload = {
+                        version: '2.0',
+                        exportDate: new Date().toISOString(),
+                        words: words.value,
+                        sentences: sentences.value
+                    };
+                    const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `japanese_study_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                    a.download = `japanese_study_full_backup_${new Date().toISOString().slice(0, 10)}.json`;
                     a.click();
                     URL.revokeObjectURL(url);
-                    showToast('已导出词库备份文件');
+                    showToast(`已导出完整学习进度与词库备份（${words.value.length} 词，${sentences.value.length} 句）`);
+                };
+
+                const resetSentences = () => {
+                    const doReset = () => {
+                        if (window.BUILTIN_SENTENCES_ALL && Array.isArray(window.BUILTIN_SENTENCES_ALL)) {
+                            sentences.value = window.BUILTIN_SENTENCES_ALL.map(s => ({
+                                ...s,
+                                level: 0,
+                                next_review_date: Date.now()
+                            }));
+                            saveSentenceData();
+                            showToast(`已重置并载入全部 ${sentences.value.length} 个内置句子！`);
+                        }
+                    };
+                    if (typeof vant !== 'undefined' && vant.showConfirmDialog) {
+                        vant.showConfirmDialog({
+                            title: '重置句子库',
+                            message: '确定要重置全部内置句子并将其复习等级恢复为初始状态吗？',
+                            confirmButtonColor: '#4f46e5'
+                        }).then(doReset).catch(() => {});
+                    } else if (confirm('确定要重置全部内置句子吗？')) {
+                        doReset();
+                    }
                 };
 
                 // Clear All
@@ -1028,42 +1192,79 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
 
                 // Sentence Methods
                 const loadSentenceData = () => {
+                    let loadedSentences = [];
                     try {
                         const raw = localStorage.getItem(LOCAL_STORAGE_SENTENCES_KEY);
                         if (raw) {
                             const parsed = JSON.parse(raw);
                             if (Array.isArray(parsed) && parsed.length > 0) {
-                                if (window.BUILTIN_SENTENCES_ALL && Array.isArray(window.BUILTIN_SENTENCES_ALL)) {
-                                    const existingMap = new Map();
-                                    parsed.forEach(s => existingMap.set(s.japanese, s));
-                                    let newCount = 0;
-                                    window.BUILTIN_SENTENCES_ALL.forEach(builtinS => {
-                                        if (!existingMap.has(builtinS.japanese)) {
-                                            parsed.push({
-                                                ...builtinS,
-                                                level: 0,
-                                                next_review_date: Date.now()
-                                            });
-                                            existingMap.set(builtinS.japanese, builtinS);
-                                            newCount++;
-                                        }
-                                    });
-                                    if (newCount > 0) {
-                                        sentences.value = parsed;
-                                        saveSentenceData();
-                                        console.log(`Auto-merged ${newCount} new built-in sentences.`);
-                                        return;
-                                    }
-                                }
-                                sentences.value = parsed;
-                                return;
+                                loadedSentences = parsed;
                             }
                         }
                     } catch (e) {
                         console.error('Failed to parse sentence data from localStorage', e);
                     }
 
-                    if (window.BUILTIN_SENTENCES_ALL && Array.isArray(window.BUILTIN_SENTENCES_ALL)) {
+                    if (loadedSentences.length > 0) {
+                        let hasChanges = false;
+                        try {
+                            if (window.BUILTIN_SENTENCES_ALL && Array.isArray(window.BUILTIN_SENTENCES_ALL)) {
+                                const existingMap = new Map();
+                                const idMap = new Map();
+                                loadedSentences.forEach(s => {
+                                    if (s.id) idMap.set(s.id, s);
+                                    if (s.japanese) existingMap.set(s.japanese, s);
+                                });
+                                let newCount = 0;
+                                window.BUILTIN_SENTENCES_ALL.forEach(builtinS => {
+                                    const exist = (builtinS.id && idMap.get(builtinS.id)) || (builtinS.japanese && existingMap.get(builtinS.japanese));
+                                    if (exist) {
+                                        // 保持用户的学习历史进度 (level, next_review_date)，仅同步校对属性
+                                        if (!exist.id && builtinS.id) {
+                                            exist.id = builtinS.id;
+                                            hasChanges = true;
+                                        }
+                                        if (builtinS.words && JSON.stringify(exist.words) !== JSON.stringify(builtinS.words)) {
+                                            exist.words = builtinS.words;
+                                            hasChanges = true;
+                                        }
+                                        if (builtinS.kana && exist.kana !== builtinS.kana) {
+                                            exist.kana = builtinS.kana;
+                                            hasChanges = true;
+                                        }
+                                        if (builtinS.chinese && exist.chinese !== builtinS.chinese) {
+                                            exist.chinese = builtinS.chinese;
+                                            hasChanges = true;
+                                        }
+                                    } else {
+                                        loadedSentences.push({
+                                            ...builtinS,
+                                            level: 0,
+                                            next_review_date: Date.now()
+                                        });
+                                        if (builtinS.id) idMap.set(builtinS.id, builtinS);
+                                        if (builtinS.japanese) existingMap.set(builtinS.japanese, builtinS);
+                                        newCount++;
+                                        hasChanges = true;
+                                    }
+                                });
+                                if (newCount > 0) {
+                                    console.log(`Auto-merged ${newCount} new built-in sentences.`);
+                                }
+                            }
+                        } catch (mergeErr) {
+                            console.error('Error auto-merging sentences:', mergeErr);
+                        }
+
+                        sentences.value = loadedSentences;
+                        if (hasChanges) {
+                            saveSentenceData();
+                        }
+                        return;
+                    }
+
+                    // Auto-load built-in sentences if localStorage is empty
+                    if (window.BUILTIN_SENTENCES_ALL && Array.isArray(window.BUILTIN_SENTENCES_ALL) && window.BUILTIN_SENTENCES_ALL.length > 0) {
                         sentences.value = window.BUILTIN_SENTENCES_ALL.map(s => ({
                             ...s,
                             level: 0,
@@ -1188,6 +1389,7 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     form,
                     editingId,
                     searchQuery,
+                    pageSize,
                     currentPage,
                     totalPages,
                     filteredWords,
@@ -1246,6 +1448,15 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     handleSentenceUnknown,
                     nextSentence,
 
+                    // Sentence Browser in Management
+                    manageSubTab,
+                    sentenceSearchQuery,
+                    sentenceCurrentPage,
+                    sentencePageSize,
+                    filteredSentencesList,
+                    sentenceTotalPages,
+                    paginatedSentences,
+
                     saveWord,
                     editWord,
                     cancelEdit,
@@ -1253,6 +1464,7 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     promptEditMeaning,
                     formatDate,
                     importBuiltin,
+                    resetSentences,
                     handleFileUpload,
                     exportData,
                     clearAllWords,
