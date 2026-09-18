@@ -53,16 +53,21 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                 const lastSyncTime = ref(localStorage.getItem('japanese_study_last_sync_time') || '');
                 let debounceSyncTimer = null;
                 
-                // Audio / Voice Engine Config
+                // Audio / Voice Engine Config (v2: 真人级自然语流 & iPad 高清声优优化)
                 const isIOS = typeof navigator !== 'undefined' && (
                     /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
                 );
+                const isMobile = typeof navigator !== 'undefined' && (
+                    isIOS || /Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                );
 
-                const AUDIO_CONFIG_KEY = 'japanese_study_audio_config_v1';
+                const AUDIO_CONFIG_KEY = 'japanese_study_audio_config_v2';
                 const showAudioSettings = ref(false);
-                const audioEngine = ref(isIOS ? 'tts' : 'online'); // iPad / iOS 优先推荐 Apple 原生 TTS，PC 推荐在线真人
-                const audioTarget = ref('kana'); // 'kana' (假名注音，精准避免多音字错误), 'word' (汉字原文)
+                // iPad / iPhone 默认首选苹果原厂高清语音 (Siri / 京子)；其他端默认在线神经网络真实语流
+                const audioEngine = ref(isIOS ? 'tts' : 'online'); 
+                // 默认采用 'word'（真人自然语调 / 汉字原文），保持纯正东京腔高低起伏；可切换 'kana'（纯假名逐字拼读）
+                const audioTarget = ref('word'); 
                 const speechRate = ref(1.0); // 1.0, 1.2, 1.35, 1.5
                 const jaVoiceName = ref('');
                 const availableVoices = ref([]);
@@ -75,18 +80,27 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     const allVoices = synth.getVoices() || [];
                     const jaVoices = allVoices.filter(v => 
                         (v.lang && (v.lang === 'ja-JP' || v.lang === 'ja' || v.lang.toLowerCase().replace('_', '-').startsWith('ja'))) ||
-                        /japanese|日本語|kyoko|otoya|siri|hattori/i.test(v.name)
+                        /japanese|日本語|kyoko|otoya|siri|hattori|nanami|keita|aoi|daichi|mayu|shiori/i.test(v.name)
                     );
                     availableVoices.value = jaVoices;
 
                     if (jaVoices.length > 0) {
                         if (!jaVoiceName.value || !jaVoices.some(v => v.name === jaVoiceName.value)) {
+                            // 真人级音色匹配优先级：
+                            // 1. Apple 原生 Siri 真人语音 (iPad/iOS 极品音质)
+                            // 2. 微软 Edge 自然神经语音 (Nanami 七海 / Keita 圭太)
+                            // 3. Apple Kyoko 京子 (Enhanced 高清强化版优先)
+                            // 4. Google 日本语自然语音
+                            // 5. Apple Otoya 乙也
                             const siri = jaVoices.find(v => /siri/i.test(v.name));
-                            const kyoko = jaVoices.find(v => /kyoko|京子/i.test(v.name));
+                            const nanami = jaVoices.find(v => /nanami/i.test(v.name));
+                            const keita = jaVoices.find(v => /keita/i.test(v.name));
                             const natural = jaVoices.find(v => /natural|online/i.test(v.name));
+                            const kyokoEnhanced = jaVoices.find(v => /kyoko|京子/i.test(v.name) && /enhanced|premium|高品質|高品位/i.test(v.name));
+                            const kyoko = jaVoices.find(v => /kyoko|京子/i.test(v.name));
                             const google = jaVoices.find(v => /google/i.test(v.name));
                             const otoya = jaVoices.find(v => /otoya|乙也/i.test(v.name));
-                            jaVoiceName.value = (siri || kyoko || natural || google || otoya || jaVoices[0]).name;
+                            jaVoiceName.value = (siri || nanami || keita || natural || kyokoEnhanced || kyoko || google || otoya || jaVoices[0]).name;
                         }
                     }
                 };
@@ -99,18 +113,21 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     }
                     const jaVoices = allVoices.filter(v => 
                         (v.lang && (v.lang === 'ja-JP' || v.lang === 'ja' || v.lang.toLowerCase().replace('_', '-').startsWith('ja'))) ||
-                        /japanese|日本語|kyoko|otoya|siri|hattori/i.test(v.name)
+                        /japanese|日本語|kyoko|otoya|siri|hattori|nanami|keita|aoi|daichi|mayu|shiori/i.test(v.name)
                     );
                     if (jaVoiceName.value) {
                         const found = jaVoices.find(v => v.name === jaVoiceName.value);
                         if (found) return found;
                     }
                     const siri = jaVoices.find(v => /siri/i.test(v.name));
-                    const kyoko = jaVoices.find(v => /kyoko|京子/i.test(v.name));
+                    const nanami = jaVoices.find(v => /nanami/i.test(v.name));
+                    const keita = jaVoices.find(v => /keita/i.test(v.name));
                     const natural = jaVoices.find(v => /natural|online/i.test(v.name));
+                    const kyokoEnhanced = jaVoices.find(v => /kyoko|京子/i.test(v.name) && /enhanced|premium|高品質|高品位/i.test(v.name));
+                    const kyoko = jaVoices.find(v => /kyoko|京子/i.test(v.name));
                     const google = jaVoices.find(v => /google/i.test(v.name));
                     const otoya = jaVoices.find(v => /otoya|乙也/i.test(v.name));
-                    return siri || kyoko || natural || google || otoya || jaVoices[0] || null;
+                    return siri || nanami || keita || natural || kyokoEnhanced || kyoko || google || otoya || jaVoices[0] || null;
                 };
 
                 const loadAudioConfig = () => {
@@ -120,6 +137,7 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                             const parsed = JSON.parse(raw);
                             if (parsed.audioEngine) audioEngine.value = parsed.audioEngine;
                             if (parsed.audioTarget) audioTarget.value = parsed.audioTarget;
+                            else audioTarget.value = 'word';
                             if (parsed.speechRate !== undefined && parsed.speechRate !== null) {
                                 const r = Number(parsed.speechRate);
                                 if (!isNaN(r) && r >= 0.8 && r <= 1.5) {
@@ -130,9 +148,18 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                             }
                             if (parsed.jaVoiceName) jaVoiceName.value = parsed.jaVoiceName;
                         } else {
-                            if (isIOS) {
-                                audioEngine.value = 'tts';
+                            // 旧版 v1 缓存平滑迁移：自动切换为真人自然语调模式
+                            const oldRaw = localStorage.getItem('japanese_study_audio_config_v1');
+                            if (oldRaw) {
+                                try {
+                                    const oldParsed = JSON.parse(oldRaw);
+                                    if (oldParsed.speechRate) speechRate.value = Number(oldParsed.speechRate) || 1.0;
+                                    if (oldParsed.jaVoiceName) jaVoiceName.value = oldParsed.jaVoiceName;
+                                } catch (e) {}
                             }
+                            audioEngine.value = isIOS ? 'tts' : 'online';
+                            audioTarget.value = 'word';
+                            saveAudioConfig();
                         }
                     } catch (e) {
                         console.error('Failed to load audio config', e);
@@ -777,11 +804,31 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     if (!item) return '';
                     if (typeof item === 'string') return cleanPronunciation(item);
 
-                    // If audioTarget is 'kana', prioritize kana for 100% accurate pronunciation without kanji polyphone guessing
+                    // 若用户手动指定“纯假名逐字拼读”，则直接取假名
                     if (audioTarget.value === 'kana') {
                         const cleanKana = cleanPronunciation(item.kana);
                         if (cleanKana) return cleanKana;
                     }
+
+                    // 【真人自然语调模式 (默认推荐)】：
+                    // 1. 接尾词/前缀 (如 ～君, ～屋, ～後) -> 自动取假名发音 (如 くん, や, ご)
+                    if (item.word && (item.word.startsWith('～') || item.word.startsWith('~'))) {
+                        return cleanPronunciation(item.kana);
+                    }
+
+                    // 2. 针对单独出现时极易被 TTS 引擎误判声调/音读的多音字，进行精确校正：
+                    if (item.word === '方' && item.kana === 'かた') return 'かた';
+                    if (item.word === '角' && item.kana === 'かど') return 'かど';
+                    if (item.word === '何' && item.kana === 'なに') return 'なに';
+                    if (item.word === '何' && item.kana === 'なん') return 'なん';
+                    if (item.word === '日' && item.kana === 'ひ') return 'ひ';
+                    if (item.word === '日' && item.kana === 'にち') return 'にち';
+                    if (item.word === '月' && item.kana === 'つき') return 'つき';
+                    if (item.word === '月' && item.kana === 'がつ') return 'がつ';
+                    if (item.word === '後' && item.kana === 'あと') return 'あと';
+                    if (item.word === '後' && item.kana === 'うしろ') return 'うしろ';
+
+                    // 3. 常规词汇：优先使用日文汉字词形，语音引擎（Siri/京子/Nanami）将依据词性自动发出纯正东京腔高低重音
                     return cleanPronunciation(item.word) || cleanPronunciation(item.kana);
                 };
 
@@ -796,20 +843,32 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                         currentAudio.pause();
 
                         const encoded = encodeURIComponent(text);
-                        const url = `https://dict.youdao.com/dictvoice?audio=${encoded}&le=jap`;
-                        currentAudio.src = url;
-                        currentAudio.playbackRate = Number(speechRate.value) || 1.0;
+                        // 第一通道：Google 神经网络高品质真人语流发音
+                        const primaryUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ja&q=${encoded}`;
+                        // 第二备用通道：网易有道发音
+                        const fallbackUrl = `https://dict.youdao.com/dictvoice?audio=${encoded}&le=jap`;
 
                         let fallbackCalled = false;
                         const triggerFallback = () => {
                             if (!fallbackCalled) {
                                 fallbackCalled = true;
-                                if (onFallback) onFallback();
+                                currentAudio.onerror = () => {
+                                    if (onFallback) onFallback();
+                                };
+                                currentAudio.src = fallbackUrl;
+                                currentAudio.playbackRate = Number(speechRate.value) || 1.0;
+                                currentAudio.play().catch(() => {
+                                    if (onFallback) onFallback();
+                                });
                             }
                         };
+
                         currentAudio.onerror = () => {
                             triggerFallback();
                         };
+                        currentAudio.src = primaryUrl;
+                        currentAudio.playbackRate = Number(speechRate.value) || 1.0;
+
                         const playPromise = currentAudio.play();
                         if (playPromise !== undefined) {
                             playPromise.catch((err) => {
@@ -1031,9 +1090,13 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     text = text.replace(/[~～\-_—]/g, '').trim();
                     if (!text) return;
 
-                    // Sentences must use TTS: dictionary voice APIs (Youdao) do not support whole sentences.
-                    // Native system Japanese voices provide natural, fluent sentence intonation on iPad, mobile, and desktop.
-                    speakTTS(text);
+                    if (audioEngine.value === 'online') {
+                        playOnlineAudio(text, () => {
+                            speakTTS(text);
+                        });
+                    } else {
+                        speakTTS(text);
+                    }
                 };
 
                 const playCurrentSentence = () => {
