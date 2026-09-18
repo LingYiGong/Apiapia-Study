@@ -850,7 +850,7 @@ function renderQuestion() {
 
     els.answerPanel.classList.add("hidden");
     els.showAnswerBtn.classList.remove("hidden");
-    els.showAnswerBtn.textContent = "写好了，核对本题";
+    els.showAnswerBtn.textContent = "✨ 写好了，核对本题";
     els.writingArea.classList.remove("hidden");
     els.answerHint.textContent = "";
     els.currentWritingPreview.removeAttribute("src");
@@ -874,7 +874,7 @@ function redrawWriting() {
     const context = els.writingCanvas.getContext("2d");
     const rect = els.writingCanvas.getBoundingClientRect();
     context.clearRect(0, 0, rect.width, rect.height);
-    context.strokeStyle = "#20242c";
+    context.strokeStyle = "#1e293b";
     context.lineCap = "round";
     context.lineJoin = "round";
 
@@ -895,7 +895,7 @@ function getWritingPoint(event) {
     return {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
-        width: 5 + pressure * 5
+        width: 6 + pressure * 6
     };
 }
 
@@ -2087,11 +2087,11 @@ function switchHomeTab(tabName) {
 
     const updateBtn = (btn, isActive) => {
         if (!btn) return;
-        btn.className = `flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative ${isActive ? 'text-indigo-600 font-bold' : 'text-gray-400 hover:text-gray-600 font-medium'}`;
-        const icon = btn.querySelector('.text-xl');
-        if (icon) icon.className = `text-xl transition-transform ${isActive ? 'scale-110' : 'opacity-70'}`;
+        btn.className = `flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative ${isActive ? 'text-indigo-600 font-black' : 'text-slate-400 hover:text-slate-600 font-bold'}`;
+        const icon = btn.querySelector('.text-xl, .text-2xl');
+        if (icon) icon.className = `text-xl sm:text-2xl transition-transform ${isActive ? 'scale-110' : 'opacity-75'}`;
         const indicator = btn.querySelector('.nav-indicator');
-        if (indicator) indicator.className = `nav-indicator w-5 h-0.5 rounded-full mt-0.5 ${isActive ? 'bg-indigo-600' : 'bg-transparent'}`;
+        if (indicator) indicator.className = `nav-indicator w-6 h-1 rounded-full mt-0.5 ${isActive ? 'bg-indigo-600' : 'bg-transparent'}`;
     };
 
     updateBtn(navTabPractice, tabName === "practice");

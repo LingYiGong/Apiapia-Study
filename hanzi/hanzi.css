@@ -1,16 +1,28 @@
+/* ============================================================
+   汉字听写小助手 · 儿童友好定制样式表
+   Child-Friendly Design System for Hanzi Learning
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&display=swap');
+
 :root {
     --app-height: 100dvh;
     --primary: #4f46e5;
-    --primary-dark: #4338ca;
+    --primary-light: #6366f1;
+    --primary-dark: #3730a3;
     --success: #10b981;
-    --danger: #ef4444;
+    --success-dark: #059669;
+    --danger: #f43f5e;
+    --danger-dark: #e11d48;
     --warning: #f59e0b;
-    --bg: #f7f8fa;
+    --warning-dark: #d97706;
+    --purple: #8b5cf6;
+    --bg: #f8fafc;
     --card: #ffffff;
-    --text: #1f2937;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-    --surface: #f9fafb;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --surface: #f1f5f9;
 }
 
 * {
@@ -28,7 +40,10 @@ html, body {
     -webkit-text-size-adjust: 100%;
     background-color: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    /* 优先使用儿童友好的圆润、清晰字族 */
+    font-family: "Quicksand", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "HarmonyOS Sans SC", "Noto Sans SC", sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 #app {
@@ -41,19 +56,91 @@ html, body {
     display: none !important;
 }
 
-/* 艾宾浩斯等级徽章 */
+/* ================== 汉字规范字体 ================== */
+.hanzi-font {
+    font-family: "KaiTi", "STKaiti", "BiauKai", "楷体", "PingFang SC", "Microsoft YaHei", serif;
+}
+
+/* ================== 儿童立体触感按钮 (3D Push Effect) ================== */
+.kid-btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border-bottom: 4px solid #3730a3;
+    color: #ffffff;
+    transition: all 0.12s ease;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+.kid-btn-primary:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 4px rgba(79, 70, 229, 0.2);
+}
+
+.kid-btn-success {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    border-bottom: 4px solid #059669;
+    color: #ffffff;
+    transition: all 0.12s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+.kid-btn-success:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 4px rgba(16, 185, 129, 0.2);
+}
+
+.kid-btn-danger {
+    background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+    border-bottom: 4px solid #be123c;
+    color: #ffffff;
+    transition: all 0.12s ease;
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
+}
+.kid-btn-danger:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 4px rgba(244, 63, 94, 0.2);
+}
+
+.kid-btn-warning {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    border-bottom: 4px solid #b45309;
+    color: #ffffff;
+    transition: all 0.12s ease;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+}
+.kid-btn-warning:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 4px rgba(245, 158, 11, 0.2);
+}
+
+.kid-btn-light {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-bottom: 4px solid #cbd5e1;
+    color: #334155;
+    transition: all 0.12s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+}
+.kid-btn-light:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* ================== 艾宾浩斯等级徽章 ================== */
 .level-badge {
     display: inline-flex;
     align-items: center;
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: 9999px;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 800;
     margin-left: 6px;
     vertical-align: middle;
     background: #e0e7ff;
     color: #4338ca;
-    border: 1px solid #c7d2fe;
+    border: 1.5px solid #c7d2fe;
 }
 
 .level-badge.level-mastered {
@@ -68,22 +155,24 @@ html, body {
     border-color: #fcd34d;
 }
 
-/* 田字格手写板 */
+/* ================== 小学生标准田字格手写板 ================== */
 .writing-board {
     position: relative;
-    width: min(340px, 78vw);
+    width: min(340px, 84vw);
     aspect-ratio: 1;
     margin: 0 auto;
     overflow: hidden;
-    border: 2px solid #f87171;
-    border-radius: 16px;
+    border: 3px solid #ef4444;
+    border-radius: 20px;
     background-color: #ffffff;
     background-image:
-        linear-gradient(to right, transparent calc(50% - 1px), #fca5a5 50%, transparent calc(50% + 1px)),
-        linear-gradient(to bottom, transparent calc(50% - 1px), #fca5a5 50%, transparent calc(50% + 1px)),
-        linear-gradient(45deg, transparent calc(50% - 0.5px), #fee2e2 50%, transparent calc(50% + 0.5px)),
-        linear-gradient(-45deg, transparent calc(50% - 0.5px), #fee2e2 50%, transparent calc(50% + 0.5px));
-    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.08);
+        /* 中间横十字虚线 */
+        linear-gradient(to right, transparent calc(50% - 1.5px), #fca5a5 50%, transparent calc(50% + 1.5px)),
+        linear-gradient(to bottom, transparent calc(50% - 1.5px), #fca5a5 50%, transparent calc(50% + 1.5px)),
+        /* 对角米字格线 */
+        linear-gradient(45deg, transparent calc(50% - 1px), #fee2e2 50%, transparent calc(50% + 1px)),
+        linear-gradient(-45deg, transparent calc(50% - 1px), #fee2e2 50%, transparent calc(50% + 1px));
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 #writingCanvas {
@@ -94,15 +183,15 @@ html, body {
     cursor: crosshair;
 }
 
-/* 笔顺演示田字格 */
+/* ================== 笔顺演示田字格 ================== */
 .answer-stroke-grid {
     position: relative;
     width: 100%;
     aspect-ratio: 1;
     margin: 0 auto 8px;
     overflow: hidden;
-    border: 2px solid #f87171;
-    border-radius: 14px;
+    border: 2.5px solid #ef4444;
+    border-radius: 16px;
     background-color: #ffffff;
     background-image:
         linear-gradient(to right, transparent calc(50% - 1px), #fca5a5 50%, transparent calc(50% + 1px)),
@@ -120,19 +209,19 @@ html, body {
 
 .stroke-grid {
     position: relative;
-    width: min(320px, 76vw);
+    width: min(320px, 80vw);
     aspect-ratio: 1;
     margin: 0 auto;
     overflow: hidden;
-    border: 2px solid #f87171;
-    border-radius: 16px;
+    border: 3px solid #ef4444;
+    border-radius: 20px;
     background-color: #ffffff;
     background-image:
-        linear-gradient(to right, transparent calc(50% - 1px), #fca5a5 50%, transparent calc(50% + 1px)),
-        linear-gradient(to bottom, transparent calc(50% - 1px), #fca5a5 50%, transparent calc(50% + 1px)),
-        linear-gradient(45deg, transparent calc(50% - 0.5px), #fee2e2 50%, transparent calc(50% + 0.5px)),
-        linear-gradient(-45deg, transparent calc(50% - 0.5px), #fee2e2 50%, transparent calc(50% + 0.5px));
-    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.08);
+        linear-gradient(to right, transparent calc(50% - 1.5px), #fca5a5 50%, transparent calc(50% + 1.5px)),
+        linear-gradient(to bottom, transparent calc(50% - 1.5px), #fca5a5 50%, transparent calc(50% + 1.5px)),
+        linear-gradient(45deg, transparent calc(50% - 1px), #fee2e2 50%, transparent calc(50% + 1px)),
+        linear-gradient(-45deg, transparent calc(50% - 1px), #fee2e2 50%, transparent calc(50% + 1px));
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.12);
 }
 
 .stroke-writer,
@@ -148,89 +237,105 @@ html, body {
     display: grid;
     place-items: center;
     padding: 16px;
-    color: var(--muted);
-    background: rgba(255, 255, 255, 0.9);
-    font-weight: 700;
-    font-size: 13px;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.92);
+    font-weight: 800;
+    font-size: 14px;
+    border-radius: 16px;
 }
 
 .stroke-status.hidden {
     display: none;
 }
 
-/* 听音选字卡片 */
+/* ================== 听音选字选项卡片 ================== */
 .choice-option {
     position: relative;
-    min-height: 110px;
-    border: 2px solid #e0e7ff;
-    border-radius: 20px;
+    min-height: 120px;
+    border: 2.5px solid #e0e7ff;
+    border-bottom: 5px solid #c7d2fe;
+    border-radius: 24px;
     background: #ffffff;
     color: var(--text);
-    font-family: "KaiTi", "STKaiti", "FangSong", serif;
-    font-size: clamp(48px, 12vw, 76px);
-    font-weight: 700;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.06);
-    transition: all 0.2s ease;
+    font-family: "KaiTi", "STKaiti", "楷体", "BiauKai", serif;
+    font-size: clamp(52px, 13vw, 80px);
+    font-weight: 800;
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.08);
+    transition: all 0.15s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+}
+
+.choice-option:hover {
+    border-color: #a5b4fc;
+    background: #f8faff;
 }
 
 .choice-option:active {
-    transform: scale(0.96);
+    transform: translateY(3px);
+    border-bottom-width: 2px;
 }
 
 .choice-option.wrong-choice {
-    border-color: #fca5a5;
-    background: #fff8f8;
-    color: #b91c1c;
-    animation: choice-shake 0.25s ease;
+    border-color: #fda4af;
+    border-bottom-color: #f43f5e;
+    background: #fff1f2;
+    color: #be123c;
+    animation: choice-shake 0.3s ease;
 }
 
 .choice-option.wrong-choice::after {
     content: "✕";
     position: absolute;
-    top: 6px;
-    right: 8px;
+    top: 8px;
+    right: 10px;
     display: grid;
     place-items: center;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     color: #fff;
-    background: #ef4444;
-    font-size: 14px;
+    background: #f43f5e;
+    font-size: 16px;
     font-weight: 900;
+    box-shadow: 0 2px 6px rgba(244, 63, 94, 0.4);
 }
 
 .choice-option.correct-choice {
     border-color: #86efac;
+    border-bottom-color: #10b981;
     background: #f0fdf4;
     color: #15803d;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
 }
 
 @keyframes choice-shake {
-    25% { transform: translateX(-4px); }
-    75% { transform: translateX(4px); }
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
 }
 
-/* 结算得分环 */
+/* ================== 结算得分环 ================== */
 .score-ring {
-    width: 130px;
-    height: 130px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     margin: 16px auto;
     display: grid;
     place-items: center;
-    background: conic-gradient(var(--primary) 0%, #e5e7eb 0);
+    background: conic-gradient(var(--primary) 0%, #e2e8f0 0);
     position: relative;
-    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.15);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.2);
 }
 
 .score-ring::after {
     content: "";
     position: absolute;
-    inset: 10px;
+    inset: 12px;
     background: white;
     border-radius: 50%;
 }
@@ -243,81 +348,174 @@ html, body {
 
 .score-ring-content strong {
     display: block;
-    font-size: 28px;
-    font-weight: 800;
-    color: #1f2937;
+    font-size: 32px;
+    font-weight: 900;
+    color: #1e293b;
+    font-family: "Quicksand", sans-serif;
 }
 
 .score-ring-content span {
-    color: var(--muted);
-    font-size: 11px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 700;
 }
 
-/* 错字本与结果卡片 */
+/* ================== 错字本与结果卡片 ================== */
 .wrong-item,
 .result-chip {
-    padding: 6px 10px;
-    border-radius: 12px;
-    background: #fff;
-    border: 1px solid #fed7aa;
-    font-size: 16px;
-    font-family: "KaiTi", "STKaiti", serif;
+    padding: 8px 14px;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 2px solid #fed7aa;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: "KaiTi", "STKaiti", "楷体", serif;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .result-chip.correct {
     color: #15803d;
-    background: #dcfce7;
+    background: #f0fdf4;
     border-color: #86efac;
 }
 
 .result-chip.wrong {
-    color: #b91c1c;
-    background: #fee2e2;
-    border-color: #fca5a5;
+    color: #be123c;
+    background: #fff1f2;
+    border-color: #fda4af;
 }
 
 .dictation-result {
-    padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: #fff;
-    margin-bottom: 10px;
+    padding: 14px;
+    border: 2px solid var(--border);
+    border-radius: 18px;
+    background: #ffffff;
+    margin-bottom: 12px;
 }
 
 .dictation-result.correct {
     border-color: #86efac;
+    background: #fcfdfc;
 }
 
 .dictation-result.wrong {
-    border-color: #fca5a5;
+    border-color: #fda4af;
+    background: #fffbfb;
 }
 
-/* 随机阅读卡纸 */
+.comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.comparison-box {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.comparison-box strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.written-preview {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+}
+
+.result-standard {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "KaiTi", "STKaiti", "楷体", serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: #1e293b;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+}
+
+.result-verdict {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 800;
+    color: #334155;
+    padding-top: 10px;
+    border-top: 2px dashed #f1f5f9;
+}
+
+/* ================== 随机短文故事纸卡 ================== */
 .story-paper {
-    margin: 12px auto;
-    padding: 20px 16px;
-    border: 1px solid #fde68a;
-    border-radius: 20px;
-    background: #fffbeb;
-    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.08);
+    margin: 10px auto;
+    padding: 22px 18px;
+    border: 2.5px solid #fde68a;
+    border-radius: 24px;
+    background: #fffdf5;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.08);
 }
 
 .story-text {
     margin: 0;
     color: #78350f;
-    font-family: "KaiTi", "STKaiti", serif;
-    font-size: clamp(22px, 5.5vw, 32px);
-    line-height: 1.8;
+    font-family: "KaiTi", "STKaiti", "楷体", "BiauKai", serif;
+    font-size: clamp(24px, 6vw, 34px);
+    line-height: 1.85;
     text-align: left;
+    font-weight: 600;
 }
 
 .story-pinyin {
-    margin-top: 12px;
+    margin-top: 14px;
     color: var(--primary);
-    font-size: 15px;
-    line-height: 1.8;
+    font-size: 17px;
+    line-height: 1.85;
     text-align: left;
+    font-weight: 700;
+    font-family: "Quicksand", -apple-system, sans-serif;
+}
+
+/* ================== 柔和阴影与动效 ================== */
+.kid-card {
+    border-radius: 20px;
+    border: 2px solid #f1f5f9;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.kid-card:active {
+    transform: scale(0.99);
+}
+
+.sync-status-val.ok {
+    color: #10b981;
+}
+.sync-status-val.error {
+    color: #f43f5e;
+}
+.sync-status-val.syncing {
+    color: #6366f1;
 }

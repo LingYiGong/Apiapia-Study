@@ -7,13 +7,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="apple-mobile-web-app-title" content="汉字听写"/>
     <meta name="theme-color" content="#4f46e5"/>
-    <title>汉字听写小助手</title>
+    <title>汉字听写小助手 · 小朋友趣味学汉字</title>
 
-    <!-- 引入 Vant 4 样式与 Tailwind CSS (同 index 和 Japanese 模块高度一致) -->
+    <!-- 引入 Vant 4 样式与 Tailwind CSS -->
     <link rel="stylesheet" href="https://unpkg.com/vant@4/lib/index.css" />
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- 自定义手写板与汉字特定样式 -->
+    <!-- 自定义儿童友好手写板与汉字特定样式 -->
     <link rel="stylesheet" href="./hanzi.css"/>
 
     <script>
@@ -32,272 +32,284 @@
         })();
     </script>
 </head>
-<body class="flex flex-col overflow-hidden bg-[#f7f8fa]">
-    <div id="app" class="flex flex-col     mx-auto w-full bg-[#f7f8fa] shadow-2xl relative  border-gray-200 h-full overflow-hidden">
+<body class="flex flex-col overflow-hidden bg-[#f8fafc]">
+    <div id="app" class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
 
-        <!-- 顶部导航栏 (iOS 安全区适配，统一像素级高度) -->
-        <header class="bg-indigo-600 text-white px-4 sm:px-6 pt-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2.5 shadow-md z-10 flex-shrink-0">
-            <div class="flex items-center justify-between h-8">
+        <!-- 顶部导航栏 (明快儿童风，加大点击区域) -->
+        <header class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-4 sm:px-6 pt-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 shadow-md z-10 flex-shrink-0">
+            <div class="flex items-center justify-between h-9">
                 <div class="flex items-center space-x-2">
-                    <a href="../index.html" class="h-7 text-xs px-2.5 rounded-full bg-indigo-700/70 hover:bg-indigo-700 text-indigo-100 font-medium flex items-center space-x-1 border border-indigo-400/40 transition-all active:scale-95 shadow-sm" title="返回学习中心">
-                        <span>← 🏠</span>
+                    <a href="../index.html" class="h-8 text-xs sm:text-sm px-3 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center space-x-1 border border-white/30 transition-all active:scale-95 shadow-sm" title="返回学习中心">
+                        <span>← 🏠 首页</span>
                     </a>
-                    <h1 class="text-base sm:text-lg font-bold tracking-wide flex items-center space-x-1.5 leading-none">
+                    <h1 class="text-base sm:text-lg font-black tracking-wide flex items-center space-x-1.5 leading-none">
                         <span>✍️</span>
-                        <span>汉字听写小助手</span>
+                        <span>汉字小能手</span>
                     </h1>
                 </div>
-                <div class="flex items-center space-x-1.5">
-                    <button id="openSyncBtn" type="button" class="h-7 px-2.5 text-xs bg-indigo-700/70 hover:bg-indigo-700 text-indigo-100 border border-indigo-400/40 rounded-full font-medium active:scale-95 shadow-sm flex items-center space-x-1" title="云端多端同步">
-                        <span>☁️ 云同步</span>
+                <div class="flex items-center space-x-2">
+                    <button id="openSyncBtn" type="button" class="h-8 px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1" title="云端多端同步">
+                        <span>☁️ 同步</span>
                     </button>
-                    <button id="openSettingsBtn" type="button" class="h-7 px-2.5 text-xs bg-indigo-700/70 hover:bg-indigo-700 text-indigo-100 border border-indigo-400/40 rounded-full font-medium active:scale-95 shadow-sm flex items-center space-x-1" title="朗读设置">
-                        <span>⚙️ 朗读</span>
+                    <button id="openSettingsBtn" type="button" class="h-8 px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1" title="朗读设置">
+                        <span>⚙️ 设置</span>
                     </button>
                 </div>
             </div>
 
-            <!-- 顶部统计概览栏 (统一高度与间距) -->
-            <div class="flex justify-between items-center h-7 mt-2 text-xs sm:text-sm opacity-95 border-t border-indigo-500/60 pt-1.5 font-medium leading-none">
-                <span>待复习: <b id="dueCount" class="text-yellow-300 font-bold ml-0.5">0</b> 字</span>
-                <span>已掌握: <b id="masteredCount" class="text-white font-bold ml-0.5">0</b> 字</span>
-                <span>错字: <b id="wrongCount" class="text-rose-300 font-bold ml-0.5">0</b></span>
-                <span>累计: <b id="totalPracticed" class="text-emerald-300 font-bold ml-0.5">0</b> 次</span>
+            <!-- 顶部统计概览栏 (加大字体与可爱图标) -->
+            <div class="flex justify-between items-center h-8 mt-2.5 text-xs sm:text-sm opacity-95 border-t border-white/20 pt-2 font-bold leading-none">
+                <span class="flex items-center">🌟 待复习: <b id="dueCount" class="text-yellow-300 font-black ml-1 text-sm">0</b> 字</span>
+                <span class="flex items-center">🏆 已掌握: <b id="masteredCount" class="text-white font-black ml-1 text-sm">0</b> 字</span>
+                <span class="flex items-center">📝 错字: <b id="wrongCount" class="text-rose-200 font-black ml-1 text-sm">0</b></span>
+                <span class="flex items-center">🎈 累计: <b id="totalPracticed" class="text-emerald-300 font-black ml-1 text-sm">0</b> 次</span>
             </div>
         </header>
 
         <!-- 主体滚动内容区 -->
-        <main class="flex-1 min-h-0 overflow-y-auto relative bg-gray-50 p-3 sm:p-4">
+        <main class="flex-1 min-h-0 overflow-y-auto relative bg-[#f8fafc] p-3.5 sm:p-5">
 
             <!-- ================= 主页 / 设置面板 ================= -->
-            <section id="setupScreen" class="space-y-3 pb-6">
+            <section id="setupScreen" class="space-y-4 pb-6">
 
                 <!-- TAB 1: 练习模式 -->
-                <div id="tabPracticeView" class="space-y-3">
+                <div id="tabPracticeView" class="space-y-4">
                     
-                    <!-- 艾宾浩斯记忆曲线今日复习提示卡 -->
-                    <div id="ebbinghausBanner" class="p-3.5 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-pink-500/10 border border-indigo-100/80 rounded-2xl shadow-sm flex items-center justify-between gap-3">
-                        <div class="flex items-center space-x-2.5 min-w-0">
-                            <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl flex-shrink-0">
-                                🧠
+                    <!-- 艾宾浩斯记忆曲线今日复习提示卡 (生动卡片，大按钮) -->
+                    <div id="ebbinghausBanner" class="p-4 bg-gradient-to-r from-amber-100/90 via-orange-50 to-pink-100/80 border-2 border-amber-200 rounded-3xl shadow-sm flex items-center justify-between gap-3">
+                        <div class="flex items-center space-x-3 min-w-0">
+                            <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl flex-shrink-0 border border-amber-100">
+                                🚀
                             </div>
                             <div class="min-w-0">
-                                <div id="ebBannerTitle" class="text-xs sm:text-sm font-bold text-gray-800 truncate">
-                                    今日艾宾浩斯复习
+                                <div id="ebBannerTitle" class="text-sm sm:text-base font-black text-amber-950 truncate">
+                                    今日复习小任务
                                 </div>
-                                <div id="ebBannerDesc" class="text-[11px] text-gray-500 truncate mt-0.5">
-                                    遗忘曲线记忆优化提醒
+                                <div id="ebBannerDesc" class="text-xs sm:text-sm text-amber-800/80 truncate mt-0.5">
+                                    按艾宾浩斯记忆曲线复习，记得牢牢的！
                                 </div>
                             </div>
                         </div>
-                        <button id="quickDueBtn" type="button" class="flex-shrink-0 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-sm transition-all whitespace-nowrap">
-                            ⚡ 立即复习
+                        <button id="quickDueBtn" type="button" class="flex-shrink-0 px-4 py-2.5 kid-btn-primary text-white text-xs sm:text-sm font-black rounded-2xl shadow-md whitespace-nowrap">
+                            ⚡ 立即挑战
                         </button>
                     </div>
 
-                    <!-- 练习设置 (范围与字数) -->
-                    <div class="bg-white p-3.5 rounded-2xl border border-gray-200/80 shadow-sm space-y-3">
-                        <div class="flex items-center justify-between text-xs font-bold text-gray-700">
+                    <!-- 练习设置 (范围与字数，大下拉框与大字体) -->
+                    <div class="bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between text-sm font-black text-slate-700">
                             <div class="flex items-center space-x-1.5">
-                                <span>📝</span>
+                                <span class="text-base">📝</span>
                                 <span>练习设置</span>
                             </div>
-                            <span class="text-[11px] text-gray-400 font-normal">选择范围与每轮题量</span>
+                            <span class="text-xs text-slate-400 font-medium">选择学习范围与每轮数量</span>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2.5 pt-1">
-                            <div class="space-y-1">
-                                <label for="categorySelect" class="block text-[11px] font-semibold text-gray-500">练习范围</label>
+                        <div class="grid grid-cols-2 gap-3 pt-1">
+                            <div class="space-y-1.5">
+                                <label for="categorySelect" class="block text-xs font-bold text-slate-600">练习范围</label>
                                 <div class="relative">
-                                    <select id="categorySelect" class="w-full text-xs bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-gray-800 font-medium focus:border-indigo-500 focus:bg-white outline-none transition-colors">
+                                    <select id="categorySelect" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold focus:border-indigo-500 focus:bg-white outline-none transition-colors">
                                     </select>
                                 </div>
                             </div>
-                            <div class="space-y-1">
-                                <label for="countSelect" class="block text-[11px] font-semibold text-gray-500">每轮字数</label>
+                            <div class="space-y-1.5">
+                                <label for="countSelect" class="block text-xs font-bold text-slate-600">每轮字数</label>
                                 <div class="relative">
-                                    <select id="countSelect" class="w-full text-xs bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-gray-800 font-medium focus:border-indigo-500 focus:bg-white outline-none transition-colors">
-                                        <option value="10" selected>10 个字</option>
-                                        <option value="20">20 个字</option>
-                                        <option value="30">30 个字</option>
+                                    <select id="countSelect" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold focus:border-indigo-500 focus:bg-white outline-none transition-colors">
+                                        <option value="10" selected>10 个字 (轻松快刷)</option>
+                                        <option value="20">20 个字 (标准巩固)</option>
+                                        <option value="30">30 个字 (强化挑战)</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 五大练习模式卡片 (Vant App 统一卡片风格) -->
-                    <div class="space-y-2.5">
-                        <div class="flex items-center space-x-1.5 text-xs font-bold text-gray-700 px-1 pt-1">
-                            <span>🎯</span>
+                    <!-- 五大练习模式大卡片 (儿童触控友好：大图标、大文字、鲜艳色彩、大点击区) -->
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-1.5 text-sm font-black text-slate-700 px-1 pt-1">
+                            <span class="text-base">🎯</span>
                             <span>选择学习模式</span>
                         </div>
 
-                        <!-- 1. 听写练习 (核心推荐模式) -->
-                        <div id="startBtn" class="bg-white rounded-2xl border border-gray-200/80 p-3.5 shadow-sm hover:shadow-md transition-all active:scale-[0.99] cursor-pointer flex items-center justify-between group relative overflow-hidden">
-                            <div class="absolute top-0 left-0 bottom-0 w-1 bg-indigo-500"></div>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
+                        <!-- 1. 听写默写 (核心主推) -->
+                        <div id="startBtn" class="bg-white rounded-3xl border-2 border-indigo-100 hover:border-indigo-300 p-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer flex items-center justify-between group relative overflow-hidden">
+                            <div class="absolute top-0 left-0 bottom-0 w-2 bg-indigo-500"></div>
+                            <div class="flex items-center space-x-3.5 pl-1">
+                                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm border border-indigo-100">
                                     🔊
                                 </div>
                                 <div>
-                                    <div class="text-sm font-bold text-gray-800 flex items-center space-x-1.5">
-                                        <span>听写练习</span>
-                                        <span class="text-[10px] bg-indigo-100 text-indigo-700 font-semibold px-1.5 py-0.2 rounded-full">主推</span>
+                                    <div class="text-base sm:text-lg font-black text-slate-800 flex items-center space-x-2">
+                                        <span>听写默写</span>
+                                        <span class="text-xs bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full">⭐ 核心推荐</span>
                                     </div>
-                                    <p class="text-[11px] text-gray-500 mt-0.5">听音在田字格手写，即时核对笔顺</p>
+                                    <p class="text-xs sm:text-sm text-slate-500 font-medium mt-1">听读音在田字格手写，写完核对正确笔顺</p>
                                 </div>
                             </div>
-                            <span class="text-gray-300 group-hover:text-indigo-600 transition-colors text-base font-bold pr-1">→</span>
+                            <span class="text-indigo-400 group-hover:text-indigo-600 transition-colors text-xl font-black pr-2">➔</span>
                         </div>
 
-                        <!-- 2. 看字认读 -->
-                        <div id="recognitionStartBtn" class="bg-white rounded-2xl border border-gray-200/80 p-3.5 shadow-sm hover:shadow-md transition-all active:scale-[0.99] cursor-pointer flex items-center justify-between group relative overflow-hidden">
-                            <div class="absolute top-0 left-0 bottom-0 w-1 bg-purple-500"></div>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
+                        <!-- 2. 看字认读卡 -->
+                        <div id="recognitionStartBtn" class="bg-white rounded-3xl border-2 border-purple-100 hover:border-purple-300 p-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer flex items-center justify-between group relative overflow-hidden">
+                            <div class="absolute top-0 left-0 bottom-0 w-2 bg-purple-500"></div>
+                            <div class="flex items-center space-x-3.5 pl-1">
+                                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm border border-purple-100">
                                     👀
                                 </div>
                                 <div>
-                                    <div class="text-sm font-bold text-gray-800">看字认读</div>
-                                    <p class="text-[11px] text-gray-500 mt-0.5">大字卡片记忆，点击听标准拼音朗读</p>
+                                    <div class="text-base sm:text-lg font-black text-slate-800 flex items-center space-x-2">
+                                        <span>看字认读卡</span>
+                                        <span class="text-xs bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-full">🌟 认读识字</span>
+                                    </div>
+                                    <p class="text-xs sm:text-sm text-slate-500 font-medium mt-1">大字卡片记忆，点一下听标准拼音朗读</p>
                                 </div>
                             </div>
-                            <span class="text-gray-300 group-hover:text-purple-600 transition-colors text-base font-bold pr-1">→</span>
+                            <span class="text-purple-400 group-hover:text-purple-600 transition-colors text-xl font-black pr-2">➔</span>
                         </div>
 
-                        <!-- 3. 听音选字 -->
-                        <div id="choiceStartBtn" class="bg-white rounded-2xl border border-gray-200/80 p-3.5 shadow-sm hover:shadow-md transition-all active:scale-[0.99] cursor-pointer flex items-center justify-between group relative overflow-hidden">
-                            <div class="absolute top-0 left-0 bottom-0 w-1 bg-amber-500"></div>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
+                        <!-- 3. 听音选字小游戏 -->
+                        <div id="choiceStartBtn" class="bg-white rounded-3xl border-2 border-amber-100 hover:border-amber-300 p-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer flex items-center justify-between group relative overflow-hidden">
+                            <div class="absolute top-0 left-0 bottom-0 w-2 bg-amber-500"></div>
+                            <div class="flex items-center space-x-3.5 pl-1">
+                                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm border border-amber-100">
                                     🎧
                                 </div>
                                 <div>
-                                    <div class="text-sm font-bold text-gray-800">听音选字</div>
-                                    <p class="text-[11px] text-gray-500 mt-0.5">仔细听发音与词意，从选项中快速辨析</p>
+                                    <div class="text-base sm:text-lg font-black text-slate-800 flex items-center space-x-2">
+                                        <span>听音选字闯关</span>
+                                        <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">🎮 趣味游戏</span>
+                                    </div>
+                                    <p class="text-xs sm:text-sm text-slate-500 font-medium mt-1">仔细听发音与词意，从3个字里选出正确的字</p>
                                 </div>
                             </div>
-                            <span class="text-gray-300 group-hover:text-amber-600 transition-colors text-base font-bold pr-1">→</span>
+                            <span class="text-amber-400 group-hover:text-amber-600 transition-colors text-xl font-black pr-2">➔</span>
                         </div>
 
-                        <!-- 4. 随机阅读 -->
-                        <div id="storyStartBtn" class="bg-white rounded-2xl border border-gray-200/80 p-3.5 shadow-sm hover:shadow-md transition-all active:scale-[0.99] cursor-pointer flex items-center justify-between group relative overflow-hidden">
-                            <div class="absolute top-0 left-0 bottom-0 w-1 bg-emerald-500"></div>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
+                        <!-- 4. 随机趣味短文 -->
+                        <div id="storyStartBtn" class="bg-white rounded-3xl border-2 border-emerald-100 hover:border-emerald-300 p-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer flex items-center justify-between group relative overflow-hidden">
+                            <div class="absolute top-0 left-0 bottom-0 w-2 bg-emerald-500"></div>
+                            <div class="flex items-center space-x-3.5 pl-1">
+                                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm border border-emerald-100">
                                     📖
                                 </div>
                                 <div>
-                                    <div class="text-sm font-bold text-gray-800">随机短文阅读</div>
-                                    <p class="text-[11px] text-gray-500 mt-0.5">语境化语句阅读，支持拼音与整句朗读</p>
+                                    <div class="text-base sm:text-lg font-black text-slate-800 flex items-center space-x-2">
+                                        <span>趣味短文阅读</span>
+                                        <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">📚 语境阅读</span>
+                                    </div>
+                                    <p class="text-xs sm:text-sm text-slate-500 font-medium mt-1">阅读生动有趣的故事句子，支持拼音与整句朗读</p>
                                 </div>
                             </div>
-                            <span class="text-gray-300 group-hover:text-emerald-600 transition-colors text-base font-bold pr-1">→</span>
+                            <span class="text-emerald-400 group-hover:text-emerald-600 transition-colors text-xl font-black pr-2">➔</span>
                         </div>
 
-                        <!-- 5. 笔画练习 -->
-                        <div id="strokeStartBtn" class="bg-white rounded-2xl border border-gray-200/80 p-3.5 shadow-sm hover:shadow-md transition-all active:scale-[0.99] cursor-pointer flex items-center justify-between group relative overflow-hidden">
-                            <div class="absolute top-0 left-0 bottom-0 w-1 bg-rose-500"></div>
-                            <div class="flex items-center space-x-3">
-                                <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
+                        <!-- 5. 笔画笔顺演示 -->
+                        <div id="strokeStartBtn" class="bg-white rounded-3xl border-2 border-rose-100 hover:border-rose-300 p-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer flex items-center justify-between group relative overflow-hidden">
+                            <div class="absolute top-0 left-0 bottom-0 w-2 bg-rose-500"></div>
+                            <div class="flex items-center space-x-3.5 pl-1">
+                                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm border border-rose-100">
                                     ✍️
                                 </div>
                                 <div>
-                                    <div class="text-sm font-bold text-gray-800">笔画笔顺演示</div>
-                                    <p class="text-[11px] text-gray-500 mt-0.5">循序渐进观察规范书写顺序与临摹动画</p>
+                                    <div class="text-base sm:text-lg font-black text-slate-800 flex items-center space-x-2">
+                                        <span>笔画笔顺临摹</span>
+                                        <span class="text-xs bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded-full">✏️ 规范书写</span>
+                                    </div>
+                                    <p class="text-xs sm:text-sm text-slate-500 font-medium mt-1">观察慢动作规范笔画书写顺序与临摹动画</p>
                                 </div>
                             </div>
-                            <span class="text-gray-300 group-hover:text-rose-600 transition-colors text-base font-bold pr-1">→</span>
+                            <span class="text-rose-400 group-hover:text-rose-600 transition-colors text-xl font-black pr-2">➔</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- TAB 2: 错字本面板 -->
-                <div id="tabWrongView" class="space-y-3 hidden">
-                    <div class="bg-white rounded-2xl border border-gray-200/80 p-4 shadow-sm space-y-3">
+                <div id="tabWrongView" class="space-y-3.5 hidden">
+                    <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3.5">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
-                                <span class="text-xl">📕</span>
-                                <h3 class="text-sm font-bold text-gray-800">错字复习本</h3>
+                                <span class="text-2xl">📕</span>
+                                <h3 class="text-base font-black text-slate-800">错字强化复习本</h3>
                             </div>
-                            <span class="text-xs text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded-full">
+                            <span class="text-xs text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-full border border-rose-100">
                                 需重点强化
                             </span>
                         </div>
-                        <p class="text-xs text-gray-500 leading-relaxed">
-                            听写练习中记错或写错的汉字会自动归集在此处，根据艾宾浩斯曲线优先安排巩固复习。
+                        <p class="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
+                            练习中记错或写错的汉字会自动归集在这里，根据艾宾浩斯曲线优先安排巩固复习。
                         </p>
 
                         <!-- 错字列表 -->
                         <div id="wrongbookSetup" class="wrongbook">
-                            <div id="wrongbookListSetup" class="wrongbook-list flex flex-wrap gap-2 pt-1">
+                            <div id="wrongbookListSetup" class="wrongbook-list flex flex-wrap gap-2.5 pt-1">
                                 <!-- 动态插入错字芯片 -->
                             </div>
                         </div>
 
-                        <!-- 快捷操作按钮 -->
-                        <div class="pt-2 border-t border-gray-100 flex space-x-2">
-                            <button id="practiceWrongFromTabBtn" type="button" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold rounded-xl shadow-sm transition-all">
-                                🔊 专项听写错字
+                        <!-- 快捷操作按钮 (大按钮) -->
+                        <div class="pt-2 border-t border-slate-100">
+                            <button id="practiceWrongFromTabBtn" type="button" class="w-full py-4 kid-btn-primary text-white text-sm sm:text-base font-black rounded-2xl shadow-md">
+                                🔊 专项听写错字本汉字
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- TAB 3: 学习统计与管理面板 -->
-                <div id="tabStatsView" class="space-y-3 hidden">
+                <div id="tabStatsView" class="space-y-3.5 hidden">
                     <!-- 4 大指标概览卡 -->
-                    <div class="bg-white rounded-2xl border border-gray-200/80 p-4 shadow-sm space-y-3">
+                    <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3.5">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-sm font-bold text-gray-800 flex items-center space-x-1.5">
+                            <h3 class="text-base font-black text-slate-800 flex items-center space-x-2">
                                 <span>📊</span>
-                                <span>学习数据与遗忘曲线</span>
+                                <span>学习数据与成就</span>
                             </h3>
-                            <span id="syncOverviewNote" class="text-[11px] text-gray-400">支持云端多端同步</span>
+                            <span id="syncOverviewNote" class="text-xs text-slate-400 font-medium">支持云端多端同步</span>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2.5 pt-1">
-                            <div class="p-3 bg-amber-50/70 border border-amber-200/70 rounded-xl text-center">
-                                <div class="text-xs text-amber-700 font-semibold">今日待复习</div>
-                                <div id="statDue" class="text-2xl font-black text-amber-600 mt-1">0</div>
+                        <div class="grid grid-cols-2 gap-3 pt-1">
+                            <div class="p-4 bg-amber-50/80 border-2 border-amber-200/80 rounded-2xl text-center shadow-sm">
+                                <div class="text-xs sm:text-sm text-amber-800 font-bold">🌟 今日待复习</div>
+                                <div id="statDue" class="text-3xl font-black text-amber-600 mt-1.5">0</div>
                             </div>
-                            <div class="p-3 bg-emerald-50/70 border border-emerald-200/70 rounded-xl text-center">
-                                <div class="text-xs text-emerald-700 font-semibold">已掌握 (Lv.3+)</div>
-                                <div id="statMastered" class="text-2xl font-black text-emerald-600 mt-1">0</div>
+                            <div class="p-4 bg-emerald-50/80 border-2 border-emerald-200/80 rounded-2xl text-center shadow-sm">
+                                <div class="text-xs sm:text-sm text-emerald-800 font-bold">🏆 已掌握 (Lv.3+)</div>
+                                <div id="statMastered" class="text-3xl font-black text-emerald-600 mt-1.5">0</div>
                             </div>
-                            <div class="p-3 bg-rose-50/70 border border-rose-200/70 rounded-xl text-center">
-                                <div class="text-xs text-rose-700 font-semibold">错字本字数</div>
-                                <div id="statWrong" class="text-2xl font-black text-rose-600 mt-1">0</div>
+                            <div class="p-4 bg-rose-50/80 border-2 border-rose-200/80 rounded-2xl text-center shadow-sm">
+                                <div class="text-xs sm:text-sm text-rose-800 font-bold">📝 错字本字数</div>
+                                <div id="statWrong" class="text-3xl font-black text-rose-600 mt-1.5">0</div>
                             </div>
-                            <div class="p-3 bg-indigo-50/70 border border-indigo-200/70 rounded-xl text-center">
-                                <div class="text-xs text-indigo-700 font-semibold">累计练习次数</div>
-                                <div id="statTotal" class="text-2xl font-black text-indigo-600 mt-1">0</div>
+                            <div class="p-4 bg-indigo-50/80 border-2 border-indigo-200/80 rounded-2xl text-center shadow-sm">
+                                <div class="text-xs sm:text-sm text-indigo-800 font-bold">🎈 累计练习次数</div>
+                                <div id="statTotal" class="text-3xl font-black text-indigo-600 mt-1.5">0</div>
                             </div>
                         </div>
 
                         <!-- 艾宾浩斯复习阶梯解析 -->
-                        <div class="p-3 bg-gray-50 rounded-xl text-[11px] text-gray-500 space-y-1 leading-relaxed border border-gray-100">
-                            <div class="font-bold text-gray-700">🧠 艾宾浩斯记忆间隔阶段：</div>
+                        <div class="p-3.5 bg-slate-50 rounded-2xl text-xs sm:text-sm text-slate-600 space-y-1.5 leading-relaxed border border-slate-200/80 font-medium">
+                            <div class="font-bold text-slate-800">🧠 艾宾浩斯记忆成长阶梯：</div>
                             <div>• <b>Lv.0</b>: 今日重练 · <b>Lv.1</b>: 1天后复习 · <b>Lv.2</b>: 3天后复习</div>
-                            <div>• <b>Lv.3</b>: 7天后 (进入已掌握) · <b>Lv.4</b>: 14天后 · <b>Lv.5</b>: 30天后</div>
+                            <div>• <b>Lv.3</b>: 7天后 (达标已掌握) · <b>Lv.4</b>: 14天后 · <b>Lv.5</b>: 30天后</div>
                         </div>
                     </div>
 
                     <!-- 使用提示 -->
-                    <div class="p-3.5 bg-white border border-gray-200/80 rounded-2xl flex items-start space-x-3 text-xs text-gray-600 shadow-sm">
+                    <div class="p-4 bg-white border-2 border-slate-100 rounded-3xl flex items-start space-x-3 text-xs sm:text-sm text-slate-600 shadow-sm font-medium">
                         <span class="text-2xl flex-shrink-0">💡</span>
                         <div class="space-y-1">
-                            <div class="font-bold text-gray-800 text-xs">听写使用小建议</div>
-                            <p class="text-gray-500 text-[11px] leading-relaxed">
-                                建议听完语音后独立在田字格中默写，写完点击“核对本题”观看笔顺演示。连续写对多次将自动延长复习间隔。
+                            <div class="font-bold text-slate-800 text-sm">听写使用小建议</div>
+                            <p class="text-slate-500 leading-relaxed">
+                                建议听完语音后独立在田字格中默写，写完点击“核对本题”观看笔顺演示。连续写对多次将自动延长复习间隔哦！
                             </p>
                         </div>
                     </div>
 
                     <!-- 清空数据按钮 -->
                     <div class="pt-2 text-center">
-                        <button id="resetDataBtn" type="button" class="text-xs text-gray-400 hover:text-rose-500 underline py-1">
+                        <button id="resetDataBtn" type="button" class="text-xs text-slate-400 hover:text-rose-500 underline py-2 font-medium">
                             清空全部汉字学习记录
                         </button>
                     </div>
@@ -306,186 +318,193 @@
             </section>
 
 
-            <!-- ================= 听音选字界面 ================= -->
-            <section id="choiceScreen" class="h-full flex flex-col space-y-3 hidden">
-                <div class="bg-white p-3.5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center justify-between">
-                    <div class="text-xs font-bold text-gray-800 flex items-center space-x-1">
+            <!-- ================= 听音选字界面 (趣味闯关) ================= -->
+            <section id="choiceScreen" class="h-full flex flex-col space-y-3.5 hidden">
+                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
+                    <div class="text-sm font-black text-slate-800 flex items-center space-x-1">
                         <span>🎧 选字：第</span>
-                        <span id="choiceCurrentNumber" class="text-indigo-600 font-bold">1</span>
+                        <span id="choiceCurrentNumber" class="text-indigo-600 font-black text-base">1</span>
                         <span>/</span>
                         <span id="choiceTotalNumber">10</span>
                         <span>题</span>
                         <span id="choiceLevelBadge" class="level-badge">Lv.1</span>
                     </div>
-                    <button id="quitChoiceBtn" class="text-xs px-2.5 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium active:scale-95 transition-all">
+                    <button id="quitChoiceBtn" class="text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-95 transition-all">
                         退出本轮
                     </button>
                 </div>
 
-                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                    <div id="choiceProgressBar" class="h-full bg-indigo-600 rounded-full transition-all duration-300" style="width: 10%"></div>
+                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                    <div id="choiceProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-300" style="width: 10%"></div>
                 </div>
 
-                <div class="flex-1 min-h-0 bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 flex flex-col items-center justify-center space-y-4">
-                    <p class="text-xs text-gray-500">仔细听读音，点击选出正确的汉字：</p>
-                    <button id="choiceSpeakBtn" class="px-6 py-3.5 bg-indigo-600 text-white rounded-2xl font-bold text-sm shadow-md active:scale-95 transition-all flex items-center space-x-2">
+                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center space-y-5">
+                    <p class="text-xs sm:text-sm font-bold text-slate-500">仔细听读音，点击选出正确的汉字：</p>
+                    
+                    <button id="choiceSpeakBtn" class="px-7 py-4 kid-btn-primary text-white rounded-2xl font-black text-base sm:text-lg shadow-lg flex items-center space-x-2">
                         <span>🔊 再听一次发音</span>
                     </button>
-                    <div id="choiceOptions" class="w-full grid grid-cols-3 gap-3 pt-2 max-w-sm"></div>
-                    <button id="choiceFeedback" class="w-full max-w-sm py-3 px-4 rounded-xl bg-emerald-100 text-emerald-800 font-bold text-sm shadow-sm hidden text-center active:scale-98 transition-all">
-                        ✅ 选对啦！轻点这里进入下一题 →
+
+                    <div id="choiceOptions" class="w-full grid grid-cols-3 gap-3.5 pt-2 max-w-sm"></div>
+
+                    <button id="choiceFeedback" class="w-full max-w-sm py-4 px-5 rounded-2xl kid-btn-success text-white font-black text-base sm:text-lg shadow-lg hidden text-center transition-all">
+                        ✅ 选对啦！点这里进入下一题 ➔
                     </button>
                 </div>
             </section>
 
 
-            <!-- ================= 听写练习界面 ================= -->
-            <section id="dictationScreen" class="h-full flex flex-col space-y-3 hidden">
-                <div class="bg-white p-3 rounded-2xl border border-gray-200/80 shadow-sm flex items-center justify-between">
-                    <div class="text-xs font-bold text-gray-800 flex items-center space-x-1">
+            <!-- ================= 听写练习界面 (核心大田字格手写) ================= -->
+            <section id="dictationScreen" class="h-full flex flex-col space-y-3.5 hidden">
+                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
+                    <div class="text-sm font-black text-slate-800 flex items-center space-x-1">
                         <span id="dictationStageLabel">听写</span>
                         <span>：第</span>
-                        <span id="currentNumber" class="text-indigo-600 font-bold">1</span>
+                        <span id="currentNumber" class="text-indigo-600 font-black text-base">1</span>
                         <span>/</span>
                         <span id="totalNumber">10</span>
                         <span>题</span>
                         <span id="dictationLevelBadge" class="level-badge">Lv.1</span>
                     </div>
-                    <button id="quitBtn" class="text-xs px-2.5 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium active:scale-95 transition-all">
+                    <button id="quitBtn" class="text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-95 transition-all">
                         退出本轮
                     </button>
                 </div>
 
-                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                    <div id="progressBar" class="h-full bg-indigo-600 rounded-full transition-all duration-300" style="width: 10%"></div>
+                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                    <div id="progressBar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-300" style="width: 10%"></div>
                 </div>
 
-                <!-- 听音与拼音提示区 -->
-                <div class="listen-area bg-white p-3 rounded-2xl border border-gray-200/80 shadow-sm text-center">
-                    <div class="flex items-center justify-center space-x-3">
+                <!-- 听音与拼音提示区 (大字拼音与大喇叭按钮) -->
+                <div class="listen-area bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm text-center">
+                    <div class="flex items-center justify-center space-x-4">
                         <div class="text-left">
-                            <span class="text-[10px] text-gray-400 font-semibold block">本题读音拼音</span>
-                            <div id="questionPinyin" class="text-2xl font-black text-indigo-600 tracking-wider"></div>
+                            <span class="text-xs text-slate-400 font-bold block">本题拼音</span>
+                            <div id="questionPinyin" class="text-3xl sm:text-4xl font-black text-indigo-600 tracking-wider"></div>
                         </div>
-                        <button id="speakBtn" class="w-11 h-11 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow-md active:scale-95 transition-all" title="播放读音">
+                        <button id="speakBtn" class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl kid-btn-primary text-white flex items-center justify-center text-2xl sm:text-3xl shadow-lg" title="播放读音">
                             🔊
                         </button>
                     </div>
-                    <p class="text-[11px] text-gray-400 mt-2 leading-tight">
-                        在下方田字格手写汉字；没听清可重复点击喇叭播放
+                    <p class="text-xs sm:text-sm text-slate-500 font-bold mt-2 leading-tight">
+                        在下方田字格手写汉字；没听清可点击大喇叭重听
                     </p>
                 </div>
 
                 <!-- 手写田字格区域 -->
-                <div id="writingArea" class="bg-white p-3.5 rounded-2xl border border-gray-200/80 shadow-sm flex flex-col items-center space-y-2.5">
-                    <div class="text-xs font-semibold text-gray-600">在田字格里写下来</div>
+                <div id="writingArea" class="bg-white p-3.5 sm:p-4 rounded-3xl border-2 border-slate-100 shadow-sm flex flex-col items-center space-y-3">
+                    <div class="text-xs sm:text-sm font-black text-slate-700">✏️ 在田字格里写一写</div>
                     <div id="writingBoard" class="writing-board">
                         <canvas id="writingCanvas"></canvas>
                     </div>
-                    <div class="w-full max-w-[340px] grid grid-cols-2 gap-2 pt-1">
-                        <button id="undoStrokeBtn" class="py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl active:scale-95 transition-all">
-                            ↩️ 撤销一笔
+                    <!-- 两个大功能按钮：撤销一笔 / 清空重写 -->
+                    <div class="w-full max-w-[340px] grid grid-cols-2 gap-3 pt-1">
+                        <button id="undoStrokeBtn" class="py-3 px-4 kid-btn-warning text-sm sm:text-base font-black rounded-2xl flex items-center justify-center space-x-1.5">
+                            <span>↩️</span>
+                            <span>撤销一笔</span>
                         </button>
-                        <button id="clearWritingBtn" class="py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl active:scale-95 transition-all">
-                            🗑️ 清空重写
+                        <button id="clearWritingBtn" class="py-3 px-4 kid-btn-danger text-sm sm:text-base font-black rounded-2xl flex items-center justify-center space-x-1.5">
+                            <span>🗑️</span>
+                            <span>清空重写</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- 核对按钮 -->
-                <button id="showAnswerBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-2xl shadow-md active:scale-98 transition-all">
-                    写好了，核对本题
+                <!-- 大核对按钮 (醒目大绿键) -->
+                <button id="showAnswerBtn" class="w-full py-4 sm:py-4.5 kid-btn-success text-white font-black text-base sm:text-lg rounded-2xl shadow-lg">
+                    ✨ 写好了，核对本题
                 </button>
 
                 <!-- 答案核对面板 -->
-                <div id="answerPanel" class="bg-white p-4 rounded-2xl border border-gray-200/80 shadow-sm space-y-3 hidden">
-                    <p class="text-xs text-gray-500 text-center font-medium">请核对笔顺与字形，判断后进入下一题：</p>
+                <div id="answerPanel" class="bg-white p-4 sm:p-5 rounded-3xl border-2 border-slate-100 shadow-sm space-y-3.5 hidden">
+                    <p class="text-xs sm:text-sm text-slate-600 text-center font-bold">请核对笔顺与字形，判断后进入下一题：</p>
                     
                     <div class="grid grid-cols-2 gap-3 pt-1">
-                        <div class="p-2 bg-gray-50 rounded-xl border border-gray-200 text-center">
-                            <strong class="block text-[11px] text-gray-500 mb-1.5 font-semibold">孩子写的</strong>
-                            <img id="currentWritingPreview" class="w-full aspect-square object-contain rounded-lg bg-white hidden" alt="手写预览" />
+                        <div class="p-2.5 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center">
+                            <strong class="block text-xs text-slate-600 mb-2 font-black">孩子写的</strong>
+                            <img id="currentWritingPreview" class="w-full aspect-square object-contain rounded-xl bg-white hidden" alt="手写预览" />
                         </div>
-                        <div class="p-2 bg-gray-50 rounded-xl border border-gray-200 text-center flex flex-col justify-between">
-                            <strong class="block text-[11px] text-gray-500 mb-1.5 font-semibold">正确笔顺动画</strong>
+                        <div class="p-2.5 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center flex flex-col justify-between">
+                            <strong class="block text-xs text-slate-600 mb-2 font-black">正确笔顺动画</strong>
                             <div class="answer-stroke-grid">
                                 <div id="answerStrokeWriter" class="answer-stroke-writer"></div>
                                 <div id="answerStrokeStatus" class="stroke-status">准备动画中…</div>
                             </div>
-                            <button id="replayAnswerStrokeBtn" class="w-full mt-1 py-1 px-2 text-[11px] bg-white border border-gray-200 rounded-lg font-semibold text-gray-700" disabled>
-                                ▶️ 再看一遍
+                            <button id="replayAnswerStrokeBtn" class="w-full mt-1.5 py-2 px-3 text-xs sm:text-sm kid-btn-light rounded-xl font-black" disabled>
+                                ▶️ 再看一遍笔顺
                             </button>
                         </div>
                     </div>
 
-                    <div id="answerHint" class="text-xs text-center text-gray-500 font-medium"></div>
+                    <div id="answerHint" class="text-sm text-center text-slate-700 font-bold"></div>
 
-                    <div id="dictationEbHint" class="p-2.5 rounded-xl bg-indigo-50/70 border border-indigo-100 text-[11px] text-indigo-900 leading-relaxed text-center">
-                        <span class="font-bold">🧠 艾宾浩斯排期：</span>
+                    <div id="dictationEbHint" class="p-3 rounded-2xl bg-indigo-50/90 border border-indigo-100 text-xs sm:text-sm text-indigo-900 leading-relaxed text-center font-medium">
+                        <span class="font-black">🧠 记忆排期：</span>
                         <span id="dictationEbPredictText"></span>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 pt-1">
-                        <button id="wrongBtn" class="py-3 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-md transition-all">
-                            ❌ 记错/写错 (末尾重练)
+                    <!-- 两个超大判定按钮：错 / 对 -->
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <button id="wrongBtn" class="py-4 kid-btn-danger text-white font-black text-sm sm:text-base rounded-2xl shadow-lg">
+                            ❌ 记错/写错 (重练)
                         </button>
-                        <button id="correctBtn" class="py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-md transition-all">
-                            ✅ 写对啦 (Lv+1 顺延)
+                        <button id="correctBtn" class="py-4 kid-btn-success text-white font-black text-sm sm:text-base rounded-2xl shadow-lg">
+                            ✅ 写对啦 (顺延)
                         </button>
                     </div>
                 </div>
             </section>
 
 
-            <!-- ================= 看字认读界面 ================= -->
-            <section id="recognitionScreen" class="h-full flex flex-col space-y-3 hidden">
-                <div class="bg-white p-3.5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center justify-between">
-                    <div class="text-xs font-bold text-gray-800 flex items-center space-x-1">
+            <!-- ================= 看字认读界面 (大字卡片) ================= -->
+            <section id="recognitionScreen" class="h-full flex flex-col space-y-3.5 hidden">
+                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
+                    <div class="text-sm font-black text-slate-800 flex items-center space-x-1">
                         <span>👀 认读：第</span>
-                        <span id="recognitionCurrentNumber" class="text-indigo-600 font-bold">1</span>
+                        <span id="recognitionCurrentNumber" class="text-indigo-600 font-black text-base">1</span>
                         <span>/</span>
                         <span id="recognitionTotalNumber">10</span>
                         <span>题</span>
                         <span id="recognitionLevelBadge" class="level-badge">Lv.1</span>
                     </div>
-                    <button id="quitRecognitionBtn" class="text-xs px-2.5 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium active:scale-95 transition-all">
+                    <button id="quitRecognitionBtn" class="text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-95 transition-all">
                         退出本轮
                     </button>
                 </div>
 
-                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                    <div id="recognitionProgressBar" class="h-full bg-indigo-600 rounded-full transition-all duration-300" style="width: 10%"></div>
+                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                    <div id="recognitionProgressBar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full transition-all duration-300" style="width: 10%"></div>
                 </div>
 
-                <div class="flex-1 min-h-0 bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 flex flex-col items-center justify-center space-y-3">
-                    <p class="text-xs text-gray-400">先自己读一遍，再轻点汉字听标准发音</p>
+                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center space-y-4">
+                    <p class="text-xs sm:text-sm font-bold text-slate-400">先自己大声读一遍，再轻点汉字听标准发音：</p>
 
-                    <!-- 大汉字卡片 -->
-                    <button id="recognitionCharBtn" class="w-full max-w-[280px] aspect-square rounded-3xl bg-gradient-to-b from-indigo-50/50 to-white border-2 border-indigo-200 shadow-sm hover:shadow-md flex flex-col items-center justify-center active:scale-98 transition-all">
-                        <span id="recognitionChar" class="text-7xl sm:text-8xl font-black text-gray-900 leading-none"></span>
-                        <span id="recognitionTapTip" class="text-xs font-bold text-indigo-600 mt-3 flex items-center space-x-1">
+                    <!-- 大汉字卡片 (大字体、立体触感) -->
+                    <button id="recognitionCharBtn" class="w-full max-w-[280px] sm:max-w-[320px] aspect-square rounded-3xl bg-gradient-to-b from-indigo-50/70 to-white border-4 border-indigo-200/90 shadow-lg flex flex-col items-center justify-center active:scale-98 transition-all">
+                        <span id="recognitionChar" class="text-8xl sm:text-9xl font-black text-slate-900 leading-none hanzi-font"></span>
+                        <span id="recognitionTapTip" class="text-xs sm:text-sm font-black text-indigo-700 mt-4 px-4 py-1.5 rounded-full bg-indigo-100 flex items-center space-x-1 shadow-sm">
                             <span>🔊 点一下听读音</span>
                         </span>
                     </button>
 
-                    <!-- 展开的答案与判断面板 -->
-                    <div id="recognitionReveal" class="w-full max-w-sm space-y-2.5 text-center hidden pt-1">
-                        <div id="recognitionPinyin" class="text-2xl font-black text-indigo-600 tracking-wide"></div>
-                        <div id="recognitionHint" class="text-xs text-gray-500"></div>
+                    <!-- 展开的答案与判断面板 (大按钮) -->
+                    <div id="recognitionReveal" class="w-full max-w-sm space-y-3 text-center hidden pt-1">
+                        <div id="recognitionPinyin" class="text-3xl sm:text-4xl font-black text-indigo-600 tracking-wide"></div>
+                        <div id="recognitionHint" class="text-xs sm:text-sm font-bold text-slate-600"></div>
 
-                        <button id="recognitionReplayBtn" class="py-1.5 px-3 bg-gray-100 text-gray-700 rounded-xl text-xs font-semibold active:scale-95">
-                            🔊 再听一次
+                        <button id="recognitionReplayBtn" class="py-2 px-4 kid-btn-light text-slate-700 rounded-xl text-xs sm:text-sm font-bold">
+                            🔊 再听一次发音
                         </button>
 
-                        <div id="recognitionEbHint" class="p-2 rounded-xl bg-indigo-50/70 border border-indigo-100 text-[11px] text-indigo-900 leading-tight">
+                        <div id="recognitionEbHint" class="p-2.5 rounded-2xl bg-indigo-50/80 border border-indigo-100 text-xs text-indigo-900 leading-tight font-medium">
                             <span id="recognitionEbPredictText"></span>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2.5 pt-1">
-                            <button id="recognitionWrongBtn" class="py-2.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                        <div class="grid grid-cols-2 gap-3 pt-1">
+                            <button id="recognitionWrongBtn" class="py-3.5 kid-btn-danger text-white font-black text-sm sm:text-base rounded-2xl shadow-lg">
                                 ❌ 还不会读 (重练)
                             </button>
-                            <button id="recognitionCorrectBtn" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                            <button id="recognitionCorrectBtn" class="py-3.5 kid-btn-success text-white font-black text-sm sm:text-base rounded-2xl shadow-lg">
                                 ✅ 我会读 (顺延)
                             </button>
                         </div>
@@ -494,34 +513,34 @@
             </section>
 
 
-            <!-- ================= 随机阅读界面 ================= -->
-            <section id="storyScreen" class="h-full flex flex-col space-y-3 hidden">
-                <div class="bg-white p-3.5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center justify-between">
-                    <div class="text-xs font-bold text-gray-800 flex items-center space-x-1.5">
-                        <span>📖</span>
-                        <span>随机短文阅读</span>
+            <!-- ================= 趣味短文阅读界面 ================= -->
+            <section id="storyScreen" class="h-full flex flex-col space-y-3.5 hidden">
+                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
+                    <div class="text-sm font-black text-slate-800 flex items-center space-x-1.5">
+                        <span class="text-base">📖</span>
+                        <span>趣味短文阅读</span>
                     </div>
-                    <button id="quitStoryBtn" class="text-xs px-2.5 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium active:scale-95 transition-all">
+                    <button id="quitStoryBtn" class="text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-95 transition-all">
                         返回主页
                     </button>
                 </div>
 
-                <div class="flex-1 min-h-0 bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 flex flex-col justify-between space-y-4">
-                    <p class="text-xs text-gray-400 text-center">先试着朗读短文，遇到生字可打开拼音或听完整朗读</p>
+                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col justify-between space-y-4">
+                    <p class="text-xs sm:text-sm font-bold text-slate-400 text-center">试着朗读短文，遇到生字可打开拼音或听完整朗读：</p>
 
                     <div class="story-paper flex-1 flex flex-col justify-center">
                         <p id="storyText" class="story-text"></p>
                         <div id="storyPinyin" class="story-pinyin hidden"></div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2 pt-1">
-                        <button id="storyPinyinBtn" class="py-2.5 px-2 bg-gray-100 text-gray-700 text-xs font-bold rounded-xl active:scale-95 transition-all">
+                    <div class="grid grid-cols-3 gap-2.5 pt-1">
+                        <button id="storyPinyinBtn" class="py-3.5 px-2 kid-btn-light text-slate-700 text-xs sm:text-sm font-black rounded-2xl">
                             显示拼音
                         </button>
-                        <button id="storySpeakBtn" class="py-2.5 px-2 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-sm active:scale-95 transition-all">
+                        <button id="storySpeakBtn" class="py-3.5 px-2 kid-btn-primary text-white text-xs sm:text-sm font-black rounded-2xl shadow-sm">
                             🔊 听朗读
                         </button>
-                        <button id="storyNextBtn" class="py-2.5 px-2 bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-sm active:scale-95 transition-all">
+                        <button id="storyNextBtn" class="py-3.5 px-2 kid-btn-success text-white text-xs sm:text-sm font-black rounded-2xl shadow-sm">
                             🔄 换一篇
                         </button>
                     </div>
@@ -529,29 +548,29 @@
             </section>
 
 
-            <!-- ================= 笔画练习界面 ================= -->
-            <section id="strokeScreen" class="h-full flex flex-col space-y-3 hidden">
-                <div class="bg-white p-3.5 rounded-2xl border border-gray-200/80 shadow-sm flex items-center justify-between">
-                    <div class="text-xs font-bold text-gray-800 flex items-center space-x-1">
+            <!-- ================= 笔画笔顺临摹界面 ================= -->
+            <section id="strokeScreen" class="h-full flex flex-col space-y-3.5 hidden">
+                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
+                    <div class="text-sm font-black text-slate-800 flex items-center space-x-1">
                         <span>✍️ 笔画练习：第</span>
-                        <span id="strokeCurrentNumber" class="text-indigo-600 font-bold">1</span>
+                        <span id="strokeCurrentNumber" class="text-indigo-600 font-black text-base">1</span>
                         <span>/</span>
                         <span id="strokeTotalNumber">1</span>
                         <span>个字</span>
                     </div>
-                    <button id="quitStrokeBtn" class="text-xs px-2.5 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium active:scale-95 transition-all">
+                    <button id="quitStrokeBtn" class="text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-95 transition-all">
                         返回主页
                     </button>
                 </div>
 
-                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                    <div id="strokeProgressBar" class="h-full bg-indigo-600 rounded-full transition-all duration-300" style="width: 10%"></div>
+                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                    <div id="strokeProgressBar" class="h-full bg-gradient-to-r from-rose-500 to-indigo-600 rounded-full transition-all duration-300" style="width: 10%"></div>
                 </div>
 
-                <div class="flex-1 min-h-0 bg-white rounded-2xl border border-gray-200/80 shadow-sm p-4 flex flex-col items-center justify-center space-y-3">
+                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center space-y-4">
                     <div class="text-center">
-                        <strong id="strokePinyin" class="text-2xl font-black text-indigo-600 block"></strong>
-                        <span id="strokeHint" class="text-xs text-gray-500 mt-0.5 block"></span>
+                        <strong id="strokePinyin" class="text-3xl font-black text-indigo-600 block"></strong>
+                        <span id="strokeHint" class="text-xs sm:text-sm font-bold text-slate-500 mt-1 block"></span>
                     </div>
 
                     <div id="strokeGrid" class="stroke-grid">
@@ -559,11 +578,11 @@
                         <div id="strokeStatus" class="stroke-status">准备动画中…</div>
                     </div>
 
-                    <div class="w-full max-w-[320px] grid grid-cols-2 gap-2.5 pt-2">
-                        <button id="previousStrokeBtn" class="py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl active:scale-95 transition-all">
+                    <div class="w-full max-w-[340px] grid grid-cols-2 gap-3 pt-2">
+                        <button id="previousStrokeBtn" class="py-3.5 kid-btn-light text-slate-700 text-sm font-black rounded-2xl">
                             ← 上一字
                         </button>
-                        <button id="nextStrokeBtn" class="py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md active:scale-95 transition-all">
+                        <button id="nextStrokeBtn" class="py-3.5 kid-btn-primary text-white text-sm font-black rounded-2xl shadow-md">
                             下一字 →
                         </button>
                     </div>
@@ -573,8 +592,8 @@
 
             <!-- ================= 本轮完成结算界面 ================= -->
             <section id="summaryScreen" class="h-full flex flex-col justify-between space-y-4 hidden pb-4">
-                <div class="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm text-center space-y-3">
-                    <h2 class="text-lg font-bold text-gray-800">🎉 本轮练习完成！</h2>
+                <div class="bg-white rounded-3xl border-2 border-slate-100 p-5 sm:p-6 shadow-sm text-center space-y-3.5">
+                    <h2 class="text-xl font-black text-slate-800">🎉 本轮练习大通关！</h2>
 
                     <div id="scoreRing" class="score-ring">
                         <div class="score-ring-content">
@@ -583,19 +602,19 @@
                         </div>
                     </div>
 
-                    <p id="summaryMessage" class="text-xs text-gray-600 leading-relaxed max-w-xs mx-auto"></p>
+                    <p id="summaryMessage" class="text-sm sm:text-base font-bold text-slate-700 leading-relaxed max-w-xs mx-auto"></p>
 
                     <div id="resultList" class="max-h-48 overflow-y-auto py-2"></div>
                 </div>
 
-                <div class="space-y-2">
-                    <button id="continueDueBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md active:scale-98 transition-all hidden">
+                <div class="space-y-3">
+                    <button id="continueDueBtn" class="w-full py-4 kid-btn-primary text-white font-black text-base rounded-2xl shadow-lg hidden">
                         ⚡ 继续复习今日待复习汉字
                     </button>
-                    <button id="practiceWrongBtn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-sm active:scale-98 transition-all">
+                    <button id="practiceWrongBtn" class="w-full py-4 kid-btn-warning text-white font-black text-base rounded-2xl shadow-md">
                         再练本轮错字
                     </button>
-                    <button id="backHomeBtn" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl active:scale-98 transition-all">
+                    <button id="backHomeBtn" class="w-full py-3.5 kid-btn-light text-slate-700 font-black text-sm sm:text-base rounded-2xl">
                         返回练习首页
                     </button>
                 </div>
@@ -603,148 +622,148 @@
 
         </main>
 
-        <!-- App-like 统一底部导航栏 (同 index 和 Japanese 模块风格一致) -->
-        <nav id="hanziBottomNav" class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-gray-200/80 pb-[env(safe-area-inset-bottom)] z-20 select-none shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-            <div class="grid grid-cols-3 h-14 items-center">
+        <!-- 儿童友好加高底部导航栏 (更宽大好按的触控区域) -->
+        <nav id="hanziBottomNav" class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t-2 border-slate-100 pb-[env(safe-area-inset-bottom)] z-20 select-none shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
+            <div class="grid grid-cols-3 h-16 items-center">
                 <!-- 练习模式 -->
                 <button id="navTabPractice" type="button"
-                        class="flex flex-col items-center justify-center py-1 text-indigo-600 font-bold transition-all active:scale-95 touch-manipulation relative">
+                        class="flex flex-col items-center justify-center py-1 text-indigo-600 font-black transition-all active:scale-95 touch-manipulation relative">
                     <div class="relative flex items-center justify-center">
-                        <span class="text-xl scale-110">✍️</span>
-                        <span id="navDueBadge" class="hidden absolute -top-1 -right-3.5 px-1.5 min-w-[16px] h-4 bg-yellow-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm animate-pulse">
+                        <span class="text-xl sm:text-2xl scale-110">✍️</span>
+                        <span id="navDueBadge" class="hidden absolute -top-1 -right-4 px-1.5 min-w-[18px] h-4.5 bg-amber-500 text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-sm animate-pulse">
                             0
                         </span>
                     </div>
-                    <span class="text-[11px] mt-0.5 tracking-tight">练习模式</span>
-                    <span class="nav-indicator w-5 h-0.5 bg-indigo-600 rounded-full mt-0.5"></span>
+                    <span class="text-xs mt-0.5 font-bold tracking-tight">练习模式</span>
+                    <span class="nav-indicator w-6 h-1 bg-indigo-600 rounded-full mt-0.5"></span>
                 </button>
 
                 <!-- 错字本 -->
                 <button id="navTabWrong" type="button"
-                        class="flex flex-col items-center justify-center py-1 text-gray-400 hover:text-gray-600 font-medium transition-all active:scale-95 touch-manipulation relative">
+                        class="flex flex-col items-center justify-center py-1 text-slate-400 hover:text-slate-600 font-bold transition-all active:scale-95 touch-manipulation relative">
                     <div class="relative flex items-center justify-center">
-                        <span class="text-xl opacity-70">📕</span>
-                        <span id="navWrongBadge" class="hidden absolute -top-1 -right-3.5 px-1.5 min-w-[16px] h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
+                        <span class="text-xl sm:text-2xl opacity-75">📕</span>
+                        <span id="navWrongBadge" class="hidden absolute -top-1 -right-4 px-1.5 min-w-[18px] h-4.5 bg-rose-500 text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-sm">
                             0
                         </span>
                     </div>
-                    <span class="text-[11px] mt-0.5 tracking-tight">错字本</span>
-                    <span class="nav-indicator w-5 h-0.5 bg-transparent rounded-full mt-0.5"></span>
+                    <span class="text-xs mt-0.5 font-bold tracking-tight">错字本</span>
+                    <span class="nav-indicator w-6 h-1 bg-transparent rounded-full mt-0.5"></span>
                 </button>
 
                 <!-- 学习统计 -->
                 <button id="navTabStats" type="button"
-                        class="flex flex-col items-center justify-center py-1 text-gray-400 hover:text-gray-600 font-medium transition-all active:scale-95 touch-manipulation relative">
+                        class="flex flex-col items-center justify-center py-1 text-slate-400 hover:text-slate-600 font-bold transition-all active:scale-95 touch-manipulation relative">
                     <div class="relative flex items-center justify-center">
-                        <span class="text-xl opacity-70">📊</span>
+                        <span class="text-xl sm:text-2xl opacity-75">📊</span>
                     </div>
-                    <span class="text-[11px] mt-0.5 tracking-tight">学习统计</span>
-                    <span class="nav-indicator w-5 h-0.5 bg-transparent rounded-full mt-0.5"></span>
+                    <span class="text-xs mt-0.5 font-bold tracking-tight">学习统计</span>
+                    <span class="nav-indicator w-6 h-1 bg-transparent rounded-full mt-0.5"></span>
                 </button>
             </div>
         </nav>
 
-        <!-- 朗读设置弹窗 (Vant 4 移动端 Bottom Popup 风格) -->
+        <!-- 朗读设置弹窗 (儿童护航大按键设计) -->
         <div id="settingsModal" class="fixed inset-0 z-50 flex flex-col justify-end hidden">
             <div id="modalBackdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"></div>
-            <div class="relative w-full    mx-auto bg-white rounded-t-3xl shadow-2xl p-5 z-10 max-h-[85vh] flex flex-col overflow-y-auto space-y-4">
-                <div class="flex items-center justify-between border-b pb-3 pr-2">
-                    <h3 class="text-base font-bold text-gray-800 flex items-center space-x-1.5">
+            <div class="relative w-full mx-auto bg-white rounded-t-3xl shadow-2xl p-6 z-10 max-h-[85vh] flex flex-col overflow-y-auto space-y-4">
+                <div class="flex items-center justify-between border-b pb-3 pr-1">
+                    <h3 class="text-base font-black text-slate-800 flex items-center space-x-2">
                         <span>⚙️ 汉字语音朗读设置</span>
                     </h3>
-                    <button id="closeSettingsBtn" class="text-gray-400 hover:text-gray-600 text-xl font-bold leading-none p-1">
+                    <button id="closeSettingsBtn" class="text-slate-400 hover:text-slate-600 text-2xl font-black leading-none p-1">
                         &times;
                     </button>
                 </div>
 
-                <div class="space-y-3">
-                    <div class="space-y-1">
-                        <label for="speechMode" class="block text-xs font-semibold text-gray-700">朗读方式</label>
-                        <select id="speechMode" class="w-full text-xs bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-gray-800 font-medium outline-none">
-                            <option value="hint" selected>汉字 + 提示词 (例: 天，天空的天)</option>
+                <div class="space-y-3.5">
+                    <div class="space-y-1.5">
+                        <label for="speechMode" class="block text-xs sm:text-sm font-bold text-slate-700">朗读方式</label>
+                        <select id="speechMode" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold outline-none">
+                            <option value="hint" selected>汉字 + 提示词 (例: 天，天空的天，推荐)</option>
                             <option value="char">只读汉字 (例: 天)</option>
                             <option value="twice">汉字读两遍 (例: 天，天)</option>
                         </select>
-                        <small class="text-[11px] text-gray-400">建议选择“汉字 + 提示词”，听写更易辨别同音字</small>
+                        <small class="text-xs text-slate-400 font-medium block">提示词能帮助小朋友快速分清同音字（比如“清”和“青”）</small>
                     </div>
 
-                    <div class="space-y-1 pt-1">
-                        <label for="speechRate" class="block text-xs font-semibold text-gray-700">朗读语速</label>
-                        <select id="speechRate" class="w-full text-xs bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-gray-800 font-medium outline-none">
-                            <option value="0.65">很慢 (0.65x)</option>
-                            <option value="0.78" selected>较慢清晰 (0.78x，推荐)</option>
+                    <div class="space-y-1.5 pt-1">
+                        <label for="speechRate" class="block text-xs sm:text-sm font-bold text-slate-700">朗读语速</label>
+                        <select id="speechRate" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold outline-none">
+                            <option value="0.65">很慢 (0.65x 适合低年级小幼幼)</option>
+                            <option value="0.78" selected>较慢清晰 (0.78x，推荐小朋友)</option>
                             <option value="0.9">正常语速 (0.90x)</option>
                         </select>
                     </div>
 
                     <div class="pt-2">
-                        <button id="testSpeechBtn" type="button" class="w-full py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold text-xs rounded-xl active:scale-98">
-                            🔊 试听发音
+                        <button id="testSpeechBtn" type="button" class="w-full py-3 kid-btn-light font-black text-sm rounded-2xl">
+                            🔊 试听发音效果
                         </button>
                     </div>
                 </div>
 
                 <div class="pt-2 border-t">
-                    <button id="confirmSettingsBtn" type="button" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl active:scale-98 shadow-md">
+                    <button id="confirmSettingsBtn" type="button" class="w-full py-4 kid-btn-primary text-white font-black text-base rounded-2xl shadow-lg">
                         完成设置并关闭
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- 云端同步设置弹窗 (Vant 4 移动端 Bottom Popup 风格) -->
+        <!-- 云端同步设置弹窗 -->
         <div id="syncModal" class="fixed inset-0 z-50 flex flex-col justify-end hidden">
             <div id="syncModalBackdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"></div>
-            <div class="relative w-full    mx-auto bg-white rounded-t-3xl shadow-2xl p-5 z-10 max-h-[85vh] flex flex-col overflow-y-auto space-y-4">
-                <div class="flex items-center justify-between border-b pb-3 pr-2">
-                    <h3 class="text-base font-bold text-gray-800 flex items-center space-x-1.5">
-                        <span>☁️ Cloudflare 云端多端同步</span>
+            <div class="relative w-full mx-auto bg-white rounded-t-3xl shadow-2xl p-6 z-10 max-h-[85vh] flex flex-col overflow-y-auto space-y-4">
+                <div class="flex items-center justify-between border-b pb-3 pr-1">
+                    <h3 class="text-base font-black text-slate-800 flex items-center space-x-2">
+                        <span>☁️ 云端多端进度同步</span>
                     </h3>
-                    <button id="closeSyncBtn" class="text-gray-400 hover:text-gray-600 text-xl font-bold leading-none p-1">
+                    <button id="closeSyncBtn" class="text-slate-400 hover:text-slate-600 text-2xl font-black leading-none p-1">
                         &times;
                     </button>
                 </div>
 
-                <div class="space-y-3">
-                    <div class="space-y-1">
-                        <label for="syncKeyInput" class="block text-xs font-semibold text-gray-700">专属同步密钥 (Sync Key)</label>
-                        <input type="text" id="syncKeyInput" placeholder="输入任意个性化密码 (例如: mypass888)" autocomplete="off" spellcheck="false" class="w-full text-xs bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-gray-800 font-mono outline-none focus:border-indigo-500 focus:bg-white" />
-                        <p class="text-[11px] text-gray-400 leading-tight">
-                            💡 手机与电脑输入相同的密钥，学习进度即可通过 Cloudflare 边缘数据库打通！
+                <div class="space-y-3.5">
+                    <div class="space-y-1.5">
+                        <label for="syncKeyInput" class="block text-xs sm:text-sm font-bold text-slate-700">专属同步密钥 (Sync Key)</label>
+                        <input type="text" id="syncKeyInput" placeholder="输入专属同步口令 (例如: baby888)" autocomplete="off" spellcheck="false" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-mono outline-none focus:border-indigo-500 focus:bg-white" />
+                        <p class="text-xs text-slate-400 leading-tight font-medium">
+                            💡 手机、平板与电脑输入相同的密钥，学习进度即可自动打通！
                         </p>
                     </div>
 
-                    <div class="p-3 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-between">
+                    <div class="p-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50 flex items-center justify-between">
                         <div>
-                            <div class="text-xs font-semibold text-gray-800">开启练习后自动云同步</div>
-                            <div class="text-[11px] text-gray-400">完成练习打卡后自动推送保存</div>
+                            <div class="text-xs sm:text-sm font-bold text-slate-800">开启练习后自动云同步</div>
+                            <div class="text-xs text-slate-400 font-medium">打卡后自动保存学习进度</div>
                         </div>
-                        <input type="checkbox" id="autoSyncCheckbox" class="w-5 h-5 accent-indigo-600 rounded cursor-pointer" />
+                        <input type="checkbox" id="autoSyncCheckbox" class="w-6 h-6 accent-indigo-600 rounded-lg cursor-pointer" />
                     </div>
 
-                    <div class="space-y-2 pt-1">
-                        <button id="pushSyncBtn" type="button" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm active:scale-98">
-                            ⬆️ 立即将本地进度推送到云端备份
+                    <div class="space-y-2.5 pt-1">
+                        <button id="pushSyncBtn" type="button" class="w-full py-3.5 kid-btn-primary text-white font-black text-sm rounded-2xl shadow-sm">
+                            ⬆️ 立即将本地进度推送到云端
                         </button>
-                        <button id="pullSyncBtn" type="button" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl active:scale-98">
-                            ⬇️ 立即从云端拉取最新进度覆盖本地
+                        <button id="pullSyncBtn" type="button" class="w-full py-3.5 kid-btn-light text-slate-700 font-black text-sm rounded-2xl">
+                            ⬇️ 从云端拉取最新进度覆盖本地
                         </button>
                     </div>
 
-                    <div class="text-[11px] text-gray-600 bg-gray-50 p-2.5 rounded-xl space-y-1 border border-gray-100">
+                    <div class="text-xs text-slate-600 bg-slate-50 p-3 rounded-2xl space-y-1.5 border border-slate-200 font-medium">
                         <div class="flex justify-between">
                             <span>同步状态：</span>
                             <strong id="syncStatusLabel" class="sync-status-val">空闲</strong>
                         </div>
                         <div class="flex justify-between">
                             <span>上次同步时间：</span>
-                            <span id="lastSyncTimeLabel" class="text-gray-400 font-mono">未同步</span>
+                            <span id="lastSyncTimeLabel" class="text-slate-400 font-mono">未同步</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="pt-2 border-t">
-                    <button id="confirmSyncBtn" type="button" class="w-full py-3 bg-gray-900 text-white font-bold text-sm rounded-xl active:scale-98">
+                    <button id="confirmSyncBtn" type="button" class="w-full py-4 bg-slate-800 hover:bg-slate-900 text-white font-black text-sm sm:text-base rounded-2xl">
                         关闭
                     </button>
                 </div>
