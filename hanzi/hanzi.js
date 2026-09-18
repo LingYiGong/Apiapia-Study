@@ -1021,16 +1021,16 @@ function renderAnswerStroke(char) {
         padding: Math.round(size * 0.08),
         showOutline: true,
         showCharacter: false,
-        strokeColor: "#20242c",
+        strokeColor: "#1e293b",
         outlineColor: "#d7dbe3",
         strokeAnimationSpeed: 0.8,
         delayBetweenStrokes: 400,
-        delayBetweenLoops: 1200,
+        delayBetweenLoops: 2000,
         onLoadCharDataSuccess: () => {
             if (renderToken !== state.answerStrokeRenderToken) return;
             els.answerStrokeStatus.classList.add("hidden");
             els.replayAnswerStrokeBtn.disabled = false;
-            state.answerStrokeWriter.animateCharacter();
+            state.answerStrokeWriter.loopCharacterAnimation();
         },
         onLoadCharDataError: () => {
             if (renderToken !== state.answerStrokeRenderToken) return;
@@ -1042,7 +1042,7 @@ function renderAnswerStroke(char) {
 function replayAnswerStroke() {
     if (!state.answerStrokeWriter) return;
     state.answerStrokeWriter.cancelQuiz?.();
-    state.answerStrokeWriter.animateCharacter();
+    state.answerStrokeWriter.loopCharacterAnimation();
 }
 
 function renderReview() {
