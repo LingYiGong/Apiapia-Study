@@ -618,8 +618,8 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_78",
     "word": "入る",
-    "kana": "いる",
-    "meaning": "进入；需要",
+    "kana": "はいる",
+    "meaning": "进入",
     "level": 0,
     "next_review_date": 1789530199425
   },
@@ -921,7 +921,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_116",
-    "word": "热",
+    "word": "熱",
     "kana": "ねつ",
     "meaning": "发烧，发热",
     "level": 0,
@@ -1098,7 +1098,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_138",
     "word": "聞く",
-    "kana": "きき",
+    "kana": "きく",
     "meaning": "听，问",
     "level": 0,
     "next_review_date": 1789530199425
@@ -1106,7 +1106,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_139",
     "word": "ポスト",
-    "kana": "ぼすと",
+    "kana": "ぽすと",
     "meaning": "邮箱，邮筒",
     "level": 0,
     "next_review_date": 1789530199425
@@ -1145,7 +1145,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_144",
-    "word": "亿",
+    "word": "億",
     "kana": "おく",
     "meaning": "亿",
     "level": 0,
@@ -1218,7 +1218,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_153",
     "word": "準備",
-    "kana": "じゅうび",
+    "kana": "じゅんび",
     "meaning": "准备",
     "level": 0,
     "next_review_date": 1789530199425
@@ -1241,7 +1241,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_156",
-    "word": "說明",
+    "word": "説明",
     "kana": "せつめい",
     "meaning": "说明，解释",
     "level": 0,
@@ -1281,7 +1281,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_161",
-    "word": "停车场",
+    "word": "駐車場",
     "kana": "ちゅうしゃじょう",
     "meaning": "停车场",
     "level": 0,
@@ -1289,7 +1289,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_162",
-    "word": "桥",
+    "word": "橋",
     "kana": "はし",
     "meaning": "桥",
     "level": 0,
@@ -1457,7 +1457,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_183",
-    "word": "意见",
+    "word": "意見",
     "kana": "いけん",
     "meaning": "意见，看法",
     "level": 0,
@@ -1737,7 +1737,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_218",
-    "word": "练习",
+    "word": "練習",
     "kana": "れんしゅう",
     "meaning": "练习",
     "level": 0,
@@ -1777,7 +1777,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_223",
-    "word": "课长",
+    "word": "課長",
     "kana": "かちょう",
     "meaning": "课长，科长",
     "level": 0,
@@ -1793,7 +1793,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_225",
-    "word": "日记",
+    "word": "日記",
     "kana": "にっき",
     "meaning": "日记",
     "level": 0,
@@ -1809,7 +1809,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_227",
-    "word": "现金",
+    "word": "現金",
     "kana": "げんきん",
     "meaning": "现金",
     "level": 0,
@@ -1953,7 +1953,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_245",
-    "word": "经济",
+    "word": "経済",
     "kana": "けいざい",
     "meaning": "经济",
     "level": 0,
@@ -2025,7 +2025,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_254",
-    "word": "见学",
+    "word": "見学",
     "kana": "けんがく",
     "meaning": "参观学习",
     "level": 0,
@@ -2113,7 +2113,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_265",
-    "word": "风邪",
+    "word": "風邪",
     "kana": "かぜ",
     "meaning": "感冒",
     "level": 0,
@@ -2129,7 +2129,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_267",
-    "word": "禁烟",
+    "word": "禁煙",
     "kana": "きんえん",
     "meaning": "禁烟",
     "level": 0,
@@ -2137,7 +2137,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_268",
-    "word": "问题",
+    "word": "問題",
     "kana": "もんだい",
     "meaning": "问题",
     "level": 0,
@@ -2289,7 +2289,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_287",
-    "word": "服务",
+    "word": "サービス",
     "kana": "さーびす",
     "meaning": "服务，折价售物",
     "level": 0,
@@ -2985,7 +2985,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_374",
-    "word": "时々",
+    "word": "時々",
     "kana": "ときどき",
     "meaning": "有时，偶尔",
     "level": 0,
@@ -3194,7 +3194,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_400",
     "word": "サンドイッチ",
-    "kana": "sandwicchi",
+    "kana": "さんどいっち",
     "meaning": "三明治",
     "level": 0,
     "next_review_date": 1789530199425
@@ -4394,7 +4394,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_550",
     "word": "宿題",
-    "kana": "しゅうだい",
+    "kana": "しゅくだい",
     "meaning": "作业",
     "level": 0,
     "next_review_date": 1789530199426
@@ -4945,7 +4945,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_619",
-    "word": "毎晚",
+    "word": "毎晩",
     "kana": "まいばん",
     "meaning": "每晚",
     "level": 0,
@@ -4977,7 +4977,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_623",
-    "word": "今晚",
+    "word": "今晩",
     "kana": "こんばん",
     "meaning": "今晚",
     "level": 0,
@@ -5001,7 +5001,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_626",
-    "word": "晚",
+    "word": "晩",
     "kana": "ばん",
     "meaning": "晚上",
     "level": 0,
@@ -5073,7 +5073,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_635",
-    "word": "时",
+    "word": "時",
     "kana": "じ",
     "meaning": "点（小时）",
     "level": 0,
@@ -5105,7 +5105,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_639",
-    "word": "银行",
+    "word": "銀行",
     "kana": "ぎんこう",
     "meaning": "银行",
     "level": 0,
@@ -5401,7 +5401,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_676",
-    "word": "英语",
+    "word": "英語",
     "kana": "えいご",
     "meaning": "英语",
     "level": 0,
@@ -5450,7 +5450,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_682",
     "word": "コンピューター",
-    "kana": "こんびゅーたー",
+    "kana": "こんぴゅーたー",
     "meaning": "计算机、电脑",
     "level": 0,
     "next_review_date": 1789530199426
@@ -5505,7 +5505,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_689",
-    "word": "伞",
+    "word": "傘",
     "kana": "かさ",
     "meaning": "伞、雨伞",
     "level": 0,
@@ -5705,7 +5705,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_714",
-    "word": "歲",
+    "word": "歳",
     "kana": "さい",
     "meaning": "岁",
     "level": 0,
@@ -6242,7 +6242,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_781",
     "word": "そして",
-    "kana": "および",
+    "kana": "そして",
     "meaning": "而且、并且；以及 / 而且、然后 [连接词]",
     "level": 0,
     "next_review_date": 1789530199426
@@ -6265,7 +6265,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_784",
-    "word": "习う",
+    "word": "習う",
     "kana": "ならう",
     "meaning": "学习、练习",
     "level": 0,
@@ -6426,7 +6426,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_804",
     "word": "心から",
-    "kana": "しんから",
+    "kana": "こころから",
     "meaning": "由衷地，打心底里",
     "level": 0,
     "next_review_date": 1789530199426
@@ -6505,7 +6505,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_814",
-    "word": "紧张",
+    "word": "緊張",
     "kana": "きんちょう",
     "meaning": "紧张",
     "level": 0,
@@ -7321,7 +7321,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_916",
-    "word": "谢る",
+    "word": "謝る",
     "kana": "あやまる",
     "meaning": "道歉，认错",
     "level": 0,
@@ -7353,7 +7353,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_920",
-    "word": "淚",
+    "word": "涙",
     "kana": "なみだ",
     "meaning": "眼泪，泪水",
     "level": 0,
@@ -7537,7 +7537,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_943",
-    "word": "减る",
+    "word": "減る",
     "kana": "へる",
     "meaning": "减少",
     "level": 0,
@@ -7625,7 +7625,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_954",
-    "word": "计算",
+    "word": "計算",
     "kana": "けいさん",
     "meaning": "计算",
     "level": 0,
@@ -7665,7 +7665,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_959",
-    "word": "陆",
+    "word": "陸",
     "kana": "りく",
     "meaning": "陆地",
     "level": 0,
@@ -7865,7 +7865,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_984",
-    "word": "お见舞い",
+    "word": "お見舞い",
     "kana": "おみまい",
     "meaning": "探望，慰问；慰问品",
     "level": 0,
@@ -8481,7 +8481,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1061",
-    "word": "诱う",
+    "word": "誘う",
     "kana": "さそう",
     "meaning": "邀请，约请",
     "level": 0,
@@ -8658,7 +8658,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_1083",
     "word": "それなら",
-    "kana": "それでは",
+    "kana": "それなら",
     "meaning": "如果是那样的话，要是那样",
     "level": 0,
     "next_review_date": 1789530199426
@@ -8713,7 +8713,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1090",
-    "word": "タベ",
+    "word": "夕べ",
     "kana": "ゆうべ",
     "meaning": "昨晚，昨夜",
     "level": 0,
@@ -8897,7 +8897,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1113",
-    "word": "规则",
+    "word": "規則",
     "kana": "きそく",
     "meaning": "规则，规章",
     "level": 0,
@@ -9033,7 +9033,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1130",
-    "word": "东",
+    "word": "東",
     "kana": "ひがし",
     "meaning": "东，东方",
     "level": 0,
@@ -9433,7 +9433,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1180",
-    "word": "针",
+    "word": "針",
     "kana": "はり",
     "meaning": "针，指针",
     "level": 0,
@@ -9930,7 +9930,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_1242",
     "word": "間に合う",
-    "kana": "まニアう",
+    "kana": "まにあう",
     "meaning": "赶得上，来得及",
     "level": 0,
     "next_review_date": 1789530199426
@@ -10481,7 +10481,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1311",
-    "word": "感谢",
+    "word": "感謝",
     "kana": "かんしゃ",
     "meaning": "感谢",
     "level": 0,
@@ -10617,7 +10617,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1328",
-    "word": "锅",
+    "word": "鍋",
     "kana": "なべ",
     "meaning": "锅",
     "level": 0,
@@ -10929,7 +10929,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1367",
-    "word": "知识",
+    "word": "知識",
     "kana": "ちしき",
     "meaning": "知识",
     "level": 0,
@@ -11097,7 +11097,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1388",
-    "word": "表现",
+    "word": "表現",
     "kana": "ひょうげん",
     "meaning": "表现，表达",
     "level": 0,
@@ -11250,7 +11250,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_1407",
     "word": "理由",
-    "kana": "りゅう",
+    "kana": "りゆう",
     "meaning": "理由，原因 / 理由、原因 [IT面试]",
     "level": 0,
     "next_review_date": 1789530199427
@@ -11265,7 +11265,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1409",
-    "word": "間違い电话",
+    "word": "間違い電話",
     "kana": "まちがいでんわ",
     "meaning": "打错的电话",
     "level": 0,
@@ -11385,7 +11385,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1424",
-    "word": "天气予報",
+    "word": "天気予報",
     "kana": "てんきよほう",
     "meaning": "天气预报",
     "level": 0,
@@ -11473,7 +11473,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1435",
-    "word": "论文",
+    "word": "論文",
     "kana": "ろんぶん",
     "meaning": "论文",
     "level": 0,
@@ -11538,7 +11538,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_1443",
     "word": "ピラミッド",
-    "kana": "ぴらみっと",
+    "kana": "ぴらみっど",
     "meaning": "金字塔",
     "level": 0,
     "next_review_date": 1789530199427
@@ -11569,7 +11569,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1447",
-    "word": "调查",
+    "word": "調査",
     "kana": "ちょうさ",
     "meaning": "调查",
     "level": 0,
@@ -11593,7 +11593,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1450",
-    "word": "变",
+    "word": "変",
     "kana": "へん",
     "meaning": "奇怪，反常",
     "level": 0,
@@ -11610,14 +11610,14 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_1452",
     "word": "一生懸命",
-    "kana": "いっしょけんめい",
+    "kana": "いっしょうけんめい",
     "meaning": "拼命，努力，竭尽全力",
     "level": 0,
     "next_review_date": 1789530199427
   },
   {
     "id": "w_1453",
-    "word": "年齡",
+    "word": "年齢",
     "kana": "ねんれい",
     "meaning": "年龄",
     "level": 0,
@@ -11937,7 +11937,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1493",
-    "word": "发音",
+    "word": "発音",
     "kana": "はつおん",
     "meaning": "发音",
     "level": 0,
@@ -12033,7 +12033,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1505",
-    "word": "歷史",
+    "word": "歴史",
     "kana": "れきし",
     "meaning": "历史",
     "level": 0,
@@ -12385,7 +12385,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1549",
-    "word": "事",
+    "word": "火事",
     "kana": "かじ",
     "meaning": "火灾（火事）",
     "level": 0,
@@ -12473,7 +12473,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1560",
-    "word": "电源",
+    "word": "電源",
     "kana": "でんげん",
     "meaning": "电源",
     "level": 0,
@@ -12481,7 +12481,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1561",
-    "word": "书类",
+    "word": "書類",
     "kana": "しょるい",
     "meaning": "文件，资料",
     "level": 0,
@@ -12522,7 +12522,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_1566",
     "word": "ドミニカ",
-    "kana": "とみにか",
+    "kana": "どみにか",
     "meaning": "多米尼加",
     "level": 0,
     "next_review_date": 1789530199427
@@ -12697,7 +12697,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1588",
-    "word": "失败",
+    "word": "失敗",
     "kana": "しっぱい",
     "meaning": "失败",
     "level": 0,
@@ -12913,7 +12913,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1615",
-    "word": "许可",
+    "word": "許可",
     "kana": "きょか",
     "meaning": "许可，准许",
     "level": 0,
@@ -12921,7 +12921,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1616",
-    "word": "岛",
+    "word": "島",
     "kana": "しま",
     "meaning": "岛，岛屿",
     "level": 0,
@@ -13049,7 +13049,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1632",
-    "word": "电子",
+    "word": "電子",
     "kana": "でんし",
     "meaning": "电子",
     "level": 0,
@@ -13057,7 +13057,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1633",
-    "word": "剑道",
+    "word": "剣道",
     "kana": "けんどう",
     "meaning": "剑道",
     "level": 0,
@@ -13130,7 +13130,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_1642",
     "word": "正しい",
-    "kana": "ただし",
+    "kana": "ただしい",
     "meaning": "正确的",
     "level": 0,
     "next_review_date": 1789530199427
@@ -13201,7 +13201,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1651",
-    "word": "鸟肉",
+    "word": "鳥肉",
     "kana": "とりにく",
     "meaning": "鸡肉，禽肉",
     "level": 0,
@@ -13218,7 +13218,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_1653",
     "word": "これでいいですか",
-    "kana": "これでいーですか",
+    "kana": "これでいいですか",
     "meaning": "这样可以吗？",
     "level": 0,
     "next_review_date": 1789530199427
@@ -13241,7 +13241,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1656",
-    "word": "說明書",
+    "word": "説明書",
     "kana": "せつめいしょ",
     "meaning": "说明书",
     "level": 0,
@@ -13313,7 +13313,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1665",
-    "word": "线",
+    "word": "線",
     "kana": "せん",
     "meaning": "线，线路",
     "level": 0,
@@ -13817,7 +13817,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1728",
-    "word": "小說",
+    "word": "小説",
     "kana": "しょうせつ",
     "meaning": "小说",
     "level": 0,
@@ -13897,7 +13897,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1738",
-    "word": "小說家",
+    "word": "小説家",
     "kana": "しょうせつか",
     "meaning": "小说家",
     "level": 0,
@@ -13913,7 +13913,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1740",
-    "word": "谁でも",
+    "word": "誰でも",
     "kana": "だれでも",
     "meaning": "任何人，谁都",
     "level": 0,
@@ -13929,7 +13929,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1742",
-    "word": "昼间",
+    "word": "昼間",
     "kana": "ひるま",
     "meaning": "白天，白昼",
     "level": 0,
@@ -14049,8 +14049,8 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1757",
-    "word": "后",
-    "kana": "こ",
+    "word": "～後",
+    "kana": "～ご",
     "meaning": "……之后，……后（～ご）",
     "level": 0,
     "next_review_date": 1789530199427
@@ -14241,7 +14241,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1781",
-    "word": "场所",
+    "word": "場所",
     "kana": "ばしょ",
     "meaning": "场所，地方",
     "level": 0,
@@ -14249,7 +14249,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1782",
-    "word": "运动会",
+    "word": "運動会",
     "kana": "うんどうかい",
     "meaning": "运动会",
     "level": 0,
@@ -14257,7 +14257,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1783",
-    "word": "新闻社",
+    "word": "新聞社",
     "kana": "しんぶんしゃ",
     "meaning": "报社",
     "level": 0,
@@ -15296,4 +15296,5 @@ window.BUILTIN_VOCAB = [
     "next_review_date": 1789540373343
   }
 ];
+
 window.BUILTIN_VOCAB_ALL = window.BUILTIN_VOCAB;

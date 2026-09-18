@@ -177,18 +177,29 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                         let hasChanges = false;
                         // Auto-fill missing meanings and append new built-in vocabulary
                         if (window.BUILTIN_VOCAB_ALL && Array.isArray(window.BUILTIN_VOCAB_ALL)) {
-                            const existingWordMap = new Map();
+                            const idMap = new Map();
                             loadedWords.forEach(w => {
+                                if (w.id) idMap.set(w.id, w);
                                 existingWordMap.set(`${w.word}__${w.kana}`, w);
                                 existingWordMap.set(w.word, w);
                             });
 
                             window.BUILTIN_VOCAB_ALL.forEach(item => {
-                                const exist = existingWordMap.get(`${item.word}__${item.kana}`) || existingWordMap.get(item.word);
+                                const exist = (item.id && idMap.get(item.id)) || existingWordMap.get(`${item.word}__${item.kana}`) || existingWordMap.get(item.word);
                                 if (exist) {
                                     if (!exist.meaning || exist.meaning.trim() === '') {
                                         exist.meaning = item.meaning;
                                         hasChanges = true;
+                                    }
+                                    if (exist.id === item.id) {
+                                        if (exist.kana !== item.kana) {
+                                            exist.kana = item.kana;
+                                            hasChanges = true;
+                                        }
+                                        if (exist.word !== item.word) {
+                                            exist.word = item.word;
+                                            hasChanges = true;
+                                        }
                                     }
                                 } else {
                                     loadedWords.push({
@@ -196,6 +207,7 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                                         level: 0,
                                         next_review_date: Date.now()
                                     });
+                                    if (item.id) idMap.set(item.id, item);
                                     existingWordMap.set(`${item.word}__${item.kana}`, item);
                                     existingWordMap.set(item.word, item);
                                     hasChanges = true;

@@ -54,7 +54,6 @@ window.BUILTIN_SENTENCES = [
     "chinese": "这是词典还是杂志？",
     "words": [
       "これ",
-      "辞书",
       "辞書",
       "雑誌"
     ],
@@ -3047,4 +3046,5 @@ window.BUILTIN_SENTENCES = [
     "next_review_date": 1789540373343
   }
 ];
+
 window.BUILTIN_SENTENCES_ALL = window.BUILTIN_SENTENCES;
