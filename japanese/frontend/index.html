@@ -989,24 +989,28 @@
                     
                     <!-- 顶栏信息与退出按钮 -->
                     <div class="bg-white p-3.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between flex-shrink-0">
-                        <div class="text-sm font-black text-slate-800 flex items-center space-x-1.5">
+                        <div class="text-sm font-black text-slate-800 flex items-center space-x-1.5 flex-wrap gap-y-1">
                             <span class="text-indigo-600">假名听写</span>
                             <span>：第</span>
                             <span class="text-indigo-600 font-black text-base font-mono">{{ currentKanaQuestionNumber }}</span>
                             <span>/</span>
                             <span class="font-mono">{{ totalKanaQuestions }}</span>
                             <span>题</span>
+                            <!-- 剩余题数徽章 -->
+                            <span class="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full border border-slate-200">
+                                剩 {{ kanaRemainingCount }} 题
+                            </span>
                             <!-- 模式徽章 -->
                             <span v-if="currentKanaItem && currentKanaItem.targetType === 'katakana'"
-                                  class="text-xs bg-amber-100 text-amber-800 font-black px-2 py-0.5 rounded-full border border-amber-200 ml-1">
+                                  class="text-xs bg-amber-100 text-amber-800 font-black px-2 py-0.5 rounded-full border border-amber-200">
                                 ⚡ 片假名
                             </span>
                             <span v-else-if="currentKanaItem && currentKanaItem.targetType === 'hiragana'"
-                                  class="text-xs bg-indigo-100 text-indigo-800 font-black px-2 py-0.5 rounded-full border border-indigo-200 ml-1">
+                                  class="text-xs bg-indigo-100 text-indigo-800 font-black px-2 py-0.5 rounded-full border border-indigo-200">
                                 🌸 平假名
                             </span>
                             <span v-else-if="currentKanaItem && currentKanaItem.targetType === 'conversion'"
-                                  class="text-xs bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded-full border border-emerald-200 ml-1">
+                                  class="text-xs bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded-full border border-emerald-200">
                                 🔄 {{ currentKanaItem.conversionDirection === 'hira_to_kata' ? '平 ➔ 片' : '片 ➔ 平' }}
                             </span>
                         </div>
@@ -1102,20 +1106,28 @@
                     
                     <!-- 顶栏状态 -->
                     <div class="bg-white p-3.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between flex-shrink-0">
-                        <div class="text-sm font-black text-slate-800 flex items-center space-x-1.5">
+                        <div class="text-sm font-black text-slate-800 flex items-center space-x-1.5 flex-wrap gap-y-1">
                             <span class="text-indigo-600">答案核对</span>
                             <span>：第</span>
                             <span class="text-indigo-600 font-black text-base font-mono">{{ currentKanaQuestionNumber }}</span>
                             <span>/</span>
                             <span class="font-mono">{{ totalKanaQuestions }}</span>
                             <span>题</span>
+                            <!-- 剩余题数徽章 -->
+                            <span class="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full border border-slate-200">
+                                剩 {{ kanaRemainingCount }} 题
+                            </span>
                             <span v-if="currentKanaItem && currentKanaItem.targetType === 'katakana'"
-                                  class="text-xs bg-amber-100 text-amber-800 font-black px-2 py-0.5 rounded-full border border-amber-200 ml-1">
+                                  class="text-xs bg-amber-100 text-amber-800 font-black px-2 py-0.5 rounded-full border border-amber-200">
                                 ⚡ 片假名
                             </span>
-                            <span v-else
-                                  class="text-xs bg-indigo-100 text-indigo-800 font-black px-2 py-0.5 rounded-full border border-indigo-200 ml-1">
+                            <span v-else-if="currentKanaItem && currentKanaItem.targetType === 'hiragana'"
+                                  class="text-xs bg-indigo-100 text-indigo-800 font-black px-2 py-0.5 rounded-full border border-indigo-200">
                                 🌸 平假名
+                            </span>
+                            <span v-else-if="currentKanaItem && currentKanaItem.targetType === 'conversion'"
+                                  class="text-xs bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded-full border border-emerald-200">
+                                🔄 {{ currentKanaItem.conversionDirection === 'hira_to_kata' ? '平 ➔ 片' : '片 ➔ 平' }}
                             </span>
                         </div>
                         <button type="button" @click="quitKanaPractice"

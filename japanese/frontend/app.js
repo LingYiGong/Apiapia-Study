@@ -1735,6 +1735,25 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     }
                 });
 
+                const currentKanaQuestionNumber = computed(() => {
+                    if (!kanaSession.value || kanaSession.value.length === 0) return 0;
+                    return kanaCurrentIndex.value + 1;
+                });
+
+                const totalKanaQuestions = computed(() => {
+                    return kanaSession.value ? kanaSession.value.length : 0;
+                });
+
+                const kanaRemainingCount = computed(() => {
+                    if (!kanaSession.value || kanaSession.value.length === 0) return 0;
+                    return Math.max(0, kanaSession.value.length - (kanaCurrentIndex.value + 1));
+                });
+
+                const kanaProgressPercent = computed(() => {
+                    if (!kanaSession.value || kanaSession.value.length === 0) return 0;
+                    return Math.min(100, Math.round(((kanaCurrentIndex.value + 1) / kanaSession.value.length) * 100));
+                });
+
                 const kanaAccuracyRate = computed(() => {
                     if (kanaAnswers.value.length === 0) return 0;
                     const correct = kanaAnswers.value.filter(a => a.isCorrect).length;
@@ -2252,6 +2271,10 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     kanaPracticeState,
                     kanaSession,
                     kanaCurrentIndex,
+                    currentKanaQuestionNumber,
+                    totalKanaQuestions,
+                    kanaRemainingCount,
+                    kanaProgressPercent,
                     kanaAnswers,
                     kanaWrongList,
                     currentKanaItem,
