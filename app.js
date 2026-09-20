@@ -1,26 +1,32 @@
-// 动态适配移动端浏览器（Safari / Chrome）地址栏展开/收起时的实际可视高度
-(function() {
-    function updateAppHeight() {
-        var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-        document.documentElement.style.setProperty('--app-height', h + 'px');
-    }
-    window.addEventListener('resize', updateAppHeight);
-    window.addEventListener('orientationchange', updateAppHeight);
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', updateAppHeight);
-    }
-    updateAppHeight();
-})();
-
 // Vue 3 + Vant 4 业务逻辑
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
-const CURRENT_VERSION = '1.0.6';
+// 当前客户端内置基线版本号
+const BUILD_VERSION = '1.0.9';
+
+// Semver 版本比较辅助函数 (remote > current 返回 true)
+function isNewerVersion(remote, current) {
+    if (!remote || !current) return false;
+    const rParts = remote.split('.').map(num => parseInt(num, 10) || 0);
+    const cParts = current.split('.').map(num => parseInt(num, 10) || 0);
+    for (let i = 0; i < Math.max(rParts.length, cParts.length); i++) {
+        const r = rParts[i] || 0;
+        const c = cParts[i] || 0;
+        if (r > c) return true;
+        if (r < c) return false;
+    }
+    return false;
+}
 
 const app = createApp({
     setup() {
-        // 当前版本与自动更新状态 (方案 C: 自动比对 version.json)
-        const appVersion = ref(CURRENT_VERSION);
+        // 当前版本与自动更新状态 (优先取本地已确认的最新版本，缺省采用 BUILD_VERSION)
+        const storedVersion = localStorage.getItem('study_hub_version');
+        // 若内置版本高于本地缓存版本，自动进位
+        const initialVersion = isNewerVersion(BUILD_VERSION, storedVersion) ? BUILD_VERSION : (storedVersion || BUILD_VERSION);
+        localStorage.setItem('study_hub_version', initialVersion);
+
+        const appVersion = ref(initialVersion);
         const hasUpdate = ref(false);
         const latestVersion = ref('');
         const isChecking = ref(false);
@@ -35,21 +41,31 @@ const app = createApp({
                 });
                 if (!res.ok) throw new Error('网络请求异常');
                 const data = await res.json();
-                if (data && data.version && data.version !== CURRENT_VERSION) {
-                    latestVersion.value = data.version;
+                const serverVersion = (data && data.version) ? data.version.trim() : '';
+
+                if (serverVersion && isNewerVersion(serverVersion, appVersion.value)) {
+                    latestVersion.value = serverVersion;
                     hasUpdate.value = true;
                     if (isManual) {
                         if (window.kidToast) {
-                            window.kidToast(`🎉 发现新版本 v${data.version}！请点击上方更新`, 'warning');
+                            window.kidToast(`🎉 发现新版本 v${serverVersion}！请点击上方更新`, 'warning');
                         } else if (window.vant && window.vant.showNotify) {
-                            window.vant.showNotify({ type: 'warning', message: `🎉 发现新版本 v${data.version}！请点击上方更新` });
+                            window.vant.showNotify({ type: 'warning', message: `🎉 发现新版本 v${serverVersion}！请点击上方更新` });
                         }
                     }
-                } else if (isManual) {
-                    if (window.kidToast) {
-                        window.kidToast('已经是最新版本啦 ✨ 跟着猫咪 Apiapia 一起闯关吧！', 'success');
-                    } else if (window.vant && window.vant.showToast) {
-                        window.vant.showToast({ message: '已经是最新版本啦 ✨ 跟着猫咪 Apiapia 一起闯关吧！', icon: 'passed' });
+                } else {
+                    hasUpdate.value = false;
+                    // 同步记录为当前版本
+                    if (serverVersion && !isNewerVersion(appVersion.value, serverVersion)) {
+                        appVersion.value = serverVersion;
+                        localStorage.setItem('study_hub_version', serverVersion);
+                    }
+                    if (isManual) {
+                        if (window.kidToast) {
+                            window.kidToast(`已经是最新版本啦 ✨ (v${appVersion.value}) 跟着猫咪 Apiapia 一起闯关吧！`, 'success');
+                        } else if (window.vant && window.vant.showToast) {
+                            window.vant.showToast({ message: `已经是最新版本啦 ✨ (v${appVersion.value}) 跟着猫咪 Apiapia 一起闯关吧！`, icon: 'passed' });
+                        }
                     }
                 }
             } catch (e) {
@@ -70,10 +86,29 @@ const app = createApp({
             checkForUpdates(true);
         };
 
-        const applyUpdate = () => {
-            // 强制带最新时间戳重定向，彻底击穿 Safari / PWA 磁盘缓存
+        const applyUpdate = async () => {
+            const targetVer = latestVersion.value || appVersion.value;
+            try {
+                // 1. 本地立即记录最新版本，确保页面重载后直观显示新版本号
+                if (targetVer) {
+                    localStorage.setItem('study_hub_version', targetVer);
+                    appVersion.value = targetVer;
+                }
+                hasUpdate.value = false;
+
+                // 2. 清理 CacheStorage（若有 ServiceWorker 或浏览器文件强缓存）
+                if (window.caches) {
+                    const cacheKeys = await window.caches.keys();
+                    await Promise.all(cacheKeys.map(k => window.caches.delete(k)));
+                }
+            } catch (e) {
+                console.warn('清理更新缓存异常:', e);
+            }
+
+            // 3. 强制携带最新版本与时间戳重载，彻底击穿 Safari / PWA 磁盘缓存
             const url = new URL(window.location.href);
-            url.searchParams.set('_v', Date.now().toString());
+            url.searchParams.set('_v', targetVer || Date.now().toString());
+            url.searchParams.set('_t', Date.now().toString());
             window.location.replace(url.toString());
         };
 

@@ -19,52 +19,16 @@
     <link rel="stylesheet" href="https://unpkg.com/vant@4/lib/index.css" />
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- 自定义儿童友好手写板与汉字特定样式 -->
-    <link rel="stylesheet" href="./hanzi.css"/>
+    <!-- 全局统一儿童友好设计系统样式表 -->
+    <link rel="stylesheet" href="../style.css?v=1.0.8" />
+    <!-- 汉字模块专属手写板与笔顺样式 -->
+    <link rel="stylesheet" href="./hanzi.css" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
     <script src="../kid-dialog.js"></script>
 
-    <script>
-        // 动态适配移动端 / iPadOS 视口与安全区，防止 Safari 视口上移与留白 bug
-        (function() {
-            function updateAppHeight() {
-                if (window.scrollY !== 0) {
-                    window.scrollTo(0, 0);
-                }
-                var h = window.innerHeight;
-                if (window.visualViewport) {
-                    if (window.visualViewport.offsetTop > 0) {
-                        window.scrollTo(0, 0);
-                    }
-                    h = window.visualViewport.height;
-                }
-                document.documentElement.style.setProperty('--app-height', h + 'px');
-            }
-            window.addEventListener('resize', updateAppHeight);
-            window.addEventListener('orientationchange', function() {
-                setTimeout(function() {
-                    window.scrollTo(0, 0);
-                    updateAppHeight();
-                }, 150);
-            });
-            if (window.visualViewport) {
-                window.visualViewport.addEventListener('resize', updateAppHeight);
-                window.visualViewport.addEventListener('scroll', function() {
-                    if (window.scrollY !== 0) {
-                        window.scrollTo(0, 0);
-                    }
-                });
-            }
-            window.addEventListener('scroll', function() {
-                if (window.scrollY !== 0) {
-                    window.scrollTo(0, 0);
-                }
-            });
-            document.addEventListener('DOMContentLoaded', updateAppHeight);
-            updateAppHeight();
-        })();
-    </script>
+    <!-- 移动端与 iPad 视口自适应模块 -->
+    <script src="../viewport.js"></script>
 </head>
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">

@@ -1,6 +1,6 @@
 /* ============================================================
-   学习中心 · 儿童友好定制样式表
-   Child-Friendly Design System for Study Hub
+   学习中心 · 儿童友好全局统一样式表
+   Global Child-Friendly Design System for Apiapia Study Hub
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700;800&display=swap');
@@ -84,6 +84,17 @@ html, body {
     display: none !important;
 }
 
+/* ================== 汉字与假名规范规范字体 ================== */
+.hanzi-font {
+    font-family: "KaiTi", "STKaiti", "BiauKai", "楷体", "PingFang SC", "Microsoft YaHei", serif;
+}
+.kana-font {
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+.kana-serif-font {
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", "MS Mincho", "Noto Serif JP", "KaiTi", serif;
+}
+
 /* ================== 儿童立体触感按钮 (3D Push Effect) ================== */
 .kid-btn-primary, .btn-3d-primary {
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
@@ -162,4 +173,92 @@ html, body {
 
 .kid-card:active {
     transform: scale(0.99);
+}
+
+/* ================== 结算得分环 (模块通用) ================== */
+.score-ring {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    margin: 16px auto;
+    display: grid;
+    place-items: center;
+    background: conic-gradient(var(--primary) 0%, #e2e8f0 0);
+    position: relative;
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.2);
+}
+
+.score-ring::after {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    background: white;
+    border-radius: 50%;
+}
+
+.score-ring-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.score-ring-content strong {
+    display: block;
+    font-size: 32px;
+    font-weight: 900;
+    color: #1e293b;
+    font-family: "Quicksand", sans-serif;
+}
+
+.score-ring-content span {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* ================== 艾宾浩斯记忆等级徽章 (模块通用) ================== */
+.level-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 800;
+    margin-left: 6px;
+    vertical-align: middle;
+    background: #e0e7ff;
+    color: #4338ca;
+    border: 1.5px solid #c7d2fe;
+}
+
+.level-badge.level-mastered {
+    background: #dcfce7;
+    color: #15803d;
+    border-color: #86efac;
+}
+
+.level-badge.level-due {
+    background: #fef3c7;
+    color: #b45309;
+    border-color: #fcd34d;
+}
+
+/* ================== 云同步状态文字色彩 ================== */
+.sync-status-val.ok {
+    color: #10b981;
+}
+.sync-status-val.error {
+    color: #f43f5e;
+}
+.sync-status-val.syncing {
+    color: #6366f1;
+}
+
+/* ================== 滚动条隐藏实用类 ================== */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.7",
+  "version": "1.0.9",
   "updatedAt": "2026-09-20",
-  "description": "整合全套应用图标与 PNG 资源至 icons/ 专属目录，统一全站模块引用规范，更新版本与文档"
+  "description": "修复立即更新后版本号未同步更新的缺陷，引入 Semver 动态版本比对与 localStorage 本地持久化升级机制，同步升级项目文档"
 }
