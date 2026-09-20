@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="日语学习">
     <meta name="theme-color" content="#4f46e5">
     <title>日语听力与假名小助手 · 小朋友趣味学日语</title>
@@ -24,17 +24,42 @@
     <link rel="stylesheet" href="style.css" />
 
     <script>
-        // 动态适配移动端浏览器（Safari / Chrome）实际可视高度
+        // 动态适配移动端 / iPadOS 视口与安全区，防止 Safari 视口上移与留白 bug
         (function() {
             function updateAppHeight() {
-                var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                if (window.scrollY !== 0) {
+                    window.scrollTo(0, 0);
+                }
+                var h = window.innerHeight;
+                if (window.visualViewport) {
+                    if (window.visualViewport.offsetTop > 0) {
+                        window.scrollTo(0, 0);
+                    }
+                    h = window.visualViewport.height;
+                }
                 document.documentElement.style.setProperty('--app-height', h + 'px');
             }
             window.addEventListener('resize', updateAppHeight);
-            window.addEventListener('orientationchange', updateAppHeight);
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    window.scrollTo(0, 0);
+                    updateAppHeight();
+                }, 150);
+            });
             if (window.visualViewport) {
                 window.visualViewport.addEventListener('resize', updateAppHeight);
+                window.visualViewport.addEventListener('scroll', function() {
+                    if (window.scrollY !== 0) {
+                        window.scrollTo(0, 0);
+                    }
+                });
             }
+            window.addEventListener('scroll', function() {
+                if (window.scrollY !== 0) {
+                    window.scrollTo(0, 0);
+                }
+            });
+            document.addEventListener('DOMContentLoaded', updateAppHeight);
             updateAppHeight();
         })();
     </script>
@@ -42,8 +67,8 @@
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" v-cloak class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
 
-        <!-- 顶部导航栏 (统一儿童风格明快渐变色，加大点击区域，与 @hanzi 完全一致) -->
-        <header class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-4 sm:px-6 pt-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 shadow-md z-10 flex-shrink-0">
+        <!-- 顶部导航栏 (统一儿童风格明快渐变色，带 app-header 安全区防遮挡) -->
+        <header class="app-header bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-4 sm:px-6 pb-3 shadow-md z-10 flex-shrink-0">
             <div class="flex items-center justify-between h-9">
                 <div class="flex items-center space-x-2">
                     <a href="../../index.html" class="h-8 text-xs sm:text-sm px-3 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center space-x-1 border border-white/30 transition-all active:scale-95 shadow-sm" title="返回学习中心">
@@ -1545,7 +1570,7 @@
         </van-popup>
 
         <!-- 底部大图标圆润导航栏 (4-columns，统一 @hanzi 导航栏设计) -->
-        <nav class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t-2 border-slate-100 pb-[env(safe-area-inset-bottom)] z-20 select-none shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
+        <nav class="app-bottom-nav flex-shrink-0 bg-white/95 backdrop-blur-md border-t-2 border-slate-100 z-20 select-none shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
             <div class="grid grid-cols-4 h-16 items-center">
                 <!-- 单词听力 -->
                 <button type="button" @click="currentTab = 'practice'"

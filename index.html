@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="学习中心">
     <meta name="theme-color" content="#4f46e5">
     <title>学习中心 · 小朋友趣味学习中心</title>
@@ -17,12 +17,53 @@
 
     <!-- 自定义儿童友好样式表 (统一 @hanzi 设计语言) -->
     <link rel="stylesheet" href="style.css" />
+
+    <script>
+        // 动态适配移动端 / iPadOS 视口与安全区，防止 Safari 视口上移与留白 bug
+        (function() {
+            function updateAppHeight() {
+                if (window.scrollY !== 0) {
+                    window.scrollTo(0, 0);
+                }
+                var h = window.innerHeight;
+                if (window.visualViewport) {
+                    if (window.visualViewport.offsetTop > 0) {
+                        window.scrollTo(0, 0);
+                    }
+                    h = window.visualViewport.height;
+                }
+                document.documentElement.style.setProperty('--app-height', h + 'px');
+            }
+            window.addEventListener('resize', updateAppHeight);
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    window.scrollTo(0, 0);
+                    updateAppHeight();
+                }, 150);
+            });
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', updateAppHeight);
+                window.visualViewport.addEventListener('scroll', function() {
+                    if (window.scrollY !== 0) {
+                        window.scrollTo(0, 0);
+                    }
+                });
+            }
+            window.addEventListener('scroll', function() {
+                if (window.scrollY !== 0) {
+                    window.scrollTo(0, 0);
+                }
+            });
+            document.addEventListener('DOMContentLoaded', updateAppHeight);
+            updateAppHeight();
+        })();
+    </script>
 </head>
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" v-cloak class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
 
         <!-- 顶部导航栏 (统一儿童风格明快渐变色，与 @hanzi 完全一致) -->
-        <header class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-4 sm:px-6 pt-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 shadow-md z-10 flex-shrink-0">
+        <header class="app-header bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-4 sm:px-6 pt-3 pb-3 shadow-md z-10 flex-shrink-0">
             <div class="flex items-center justify-between h-9">
                 <div class="flex items-center space-x-2">
                     <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-lg shadow-sm backdrop-blur-sm flex-shrink-0 border border-white/30">

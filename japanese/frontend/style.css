@@ -39,9 +39,15 @@
 }
 
 html, body {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
     height: 100%;
     height: 100dvh;
-    height: var(--app-height, 100dvh);
+    height: -webkit-fill-available;
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -55,9 +61,23 @@ html, body {
 }
 
 #app {
+    width: 100%;
     height: 100%;
     height: 100dvh;
-    height: var(--app-height, 100dvh);
+    height: -webkit-fill-available;
+    height: var(--app-height, 100%);
+    overflow: hidden;
+    position: relative;
+}
+
+/* 统一安全区顶部内边距，确保 iPad / iPhone 状态栏 (WiFi / 时间) 绝不遮挡 */
+.app-header {
+    padding-top: calc(0.75rem + env(safe-area-inset-top, 0px)) !important;
+}
+
+/* 统一安全区底部内边距，紧贴底边并消除空白间隙 */
+.app-bottom-nav {
+    padding-bottom: calc(0.25rem + env(safe-area-inset-bottom, 0px)) !important;
 }
 
 .hidden {
