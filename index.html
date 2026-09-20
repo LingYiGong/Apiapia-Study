@@ -7,148 +7,142 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="学习中心">
     <meta name="theme-color" content="#4f46e5">
-    <title>学习中心 · Study Hub</title>
+    <title>学习中心 · 小朋友趣味学习中心</title>
 
-    <!-- 引入 Vant 4 移动端 UI 样式与脚本 (同 Japanese 模块一致) -->
+    <!-- 引入 Vant 4 样式与 Tailwind CSS -->
     <link rel="stylesheet" href="https://unpkg.com/vant@4/lib/index.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://unpkg.com/vant@4/lib/vant.min.js"></script>
 
-    <!-- 自定义主题与移动端布局样式 -->
+    <!-- 自定义儿童友好样式表 (统一 @hanzi 设计语言) -->
     <link rel="stylesheet" href="style.css" />
 </head>
-<body class="flex flex-col overflow-hidden">
-    <div id="app" v-cloak class="flex flex-col     mx-auto w-full bg-[#f7f8fa] shadow-2xl relative  border-gray-200">
+<body class="flex flex-col overflow-hidden bg-[#f8fafc]">
+    <div id="app" v-cloak class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
 
-        <!-- 顶部导航栏 (iOS 安全区适配，统一像素级高度) -->
-        <header class="bg-indigo-600 text-white px-4 sm:px-6 pt-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2.5 shadow-md z-10 flex-shrink-0">
-            <div class="flex items-center justify-between h-8">
+        <!-- 顶部导航栏 (统一儿童风格明快渐变色，与 @hanzi 完全一致) -->
+        <header class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-4 sm:px-6 pt-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 shadow-md z-10 flex-shrink-0">
+            <div class="flex items-center justify-between h-9">
                 <div class="flex items-center space-x-2">
-                    <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center text-base shadow-sm backdrop-blur-sm flex-shrink-0">
+                    <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-lg shadow-sm backdrop-blur-sm flex-shrink-0 border border-white/30">
                         🎓
                     </div>
-                    <h1 class="text-base sm:text-lg font-bold tracking-wide flex items-center space-x-1.5 leading-none">
+                    <h1 class="text-base sm:text-lg font-black tracking-wide flex items-center space-x-1.5 leading-none">
                         <span>Study Hub</span>
-                        <span class="text-xs font-normal opacity-90 ml-1">学习中心</span>
+                        <span class="text-xs font-bold opacity-90 ml-1">学习中心</span>
                     </h1>
                 </div>
 
-                <!-- 今日日期徽章 -->
-                <div class="h-7 flex items-center space-x-1 text-xs bg-indigo-700/70 border border-indigo-400/40 px-2.5 rounded-full text-indigo-100 font-medium shadow-sm select-none">
+                <!-- 今日日期徽章 (加大点击与显示尺寸) -->
+                <div class="h-8 flex items-center space-x-1.5 text-xs sm:text-sm bg-white/20 border border-white/30 px-3 rounded-full text-white font-black shadow-sm select-none">
                     <span>📅</span>
                     <span>{{ currentDateText }}</span>
                 </div>
             </div>
 
-            <!-- 学习中心概览统计栏 (统一 App 头部高度与间距) -->
-            <div class="flex justify-between items-center h-7 mt-2 text-xs sm:text-sm opacity-95 border-t border-indigo-500/60 pt-1.5 font-medium leading-none">
-                <span>🎌 日语: <b class="text-emerald-300 font-bold">1780+</b> 词</span>
-                <span>✍️ 汉字: <b class="text-yellow-300 font-bold">240+</b> 字</span>
-                <span>🔤 英语: <b class="text-pink-300 font-bold">核心动词</b></span>
+            <!-- 学习中心概览统计栏 (可爱图标与放大字体) -->
+            <div class="flex justify-between items-center h-8 mt-2.5 text-xs sm:text-sm opacity-95 border-t border-white/20 pt-2 font-bold leading-none">
+                <span class="flex items-center">🎌 日语: <b class="text-emerald-300 font-black ml-1 text-sm">1910+</b> 词</span>
+                <span class="flex items-center">✍️ 汉字: <b class="text-yellow-300 font-black ml-1 text-sm">240+</b> 字</span>
+                <span class="flex items-center">🔤 英语: <b class="text-pink-300 font-black ml-1 text-sm">高频动词</b></span>
             </div>
         </header>
 
-        <!-- 主体滚动内容区 -->
-        <main class="flex-1 min-h-0 overflow-y-auto relative bg-gray-50 p-4 sm:p-5 space-y-4">
+        <!-- 主体滚动内容区 (儿童友好背景与舒适间距) -->
+        <main class="flex-1 min-h-0 overflow-y-auto relative bg-[#f8fafc] p-4 sm:p-6 space-y-4">
 
-            <!-- 欢迎与引导横幅 -->
-            <div class="p-4 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-pink-500/10 border border-indigo-100/80 rounded-2xl shadow-sm">
-                <div class="inline-flex items-center space-x-1 text-xs font-semibold text-indigo-700 bg-indigo-100/80 px-2.5 py-0.5 rounded-full mb-2">
+            <!-- 欢迎与引导横幅 (暖色调大圆角卡片，与 @hanzi 复习卡一致) -->
+            <div class="p-4 sm:p-5 bg-gradient-to-r from-amber-100/90 via-orange-50 to-pink-100/80 border-2 border-amber-200 rounded-3xl shadow-sm space-y-2">
+                <div class="inline-flex items-center space-x-1.5 text-xs font-black text-amber-900 bg-white/90 border border-amber-200 px-3 py-1 rounded-full shadow-2xs">
                     <span>✨</span>
                     <span>全模块即开即练 · 科学间隔重复</span>
                 </div>
-                <h2 class="text-base sm:text-lg font-bold text-gray-800 tracking-tight">今天你想学习什么？</h2>
-                <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-                    选择对应的学习板块。结合艾宾浩斯记忆曲线与多感官听写盲测，打造沉浸高效的自学节奏。
+                <h2 class="text-lg sm:text-xl font-black text-amber-950 tracking-tight">今天你想学习什么？</h2>
+                <p class="text-xs sm:text-sm text-amber-900/80 font-medium leading-relaxed">
+                    选择对应的学习板块。结合艾宾浩斯记忆曲线与多感官听写盲测，让小朋友在轻松闯关中牢牢记住知识！
                 </p>
             </div>
 
-            <!-- 三大学习模块卡片 (Vant 4 统一 UI) -->
+            <!-- 三大学习模块卡片 (大圆角卡片 + 3D 立体触感大按钮) -->
             <div class="space-y-4">
                 <div v-for="item in modules" :key="item.id"
                      @click="goToModule(item.url, item.id)"
-                     class="bg-white rounded-2xl border border-gray-200/80 shadow-sm hover:shadow-md transition-all duration-200 p-4 sm:p-5 flex flex-col space-y-3.5 relative overflow-hidden cursor-pointer group active:scale-[0.99]">
+                     class="bg-white rounded-3xl border-2 border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-md transition-all duration-200 p-5 sm:p-6 flex flex-col space-y-4 relative overflow-hidden cursor-pointer group active:scale-[0.99]">
                     
                     <!-- 顶部主题色发光条 -->
-                    <div class="absolute top-0 left-0 right-0 h-1" :class="item.barClass"></div>
+                    <div class="absolute top-0 left-0 right-0 h-1.5" :class="item.barClass"></div>
 
                     <!-- 卡片头部: 图标、标题与上次学习标识 -->
                     <div class="flex items-start justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-sm flex-shrink-0" :class="item.iconBg">
+                        <div class="flex items-center space-x-3.5">
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-sm flex-shrink-0" :class="item.iconBg">
                                 {{ item.icon }}
                             </div>
                             <div>
-                                <h3 class="text-base sm:text-lg font-bold text-gray-800 group-hover:text-indigo-600 transition-colors flex items-center space-x-1.5">
+                                <h3 class="text-lg sm:text-xl font-black text-slate-800 group-hover:text-indigo-600 transition-colors flex items-center space-x-1.5">
                                     <span>{{ item.title }}</span>
                                 </h3>
-                                <p class="text-xs text-gray-400 mt-0.5">{{ item.subtitle }}</p>
+                                <p class="text-xs sm:text-sm text-slate-400 font-bold mt-0.5">{{ item.subtitle }}</p>
                             </div>
                         </div>
 
-                        <!-- 上次学习标识 (Vant Tag) -->
+                        <!-- 上次学习标识 -->
                         <div v-if="lastVisitedModule === item.id">
-                            <van-tag type="warning" size="medium" round class="!px-2.5 !py-0.5 !font-bold shadow-sm">
+                            <span class="inline-flex items-center bg-amber-100 text-amber-800 border border-amber-200 font-black text-xs px-2.5 py-1 rounded-full shadow-2xs">
                                 🌟 上次学习
-                            </van-tag>
+                            </span>
                         </div>
                     </div>
 
                     <!-- 简介 -->
-                    <p class="text-xs text-gray-600 leading-relaxed">
+                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
                         {{ item.desc }}
                     </p>
 
-                    <!-- 标签栏 (Vant Tags) -->
-                    <div class="flex flex-wrap gap-1.5">
-                        <van-tag v-for="tag in item.tags" :key="tag.text"
-                                 :type="tag.type"
-                                 :color="tag.color"
-                                 size="medium"
-                                 round
-                                 class="!px-2.5 !py-0.5 !text-xs !font-medium">
+                    <!-- 标签栏 (彩色大胶囊标签) -->
+                    <div class="flex flex-wrap gap-2">
+                        <span v-for="tag in item.tags" :key="tag.text"
+                              :style="{ backgroundColor: tag.color + '18', color: tag.color, borderColor: tag.color + '33' }"
+                              class="px-3 py-1 rounded-xl text-xs font-black border">
                             {{ tag.text }}
-                        </van-tag>
+                        </span>
                     </div>
 
                     <!-- 核心特性列表 -->
-                    <ul class="border-t border-gray-100 pt-3 space-y-1.5 text-xs text-gray-600">
+                    <ul class="border-t-2 border-slate-100 pt-3.5 space-y-2 text-xs sm:text-sm text-slate-600 font-medium">
                         <li v-for="highlight in item.highlights" :key="highlight" class="flex items-center space-x-2">
-                            <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" :class="item.bulletClass"></span>
+                            <span class="w-2 h-2 rounded-full flex-shrink-0" :class="item.bulletClass"></span>
                             <span>{{ highlight }}</span>
                         </li>
                     </ul>
 
-                    <!-- 进入按钮 (Vant Button) -->
+                    <!-- 3D 触控大按钮 (与 @hanzi 完全一致) -->
                     <div class="pt-1">
-                        <van-button :type="item.btnType"
-                                    block
-                                    round
-                                    size="normal"
-                                    :class="item.btnClass"
-                                    class="!h-10 !text-sm !font-bold !rounded-xl active:scale-98 shadow-sm">
+                        <button type="button"
+                                :class="item.btnClass"
+                                class="w-full py-4 text-white font-black text-base sm:text-lg rounded-2xl shadow-md active:scale-95 transition-all flex items-center justify-center space-x-2">
                             <span>{{ item.btnText }}</span>
-                            <span class="ml-1 transition-transform group-hover:translate-x-1">→</span>
-                        </van-button>
+                            <span class="text-xl font-black transition-transform group-hover:translate-x-1">➔</span>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- 底部添加到主屏幕提示卡片 -->
-            <div class="p-3.5 bg-white border border-gray-200/80 rounded-2xl flex items-start space-x-3 text-xs text-gray-600 shadow-sm">
-                <span class="text-2xl flex-shrink-0">📱</span>
+            <!-- 底部添加到主屏幕提示卡片 (大圆角卡片) -->
+            <div class="p-4 sm:p-5 bg-white border-2 border-slate-100 rounded-3xl flex items-start space-x-3.5 text-xs sm:text-sm text-slate-600 shadow-sm font-medium">
+                <span class="text-3xl flex-shrink-0">📱</span>
                 <div class="space-y-1">
-                    <div class="font-bold text-gray-800 text-xs">支持添加到手机主屏幕使用</div>
-                    <p class="text-gray-500 text-[11px] leading-relaxed">
-                        使用手机浏览器（Safari / Chrome）打开本站，点击“添加到主屏幕”，即可如同独立 App 一样全屏沉浸式刷题。
+                    <div class="font-black text-slate-800 text-xs sm:text-sm">支持添加到手机或 iPad 主屏幕使用</div>
+                    <p class="text-slate-500 text-xs leading-relaxed">
+                        使用 Safari 或 Chrome 浏览器打开本站，点击“添加到主屏幕”，即可如同独立 App 一样全屏沉浸式刷题练习，字体更大更清晰！
                     </p>
                 </div>
             </div>
 
             <!-- 页脚 -->
-            <footer class="text-center text-[11px] text-gray-400 py-3 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-                Study Hub · 个人综合学习平台 · 自主学习与科学记忆
+            <footer class="text-center text-xs text-slate-400 py-4 font-bold pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+                Study Hub · 小朋友趣味自学中心 · 科学记忆与快乐学习
             </footer>
         </main>
     </div>

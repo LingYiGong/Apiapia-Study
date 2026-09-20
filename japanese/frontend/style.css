@@ -1,9 +1,41 @@
+/* ============================================================
+   日语听力与假名小助手 · 儿童友好定制样式表
+   Child-Friendly Design System for Japanese Learning
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700;800&display=swap');
+
 :root {
     --app-height: 100dvh;
     --primary: #4f46e5;
+    --primary-light: #6366f1;
+    --primary-dark: #3730a3;
     --success: #10b981;
+    --success-dark: #059669;
     --danger: #f43f5e;
+    --danger-dark: #e11d48;
     --warning: #f59e0b;
+    --warning-dark: #d97706;
+    --purple: #8b5cf6;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --surface: #f1f5f9;
+
+    /* Vant 4 统一覆盖，符合儿童圆润大触控风格 */
+    --van-primary-color: #4f46e5;
+    --van-success-color: #10b981;
+    --van-danger-color: #f43f5e;
+    --van-warning-color: #f59e0b;
+    --van-button-border-radius: 16px;
+    --van-font-bold: 800;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
@@ -14,6 +46,12 @@ html, body {
     padding: 0;
     overflow: hidden;
     -webkit-text-size-adjust: 100%;
+    background-color: var(--bg);
+    color: var(--text);
+    /* 优先使用儿童友好的圆润清晰字族 */
+    font-family: "Quicksand", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "HarmonyOS Sans SC", "Noto Sans SC", sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 #app {
@@ -22,16 +60,20 @@ html, body {
     height: var(--app-height, 100dvh);
 }
 
-/* ================== 日语假名字体 ================== */
+.hidden {
+    display: none !important;
+}
+
+/* ================== 日语假名与汉字规范字体 ================== */
 .kana-font {
-    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP", sans-serif;
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
 }
 
 .kana-serif-font {
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", "MS Mincho", "Noto Serif JP", serif;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", "MS Mincho", "Noto Serif JP", "KaiTi", serif;
 }
 
-/* ================== 立体触感按钮 (3D Push Effect) ================== */
+/* ================== 儿童立体触感按钮 (3D Push Effect) ================== */
 .kid-btn-primary, .btn-3d-primary {
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     border-bottom: 4px solid #3730a3;
@@ -98,10 +140,10 @@ html, body {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-/* ================== 标准田字格/米字格手写板 ================== */
-.kana-writing-board {
+/* ================== 小学生标准田字格手写板 ================== */
+.kana-writing-board, .writing-board {
     position: relative;
-    width: min(320px, 80vw);
+    width: min(340px, 84vw);
     aspect-ratio: 1;
     margin: 0 auto;
     overflow: hidden;
@@ -109,7 +151,7 @@ html, body {
     border-radius: 20px;
     background-color: #ffffff;
     background-image:
-        /* 中间横竖十字虚线 */
+        /* 中间横十字虚线 */
         linear-gradient(to right, transparent calc(50% - 1.5px), #fca5a5 50%, transparent calc(50% + 1.5px)),
         linear-gradient(to bottom, transparent calc(50% - 1.5px), #fca5a5 50%, transparent calc(50% + 1.5px)),
         /* 对角米字格线 */
@@ -118,7 +160,7 @@ html, body {
     box-shadow: 0 8px 24px rgba(239, 68, 68, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
-.kana-writing-canvas {
+.kana-writing-canvas, #writingCanvas {
     display: block;
     width: 100%;
     height: 100%;
@@ -158,10 +200,61 @@ html, body {
     font-size: 32px;
     font-weight: 900;
     color: #1e293b;
+    font-family: "Quicksand", sans-serif;
 }
 
 .score-ring-content span {
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 13px;
     font-weight: 700;
+}
+
+/* ================== 等级徽章 ================== */
+.level-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 800;
+    margin-left: 6px;
+    vertical-align: middle;
+    background: #e0e7ff;
+    color: #4338ca;
+    border: 1.5px solid #c7d2fe;
+}
+
+.level-badge.level-mastered {
+    background: #dcfce7;
+    color: #15803d;
+    border-color: #86efac;
+}
+
+.level-badge.level-due {
+    background: #fef3c7;
+    color: #b45309;
+    border-color: #fcd34d;
+}
+
+/* ================== 柔和卡片与动效 ================== */
+.kid-card {
+    border-radius: 24px;
+    border: 2px solid #f1f5f9;
+    background-color: #ffffff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.kid-card:active {
+    transform: scale(0.99);
+}
+
+.sync-status-val.ok {
+    color: #10b981;
+}
+.sync-status-val.error {
+    color: #f43f5e;
+}
+.sync-status-val.syncing {
+    color: #6366f1;
 }

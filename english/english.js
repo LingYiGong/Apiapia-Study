@@ -143,7 +143,7 @@ function initDOM() {
     listTitle = document.getElementById("listTitle");
 }
 
-// 更新闪卡展示
+// 更新闪卡展示 (儿童友好大字号与明快配色)
 function updateCard() {
     const current = words[currentIndex];
     if (!current) return;
@@ -156,13 +156,13 @@ function updateCard() {
     if (cardStatusBadge) {
         if (status === "known") {
             cardStatusBadge.textContent = "✓ 已掌握";
-            cardStatusBadge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
+            cardStatusBadge.className = "text-xs px-2.5 py-1 rounded-full font-black bg-emerald-100 text-emerald-800 border border-emerald-200";
         } else if (status === "unknown") {
             cardStatusBadge.textContent = "✕ 需复习";
-            cardStatusBadge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-100 text-rose-800";
+            cardStatusBadge.className = "text-xs px-2.5 py-1 rounded-full font-black bg-rose-100 text-rose-800 border border-rose-200";
         } else {
             cardStatusBadge.textContent = "未判断";
-            cardStatusBadge.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-gray-100 text-gray-500";
+            cardStatusBadge.className = "text-xs px-2.5 py-1 rounded-full font-bold bg-slate-100 text-slate-500 border border-slate-200";
         }
     }
 
@@ -255,7 +255,7 @@ function saveProgress() {
     renderList();
 }
 
-// 更新统计看板
+// 更新统计看板 (统一 @hanzi 得分环)
 function updateStats() {
     let known = 0;
     let unknown = 0;
@@ -300,27 +300,27 @@ function updateStats() {
         navUnknownBadge.classList.toggle("hidden", unknown === 0);
     }
 
-    // 掌握率圆环
+    // 掌握率圆环 (Conic Gradient 统一)
     const scoreText = document.getElementById("scoreText");
     const scoreRing = document.getElementById("scoreRing");
     if (scoreText) scoreText.textContent = `${percent}%`;
     if (scoreRing) {
-        scoreRing.style.background = `conic-gradient(#4f46e5 ${percent}%, #e5e7eb ${percent}%)`;
+        scoreRing.style.background = `conic-gradient(#4f46e5 ${percent}%, #e2e8f0 0)`;
     }
 
     const statsSummaryMessage = document.getElementById("statsSummaryMessage");
     if (statsSummaryMessage) {
         if (percent === 100) {
-            statsSummaryMessage.textContent = "太厉害了！已全部熟练掌握 100 个核心高频动词！";
+            statsSummaryMessage.textContent = "太厉害了！已全部熟练掌握 100 个核心高频动词！🎉";
         } else if (percent >= 60) {
-            statsSummaryMessage.textContent = `已熟练掌握 ${known} 个动词，再巩固一下 ${unknown} 个需复习单词！`;
+            statsSummaryMessage.textContent = `已熟练掌握 ${known} 个动词，再巩固一下 ${unknown} 个需复习单词！💪`;
         } else {
-            statsSummaryMessage.textContent = `当前已掌握 ${known} 个，保持翻牌复习节奏！`;
+            statsSummaryMessage.textContent = `当前已掌握 ${known} 个，保持翻牌复习节奏！🌟`;
         }
     }
 }
 
-// 渲染词库列表
+// 渲染词库列表 (儿童友好大尺寸列表卡片)
 function renderList() {
     if (!wordList) return;
     wordList.innerHTML = "";
@@ -333,7 +333,7 @@ function renderList() {
 
         count++;
         const itemEl = document.createElement("div");
-        itemEl.className = "py-3 px-4 flex items-center justify-between hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer";
+        itemEl.className = "p-3.5 sm:p-4 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 transition-all bg-white mb-2 shadow-2xs flex items-center justify-between cursor-pointer active:scale-[0.99]";
         itemEl.onclick = () => {
             currentIndex = index;
             flipped = false;
@@ -343,29 +343,29 @@ function renderList() {
 
         let tagHTML = "";
         if (status === "known") {
-            tagHTML = `<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800">✓ 认识</span>`;
+            tagHTML = `<span class="text-xs px-2.5 py-0.5 rounded-full font-black bg-emerald-100 text-emerald-800 border border-emerald-200">✓ 认识</span>`;
         } else if (status === "unknown") {
-            tagHTML = `<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-rose-100 text-rose-800">✕ 需复习</span>`;
+            tagHTML = `<span class="text-xs px-2.5 py-0.5 rounded-full font-black bg-rose-100 text-rose-800 border border-rose-200">✕ 需复习</span>`;
         } else {
-            tagHTML = `<span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-gray-100 text-gray-400">未学</span>`;
+            tagHTML = `<span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-slate-100 text-slate-400 border border-slate-200">未学</span>`;
         }
 
         itemEl.innerHTML = `
-            <div class="flex items-center space-x-3 min-w-0 pr-2">
-                <span class="text-xs text-gray-400 font-mono w-7 flex-shrink-0">#${index + 101}</span>
+            <div class="flex items-center space-x-3.5 min-w-0 pr-2">
+                <span class="text-xs text-slate-400 font-mono font-bold w-9 flex-shrink-0">#${index + 101}</span>
                 <div class="min-w-0">
-                    <div class="text-sm font-bold text-gray-900 flex items-center space-x-1.5">
+                    <div class="text-base sm:text-lg font-black text-slate-900 flex items-center space-x-2">
                         <span>${item.english}</span>
-                        <button onclick="event.stopPropagation(); speakText('${item.english}')" class="text-gray-400 hover:text-indigo-600 text-xs p-1" title="朗读">
+                        <button onclick="event.stopPropagation(); speakText('${item.english}')" class="w-7 h-7 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold active:scale-95 transition-all" title="朗读">
                             🔊
                         </button>
                     </div>
-                    <div class="text-xs text-gray-500 truncate">${item.chinese}</div>
+                    <div class="text-xs sm:text-sm text-slate-500 font-medium truncate mt-0.5">${item.chinese}</div>
                 </div>
             </div>
             <div class="flex-shrink-0 flex items-center space-x-2">
                 ${tagHTML}
-                <span class="text-gray-300 text-xs">→</span>
+                <span class="text-slate-300 font-bold text-base">➔</span>
             </div>
         `;
         wordList.appendChild(itemEl);
@@ -373,9 +373,9 @@ function renderList() {
 
     if (count === 0) {
         wordList.innerHTML = `
-            <div class="p-8 text-center text-gray-400 text-xs space-y-1">
-                <div class="text-2xl mb-1">📭</div>
-                <div>此分类下暂时没有单词</div>
+            <div class="p-10 text-center text-slate-400 text-xs sm:text-sm space-y-2">
+                <div class="text-3xl mb-1">📭</div>
+                <div class="font-bold">此分类下暂时没有单词</div>
             </div>
         `;
     }
@@ -388,8 +388,8 @@ function showList(type) {
     const btnKnown = document.getElementById("tabBtnKnown");
     const btnUnknown = document.getElementById("tabBtnUnknown");
 
-    const activeClass = "flex-1 py-1.5 text-xs font-bold rounded-xl transition-all text-white bg-indigo-600 shadow-sm";
-    const inactiveClass = "flex-1 py-1.5 text-xs font-bold rounded-xl transition-all text-gray-600 hover:text-gray-900 bg-gray-50";
+    const activeClass = "flex-1 py-2 text-xs sm:text-sm font-black rounded-xl transition-all text-white kid-btn-primary shadow-sm";
+    const inactiveClass = "flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all text-slate-600 hover:text-slate-900 bg-slate-50";
 
     if (btnAll) btnAll.className = type === "all" ? activeClass : inactiveClass;
     if (btnKnown) btnKnown.className = type === "known" ? activeClass : inactiveClass;
@@ -421,11 +421,11 @@ function switchTab(tabName) {
 
     const updateBtn = (btn, isActive) => {
         if (!btn) return;
-        btn.className = `flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative ${isActive ? 'text-indigo-600 font-bold' : 'text-gray-400 hover:text-gray-600 font-medium'}`;
-        const icon = btn.querySelector('.text-xl');
-        if (icon) icon.className = `text-xl transition-transform ${isActive ? 'scale-110' : 'opacity-70'}`;
+        btn.className = `flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative ${isActive ? 'text-indigo-600 font-black' : 'text-slate-400 hover:text-slate-600 font-bold'}`;
+        const icon = btn.querySelector('.text-2xl');
+        if (icon) icon.className = `text-2xl transition-transform ${isActive ? 'scale-110' : 'opacity-75'}`;
         const indicator = btn.querySelector('.nav-indicator');
-        if (indicator) indicator.className = `nav-indicator w-5 h-0.5 rounded-full mt-0.5 ${isActive ? 'bg-indigo-600' : 'bg-transparent'}`;
+        if (indicator) indicator.className = `nav-indicator w-6 h-1 rounded-full mt-0.5 ${isActive ? 'bg-indigo-600' : 'bg-transparent'}`;
     };
 
     updateBtn(navTabCard, tabName === "card");
