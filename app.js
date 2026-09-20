@@ -13,10 +13,81 @@
 })();
 
 // Vue 3 + Vant 4 业务逻辑
-const { createApp, ref, computed } = Vue;
+const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
+
+const CURRENT_VERSION = '1.0.1';
 
 const app = createApp({
     setup() {
+        // 当前版本与自动更新状态 (方案 C: 自动比对 version.json)
+        const appVersion = ref(CURRENT_VERSION);
+        const hasUpdate = ref(false);
+        const latestVersion = ref('');
+        const isChecking = ref(false);
+
+        const checkForUpdates = async (isManual = false) => {
+            if (isChecking.value) return;
+            isChecking.value = true;
+            try {
+                const res = await fetch(`version.json?_t=${Date.now()}`, {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+                });
+                if (!res.ok) throw new Error('网络请求异常');
+                const data = await res.json();
+                if (data && data.version && data.version !== CURRENT_VERSION) {
+                    latestVersion.value = data.version;
+                    hasUpdate.value = true;
+                    if (isManual && window.vant && window.vant.showNotify) {
+                        window.vant.showNotify({ type: 'warning', message: `🎉 发现新版本 v${data.version}！请点击上方更新` });
+                    }
+                } else if (isManual) {
+                    if (window.vant && window.vant.showToast) {
+                        window.vant.showToast({ message: '已经是最新版本啦 ✨', icon: 'passed' });
+                    }
+                }
+            } catch (e) {
+                console.warn('检查更新失败:', e);
+                if (isManual && window.vant && window.vant.showToast) {
+                    window.vant.showToast({ message: '检查更新失败，请稍候再试', icon: 'cross' });
+                }
+            } finally {
+                isChecking.value = false;
+            }
+        };
+
+        const manualCheckUpdate = () => {
+            checkForUpdates(true);
+        };
+
+        const applyUpdate = () => {
+            // 强制带最新时间戳重定向，彻底击穿 Safari / PWA 磁盘缓存
+            const url = new URL(window.location.href);
+            url.searchParams.set('_v', Date.now().toString());
+            window.location.replace(url.toString());
+        };
+
+        const dismissUpdate = () => {
+            hasUpdate.value = false;
+        };
+
+        // 监听应用回到前台（如 iPad 从后台切换回来）自动静默检查
+        const onVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                checkForUpdates(false);
+            }
+        };
+
+        onMounted(() => {
+            checkForUpdates(false);
+            document.addEventListener('visibilitychange', onVisibilityChange);
+            window.addEventListener('pageshow', () => checkForUpdates(false));
+        });
+
+        onUnmounted(() => {
+            document.removeEventListener('visibilitychange', onVisibilityChange);
+        });
+
         // 上次学习记录
         const lastVisitedModule = ref(localStorage.getItem('study_hub_last_module') || '');
 
@@ -116,6 +187,13 @@ const app = createApp({
         };
 
         return {
+            appVersion,
+            hasUpdate,
+            latestVersion,
+            isChecking,
+            manualCheckUpdate,
+            applyUpdate,
+            dismissUpdate,
             lastVisitedModule,
             currentDateText,
             modules,
