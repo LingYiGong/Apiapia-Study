@@ -470,6 +470,12 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                         }
                     });
 
+                    window.addEventListener('resize', () => {
+                        if (kanaPracticeState.value === 'writing') {
+                            initKanaCanvas();
+                        }
+                    });
+
                     try {
                         loadAudioConfig();
                     } catch (e) {
@@ -1686,6 +1692,27 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                 };
 
                 // 画板 Canvas 手写相关实现 (参考 @hanzi 田字格)
+                const redrawKanaCanvas = () => {
+                    const canvas = kanaCanvasRef.value;
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    const rect = canvas.getBoundingClientRect();
+                    ctx.clearRect(0, 0, rect.width, rect.height);
+                    ctx.strokeStyle = '#1e293b';
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+
+                    kanaStrokes.value.forEach(stroke => {
+                        if (!stroke || stroke.length === 0) return;
+                        ctx.beginPath();
+                        ctx.moveTo(stroke[0].x, stroke[0].y);
+                        stroke.slice(1).forEach(pt => ctx.lineTo(pt.x, pt.y));
+                        if (stroke.length === 1) ctx.lineTo(stroke[0].x + 0.1, stroke[0].y + 0.1);
+                        ctx.lineWidth = stroke[0].width || 8;
+                        ctx.stroke();
+                    });
+                };
+
                 const initKanaCanvas = () => {
                     const canvas = kanaCanvasRef.value;
                     if (!canvas) return;
@@ -1815,18 +1842,20 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     kanaPracticeState.value = 'writing';
                     clearKanaWriting();
 
+                    // 用户点击“开始听写”时第一时间直接播放第一题读音（在用户点击事件手势内同步触发）
+                    if (sessionItems.length > 0) {
+                        playKanaAudio(sessionItems[0].hiragana);
+                    }
+
                     nextTick(() => {
                         initKanaCanvas();
-                        setTimeout(playCurrentKana, 350);
                     });
                 };
 
                 const submitKanaWriting = () => {
                     captureKanaWriting();
                     kanaPracticeState.value = 'checking';
-                    setTimeout(() => {
-                        playCurrentKana();
-                    }, 120);
+                    // 写好了核对时不再自动发音，避免打扰视觉核对；若需要重听可点击核对卡片中的“🔊 重听发音”
                 };
 
                 const recordKanaAnswer = (isCorrect) => {
@@ -1902,9 +1931,12 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                         kanaCurrentIndex.value += 1;
                         kanaPracticeState.value = 'writing';
                         clearKanaWriting();
+                        const nextItem = kanaSession.value[kanaCurrentIndex.value];
+                        if (nextItem) {
+                            playKanaAudio(nextItem.hiragana);
+                        }
                         nextTick(() => {
                             initKanaCanvas();
-                            setTimeout(playCurrentKana, 280);
                         });
                     } else {
                         kanaPracticeState.value = 'summary';
@@ -2014,6 +2046,7 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     playKanaAudio,
                     playCurrentKana,
                     initKanaCanvas,
+                    redrawKanaCanvas,
                     beginKanaStroke,
                     continueKanaStroke,
                     endKanaStroke,
