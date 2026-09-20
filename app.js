@@ -15,7 +15,7 @@
 // Vue 3 + Vant 4 业务逻辑
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
-const CURRENT_VERSION = '1.0.3';
+const CURRENT_VERSION = '1.0.4';
 
 const app = createApp({
     setup() {
@@ -88,11 +88,7 @@ const app = createApp({
             }
         };
 
-        onMounted(() => {
-            checkForUpdates(false);
-            document.addEventListener('visibilitychange', onVisibilityChange);
-            window.addEventListener('pageshow', () => checkForUpdates(false));
-        });
+
 
         onUnmounted(() => {
             document.removeEventListener('visibilitychange', onVisibilityChange);
@@ -111,28 +107,33 @@ const app = createApp({
             }
         });
 
-        // 三大学习模块配置数据 (儿童友好定制)
+        // 学习模块配置数据 (与项目实际数据及功能 100% 精确对齐)
         const modules = ref([
             {
                 id: 'japanese',
                 title: '日语听力与假名',
-                subtitle: '假名手写 · 听力优先 · SM-2 记忆',
+                subtitle: '五十音田字格 · 1912词盲听 · 226句例句',
                 icon: '🎌',
                 iconBg: 'bg-indigo-50 text-indigo-600 border border-indigo-100',
                 barClass: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500',
                 bulletClass: 'bg-indigo-500',
                 btnClass: 'kid-btn-primary',
-                desc: '包含标准田字格平假名/片假名听写书写，1912个核心词汇与226句实用例句盲听测试，搭配艾宾浩斯复习曲线。',
+                desc: '包含五十音标准田字格平假名/片假名听写与形态对照，1912个核心词汇与226句生活实用例句纯听力盲测，搭配 SM-2 艾宾浩斯间隔复习与云端同步。',
+                userProgressText: '1912 词 · 226 句 · 104 假名',
+                dueCount: 0,
+                masteredCount: 0,
                 tags: [
-                    { text: '假名田字格手写', color: '#6366f1' },
-                    { text: '平片对照辨析', color: '#f59e0b' },
-                    { text: '艾宾浩斯算法', color: '#10b981' },
-                    { text: '纯听力盲测', color: '#8b5cf6' }
+                    { text: '五十音田字格手写', color: '#6366f1' },
+                    { text: '1912 词纯听力盲测', color: '#10b981' },
+                    { text: '226 句情境例句点读', color: '#8b5cf6' },
+                    { text: '艾宾浩斯记忆算法', color: '#f59e0b' },
+                    { text: 'Cloudflare 云端同步', color: '#ec4899' }
                 ],
                 highlights: [
-                    '假名听写手写练习（田字格·平假名与片假名对照辨析）',
-                    '纯听力盲测模式 & 单词发音释义解析',
-                    '226 句日常高频对话听力理解与重点词汇'
+                    '五十音平假名/片假名对照手写（支持笔画撤销、清空与标准形态对比）',
+                    '1912 个核心高频词汇纯盲听测试，自然语音语调与词库管理',
+                    '226 句日常实用对话例句听力，支持重点词汇单独点读',
+                    'SM-2 艾宾浩斯记忆曲线智能安排每日复习与云端备份'
                 ],
                 url: 'japanese/frontend/index.html',
                 btnText: '进入日语小能手'
@@ -140,52 +141,133 @@ const app = createApp({
             {
                 id: 'hanzi',
                 title: '汉字听写与笔顺',
-                subtitle: '汉字启蒙 · 规范笔顺与语音听写',
+                subtitle: '170 启蒙字 · 规范笔顺动画 · 同音提示朗读',
                 icon: '✍️',
                 iconBg: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
                 barClass: 'bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500',
                 bulletClass: 'bg-emerald-500',
                 btnClass: 'kid-btn-success',
-                desc: '面向汉字启蒙与小学生标准听写辅助。包含人教版生字库、标准田字格手写板、生动笔顺动画临摹与看字认读卡。',
+                desc: '面向儿童汉字启蒙与小学低年级标准听写。精选 170 个高频基础生字，配备规范笔顺慢动作动画临摹、标准田字格手写板、同音提示词朗读及云端多端同步。',
+                userProgressText: '170 常用启蒙生字 · 规范笔顺',
+                dueCount: 0,
+                masteredCount: 0,
                 tags: [
-                    { text: '标准田字格', color: '#10b981' },
-                    { text: '慢动作笔顺临摹', color: '#f59e0b' },
-                    { text: '听音选字小游戏', color: '#ec4899' },
-                    { text: '云端多端同步', color: '#8b5cf6' }
+                    { text: '170 常用启蒙生字', color: '#10b981' },
+                    { text: '标准田字格手写板', color: '#6366f1' },
+                    { text: '规范慢动作笔顺临摹', color: '#f59e0b' },
+                    { text: '字+提示词防混淆朗读', color: '#ec4899' },
+                    { text: 'Cloudflare 云端同步', color: '#8b5cf6' }
                 ],
                 highlights: [
-                    '小学生标准田字格手写板，支持笔画撤销与重写',
-                    '规范笔画笔顺动画临摹演示，慢动作演示每一笔',
-                    '听音选字闯关、看字认读卡与趣味短文阅读'
+                    '标准田字格手写板，支持笔画一笔撤销、清空重写与答案核对',
+                    '生动笔顺动画临摹演示，拆解笔画与笔顺规范',
+                    '智能语音朗读：支持“汉字+提示词”（如：天，天空的天），告别同音字混淆',
+                    '云端密钥同步支持，手机、iPad 多设备练字打卡不丢失'
                 ],
                 url: 'hanzi/hanzi.html',
                 btnText: '进入汉字小能手'
             },
             {
                 id: 'english',
-                title: '英语单词记忆卡',
-                subtitle: '核心动词 · 双面翻牌闪卡记忆',
+                title: '英语核心动词卡',
+                subtitle: '100 高频动词 · 3D 双面翻牌 · 掌握度看板',
                 icon: '🔤',
                 iconBg: 'bg-rose-50 text-rose-600 border border-rose-100',
                 barClass: 'bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500',
                 bulletClass: 'bg-rose-500',
                 btnClass: 'kid-btn-danger',
-                desc: '极简高效的英语核心动词与高频生活词卡，双面翻牌互动，随时随地开启碎片化记忆与复习。',
+                desc: '精选英语日常对话最基础、最高频的 100 个核心生活与情态动词。采用 3D 双面立体翻牌卡片互动设计，支持标准真人发音与“已掌握/需复习”分类学习。',
+                userProgressText: '100 核心高频动词 · 3D 闪卡',
+                dueCount: 0,
+                masteredCount: 0,
                 tags: [
-                    { text: '核心高频动词', color: '#f43f5e' },
-                    { text: '双面翻牌卡片', color: '#8b5cf6' },
-                    { text: '掌握度标记', color: '#10b981' },
-                    { text: '秒级即开即练', color: '#0284c7' }
+                    { text: '100 核心高频动词', color: '#f43f5e' },
+                    { text: '3D 双面翻牌闪卡', color: '#8b5cf6' },
+                    { text: '标准真人发音朗读', color: '#0284c7' },
+                    { text: '掌握度进度看板', color: '#10b981' }
                 ],
                 highlights: [
-                    '经典闪卡交互，点击快速看释义与发音',
-                    '“认识 / 不认识” 标记与记忆打卡',
-                    '纯轻量静态设计，秒级即开即学'
+                    '经典 3D 双面翻牌闪卡：正面中文释义联想，背面英文发音揭晓',
+                    '“认识 / 不认识” 快速标记打卡与快捷键键盘支持',
+                    '学习进度看板与掌握度圆环，直观掌握 100 动词记忆情况'
                 ],
                 url: 'english/english.html',
                 btnText: '进入英语词卡'
             }
         ]);
+
+        // 动态加载各模块在用户本地的实际学习足迹与进度
+        const refreshModuleProgress = () => {
+            // 1. 日语模块进度
+            try {
+                const jaRaw = localStorage.getItem('ja_vocab_list');
+                const jaMod = modules.value.find(m => m.id === 'japanese');
+                if (jaMod) {
+                    if (jaRaw) {
+                        const list = JSON.parse(jaRaw);
+                        if (Array.isArray(list) && list.length > 0) {
+                            const mastered = list.filter(w => (w.level || 0) >= 3).length;
+                            const now = Date.now();
+                            const due = list.filter(w => (w.level || 0) > 0 && w.next_review_date && w.next_review_date <= now).length;
+                            const started = list.filter(w => (w.level || 0) > 0).length;
+                            jaMod.dueCount = due;
+                            jaMod.masteredCount = mastered;
+                            if (started > 0) {
+                                jaMod.userProgressText = `已学 ${started} 词 · 掌握 ${mastered} 词`;
+                            } else {
+                                jaMod.userProgressText = '尚未开始打卡，点击进入开启练习';
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('读取日语进度异常', e);
+            }
+
+            // 2. 汉字模块进度
+            try {
+                const hzRaw = localStorage.getItem('hanziDictationStatsV1');
+                const hzMod = modules.value.find(m => m.id === 'hanzi');
+                if (hzMod) {
+                    if (hzRaw) {
+                        const stats = JSON.parse(hzRaw);
+                        const chars = Object.keys(stats);
+                        if (chars.length > 0) {
+                            const mastered = chars.filter(c => stats[c].correct > 0 && (stats[c].wrong || 0) === 0).length;
+                            hzMod.masteredCount = mastered;
+                            hzMod.userProgressText = `已练 ${chars.length} / 170 字 · 满分掌握 ${mastered} 字`;
+                        } else {
+                            hzMod.userProgressText = '尚未开始打卡，点击开启笔顺练习';
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('读取汉字进度异常', e);
+            }
+
+            // 3. 英语模块进度
+            try {
+                const enRaw = localStorage.getItem('englishWordProgress');
+                const enMod = modules.value.find(m => m.id === 'english');
+                if (enMod) {
+                    if (enRaw) {
+                        const progress = JSON.parse(enRaw);
+                        const vals = Object.values(progress);
+                        const known = vals.filter(v => v === 'known').length;
+                        const unknown = vals.filter(v => v === 'unknown').length;
+                        enMod.masteredCount = known;
+                        enMod.dueCount = unknown;
+                        if (vals.length > 0) {
+                            enMod.userProgressText = `已掌握 ${known} 词 · 需复习 ${unknown} 词`;
+                        } else {
+                            enMod.userProgressText = '尚未开始学习，点击开启翻牌卡片';
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('读取英语进度异常', e);
+            }
+        };
 
         // 模块跳转与记录
         const goToModule = (url, id) => {
@@ -195,6 +277,16 @@ const app = createApp({
             } catch (e) {}
             window.location.href = url;
         };
+
+        onMounted(() => {
+            checkForUpdates(false);
+            refreshModuleProgress();
+            document.addEventListener('visibilitychange', onVisibilityChange);
+            window.addEventListener('pageshow', () => {
+                checkForUpdates(false);
+                refreshModuleProgress();
+            });
+        });
 
         return {
             appVersion,

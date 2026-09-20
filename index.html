@@ -16,7 +16,7 @@
     <script src="https://unpkg.com/vant@4/lib/vant.min.js"></script>
 
     <!-- 自定义儿童友好样式表 (统一 @hanzi 设计语言) -->
-    <link rel="stylesheet" href="style.css?v=1.0.3" />
+    <link rel="stylesheet" href="style.css?v=1.0.4" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
     <script src="kid-dialog.js"></script>
@@ -92,11 +92,11 @@
                 </div>
             </div>
 
-            <!-- 学习中心概览统计栏 (可爱图标与放大字体) -->
+            <!-- 学习中心概览统计栏 (精准对齐项目实际数据规制) -->
             <div class="flex justify-between items-center h-8 mt-2.5 text-xs sm:text-sm opacity-95 border-t border-white/20 pt-2 font-bold leading-none">
-                <span class="flex items-center">🎌 日语: <b class="text-emerald-300 font-black ml-1 text-sm">1910+</b> 词</span>
-                <span class="flex items-center">✍️ 汉字: <b class="text-yellow-300 font-black ml-1 text-sm">240+</b> 字</span>
-                <span class="flex items-center">🔤 英语: <b class="text-pink-300 font-black ml-1 text-sm">高频动词</b></span>
+                <span class="flex items-center">🎌 日语: <b class="text-emerald-300 font-black ml-1 text-sm">1912</b> 词 · <b class="text-emerald-300 font-black ml-0.5 text-sm">226</b> 句</span>
+                <span class="flex items-center">✍️ 汉字: <b class="text-yellow-300 font-black ml-1 text-sm">170</b> 启蒙字</span>
+                <span class="flex items-center">🔤 英语: <b class="text-pink-300 font-black ml-1 text-sm">100</b> 动词</span>
             </div>
         </header>
 
@@ -121,16 +121,36 @@
         <!-- 主体滚动内容区 (儿童友好背景与舒适间距) -->
         <main class="flex-1 min-h-0 overflow-y-auto relative bg-[#f8fafc] p-4 sm:p-6 space-y-4">
 
-            <!-- 欢迎与引导横幅 (暖色调大圆角卡片，与 @hanzi 复习卡一致) -->
-            <div class="p-4 sm:p-5 bg-gradient-to-r from-amber-100/90 via-orange-50 to-pink-100/80 border-2 border-amber-200 rounded-3xl shadow-sm space-y-2">
+            <!-- 欢迎与引导横幅 (暖色调大圆角卡片，与全局设计语言统一) -->
+            <div class="p-4 sm:p-5 bg-gradient-to-r from-amber-100/90 via-orange-50 to-pink-100/80 border-2 border-amber-200 rounded-3xl shadow-sm space-y-2.5">
                 <div class="inline-flex items-center space-x-1.5 text-xs font-black text-amber-900 bg-white/90 border border-amber-200 px-3 py-1 rounded-full shadow-2xs">
                     <span>✨</span>
-                    <span>全模块即开即练 · 科学间隔重复</span>
+                    <span>全模块即开即练 · 科学记忆与云端同步</span>
                 </div>
                 <h2 class="text-lg sm:text-xl font-black text-amber-950 tracking-tight">今天你想学习什么？</h2>
                 <p class="text-xs sm:text-sm text-amber-900/80 font-medium leading-relaxed">
-                    选择对应的学习板块。结合艾宾浩斯记忆曲线与多感官听写盲测，让小朋友在轻松闯关中牢牢记住知识！
+                    精选日语五十音与核心词句、小学启蒙汉字笔顺动画、英语高频动词闪卡。科学结合艾宾浩斯记忆曲线，让小朋友在轻松闯关中快乐学习！
                 </p>
+
+                <!-- 核心特性微标签 -->
+                <div class="flex flex-wrap gap-2 pt-1 text-xs font-black text-amber-900/90">
+                    <span class="px-2.5 py-1 rounded-xl bg-white/80 border border-amber-200/80 flex items-center space-x-1 shadow-2xs">
+                        <span>🔊</span>
+                        <span>真人发音语调</span>
+                    </span>
+                    <span class="px-2.5 py-1 rounded-xl bg-white/80 border border-amber-200/80 flex items-center space-x-1 shadow-2xs">
+                        <span>☁️</span>
+                        <span>Cloudflare 云同步</span>
+                    </span>
+                    <span class="px-2.5 py-1 rounded-xl bg-white/80 border border-amber-200/80 flex items-center space-x-1 shadow-2xs">
+                        <span>🧠</span>
+                        <span>艾宾浩斯复习</span>
+                    </span>
+                    <span class="px-2.5 py-1 rounded-xl bg-white/80 border border-amber-200/80 flex items-center space-x-1 shadow-2xs">
+                        <span>📱</span>
+                        <span>iPad 全屏防误触</span>
+                    </span>
+                </div>
             </div>
 
             <!-- 三大学习模块卡片 (大圆角卡片 + 3D 立体触感大按钮) -->
@@ -164,6 +184,22 @@
                         </div>
                     </div>
 
+                    <!-- 个人学习足迹与进度胶囊 (动态显示真实打卡与掌握情况) -->
+                    <div class="p-3 bg-slate-50 border-2 border-slate-100 rounded-2xl flex items-center justify-between text-xs">
+                        <div class="flex items-center space-x-2 truncate">
+                            <span class="text-slate-400 font-bold flex-shrink-0">学习足迹:</span>
+                            <span class="font-black text-slate-700 truncate">{{ item.userProgressText }}</span>
+                        </div>
+                        <div v-if="item.dueCount > 0" class="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700 font-black text-[11px] animate-pulse flex-shrink-0 ml-2">
+                            <span>⏰</span>
+                            <span>{{ item.dueCount }} 待复习</span>
+                        </div>
+                        <div v-else-if="item.masteredCount > 0" class="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-black text-[11px] flex-shrink-0 ml-2">
+                            <span>🏆</span>
+                            <span>已掌握 {{ item.masteredCount }}</span>
+                        </div>
+                    </div>
+
                     <!-- 简介 -->
                     <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
                         {{ item.desc }}
@@ -186,7 +222,7 @@
                         </li>
                     </ul>
 
-                    <!-- 3D 触控大按钮 (与 @hanzi 完全一致) -->
+                    <!-- 3D 触控大按钮 (与全局完全一致) -->
                     <div class="pt-1">
                         <button type="button"
                                 :class="item.btnClass"
@@ -221,6 +257,6 @@
     </div>
 
     <!-- 业务逻辑脚本 (Vue 3 + Vant 4) -->
-    <script src="app.js?v=1.0.3"></script>
+    <script src="app.js?v=1.0.4"></script>
 </body>
 </html>
