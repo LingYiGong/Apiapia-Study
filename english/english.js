@@ -318,6 +318,20 @@ function updateStats() {
             statsSummaryMessage.textContent = `当前已掌握 ${known} 个，保持翻牌复习节奏！🌟`;
         }
     }
+
+    if (percent === 100 && total > 0) {
+        if (!window._english100RewardTriggered) {
+            window._english100RewardTriggered = true;
+            setTimeout(() => {
+                window.showApiapiaPerfectReward && window.showApiapiaPerfectReward({
+                    moduleName: "英语核心动词",
+                    detail: `恭喜你！全部 ${total} 个核心高频生活动词已全部掌握！`
+                });
+            }, 350);
+        }
+    } else {
+        window._english100RewardTriggered = false;
+    }
 }
 
 // 渲染词库列表 (儿童友好大尺寸列表卡片)

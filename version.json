@@ -1,5 +1,5 @@
 {
-  "version": "1.0.10",
+  "version": "1.0.11",
   "updatedAt": "2026-09-20",
-  "description": "规范前端工程目录架构：将公用样式 style.css 与公用脚本 (kid-dialog.js, viewport.js) 分别归纳至 css/ 与 js/ 专属目录，全站模块引用路径无缝对齐"
+  "description": "全模块 100% 满分成就奖：新增 Apiapia 真实照片与 3D 卡通形象双萌照庆典特效奖励弹窗，集成五彩礼花喷射、和弦欢呼音效与专属学霸勋章"
 }

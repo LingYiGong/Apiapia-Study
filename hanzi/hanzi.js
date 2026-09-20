@@ -1370,6 +1370,15 @@ function finishRecognition() {
 
     showScreen("summary");
     refreshHomeStats();
+
+    if (percentage === 100 && total > 0) {
+        setTimeout(() => {
+            window.showApiapiaPerfectReward && window.showApiapiaPerfectReward({
+                moduleName: "汉字快速认读",
+                detail: `本轮 ${total} 个汉字全部都会读！`
+            });
+        }, 350);
+    }
 }
 
 function getChoiceOptions(item) {
@@ -1541,6 +1550,15 @@ function finishChoice() {
 
     showScreen("summary");
     refreshHomeStats();
+
+    if (percentage === 100 && total > 0) {
+        setTimeout(() => {
+            window.showApiapiaPerfectReward && window.showApiapiaPerfectReward({
+                moduleName: "汉字听音选字",
+                detail: `本轮 ${total} 题全部一次选对！`
+            });
+        }, 350);
+    }
 }
 
 function finishSession() {
@@ -1594,8 +1612,7 @@ function finishSession() {
             writtenBox.appendChild(image);
         } else {
             const empty = document.createElement("div");
-            empty.className = "result-standard";
-            empty.textContent = "未写";
+            empty.className = "result-standard bg-slate-50/50";
             writtenBox.appendChild(empty);
         }
 
@@ -1636,6 +1653,15 @@ function finishSession() {
 
     showScreen("summary");
     refreshHomeStats();
+
+    if (percentage === 100 && total > 0) {
+        setTimeout(() => {
+            window.showApiapiaPerfectReward && window.showApiapiaPerfectReward({
+                moduleName: "汉字听写默写",
+                detail: `本轮 ${total} 个字全部默写正确！`
+            });
+        }, 350);
+    }
 }
 
 function showScreen(name) {
@@ -1650,6 +1676,9 @@ function showScreen(name) {
     const bottomNav = document.getElementById("hanziBottomNav");
     if (bottomNav) {
         bottomNav.classList.toggle("hidden", name !== "setup");
+    }
+    if (name === "summary" && els.resultList) {
+        els.resultList.scrollTop = 0;
     }
     window.scrollTo({top: 0, behavior: "smooth"});
 }

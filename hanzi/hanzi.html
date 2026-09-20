@@ -590,30 +590,30 @@
 
 
             <!-- ================= 本轮完成结算界面 ================= -->
-            <section id="summaryScreen" class="h-full flex flex-col justify-between space-y-4 hidden pb-4">
-                <div class="bg-white rounded-3xl border-2 border-slate-100 p-5 sm:p-6 shadow-sm text-center space-y-3.5">
-                    <h2 class="text-xl font-black text-slate-800">🎉 本轮练习大通关！</h2>
+            <section id="summaryScreen" class="summary-screen h-full min-h-0 flex flex-col justify-between space-y-3 sm:space-y-4 hidden pb-2">
+                <div class="summary-card bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-6 shadow-sm text-center flex flex-col flex-1 min-h-0 space-y-3">
+                    <h2 class="text-xl font-black text-slate-800 flex-shrink-0">🎉 本轮练习大通关！</h2>
 
-                    <div id="scoreRing" class="score-ring">
+                    <div id="scoreRing" class="score-ring flex-shrink-0 my-1 sm:my-2">
                         <div class="score-ring-content">
                             <strong id="scoreText">0%</strong>
                             <span>正确率</span>
                         </div>
                     </div>
 
-                    <p id="summaryMessage" class="text-sm sm:text-base font-bold text-slate-700 leading-relaxed max-w-xs mx-auto"></p>
+                    <p id="summaryMessage" class="text-sm sm:text-base font-bold text-slate-700 leading-relaxed max-w-xs mx-auto flex-shrink-0"></p>
 
-                    <div id="resultList" class="max-h-48 overflow-y-auto py-2"></div>
+                    <div id="resultList" class="result-list flex-1 min-h-0 overflow-y-auto py-2 px-1"></div>
                 </div>
 
-                <div class="space-y-3">
-                    <button id="continueDueBtn" class="w-full py-4 kid-btn-primary text-white font-black text-base rounded-2xl shadow-lg hidden">
+                <div class="space-y-2.5 sm:space-y-3 flex-shrink-0 pt-1">
+                    <button id="continueDueBtn" class="w-full py-3.5 sm:py-4 kid-btn-primary text-white font-black text-base rounded-2xl shadow-lg hidden">
                         ⚡ 继续复习今日待复习汉字
                     </button>
-                    <button id="practiceWrongBtn" class="w-full py-4 kid-btn-warning text-white font-black text-base rounded-2xl shadow-md">
+                    <button id="practiceWrongBtn" class="w-full py-3.5 sm:py-4 kid-btn-warning text-white font-black text-base rounded-2xl shadow-md">
                         再练本轮错字
                     </button>
-                    <button id="backHomeBtn" class="w-full py-3.5 kid-btn-light text-slate-700 font-black text-sm sm:text-base rounded-2xl">
+                    <button id="backHomeBtn" class="w-full py-3 sm:py-3.5 kid-btn-light text-slate-700 font-black text-sm sm:text-base rounded-2xl">
                         返回练习首页
                     </button>
                 </div>

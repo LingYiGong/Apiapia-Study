@@ -1376,6 +1376,16 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                 const checkQueueStatus = () => {
                     if (todayQueue.value.length === 0) {
                         practiceState.value = 'idle';
+                        const count = initialQueueLength.value;
+                        initialQueueLength.value = 0;
+                        if (count > 0) {
+                            setTimeout(() => {
+                                window.showApiapiaPerfectReward && window.showApiapiaPerfectReward({
+                                    moduleName: '日语单词听力',
+                                    detail: `今日复习的 ${count} 个单词已全部顺利掌握！`
+                                });
+                            }, 350);
+                        }
                     } else {
                         practiceState.value = 'listening';
                         playCurrent();
@@ -1572,7 +1582,18 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                 const checkSentenceQueueStatus = () => {
                     if (sentenceQueue.value.length === 0) {
                         sentencePracticeState.value = 'idle';
-                        showToast('🎉 太棒了！本轮句子听力练习完成！');
+                        const count = initialSentenceQueueLength.value;
+                        initialSentenceQueueLength.value = 0;
+                        if (count > 0) {
+                            setTimeout(() => {
+                                window.showApiapiaPerfectReward && window.showApiapiaPerfectReward({
+                                    moduleName: '日语句子听力',
+                                    detail: `今日复习的 ${count} 个句子已全部顺利掌握！`
+                                });
+                            }, 350);
+                        } else {
+                            showToast('🎉 太棒了！本轮句子听力练习完成！');
+                        }
                     } else {
                         sentencePracticeState.value = 'listening';
                         playCurrentSentence();
@@ -2053,6 +2074,14 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                         });
                     } else {
                         kanaPracticeState.value = 'summary';
+                        if (kanaAccuracyRate.value === 100 && kanaAnswers.value.length > 0) {
+                            setTimeout(() => {
+                                window.showApiapiaPerfectReward && window.showApiapiaPerfectReward({
+                                    moduleName: '五十音假名听写',
+                                    detail: `本轮假名听写全部正确，正确率 100%！`
+                                });
+                            }, 350);
+                        }
                     }
                 };
 

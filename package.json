@@ -1,6 +1,6 @@
 {
   "name": "apiapia-study",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Apiapia学习中心 (日语、汉字、英语) - 萌宠猫咪主题 - Cloudflare 全栈部署",
   "scripts": {
     "build": "echo 'Ready'",
