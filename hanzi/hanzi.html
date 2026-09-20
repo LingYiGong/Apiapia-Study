@@ -16,6 +16,9 @@
     <!-- 自定义儿童友好手写板与汉字特定样式 -->
     <link rel="stylesheet" href="./hanzi.css"/>
 
+    <!-- 全局统一儿童友好弹窗与提示系统 -->
+    <script src="../kid-dialog.js"></script>
+
     <script>
         // 动态适配移动端 / iPadOS 视口与安全区，防止 Safari 视口上移与留白 bug
         (function() {
@@ -60,12 +63,12 @@
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
 
-        <!-- 顶部导航栏 (明快儿童风，带 app-header 安全区防遮挡) -->
-        <header class="app-header bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-4 sm:px-6 pb-3 shadow-md z-10 flex-shrink-0">
+        <!-- 顶部导航栏 (统一儿童风格明快渐变色，与 @hanzi 完全一致) -->
+        <header class="app-header bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 text-white px-4 sm:px-6 pt-3 pb-3 shadow-md z-10 flex-shrink-0">
             <div class="flex items-center justify-between h-9">
                 <div class="flex items-center space-x-2">
                     <a href="../index.html" class="h-8 text-xs sm:text-sm px-3 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center space-x-1 border border-white/30 transition-all active:scale-95 shadow-sm" title="返回学习中心">
-                        <span>← 🏠 首页</span>
+                        <span>🏠 首页</span>
                     </a>
                     <h1 class="text-base sm:text-lg font-black tracking-wide flex items-center space-x-1.5 leading-none">
                         <span>✍️</span>

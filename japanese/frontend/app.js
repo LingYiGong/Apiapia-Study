@@ -10,8 +10,10 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                 const toastMessage = ref('');
                 let toastTimer = null;
 
-                const showToast = (msg) => {
-                    if (typeof vant !== 'undefined' && vant.showToast) {
+                const showToast = (msg, type = 'info') => {
+                    if (window.kidToast) {
+                        window.kidToast(msg, type);
+                    } else if (typeof vant !== 'undefined' && vant.showToast) {
                         vant.showToast({ message: msg, position: 'top', duration: 2200 });
                     }
                     toastMessage.value = msg;
@@ -815,7 +817,7 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     showToast(`已导出完整学习进度与词库备份（${words.value.length} 词，${sentences.value.length} 句）`);
                 };
 
-                const resetSentences = () => {
+                const resetSentences = async () => {
                     const doReset = () => {
                         if (window.BUILTIN_SENTENCES_ALL && Array.isArray(window.BUILTIN_SENTENCES_ALL)) {
                             sentences.value = window.BUILTIN_SENTENCES_ALL.map(s => ({
@@ -824,33 +826,41 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                                 next_review_date: Date.now()
                             }));
                             saveSentenceData();
-                            showToast(`已重置并载入全部 ${sentences.value.length} 个内置句子！`);
+                            showToast(`已重置并载入全部 ${sentences.value.length} 个内置句子！`, 'success');
                         }
                     };
-                    if (typeof vant !== 'undefined' && vant.showConfirmDialog) {
-                        vant.showConfirmDialog({
-                            title: '重置句子库',
+                    if (window.kidConfirm) {
+                        const ok = await window.kidConfirm({
+                            title: '重置句子库？',
                             message: '确定要重置全部内置句子并将其复习等级恢复为初始状态吗？',
-                            confirmButtonColor: '#4f46e5'
-                        }).then(doReset).catch(() => {});
+                            icon: '⚠️',
+                            type: 'warning',
+                            confirmText: '确定重置',
+                            cancelText: '取消'
+                        });
+                        if (ok) doReset();
                     } else if (confirm('确定要重置全部内置句子吗？')) {
                         doReset();
                     }
                 };
 
                 // Clear All
-                const clearAllWords = () => {
+                const clearAllWords = async () => {
                     const doClear = () => {
                         words.value = [];
                         saveData();
-                        showToast('已清空词库');
+                        showToast('已清空词库', 'warning');
                     };
-                    if (typeof vant !== 'undefined' && vant.showConfirmDialog) {
-                        vant.showConfirmDialog({
-                            title: '清空确认',
+                    if (window.kidConfirm) {
+                        const ok = await window.kidConfirm({
+                            title: '清空词库？',
                             message: `确定要清空全部 ${words.value.length} 个词汇吗？此操作不可恢复。`,
-                            confirmButtonColor: '#e11d48'
-                        }).then(doClear).catch(() => {});
+                            icon: '🗑️',
+                            type: 'danger',
+                            confirmText: '确定清空',
+                            cancelText: '取消'
+                        });
+                        if (ok) doClear();
                     } else if (confirm(`确定要清空全部 ${words.value.length} 个词汇吗？此操作不可恢复。`)) {
                         doClear();
                     }
@@ -904,18 +914,22 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     showAddForm.value = false;
                 };
 
-                const deleteWord = (id) => {
+                const deleteWord = async (id) => {
                     const doDelete = () => {
                         words.value = words.value.filter(w => w.id !== id);
                         saveData();
-                        showToast('词汇已删除');
+                        showToast('词汇已删除', 'success');
                     };
-                    if (typeof vant !== 'undefined' && vant.showConfirmDialog) {
-                        vant.showConfirmDialog({
-                            title: '删除确认',
+                    if (window.kidConfirm) {
+                        const ok = await window.kidConfirm({
+                            title: '删除词汇？',
                             message: '确定要删除该词汇吗？',
-                            confirmButtonColor: '#e11d48'
-                        }).then(doDelete).catch(() => {});
+                            icon: '🗑️',
+                            type: 'danger',
+                            confirmText: '确定删除',
+                            cancelText: '取消'
+                        });
+                        if (ok) doDelete();
                     } else if (confirm('确定要删除该词汇吗？')) {
                         doDelete();
                     }
@@ -1980,19 +1994,101 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     showToast('已从错题本移出');
                 };
 
-                const clearWrongBook = () => {
-                    if (confirm('确定要清空假名错题本吗？')) {
+                const clearWrongBook = async () => {
+                    if (window.kidConfirm) {
+                        const ok = await window.kidConfirm({
+                            title: '清空错题本？',
+                            message: '确定要清空假名错题记录吗？',
+                            icon: '🗑️',
+                            type: 'danger',
+                            confirmText: '确定清空',
+                            cancelText: '取消'
+                        });
+                        if (ok) {
+                            kanaWrongList.value = [];
+                            saveKanaWrongList();
+                            showToast('已清空错题本', 'success');
+                        }
+                    } else if (confirm('确定要清空假名错题本吗？')) {
                         kanaWrongList.value = [];
                         saveKanaWrongList();
                         showToast('已清空错题本');
                     }
                 };
 
-                const quitKanaPractice = () => {
+                const quitKanaPractice = async () => {
+                    if (kanaPracticeState.value === 'writing') {
+                        if (window.kidConfirmExitPractice) {
+                            const ok = await window.kidConfirmExitPractice({
+                                title: '退出假名听写？',
+                                message: '确定要退出本轮假名听写吗？未完成的练习进度将离开哦～',
+                                confirmText: '确定退出',
+                                cancelText: '继续练习'
+                            });
+                            if (!ok) return;
+                        }
+                    }
                     kanaPracticeState.value = 'idle';
                     kanaSession.value = [];
                     kanaAnswers.value = [];
                     clearKanaWriting();
+                };
+
+                // 练习中退出二次确认 handlers
+                const confirmReturnHome = async (e) => {
+                    if (e && e.preventDefault) e.preventDefault();
+                    const isPracticing = practiceState.value !== 'idle' ||
+                                         sentencePracticeState.value !== 'idle' ||
+                                         kanaPracticeState.value === 'writing';
+                    if (isPracticing) {
+                        if (window.kidConfirmExitPractice) {
+                            const ok = await window.kidConfirmExitPractice({
+                                title: '返回学习中心？',
+                                message: '当前正在练习中，确定要退出练习并返回首页吗？',
+                                confirmText: '确定退出',
+                                cancelText: '继续练习'
+                            });
+                            if (ok) {
+                                window.location.href = '../../index.html';
+                            }
+                        } else {
+                            window.location.href = '../../index.html';
+                        }
+                    } else {
+                        window.location.href = '../../index.html';
+                    }
+                };
+
+                const confirmExitWordPractice = async () => {
+                    if (window.kidConfirmExitPractice) {
+                        const ok = await window.kidConfirmExitPractice({
+                            title: '结束单词练习？',
+                            message: '确定要结束本轮单词听力练习吗？',
+                            confirmText: '确定结束',
+                            cancelText: '继续练习'
+                        });
+                        if (ok) {
+                            practiceState.value = 'idle';
+                        }
+                    } else {
+                        practiceState.value = 'idle';
+                    }
+                };
+
+                const confirmExitSentencePractice = async () => {
+                    if (window.kidConfirmExitPractice) {
+                        const ok = await window.kidConfirmExitPractice({
+                            title: '结束句子练习？',
+                            message: '确定要结束本轮句子精听练习吗？',
+                            confirmText: '确定结束',
+                            cancelText: '继续练习'
+                        });
+                        if (ok) {
+                            sentencePracticeState.value = 'idle';
+                        }
+                    } else {
+                        sentencePracticeState.value = 'idle';
+                    }
                 };
 
                 return {
@@ -2060,6 +2156,9 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     removeFromWrongBook,
                     clearWrongBook,
                     quitKanaPractice,
+                    confirmReturnHome,
+                    confirmExitWordPractice,
+                    confirmExitSentencePractice,
 
                     // Cloudflare Cloud Sync
                     showSyncModal,

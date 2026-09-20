@@ -1732,7 +1732,16 @@ function showNextStrokeCharacter() {
     renderStrokeCharacter();
 }
 
-function quitStrokePractice() {
+async function quitStrokePractice() {
+    if (window.kidConfirmExitPractice) {
+        const confirmed = await window.kidConfirmExitPractice({
+            title: "退出笔顺临摹？",
+            message: "确定要退出本轮笔顺临摹练习吗？",
+            confirmText: "确定退出",
+            cancelText: "继续练习"
+        });
+        if (!confirmed) return;
+    }
     state.strokeStartToken += 1;
     state.strokeRenderToken += 1;
     state.strokeWriter?.pauseAnimation?.();
@@ -1791,9 +1800,19 @@ function speakStory() {
     window.speechSynthesis.speak(utterance);
 }
 
-function quitSession() {
-    const confirmed = confirm("确定要退出本轮听写吗？已经判定过的题目会保留记录。");
-    if (!confirmed) return;
+async function quitSession() {
+    if (window.kidConfirmExitPractice) {
+        const confirmed = await window.kidConfirmExitPractice({
+            title: "退出本轮听写？",
+            message: "确定要退出本轮听写吗？已经判定过的题目会保留记录。",
+            confirmText: "确定退出",
+            cancelText: "继续练习"
+        });
+        if (!confirmed) return;
+    } else {
+        const confirmed = confirm("确定要退出本轮听写吗？已经判定过的题目会保留记录。");
+        if (!confirmed) return;
+    }
 
     window.speechSynthesis?.cancel?.();
     clearAnswerStroke();
@@ -1802,26 +1821,58 @@ function quitSession() {
 }
 
 
-function quitRecognition() {
-    const confirmed = confirm("确定要退出本轮认读练习吗？");
-    if (!confirmed) return;
+async function quitRecognition() {
+    if (window.kidConfirmExitPractice) {
+        const confirmed = await window.kidConfirmExitPractice({
+            title: "退出认读练习？",
+            message: "确定要退出本轮认读练习吗？",
+            confirmText: "确定退出",
+            cancelText: "继续练习"
+        });
+        if (!confirmed) return;
+    } else {
+        const confirmed = confirm("确定要退出本轮认读练习吗？");
+        if (!confirmed) return;
+    }
 
     window.speechSynthesis?.cancel?.();
     showScreen("setup");
     refreshHomeStats();
 }
 
-function quitChoice() {
-    if (!confirm("确定要退出本轮选字游戏吗？")) return;
+async function quitChoice() {
+    if (window.kidConfirmExitPractice) {
+        const confirmed = await window.kidConfirmExitPractice({
+            title: "退出选字游戏？",
+            message: "确定要退出本轮选字游戏吗？",
+            confirmText: "确定退出",
+            cancelText: "继续练习"
+        });
+        if (!confirmed) return;
+    } else {
+        if (!confirm("确定要退出本轮选字游戏吗？")) return;
+    }
     window.speechSynthesis?.cancel?.();
     showScreen("setup");
     refreshHomeStats();
 }
 
-function resetAllData() {
-    const confirmed = confirm(
-        "确定要清空全部学习记录吗？错字本和累计成绩都会被删除，此操作不能恢复。"
-    );
+async function resetAllData() {
+    let confirmed = false;
+    if (window.kidConfirm) {
+        confirmed = await window.kidConfirm({
+            title: "清空全部学习记录？",
+            message: "确定要清空全部学习记录吗？错字本和累计成绩都会被删除，此操作不能恢复。",
+            icon: "🗑️",
+            type: "danger",
+            confirmText: "确定清空",
+            cancelText: "取消"
+        });
+    } else {
+        confirmed = confirm(
+            "确定要清空全部学习记录吗？错字本和累计成绩都会被删除，此操作不能恢复。"
+        );
+    }
 
     if (!confirmed) return;
 
@@ -1829,7 +1880,11 @@ function resetAllData() {
     localStorage.removeItem(STROKE_PROGRESS_KEY);
     refreshHomeStats();
     triggerAutoSync();
-    alert("学习记录已经清空。");
+    if (window.kidToast) {
+        window.kidToast("学习记录已经清空啦！", "success");
+    } else {
+        alert("学习记录已经清空。");
+    }
 }
 
 els.startBtn.addEventListener("click", () => startSession());

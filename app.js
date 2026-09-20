@@ -15,7 +15,7 @@
 // Vue 3 + Vant 4 业务逻辑
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
-const CURRENT_VERSION = '1.0.1';
+const CURRENT_VERSION = '1.0.2';
 
 const app = createApp({
     setup() {
@@ -38,18 +38,28 @@ const app = createApp({
                 if (data && data.version && data.version !== CURRENT_VERSION) {
                     latestVersion.value = data.version;
                     hasUpdate.value = true;
-                    if (isManual && window.vant && window.vant.showNotify) {
-                        window.vant.showNotify({ type: 'warning', message: `🎉 发现新版本 v${data.version}！请点击上方更新` });
+                    if (isManual) {
+                        if (window.kidToast) {
+                            window.kidToast(`🎉 发现新版本 v${data.version}！请点击上方更新`, 'warning');
+                        } else if (window.vant && window.vant.showNotify) {
+                            window.vant.showNotify({ type: 'warning', message: `🎉 发现新版本 v${data.version}！请点击上方更新` });
+                        }
                     }
                 } else if (isManual) {
-                    if (window.vant && window.vant.showToast) {
+                    if (window.kidToast) {
+                        window.kidToast('已经是最新版本啦 ✨', 'success');
+                    } else if (window.vant && window.vant.showToast) {
                         window.vant.showToast({ message: '已经是最新版本啦 ✨', icon: 'passed' });
                     }
                 }
             } catch (e) {
                 console.warn('检查更新失败:', e);
-                if (isManual && window.vant && window.vant.showToast) {
-                    window.vant.showToast({ message: '检查更新失败，请稍候再试', icon: 'cross' });
+                if (isManual) {
+                    if (window.kidToast) {
+                        window.kidToast('检查更新失败，请稍候再试', 'error');
+                    } else if (window.vant && window.vant.showToast) {
+                        window.vant.showToast({ message: '检查更新失败，请稍候再试', icon: 'cross' });
+                    }
                 }
             } finally {
                 isChecking.value = false;

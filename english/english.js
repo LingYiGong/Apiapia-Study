@@ -438,10 +438,17 @@ function switchTab(tabName) {
 }
 
 // 清除所有学习记录
-function clearProgress() {
-    if (!confirm("确定要清空英语单词的所有学习掌握记录吗？此操作不可恢复。")) {
-        return;
-    }
+async function clearProgress() {
+    const ok = await window.kidConfirm({
+        title: '清空学习记录？',
+        message: '确定要清空英语单词的所有学习掌握记录吗？此操作不可恢复。',
+        icon: '🗑️',
+        type: 'danger',
+        confirmText: '确定清空',
+        cancelText: '取消'
+    });
+    if (!ok) return;
+
     progress = {};
     try {
         localStorage.removeItem("englishWordProgress");
@@ -451,7 +458,7 @@ function clearProgress() {
     updateStats();
     updateCard();
     renderList();
-    alert("英语学习记录已清空！");
+    window.kidToast("英语学习记录已清空！", "success");
 }
 
 // 键盘快捷键监听
