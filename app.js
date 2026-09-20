@@ -15,7 +15,7 @@
 // Vue 3 + Vant 4 业务逻辑
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
-const CURRENT_VERSION = '1.0.2';
+const CURRENT_VERSION = '1.0.3';
 
 const app = createApp({
     setup() {

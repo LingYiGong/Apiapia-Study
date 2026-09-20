@@ -459,7 +459,18 @@ function triggerAutoSync() {
 async function pushToCloud(silent = false) {
     const key = (els.syncKeyInput ? els.syncKeyInput.value.trim() : "") || (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim();
     if (!key) {
-        if (!silent) alert("请先输入专属同步密钥 (Sync Key)！");
+        if (!silent) {
+            if (window.kidAlert) {
+                window.kidAlert({
+                    title: "同步提示",
+                    message: "请先输入专属同步密钥 (Sync Key)！",
+                    icon: "💡",
+                    type: "warning"
+                });
+            } else {
+                alert("请先输入专属同步密钥 (Sync Key)！");
+            }
+        }
         return;
     }
 
@@ -493,22 +504,73 @@ async function pushToCloud(silent = false) {
             const nowStr = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
             setSyncStatus("success", `同步成功 (${now.toLocaleTimeString()})`);
             setLastSyncTime(nowStr);
-            if (!silent) alert("☁️ 已成功将本地学习数据推送到云端备份！");
+            if (!silent) {
+                if (window.kidToast) {
+                    window.kidToast("☁️ 已成功推送到云端备份！", "success");
+                } else {
+                    alert("☁️ 已成功将本地学习数据推送到云端备份！");
+                }
+            }
         } else {
             setSyncStatus("error", json.message || "同步失败");
-            if (!silent) alert("推送云端失败：" + (json.message || json.error || "未知错误"));
+            if (!silent) {
+                if (window.kidAlert) {
+                    window.kidAlert({
+                        title: "推送失败",
+                        message: "推送云端失败：" + (json.message || json.error || "未知错误"),
+                        icon: "⚠️",
+                        type: "warning"
+                    });
+                } else {
+                    alert("推送云端失败：" + (json.message || json.error || "未知错误"));
+                }
+            }
         }
     } catch (err) {
         setSyncStatus("error", "网络或接口异常");
-        if (!silent) alert("推送失败，请检查网络连接或 Cloudflare 部署状态：" + err.message);
+        if (!silent) {
+            if (window.kidAlert) {
+                window.kidAlert({
+                    title: "网络异常",
+                    message: "推送失败，请检查网络连接或 Cloudflare 部署状态：" + err.message,
+                    icon: "⚠️",
+                    type: "danger"
+                });
+            } else {
+                alert("推送失败，请检查网络连接或 Cloudflare 部署状态：" + err.message);
+            }
+        }
     }
 }
 
 async function pullFromCloud(silent = false) {
     const key = (els.syncKeyInput ? els.syncKeyInput.value.trim() : "") || (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim();
     if (!key) {
-        if (!silent) alert("请先输入专属同步密钥 (Sync Key)！");
+        if (!silent) {
+            if (window.kidAlert) {
+                window.kidAlert({
+                    title: "同步提示",
+                    message: "请先输入专属同步密钥 (Sync Key)！",
+                    icon: "💡",
+                    type: "warning"
+                });
+            } else {
+                alert("请先输入专属同步密钥 (Sync Key)！");
+            }
+        }
         return;
+    }
+
+    if (!silent && window.kidConfirm) {
+        const ok = await window.kidConfirm({
+            title: "拉取云端进度？",
+            message: "从云端拉取将覆盖本地当前的汉字学习记录与错字本，确定要拉取吗？",
+            icon: "⬇️",
+            type: "warning",
+            confirmText: "确定拉取",
+            cancelText: "取消"
+        });
+        if (!ok) return;
     }
 
     setSyncStatus("syncing", "正在拉取...");
@@ -538,18 +600,55 @@ async function pullFromCloud(silent = false) {
             if (!silent) {
                 const total = cloudData.stats?.totalPracticed || 0;
                 const wrong = Object.values(cloudData.stats?.characters || {}).filter(c => c.wrong > 0).length;
-                alert(`☁️ 已成功拉取云端数据！（累计练习 ${total} 次，错字本 ${wrong} 个）`);
+                if (window.kidToast) {
+                    window.kidToast(`☁️ 已拉取云端数据（练习 ${total} 次，错字本 ${wrong} 个）`, "success");
+                } else {
+                    alert(`☁️ 已成功拉取云端数据！（累计练习 ${total} 次，错字本 ${wrong} 个）`);
+                }
             }
         } else if (json.success && !json.data) {
             setSyncStatus("success", "云端暂无数据");
-            if (!silent) alert("该密钥在云端尚无记录，您可以先点击【推送到云端】进行初次备份！");
+            if (!silent) {
+                if (window.kidAlert) {
+                    window.kidAlert({
+                        title: "云端暂无数据",
+                        message: "该密钥在云端尚无记录，您可以先点击【推送到云端】进行初次备份！",
+                        icon: "💡",
+                        type: "info"
+                    });
+                } else {
+                    alert("该密钥在云端尚无记录，您可以先点击【推送到云端】进行初次备份！");
+                }
+            }
         } else {
             setSyncStatus("error", json.message || "拉取失败");
-            if (!silent) alert("拉取失败：" + (json.message || json.error || "未知错误"));
+            if (!silent) {
+                if (window.kidAlert) {
+                    window.kidAlert({
+                        title: "拉取失败",
+                        message: "拉取失败：" + (json.message || json.error || "未知错误"),
+                        icon: "⚠️",
+                        type: "warning"
+                    });
+                } else {
+                    alert("拉取失败：" + (json.message || json.error || "未知错误"));
+                }
+            }
         }
     } catch (err) {
         setSyncStatus("error", "网络或接口异常");
-        if (!silent) alert("拉取失败，请检查网络连接或 Cloudflare 部署状态：" + err.message);
+        if (!silent) {
+            if (window.kidAlert) {
+                window.kidAlert({
+                    title: "网络异常",
+                    message: "拉取失败，请检查网络连接或 Cloudflare 部署状态：" + err.message,
+                    icon: "⚠️",
+                    type: "danger"
+                });
+            } else {
+                alert("拉取失败，请检查网络连接或 Cloudflare 部署状态：" + err.message);
+            }
+        }
     }
 }
 

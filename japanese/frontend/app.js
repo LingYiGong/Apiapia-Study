@@ -302,7 +302,18 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                 const pushToCloud = async (silent = false) => {
                     const key = syncKey.value.trim();
                     if (!key) {
-                        if (!silent) alert('请先输入专属同步密钥 (Sync Key)！');
+                        if (!silent) {
+                            if (window.kidAlert) {
+                                window.kidAlert({
+                                    title: '同步提示',
+                                    message: '请先输入专属同步密钥 (Sync Key)！',
+                                    icon: '💡',
+                                    type: 'warning'
+                                });
+                            } else {
+                                alert('请先输入专属同步密钥 (Sync Key)！');
+                            }
+                        }
                         return;
                     }
 
@@ -327,24 +338,75 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                             syncStatusText.value = `同步成功 (${nowStr})`;
                             lastSyncTime.value = new Date().toLocaleString();
                             localStorage.setItem('japanese_study_last_sync_time', lastSyncTime.value);
-                            if (!silent) showToast('☁️ 已成功将本地学习进度推送到云端备份！');
+                            if (!silent) {
+                                if (window.kidToast) {
+                                    window.kidToast('☁️ 已成功推送到云端备份！', 'success');
+                                } else {
+                                    showToast('☁️ 已成功将本地学习进度推送到云端备份！');
+                                }
+                            }
                         } else {
                             syncStatus.value = 'error';
                             syncStatusText.value = json.message || '同步失败';
-                            if (!silent) alert('推送云端失败：' + (json.message || json.error));
+                            if (!silent) {
+                                if (window.kidAlert) {
+                                    window.kidAlert({
+                                        title: '推送失败',
+                                        message: '推送云端失败：' + (json.message || json.error),
+                                        icon: '⚠️',
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    alert('推送云端失败：' + (json.message || json.error));
+                                }
+                            }
                         }
                     } catch (err) {
                         syncStatus.value = 'error';
                         syncStatusText.value = '网络或接口异常';
-                        if (!silent) alert('推送失败，请检查网络连接或 Cloudflare 部署状态：' + err.message);
+                        if (!silent) {
+                            if (window.kidAlert) {
+                                window.kidAlert({
+                                    title: '网络异常',
+                                    message: '推送失败，请检查网络连接或 Cloudflare 部署状态：' + err.message,
+                                    icon: '⚠️',
+                                    type: 'danger'
+                                });
+                            } else {
+                                alert('推送失败，请检查网络连接或 Cloudflare 部署状态：' + err.message);
+                            }
+                        }
                     }
                 };
 
                 const pullFromCloud = async (silent = false) => {
                     const key = syncKey.value.trim();
                     if (!key) {
-                        if (!silent) alert('请先输入专属同步密钥 (Sync Key)！');
+                        if (!silent) {
+                            if (window.kidAlert) {
+                                window.kidAlert({
+                                    title: '同步提示',
+                                    message: '请先输入专属同步密钥 (Sync Key)！',
+                                    icon: '💡',
+                                    type: 'warning'
+                                });
+                            } else {
+                                alert('请先输入专属同步密钥 (Sync Key)！');
+                            }
+                        }
                         return;
+                    }
+
+                    if (!silent && window.kidConfirm) {
+                        const ok = await window.kidConfirm({
+                            title: '拉取云端数据？',
+                            message: '从云端拉取数据将合并并更新本地学习进度，确定要拉取吗？',
+                            icon: '⬇️',
+                            type: 'warning',
+                            confirmText: '确定拉取',
+                            cancelText: '取消'
+                        });
+                        if (!ok) return;
                     }
 
                     syncStatus.value = 'syncing';
@@ -411,21 +473,58 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                             localStorage.setItem('japanese_study_last_sync_time', lastSyncTime.value);
 
                             if (!silent) {
-                                showToast(`☁️ 已同步最新数据（${words.value.length} 词，${sentences.value.length} 句）`);
+                                if (window.kidToast) {
+                                    window.kidToast(`☁️ 已同步最新数据（${words.value.length} 词，${sentences.value.length} 句）`, 'success');
+                                } else {
+                                    showToast(`☁️ 已同步最新数据（${words.value.length} 词，${sentences.value.length} 句）`);
+                                }
                             }
                         } else if (json.success && !json.data) {
                             syncStatus.value = 'idle';
                             syncStatusText.value = '云端暂无数据';
-                            if (!silent) alert('该密钥在云端尚未有数据备份，请先在已有数据的设备上点击【推送到云端备份】。');
+                            if (!silent) {
+                                if (window.kidAlert) {
+                                    window.kidAlert({
+                                        title: '云端暂无数据',
+                                        message: '该密钥在云端尚未有数据备份，请先在已有数据的设备上点击【推送到云端备份】。',
+                                        icon: '💡',
+                                        type: 'info'
+                                    });
+                                } else {
+                                    alert('该密钥在云端尚未有数据备份，请先在已有数据的设备上点击【推送到云端备份】。');
+                                }
+                            }
                         } else {
                             syncStatus.value = 'error';
                             syncStatusText.value = json.message || '拉取失败';
-                            if (!silent) alert('拉取失败：' + (json.message || json.error));
+                            if (!silent) {
+                                if (window.kidAlert) {
+                                    window.kidAlert({
+                                        title: '拉取失败',
+                                        message: '拉取失败：' + (json.message || json.error),
+                                        icon: '⚠️',
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    alert('拉取失败：' + (json.message || json.error));
+                                }
+                            }
                         }
                     } catch (err) {
                         syncStatus.value = 'error';
                         syncStatusText.value = '网络异常';
-                        if (!silent) alert('拉取失败，请检查网络或服务配置：' + err.message);
+                        if (!silent) {
+                            if (window.kidAlert) {
+                                window.kidAlert({
+                                    title: '网络异常',
+                                    message: '拉取失败，请检查网络或服务配置：' + err.message,
+                                    icon: '⚠️',
+                                    type: 'danger'
+                                });
+                            } else {
+                                alert('拉取失败，请检查网络或服务配置：' + err.message);
+                            }
+                        }
                     }
                 };
 
