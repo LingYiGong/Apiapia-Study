@@ -3,7 +3,7 @@
    English Learning Module Specific Styles (Extends ../style.css)
    ========================================================================== */
 
-@import "../style.css";
+@import "../css/style.css";
 
 /* ================== 闪卡 3D 翻牌效果 ================== */
 .card-perspective {

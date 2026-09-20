@@ -1,5 +1,5 @@
 {
-  "version": "1.0.9",
+  "version": "1.0.10",
   "updatedAt": "2026-09-20",
-  "description": "修复立即更新后版本号未同步更新的缺陷，引入 Semver 动态版本比对与 localStorage 本地持久化升级机制，同步升级项目文档"
+  "description": "规范前端工程目录架构：将公用样式 style.css 与公用脚本 (kid-dialog.js, viewport.js) 分别归纳至 css/ 与 js/ 专属目录，全站模块引用路径无缝对齐"
 }

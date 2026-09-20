@@ -3,7 +3,7 @@
    Japanese Learning Module Specific Styles (Extends ../../style.css)
    ============================================================ */
 
-@import "../../style.css";
+@import "../../css/style.css";
 
 /* ================== 小学生标准田字格手写板 ================== */
 .kana-writing-board, .writing-board {
