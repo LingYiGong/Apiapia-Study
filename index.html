@@ -5,9 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="学习中心">
+    <meta name="apple-mobile-web-app-title" content="Apiapia">
     <meta name="theme-color" content="#4f46e5">
-    <title>学习中心 · 小朋友趣味学习中心</title>
+    <title>Apiapia 学习中心 · 小朋友趣味自学</title>
+    <!-- 网站 Favicon 与 iOS / PWA 应用图标 (萌宠猫咪 Apiapia 主题) -->
+    <link rel="icon" type="image/x-icon" href="./icons/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
 
     <!-- 引入 Vant 4 样式与 Tailwind CSS -->
     <link rel="stylesheet" href="https://unpkg.com/vant@4/lib/index.css" />
@@ -16,7 +22,7 @@
     <script src="https://unpkg.com/vant@4/lib/vant.min.js"></script>
 
     <!-- 自定义儿童友好样式表 (统一 @hanzi 设计语言) -->
-    <link rel="stylesheet" href="style.css?v=1.0.4" />
+    <link rel="stylesheet" href="style.css?v=1.0.7" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
     <script src="kid-dialog.js"></script>
@@ -69,12 +75,10 @@
         <header class="app-header bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-4 sm:px-6 pt-3 pb-3 shadow-md z-10 flex-shrink-0">
             <div class="flex items-center justify-between h-9">
                 <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-lg shadow-sm backdrop-blur-sm flex-shrink-0 border border-white/30">
-                        🎓
-                    </div>
+                    <img src="./icons/apple-touch-icon.png" alt="Apiapia" class="w-8 h-8 rounded-xl object-cover shadow-sm border-2 border-white/40 flex-shrink-0" />
                     <div class="flex items-center space-x-1.5 leading-none">
                         <h1 class="text-base sm:text-lg font-black tracking-wide flex items-center space-x-1 leading-none">
-                            <span>Study Hub</span>
+                            <span>Apiapia</span>
                             <span class="text-xs font-bold opacity-90 ml-1">学习中心</span>
                         </h1>
                         <!-- 头部版本号徽章 (点击可手动检查更新) -->
@@ -121,19 +125,28 @@
         <!-- 主体滚动内容区 (儿童友好背景与舒适间距) -->
         <main class="flex-1 min-h-0 overflow-y-auto relative bg-[#f8fafc] p-4 sm:p-6 space-y-4">
 
-            <!-- 欢迎与引导横幅 (暖色调大圆角卡片，与全局设计语言统一) -->
-            <div class="p-4 sm:p-5 bg-gradient-to-r from-amber-100/90 via-orange-50 to-pink-100/80 border-2 border-amber-200 rounded-3xl shadow-sm space-y-2.5">
+            <!-- 欢迎与引导横幅 (暖色调大圆角卡片，猫咪 Apiapia 伴学) -->
+            <div class="p-4 sm:p-5 bg-gradient-to-r from-amber-100/90 via-orange-50 to-pink-100/80 border-2 border-amber-200 rounded-3xl shadow-sm space-y-3">
                 <div class="inline-flex items-center space-x-1.5 text-xs font-black text-amber-900 bg-white/90 border border-amber-200 px-3 py-1 rounded-full shadow-2xs">
-                    <span>✨</span>
-                    <span>全模块即开即练 · 科学记忆与云端同步</span>
+                    <img src="./icons/apple-touch-icon.png" alt="Apiapia" class="w-4 h-4 rounded-full object-cover inline-block" />
+                    <span>学霸小猫咪 Apiapia 陪你快乐自学 · 科学记忆与云端同步</span>
                 </div>
-                <h2 class="text-lg sm:text-xl font-black text-amber-950 tracking-tight">今天你想学习什么？</h2>
-                <p class="text-xs sm:text-sm text-amber-900/80 font-medium leading-relaxed">
-                    精选日语五十音与核心词句、小学启蒙汉字笔顺动画、英语高频动词闪卡。科学结合艾宾浩斯记忆曲线，让小朋友在轻松闯关中快乐学习！
-                </p>
+                <div class="flex items-start space-x-3.5 pt-0.5">
+                    <img src="./icons/apple-touch-icon.png" alt="Apiapia" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover shadow-md border-2 border-white flex-shrink-0" />
+                    <div class="space-y-1">
+                        <h2 class="text-lg sm:text-xl font-black text-amber-950 tracking-tight leading-snug">喵！今天想和 Apiapia 学点什么？</h2>
+                        <p class="text-xs sm:text-sm text-amber-900/80 font-medium leading-relaxed">
+                            精选日语五十音与核心词句、小学启蒙汉字笔顺动画、英语高频动词闪卡。猫咪 Apiapia 会全程陪着你，结合艾宾浩斯科学曲线，在轻松闯关中快乐掌握！
+                        </p>
+                    </div>
+                </div>
 
                 <!-- 核心特性微标签 -->
                 <div class="flex flex-wrap gap-2 pt-1 text-xs font-black text-amber-900/90">
+                    <span class="px-2.5 py-1 rounded-xl bg-white/80 border border-amber-200/80 flex items-center space-x-1 shadow-2xs">
+                        <span>🐾</span>
+                        <span>猫咪趣味伴学</span>
+                    </span>
                     <span class="px-2.5 py-1 rounded-xl bg-white/80 border border-amber-200/80 flex items-center space-x-1 shadow-2xs">
                         <span>🔊</span>
                         <span>真人发音语调</span>
@@ -247,7 +260,7 @@
 
             <!-- 页脚 -->
             <footer class="text-center text-xs text-slate-400 py-4 font-bold pb-[max(1.5rem,env(safe-area-inset-bottom))] space-y-1">
-                <div>Study Hub · 小朋友趣味自学中心 · 科学记忆与快乐学习</div>
+                <div>🐱 学霸猫咪 Apiapia 陪伴小朋友快乐自学 · 科学记忆与趣味启蒙</div>
                 <div class="text-[11px] text-slate-400/80">
                     当前版本 v{{ appVersion }} · 
                     <button @click="manualCheckUpdate" type="button" class="underline hover:text-indigo-600 transition-colors">检查更新</button>
@@ -257,6 +270,6 @@
     </div>
 
     <!-- 业务逻辑脚本 (Vue 3 + Vant 4) -->
-    <script src="app.js?v=1.0.4"></script>
+    <script src="app.js?v=1.0.7"></script>
 </body>
 </html>

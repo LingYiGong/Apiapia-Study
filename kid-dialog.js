@@ -280,6 +280,27 @@
         }
     }
 
+    // 自动根据页面层级计算 Apiapia 头像路径
+    function getApiapiaIconPath() {
+        const path = window.location.pathname || '';
+        if (path.includes('/japanese/frontend')) {
+            return '../../icons/apple-touch-icon.png';
+        }
+        if (path.includes('/hanzi/') || path.includes('/english/')) {
+            return '../icons/apple-touch-icon.png';
+        }
+        return './icons/apple-touch-icon.png';
+    }
+
+    // 辅助函数：填充弹窗图标元素（支持 Emoji 或图片路径）
+    function renderDialogIcon(iconEl, iconVal) {
+        if (typeof iconVal === 'string' && (iconVal.endsWith('.png') || iconVal.endsWith('.jpg') || iconVal.startsWith('.') || iconVal.startsWith('/') || iconVal.startsWith('http'))) {
+            iconEl.innerHTML = `<img src="${iconVal}" alt="Apiapia" style="width:100%;height:100%;object-fit:cover;border-radius:18px;" />`;
+        } else {
+            iconEl.textContent = iconVal;
+        }
+    }
+
     /**
      * 二次确认弹窗 (Promise 接口)
      * @param {Object} options
@@ -307,7 +328,7 @@
             const iconEl = document.createElement('div');
             iconEl.className = 'kid-dialog-icon-wrapper';
             iconEl.style.cssText = theme.bg;
-            iconEl.textContent = theme.icon;
+            renderDialogIcon(iconEl, theme.icon);
 
             const titleEl = document.createElement('h3');
             titleEl.className = 'kid-dialog-title';
@@ -403,7 +424,7 @@
             const iconEl = document.createElement('div');
             iconEl.className = 'kid-dialog-icon-wrapper';
             iconEl.style.cssText = theme.bg;
-            iconEl.textContent = theme.icon;
+            renderDialogIcon(iconEl, theme.icon);
 
             const titleEl = document.createElement('h3');
             titleEl.className = 'kid-dialog-title';
@@ -469,12 +490,12 @@
      */
     window.kidConfirmExitPractice = function(options = {}) {
         return window.kidConfirm({
-            title: options.title || '要退出当前练习吗？',
-            message: options.message || '退出后本轮未完成的练习进度将离开哦，小朋友确定要退出吗？',
-            icon: options.icon || '🚪',
+            title: options.title || '🐱 猫咪 Apiapia 悄悄问：',
+            message: options.message || '今天表现超棒！确定要先休息一下吗？本轮练习进度猫咪随时准备陪你继续哦！',
+            icon: options.icon || getApiapiaIconPath(),
             type: 'exit',
-            confirmText: options.confirmText || '确定退出',
-            cancelText: options.cancelText || '继续练习'
+            confirmText: options.confirmText || '先休息啦',
+            cancelText: options.cancelText || '继续加油'
         });
     };
 

@@ -8,6 +8,12 @@
     <meta name="apple-mobile-web-app-title" content="汉字听写"/>
     <meta name="theme-color" content="#4f46e5"/>
     <title>汉字听写小助手 · 小朋友趣味学汉字</title>
+    <!-- 网站 Favicon 与 iOS / PWA 应用图标 -->
+    <link rel="icon" type="image/x-icon" href="../icons/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="../icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png" />
+    <link rel="manifest" href="../manifest.json" />
 
     <!-- 引入 Vant 4 样式与 Tailwind CSS -->
     <link rel="stylesheet" href="https://unpkg.com/vant@4/lib/index.css" />
@@ -67,8 +73,9 @@
         <header class="app-header bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 text-white px-4 sm:px-6 pt-3 pb-3 shadow-md z-10 flex-shrink-0">
             <div class="flex items-center justify-between h-9">
                 <div class="flex items-center space-x-2">
-                    <a href="../index.html" class="h-8 text-xs sm:text-sm px-3 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center space-x-1 border border-white/30 transition-all active:scale-95 shadow-sm" title="返回学习中心">
-                        <span>🏠 首页</span>
+                    <a href="../index.html" class="h-8 text-xs sm:text-sm px-2.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center space-x-1.5 border border-white/30 transition-all active:scale-95 shadow-sm" title="返回 Apiapia 学习中心">
+                        <img src="../icons/apple-touch-icon.png" alt="Apiapia" class="w-5 h-5 rounded-full object-cover border border-white/50 flex-shrink-0" />
+                        <span>首页</span>
                     </a>
                     <h1 class="text-base sm:text-lg font-black tracking-wide flex items-center space-x-1.5 leading-none">
                         <span>✍️</span>

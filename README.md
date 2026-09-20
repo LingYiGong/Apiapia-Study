@@ -1,14 +1,15 @@
-# Study Hub · 语言与识字综合自学中心
+# 🐱 Apiapia 学习中心 · 小朋友趣味自学平台
 
-> 基于 **Cloudflare 全栈架构 (Workers + KV + Assets)** 构建的多合一轻量化自学平台，包含日语、汉字、英语等多语言与学习技能模块。
+> 萌宠学霸猫咪 **Apiapia** 陪伴小朋友快乐学习！基于 **Cloudflare 全栈架构 (Workers + KV + Assets)** 构建的多合一轻量化自学中心，深度融合日语听力假名、汉字规范笔顺听写与英语核心动词卡片。
 
 无需自建复杂服务器，依托 Cloudflare 全球边缘网络与分布式 KV 数据库，实现：
+- 🐱 **萌宠学霸猫咪伴学**：全套定制 3D 萌宠小猫咪主题视觉、高清 iOS App 图标与 Favicon，陪伴小朋友快乐启蒙；
 - 🌐 **全球极速访问**：纯前端轻量化静态页面，秒级即开即学，免运维且自带免费 HTTPS；
 - 🧠 **科学记忆算法**：全面采用**艾宾浩斯（SM-2）间隔重复遗忘曲线**，科学规划复习周期；
 - 📱 **多端全自动同步**：手机、平板、电脑通过专属密钥（Sync Key）跨设备实时同步刷题与复习进度；
 - 👶 **儿童友好护航设计**：全局 3D 立体触感大按键、统一的儿童防误触二次确认与柔和气泡提醒（`kid-dialog.js`）；
 - 🍎 **移动端 / iPad 深度适配**：支持 PWA / 添加到主屏幕全屏运行，针对 iOS/iPadOS Safari 视口上移、留白 bug 及 WebKit 音频进行了全方位深度优化；
-- 🔄 **自动感知平滑更新**：内置版本监测机制（方案 C），新版发布后在首页无感感知并提醒一键击穿缓存刷新。
+- 🔄 **自动感知平滑更新**：内置版本监测机制（方案 C，当前 `v1.0.7`），新版发布后在首页无感感知并提醒一键击穿缓存刷新。
 
 ---
 
@@ -82,11 +83,19 @@ study/
 │   └── routes/
 │       ├── japanese.js        # 🎌 日语模块 KV 云同步路由 (/api/japanese/sync, /api/sync)
 │       └── hanzi.js           # ✍️ 汉字模块 KV 云同步路由 (/api/hanzi/sync)
-├── index.html                 # 🎓 学习中心主门户导航 (Study Hub 首页，集成动态学习足迹)
+├── index.html                 # 🐱 Apiapia 学习中心主门户导航 (集成动态学习足迹)
 ├── app.js                     # 🌟 主门户业务逻辑 (Vue 3 + Vant 4 + 本地进度汇总 + 版本感知更新)
 ├── style.css                  # 🎨 全局儿童友好设计系统 (Quicksand 字体 + 3D 浮雕大按键)
 ├── kid-dialog.js              # 🎈 全局统一儿童弹窗、提示与二次确认模块
-├── version.json               # 🏷️ 自动化版本号与更新描述文件 (当前 v1.0.4)
+├── version.json               # 🏷️ 自动化版本号与更新描述文件 (当前 v1.0.7)
+├── manifest.json              # 📱 Web App PWA 配置文件 (定义添加到主屏幕名称、颜色与猫咪图标)
+├── icons/                     # 🐱 萌宠猫咪 Apiapia 全套高清图标与 PNG 资源目录
+│   ├── apple-touch-icon.png   # 🍎 iOS 主屏幕高清图标 (180x180，儿童萌宠学霸猫咪 Apiapia 设计)
+│   ├── icon-192.png           # 📱 PWA 高清应用图标 (192x192)
+│   ├── icon-512.png           # 📱 PWA 高清大图标 (512x512)
+│   ├── favicon-32.png / 64.png# 🌐 浏览器标签页高清 Favicon
+│   ├── favicon.png            # 🌐 标签页 PNG 图标
+│   └── favicon.ico            # 🌐 传统多尺寸 Favicon
 ├── japanese/                  # 🎌 日语学习模块
 │   └── frontend/
 │       ├── index.html         # 日语单页应用 (Vue 3 + Tailwind CSS + Vant 4)
@@ -105,7 +114,7 @@ study/
 │   ├── english.js             # 英语动词 100 词卡逻辑、语音播放与掌握度统计
 │   └── english.css            # 3D 翻转卡片与透视样式
 ├── wrangler.toml              # 🚀 Cloudflare Worker 与 KV 绑定配置文件
-├── package.json               # 📦 项目元数据与构建脚本 (v1.0.4)
+├── package.json               # 📦 项目元数据与构建脚本 (v1.0.7)
 ├── .assetsignore              # 🛡️ 静态资源部署忽略规则
 └── README.md                  # 📖 项目总说明文档
 ```

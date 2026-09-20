@@ -15,7 +15,7 @@
 // Vue 3 + Vant 4 业务逻辑
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
-const CURRENT_VERSION = '1.0.4';
+const CURRENT_VERSION = '1.0.6';
 
 const app = createApp({
     setup() {
@@ -47,9 +47,9 @@ const app = createApp({
                     }
                 } else if (isManual) {
                     if (window.kidToast) {
-                        window.kidToast('已经是最新版本啦 ✨', 'success');
+                        window.kidToast('已经是最新版本啦 ✨ 跟着猫咪 Apiapia 一起闯关吧！', 'success');
                     } else if (window.vant && window.vant.showToast) {
-                        window.vant.showToast({ message: '已经是最新版本啦 ✨', icon: 'passed' });
+                        window.vant.showToast({ message: '已经是最新版本啦 ✨ 跟着猫咪 Apiapia 一起闯关吧！', icon: 'passed' });
                     }
                 }
             } catch (e) {

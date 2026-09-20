@@ -1,0 +1,29 @@
+{
+  "name": "Apiapia 学习中心 · 小朋友趣味自学",
+  "short_name": "Apiapia",
+  "description": "专为小朋友打造的趣味学习中心，萌宠猫咪 Apiapia 陪伴学习：日语听力与假名、汉字笔顺听写、英语核心动词闪卡",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
