@@ -1,4 +1,4 @@
-const { createApp, ref, computed, onMounted, watch } = Vue;
+const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
 
         const LOCAL_STORAGE_KEY = 'ja_vocab_list';
 
@@ -487,6 +487,18 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     } catch (e) {
                         console.error('Failed to load sentence data', e);
                     }
+
+                    try {
+                        loadKanaWrongList();
+                    } catch (e) {
+                        console.error('Failed to load kana wrong list', e);
+                    }
+
+                    window.addEventListener('resize', () => {
+                        if (kanaPracticeState.value === 'writing') {
+                            initKanaCanvas();
+                        }
+                    });
 
                     if (autoSync.value && syncKey.value.trim()) {
                         pullFromCloud(true);
@@ -1486,6 +1498,471 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     }
                 }, { immediate: true });
 
+                // ==================== 假名听写与辨析模块 (参考 @hanzi 流程) ====================
+                const LOCAL_STORAGE_KANA_WRONG = 'japanese_study_wrong_kana_v1';
+                const kanaData = ref(window.KANA_DATA || []);
+                const kanaCurrentSubTab = ref('setup'); // 'setup' | 'wrong' | 'chart'
+                const kanaTypeMode = ref('mixed'); // 'hiragana' | 'katakana' | 'mixed' | 'conversion'
+                const kanaRangeScope = ref('seion'); // 'seion' | 'dakuon' | 'youon' | 'all' | 'custom'
+                const kanaSelectedRows = ref(['a', 'ka', 'sa', 'ta', 'na', 'ha', 'ma', 'ya', 'ra', 'wa']);
+                const kanaQuestionCount = ref(10); // 10, 20, 0 (全部)
+                const kanaPracticeState = ref('idle'); // 'idle' | 'writing' | 'checking' | 'summary'
+                const kanaSession = ref([]);
+                const kanaCurrentIndex = ref(0);
+                const kanaAnswers = ref([]);
+                const kanaWrongList = ref([]);
+                const chartGroupTab = ref('seion'); // 'seion' | 'dakuon' | 'youon'
+
+                // Canvas & Drawing refs
+                const kanaCanvasRef = ref(null);
+                const kanaStrokes = ref([]);
+                let kanaActiveStroke = null;
+                const kanaCapturedWriting = ref('');
+                const showKanaResultDetailModal = ref(false);
+                const selectedKanaResultDetail = ref(null);
+
+                const kanaRowOptions = [
+                    { id: 'a', name: 'あ行 (a, i, u, e, o)' },
+                    { id: 'ka', name: 'か行 (ka, ki, ku, ke, ko)' },
+                    { id: 'sa', name: 'さ行 (sa, shi, su, se, so)' },
+                    { id: 'ta', name: 'た行 (ta, chi, tsu, te, to)' },
+                    { id: 'na', name: 'な行 (na, ni, nu, ne, no)' },
+                    { id: 'ha', name: 'は行 (ha, hi, fu, he, ho)' },
+                    { id: 'ma', name: 'ま行 (ma, mi, mu, me, mo)' },
+                    { id: 'ya', name: 'や行 (ya, yu, yo)' },
+                    { id: 'ra', name: 'ら行 (ra, ri, ru, re, ro)' },
+                    { id: 'wa', name: 'わ行 (wa, wo, n)' }
+                ];
+
+                const toggleKanaRow = (rowId) => {
+                    const idx = kanaSelectedRows.value.indexOf(rowId);
+                    if (idx >= 0) {
+                        if (kanaSelectedRows.value.length <= 1) {
+                            showToast('至少保留一行假名');
+                            return;
+                        }
+                        kanaSelectedRows.value.splice(idx, 1);
+                    } else {
+                        kanaSelectedRows.value.push(rowId);
+                    }
+                };
+
+                const loadKanaWrongList = () => {
+                    try {
+                        const raw = localStorage.getItem(LOCAL_STORAGE_KANA_WRONG);
+                        if (raw) {
+                            const parsed = JSON.parse(raw);
+                            if (Array.isArray(parsed)) {
+                                kanaWrongList.value = parsed;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to load kana wrong list', e);
+                    }
+                };
+
+                const saveKanaWrongList = () => {
+                    try {
+                        localStorage.setItem(LOCAL_STORAGE_KANA_WRONG, JSON.stringify(kanaWrongList.value));
+                    } catch (e) {
+                        console.error('Failed to save kana wrong list', e);
+                    }
+                };
+
+                const currentKanaItem = computed(() => {
+                    return kanaSession.value[kanaCurrentIndex.value] || null;
+                });
+
+                const currentKanaExpectedChar = computed(() => {
+                    const it = currentKanaItem.value;
+                    if (!it) return '';
+                    return it.expectedChar || (it.targetType === 'katakana' ? it.katakana : it.hiragana);
+                });
+
+                const currentKanaPairedChar = computed(() => {
+                    const it = currentKanaItem.value;
+                    if (!it) return '';
+                    return it.pairedChar || (it.targetType === 'katakana' ? it.hiragana : it.katakana);
+                });
+
+                const kanaTypeModeLabel = computed(() => {
+                    switch (kanaTypeMode.value) {
+                        case 'hiragana': return '平假名';
+                        case 'katakana': return '片假名';
+                        case 'mixed': return '平片混合';
+                        case 'conversion': return '平片互换';
+                        default: return '假名听写';
+                    }
+                });
+
+                const kanaAccuracyRate = computed(() => {
+                    if (kanaAnswers.value.length === 0) return 0;
+                    const correct = kanaAnswers.value.filter(a => a.isCorrect).length;
+                    return Math.round((correct / kanaAnswers.value.length) * 100);
+                });
+
+                const kanaWrongCountInSession = computed(() => {
+                    return kanaAnswers.value.filter(a => !a.isCorrect).length;
+                });
+
+                const kanaSummaryMessage = computed(() => {
+                    const rate = kanaAccuracyRate.value;
+                    if (rate === 100) return '🎊 太棒了！全对通关，平假名与片假名辨析极为清晰准确！';
+                    if (rate >= 80) return '🎉 表现出色！假名书写很标准，稍加巩固即可全面掌握！';
+                    if (rate >= 60) return '💪 顺利过关！错题已追加至末尾重练，建议复习错题本强化。';
+                    return '🌱 还在打基础阶段，多看五十音图速查表，继续加油！';
+                });
+
+                const chartKanaList = computed(() => {
+                    const all = (kanaData.value && kanaData.value.length > 0) ? kanaData.value : (window.KANA_DATA || []);
+                    if (chartGroupTab.value === 'seion') {
+                        const seion = all.filter(k => k.group === 'seion');
+                        const findK = (id) => seion.find(k => k.id === id);
+                        return [
+                            // あ行 (a, i, u, e, o)
+                            findK('k_a'), findK('k_i'), findK('k_u'), findK('k_e'), findK('k_o'),
+                            // か行
+                            findK('k_ka'), findK('k_ki'), findK('k_ku'), findK('k_ke'), findK('k_ko'),
+                            // さ行
+                            findK('k_sa'), findK('k_shi'), findK('k_su'), findK('k_se'), findK('k_so'),
+                            // た行
+                            findK('k_ta'), findK('k_chi'), findK('k_tsu'), findK('k_te'), findK('k_to'),
+                            // な行
+                            findK('k_na'), findK('k_ni'), findK('k_nu'), findK('k_ne'), findK('k_no'),
+                            // は行
+                            findK('k_ha'), findK('k_hi'), findK('k_fu'), findK('k_he'), findK('k_ho'),
+                            // ま行
+                            findK('k_ma'), findK('k_mi'), findK('k_mu'), findK('k_me'), findK('k_mo'),
+                            // や行 (ya, 空, yu, 空, yo)
+                            findK('k_ya'), { isEmpty: true, id: 'e_yi' }, findK('k_yu'), { isEmpty: true, id: 'e_ye' }, findK('k_yo'),
+                            // ら行
+                            findK('k_ra'), findK('k_ri'), findK('k_ru'), findK('k_re'), findK('k_ro'),
+                            // わ行 (wa, 空, 空, 空, wo)
+                            findK('k_wa'), { isEmpty: true, id: 'e_wi' }, { isEmpty: true, id: 'e_wu' }, { isEmpty: true, id: 'e_we' }, findK('k_wo'),
+                            // 拨音 (n, 空, 空, 空, 空)
+                            findK('k_n'), { isEmpty: true, id: 'e_n2' }, { isEmpty: true, id: 'e_n3' }, { isEmpty: true, id: 'e_n4' }, { isEmpty: true, id: 'e_n5' }
+                        ].filter(Boolean);
+                    } else if (chartGroupTab.value === 'dakuon') {
+                        const dakuon = all.filter(k => k.group === 'dakuon');
+                        const findD = (id) => dakuon.find(k => k.id === id);
+                        return [
+                            // が行
+                            findD('k_ga'), findD('k_gi'), findD('k_gu'), findD('k_ge'), findD('k_go'),
+                            // ざ行
+                            findD('k_za'), findD('k_ji_z'), findD('k_zu_z'), findD('k_ze'), findD('k_zo'),
+                            // だ行
+                            findD('k_da'), findD('k_ji_d'), findD('k_zu_d'), findD('k_de'), findD('k_do'),
+                            // ば行
+                            findD('k_ba'), findD('k_bi'), findD('k_bu'), findD('k_be'), findD('k_bo'),
+                            // ぱ行
+                            findD('k_pa'), findD('k_pi'), findD('k_pu'), findD('k_pe'), findD('k_po')
+                        ].filter(Boolean);
+                    } else {
+                        // 常用拗音 (33字)
+                        return all.filter(k => k.group === 'youon');
+                    }
+                });
+
+                const playKanaAudio = (text) => {
+                    if (!text) return;
+                    if (audioEngine.value === 'online') {
+                        playOnlineAudio(text, () => {
+                            speakTTS(text);
+                        });
+                    } else {
+                        const voice = getJapaneseVoice();
+                        if (!voice && synth && (availableVoices.value.length === 0 || !availableVoices.value.some(v => /ja|japanese|京子|siri/i.test(v.lang || v.name)))) {
+                            playOnlineAudio(text);
+                        } else {
+                            speakTTS(text);
+                        }
+                    }
+                };
+
+                const playCurrentKana = () => {
+                    const item = currentKanaItem.value;
+                    if (!item) return;
+                    playKanaAudio(item.hiragana);
+                };
+
+                // 画板 Canvas 手写相关实现 (参考 @hanzi 田字格)
+                const initKanaCanvas = () => {
+                    const canvas = kanaCanvasRef.value;
+                    if (!canvas) return;
+                    const rect = canvas.getBoundingClientRect();
+                    if (!rect.width || !rect.height) return;
+
+                    const ratio = Math.min(window.devicePixelRatio || 1, 3);
+                    canvas.width = Math.round(rect.width * ratio);
+                    canvas.height = Math.round(rect.height * ratio);
+                    const ctx = canvas.getContext('2d');
+                    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+                    redrawKanaCanvas();
+                };
+
+                const getCanvasPoint = (event) => {
+                    const canvas = kanaCanvasRef.value;
+                    const rect = canvas.getBoundingClientRect();
+                    const pressure = event.pressure > 0 ? event.pressure : 0.5;
+                    return {
+                        x: event.clientX - rect.left,
+                        y: event.clientY - rect.top,
+                        width: 6 + pressure * 6
+                    };
+                };
+
+                const beginKanaStroke = (event) => {
+                    if (kanaPracticeState.value !== 'writing') return;
+                    event.preventDefault();
+                    const canvas = kanaCanvasRef.value;
+                    if (!canvas) return;
+                    if (event.setPointerCapture && event.pointerId) {
+                        try { canvas.setPointerCapture(event.pointerId); } catch(e){}
+                    }
+                    const pt = getCanvasPoint(event);
+                    kanaActiveStroke = [pt];
+                    kanaStrokes.value.push(kanaActiveStroke);
+                    redrawKanaCanvas();
+                };
+
+                const continueKanaStroke = (event) => {
+                    if (!kanaActiveStroke) return;
+                    event.preventDefault();
+                    const events = event.getCoalescedEvents ? event.getCoalescedEvents() : [event];
+                    events.forEach(pe => kanaActiveStroke.push(getCanvasPoint(pe)));
+                    redrawKanaCanvas();
+                };
+
+                const endKanaStroke = (event) => {
+                    if (!kanaActiveStroke) return;
+                    event.preventDefault();
+                    kanaActiveStroke = null;
+                };
+
+                const undoKanaStroke = () => {
+                    if (kanaPracticeState.value !== 'writing') return;
+                    kanaStrokes.value.pop();
+                    redrawKanaCanvas();
+                };
+
+                const clearKanaWriting = () => {
+                    kanaStrokes.value = [];
+                    kanaActiveStroke = null;
+                    kanaCapturedWriting.value = '';
+                    redrawKanaCanvas();
+                };
+
+                const captureKanaWriting = () => {
+                    const canvas = kanaCanvasRef.value;
+                    if (!canvas || kanaStrokes.value.length === 0) {
+                        kanaCapturedWriting.value = '';
+                        return '';
+                    }
+                    kanaCapturedWriting.value = canvas.toDataURL('image/png');
+                    return kanaCapturedWriting.value;
+                };
+
+                const startKanaPractice = (customItems = null, forcedMode = null) => {
+                    let pool = [];
+                    if (customItems && customItems.length > 0) {
+                        pool = [...customItems];
+                    } else {
+                        const all = (kanaData.value && kanaData.value.length > 0) ? kanaData.value : (window.KANA_DATA || []);
+                        if (kanaRangeScope.value === 'all') {
+                            pool = [...all];
+                        } else if (kanaRangeScope.value === 'custom') {
+                            pool = all.filter(k => kanaSelectedRows.value.includes(k.row));
+                        } else {
+                            pool = all.filter(k => k.group === kanaRangeScope.value);
+                        }
+                    }
+
+                    if (pool.length === 0) {
+                        showToast('所选范围内没有假名，请重新选择');
+                        return;
+                    }
+
+                    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+                    const count = (customItems || kanaQuestionCount.value === 0) ? shuffled.length : Math.min(kanaQuestionCount.value, shuffled.length);
+                    const selected = shuffled.slice(0, count);
+
+                    const mode = forcedMode || kanaTypeMode.value;
+                    const sessionItems = selected.map(k => {
+                        let tType = mode;
+                        let convDir = null;
+                        if (mode === 'mixed') {
+                            tType = Math.random() > 0.5 ? 'hiragana' : 'katakana';
+                        } else if (mode === 'conversion') {
+                            tType = 'conversion';
+                            convDir = Math.random() > 0.5 ? 'hira_to_kata' : 'kata_to_hira';
+                        }
+                        
+                        const expected = (tType === 'katakana' || convDir === 'hira_to_kata') ? k.katakana : k.hiragana;
+                        const paired = (tType === 'katakana' || convDir === 'hira_to_kata') ? k.hiragana : k.katakana;
+
+                        return {
+                            ...k,
+                            targetType: tType,
+                            conversionDirection: convDir,
+                            expectedChar: expected,
+                            pairedChar: paired
+                        };
+                    });
+
+                    kanaSession.value = sessionItems;
+                    kanaCurrentIndex.value = 0;
+                    kanaAnswers.value = [];
+                    kanaPracticeState.value = 'writing';
+                    clearKanaWriting();
+
+                    nextTick(() => {
+                        initKanaCanvas();
+                        setTimeout(playCurrentKana, 350);
+                    });
+                };
+
+                const submitKanaWriting = () => {
+                    captureKanaWriting();
+                    kanaPracticeState.value = 'checking';
+                    setTimeout(() => {
+                        playCurrentKana();
+                    }, 120);
+                };
+
+                const recordKanaAnswer = (isCorrect) => {
+                    const item = currentKanaItem.value;
+                    if (!item) return;
+
+                    const record = {
+                        item: { ...item },
+                        expectedChar: currentKanaExpectedChar.value,
+                        pairedChar: currentKanaPairedChar.value,
+                        targetType: item.targetType,
+                        conversionDirection: item.conversionDirection,
+                        romaji: item.romaji,
+                        rowName: item.rowName,
+                        groupName: item.groupName,
+                        example: item.example,
+                        exampleKata: item.exampleKata,
+                        strokesHira: item.strokesHira,
+                        strokesKata: item.strokesKata,
+                        writingUrl: kanaCapturedWriting.value,
+                        isCorrect: isCorrect,
+                        timestamp: Date.now()
+                    };
+
+                    kanaAnswers.value.push(record);
+
+                    if (!isCorrect) {
+                        // 参考 @hanzi 机制：答错的题目自动追加到本轮队列末尾重练，加深记忆！
+                        kanaSession.value.push({ ...item });
+
+                        // 记入错题本
+                        const wrongKey = `${item.id}__${item.targetType}`;
+                        const existIndex = kanaWrongList.value.findIndex(w => w.key === wrongKey);
+                        if (existIndex >= 0) {
+                            kanaWrongList.value[existIndex].errorCount += 1;
+                            kanaWrongList.value[existIndex].lastFailedAt = Date.now();
+                        } else {
+                            kanaWrongList.value.unshift({
+                                key: wrongKey,
+                                kanaId: item.id,
+                                targetType: item.targetType,
+                                conversionDirection: item.conversionDirection,
+                                expectedChar: currentKanaExpectedChar.value,
+                                pairedChar: currentKanaPairedChar.value,
+                                romaji: item.romaji,
+                                rowName: item.rowName,
+                                groupName: item.groupName,
+                                example: item.example,
+                                exampleKata: item.exampleKata,
+                                strokesHira: item.strokesHira,
+                                strokesKata: item.strokesKata,
+                                hiragana: item.hiragana,
+                                katakana: item.katakana,
+                                errorCount: 1,
+                                lastFailedAt: Date.now()
+                            });
+                        }
+                        saveKanaWrongList();
+                    } else {
+                        // 回答正确，扣减错题本中的错误计数
+                        const wrongKey = `${item.id}__${item.targetType}`;
+                        const existIndex = kanaWrongList.value.findIndex(w => w.key === wrongKey);
+                        if (existIndex >= 0) {
+                            kanaWrongList.value[existIndex].errorCount -= 1;
+                            if (kanaWrongList.value[existIndex].errorCount <= 0) {
+                                kanaWrongList.value.splice(existIndex, 1);
+                            }
+                            saveKanaWrongList();
+                        }
+                    }
+
+                    if (kanaCurrentIndex.value < kanaSession.value.length - 1) {
+                        kanaCurrentIndex.value += 1;
+                        kanaPracticeState.value = 'writing';
+                        clearKanaWriting();
+                        nextTick(() => {
+                            initKanaCanvas();
+                            setTimeout(playCurrentKana, 280);
+                        });
+                    } else {
+                        kanaPracticeState.value = 'summary';
+                    }
+                };
+
+                const retryWrongInSession = () => {
+                    const wrongAnswers = kanaAnswers.value.filter(a => !a.isCorrect);
+                    if (wrongAnswers.length === 0) return;
+                    const items = wrongAnswers.map(a => a.item);
+                    startKanaPractice(items);
+                };
+
+                const practiceFromWrongBook = () => {
+                    if (kanaWrongList.value.length === 0) {
+                        showToast('错题本暂时没有错字，先去练习吧！');
+                        return;
+                    }
+                    const items = kanaWrongList.value.map(w => ({
+                        id: w.kanaId,
+                        hiragana: w.hiragana,
+                        katakana: w.katakana,
+                        romaji: w.romaji,
+                        groupName: w.groupName,
+                        rowName: w.rowName,
+                        example: w.example,
+                        exampleKata: w.exampleKata,
+                        strokesHira: w.strokesHira,
+                        strokesKata: w.strokesKata,
+                        targetType: w.targetType,
+                        conversionDirection: w.conversionDirection,
+                        expectedChar: w.expectedChar,
+                        pairedChar: w.pairedChar
+                    }));
+                    startKanaPractice(items);
+                };
+
+                const removeFromWrongBook = (itemKey) => {
+                    kanaWrongList.value = kanaWrongList.value.filter(w => w.key !== itemKey);
+                    saveKanaWrongList();
+                    showToast('已从错题本移出');
+                };
+
+                const clearWrongBook = () => {
+                    if (confirm('确定要清空假名错题本吗？')) {
+                        kanaWrongList.value = [];
+                        saveKanaWrongList();
+                        showToast('已清空错题本');
+                    }
+                };
+
+                const quitKanaPractice = () => {
+                    kanaPracticeState.value = 'idle';
+                    kanaSession.value = [];
+                    kanaAnswers.value = [];
+                    clearKanaWriting();
+                };
+
                 return {
                     currentTab,
                     words,
@@ -1505,6 +1982,51 @@ const { createApp, ref, computed, onMounted, watch } = Vue;
                     todayQueue,
                     initialQueueLength,
                     currentPracticeWord,
+
+                    // Kana Practice Module (参考 @hanzi 流程)
+                    kanaData,
+                    kanaCurrentSubTab,
+                    kanaTypeMode,
+                    kanaTypeModeLabel,
+                    kanaRangeScope,
+                    kanaSelectedRows,
+                    kanaRowOptions,
+                    toggleKanaRow,
+                    kanaQuestionCount,
+                    kanaPracticeState,
+                    kanaSession,
+                    kanaCurrentIndex,
+                    kanaAnswers,
+                    kanaWrongList,
+                    currentKanaItem,
+                    currentKanaExpectedChar,
+                    currentKanaPairedChar,
+                    kanaAccuracyRate,
+                    kanaWrongCountInSession,
+                    kanaSummaryMessage,
+                    chartGroupTab,
+                    chartKanaList,
+                    kanaCanvasRef,
+                    kanaStrokes,
+                    kanaCapturedWriting,
+                    showKanaResultDetailModal,
+                    selectedKanaResultDetail,
+                    playKanaAudio,
+                    playCurrentKana,
+                    initKanaCanvas,
+                    beginKanaStroke,
+                    continueKanaStroke,
+                    endKanaStroke,
+                    undoKanaStroke,
+                    clearKanaWriting,
+                    startKanaPractice,
+                    submitKanaWriting,
+                    recordKanaAnswer,
+                    retryWrongInSession,
+                    practiceFromWrongBook,
+                    removeFromWrongBook,
+                    clearWrongBook,
+                    quitKanaPractice,
 
                     // Cloudflare Cloud Sync
                     showSyncModal,

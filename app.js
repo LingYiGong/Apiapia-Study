@@ -44,15 +44,15 @@ const app = createApp({
                 btnClass: '!bg-indigo-600 !border-indigo-600 shadow-indigo-100',
                 desc: '基于艾宾浩斯（SM-2）间隔重复算法与“听力优先”理念设计，包含海量核心词库与实用例句。',
                 tags: [
+                    { text: '假名听写手写', color: '#ec4899' },
+                    { text: '平片对照辨析', type: 'warning' },
                     { text: 'SM-2 算法', type: 'primary' },
-                    { text: '听力盲测', color: '#0284c7' },
-                    { text: '1780+ 词汇', type: 'primary' },
-                    { text: '云端多端同步', color: '#7c3aed' }
+                    { text: '听力盲测', color: '#0284c7' }
                 ],
                 highlights: [
+                    '假名听写手写练习（田字格·平假名与片假名对照辨析）',
                     '纯听力盲测模式 & 假名释义解析',
-                    '120 句日常高频对话与 IT 面试清单',
-                    'Cloudflare KV 手机电脑无缝同步'
+                    '220+ 句日常高频对话与 IT 面试清单'
                 ],
                 url: 'japanese/frontend/index.html',
                 btnText: '进入日语学习'

@@ -1,5 +1,9 @@
 :root {
     --app-height: 100dvh;
+    --primary: #4f46e5;
+    --success: #10b981;
+    --danger: #f43f5e;
+    --warning: #f59e0b;
 }
 
 html, body {
@@ -16,4 +20,148 @@ html, body {
     height: 100%;
     height: 100dvh;
     height: var(--app-height, 100dvh);
+}
+
+/* ================== 日语假名字体 ================== */
+.kana-font {
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP", sans-serif;
+}
+
+.kana-serif-font {
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", "MS Mincho", "Noto Serif JP", serif;
+}
+
+/* ================== 立体触感按钮 (3D Push Effect) ================== */
+.kid-btn-primary, .btn-3d-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border-bottom: 4px solid #3730a3;
+    color: #ffffff;
+    transition: all 0.12s ease;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+.kid-btn-primary:active, .btn-3d-primary:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 4px rgba(79, 70, 229, 0.2);
+}
+
+.kid-btn-success, .btn-3d-success {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    border-bottom: 4px solid #059669;
+    color: #ffffff;
+    transition: all 0.12s ease;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+.kid-btn-success:active, .btn-3d-success:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 4px rgba(16, 185, 129, 0.2);
+}
+
+.kid-btn-danger, .btn-3d-danger {
+    background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+    border-bottom: 4px solid #be123c;
+    color: #ffffff;
+    transition: all 0.12s ease;
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
+}
+.kid-btn-danger:active, .btn-3d-danger:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 4px rgba(244, 63, 94, 0.2);
+}
+
+.kid-btn-warning, .btn-3d-warning {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    border-bottom: 4px solid #b45309;
+    color: #ffffff;
+    transition: all 0.12s ease;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+}
+.kid-btn-warning:active, .btn-3d-warning:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 4px rgba(245, 158, 11, 0.2);
+}
+
+.kid-btn-light, .btn-3d-light {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-bottom: 4px solid #cbd5e1;
+    color: #334155;
+    transition: all 0.12s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+}
+.kid-btn-light:active, .btn-3d-light:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* ================== 标准田字格/米字格手写板 ================== */
+.kana-writing-board {
+    position: relative;
+    width: min(320px, 80vw);
+    aspect-ratio: 1;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 3px solid #ef4444;
+    border-radius: 20px;
+    background-color: #ffffff;
+    background-image:
+        /* 中间横竖十字虚线 */
+        linear-gradient(to right, transparent calc(50% - 1.5px), #fca5a5 50%, transparent calc(50% + 1.5px)),
+        linear-gradient(to bottom, transparent calc(50% - 1.5px), #fca5a5 50%, transparent calc(50% + 1.5px)),
+        /* 对角米字格线 */
+        linear-gradient(45deg, transparent calc(50% - 1px), #fee2e2 50%, transparent calc(50% + 1px)),
+        linear-gradient(-45deg, transparent calc(50% - 1px), #fee2e2 50%, transparent calc(50% + 1px));
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.kana-writing-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    cursor: crosshair;
+}
+
+/* ================== 结算得分环 ================== */
+.score-ring {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    margin: 16px auto;
+    display: grid;
+    place-items: center;
+    background: conic-gradient(var(--primary) 0%, #e2e8f0 0);
+    position: relative;
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.2);
+}
+
+.score-ring::after {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    background: white;
+    border-radius: 50%;
+}
+
+.score-ring-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.score-ring-content strong {
+    display: block;
+    font-size: 32px;
+    font-weight: 900;
+    color: #1e293b;
+}
+
+.score-ring-content span {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
 }

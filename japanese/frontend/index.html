@@ -16,6 +16,7 @@
     <!-- 引入内置词库与句子库数据 -->
     <script src="vocab_data.js"></script>
     <script src="sentence_data.js"></script>
+    <script src="kana_data.js"></script>
     <!-- 自定义及主题定制样式 -->
     <link rel="stylesheet" href="style.css" />
     <script>
@@ -65,7 +66,12 @@
                     </van-button>
                 </div>
             </div>
-            <div class="flex justify-between items-center h-7 mt-2 text-xs sm:text-sm opacity-95 border-t border-indigo-500/60 pt-1.5 font-medium leading-none">
+            <div v-if="currentTab === 'kana'" class="flex justify-between items-center h-7 mt-2 text-xs sm:text-sm opacity-95 border-t border-indigo-500/60 pt-1.5 font-medium leading-none">
+                <span>假名总数: <b class="text-emerald-300 font-bold">{{ kanaData.length }}</b> 字</span>
+                <span>错题本: <b class="text-yellow-300 font-bold ml-0.5">{{ kanaWrongList.length }}</b> 字</span>
+                <span>当前模式: <b class="text-white font-bold">{{ kanaTypeModeLabel }}</b></span>
+            </div>
+            <div v-else class="flex justify-between items-center h-7 mt-2 text-xs sm:text-sm opacity-95 border-t border-indigo-500/60 pt-1.5 font-medium leading-none">
                 <span>已学词汇: <b class="text-emerald-300 font-bold">{{ learnedWordsCount }}</b> / {{ words.length }}</span>
                 <span>待复习: 词<b class="text-yellow-300 font-bold ml-0.5">{{ todayDueCount }}</b> | 句<b class="text-yellow-300 font-bold ml-0.5">{{ sentenceDueCount }}</b></span>
                 <span>已掌握: <b class="text-white font-bold">{{ masteredCount }}</b> 词</span>
@@ -914,11 +920,648 @@
                 </div>
 
             </div>
+
+            <!-- Kana Practice & Distinction View (假名练习：区分平假名与片假名，参考 @hanzi 听写练习流程) -->
+            <div v-show="currentTab === 'kana'" class="h-full flex flex-col p-2.5 sm:p-4 min-h-0">
+
+                <!-- 1. 假名练习初始/设置界面 (kanaPracticeState === 'idle') -->
+                <div v-if="kanaPracticeState === 'idle'" :class="kanaCurrentSubTab === 'chart' ? 'flex-1 min-h-0 flex flex-col space-y-2.5' : 'flex-1 min-h-0 overflow-y-auto space-y-3.5 pb-8'">
+                    
+                    <!-- Sub-tabs 切换栏: 🎯 听写设置 | 📕 假名错题本 | 📋 五十音图速查 -->
+                    <div class="bg-white p-1 rounded-2xl border border-gray-200 shadow-sm grid grid-cols-3 gap-1 flex-shrink-0">
+                        <button type="button" @click="kanaCurrentSubTab = 'setup'"
+                                class="py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
+                                :class="kanaCurrentSubTab === 'setup' ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'">
+                            <span>🎯</span>
+                            <span>听写设置</span>
+                        </button>
+                        <button type="button" @click="kanaCurrentSubTab = 'wrong'"
+                                class="py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1 relative"
+                                :class="kanaCurrentSubTab === 'wrong' ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'">
+                            <span>📕</span>
+                            <span>错题本</span>
+                            <span v-if="kanaWrongList.length > 0" class="ml-1 px-1.5 py-0.2 bg-rose-500 text-white text-[10px] font-black rounded-full">
+                                {{ kanaWrongList.length }}
+                            </span>
+                        </button>
+                        <button type="button" @click="kanaCurrentSubTab = 'chart'"
+                                class="py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
+                                :class="kanaCurrentSubTab === 'chart' ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'">
+                            <span>📋</span>
+                            <span>五十音图</span>
+                        </button>
+                    </div>
+
+                    <!-- TAB 1: 练习设置与开始 -->
+                    <div v-if="kanaCurrentSubTab === 'setup'" class="space-y-3.5">
+                        
+                        <!-- 核心：区别平假名与片假名 - 模式选择 -->
+                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 shadow-sm space-y-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xl">🎌</span>
+                                <h3 class="text-sm font-black text-slate-800">假名听写模式（平假名 vs 片假名）</h3>
+                            </div>
+                            <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                                针对性区分平假名与片假名书写形态，告别混淆：
+                            </p>
+
+                            <div class="grid grid-cols-2 gap-2.5 pt-1">
+                                <!-- 模式 1: 纯平假名 -->
+                                <div @click="kanaTypeMode = 'hiragana'"
+                                     class="p-3 rounded-2xl border-2 cursor-pointer transition-all active:scale-[0.98] relative overflow-hidden"
+                                     :class="kanaTypeMode === 'hiragana' ? 'border-indigo-500 bg-indigo-50/60 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-lg">🌸</span>
+                                        <span class="text-xs font-black text-slate-800">纯平假名</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-1 font-medium">听读音手写あいうえお，掌握平假名圆润字形</p>
+                                </div>
+
+                                <!-- 模式 2: 纯片假名 -->
+                                <div @click="kanaTypeMode = 'katakana'"
+                                     class="p-3 rounded-2xl border-2 cursor-pointer transition-all active:scale-[0.98] relative overflow-hidden"
+                                     :class="kanaTypeMode === 'katakana' ? 'border-amber-500 bg-amber-50/60 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-lg">⚡</span>
+                                        <span class="text-xs font-black text-slate-800">纯片假名</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-1 font-medium">听读音手写アイウエオ，攻克片假名外来语</p>
+                                </div>
+
+                                <!-- 模式 3: 平片混合 (推荐) -->
+                                <div @click="kanaTypeMode = 'mixed'"
+                                     class="p-3 rounded-2xl border-2 cursor-pointer transition-all active:scale-[0.98] relative overflow-hidden"
+                                     :class="kanaTypeMode === 'mixed' ? 'border-purple-500 bg-purple-50/60 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-lg">🔀</span>
+                                            <span class="text-xs font-black text-slate-800">平片假名混合</span>
+                                        </div>
+                                        <span class="text-[10px] bg-purple-100 text-purple-700 font-bold px-1.5 py-0.2 rounded-full">推荐</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-1 font-medium">随机指定写平假名或片假名，防止混淆彻底夯实</p>
+                                </div>
+
+                                <!-- 模式 4: 平片互换练习 -->
+                                <div @click="kanaTypeMode = 'conversion'"
+                                     class="p-3 rounded-2xl border-2 cursor-pointer transition-all active:scale-[0.98] relative overflow-hidden"
+                                     :class="kanaTypeMode === 'conversion' ? 'border-emerald-500 bg-emerald-50/60 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-lg">🔄</span>
+                                        <span class="text-xs font-black text-slate-800">平片互换默写</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-1 font-medium">看平假名写片假名，看片写平，双向转换记忆</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 范围选择卡片 -->
+                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 shadow-sm space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xl">📚</span>
+                                    <h3 class="text-sm font-black text-slate-800">练习范围与行属</h3>
+                                </div>
+                                <span class="text-xs text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full">
+                                    {{ kanaRangeScope === 'seion' ? '清音46字' : (kanaRangeScope === 'dakuon' ? '浊音25字' : (kanaRangeScope === 'youon' ? '拗音33字' : (kanaRangeScope === 'all' ? '全部104字' : '自选行'))) }}
+                                </span>
+                            </div>
+
+                            <!-- 范围切换标签 -->
+                            <div class="grid grid-cols-5 gap-1.5 pt-1">
+                                <button type="button" @click="kanaRangeScope = 'seion'"
+                                        class="py-2 text-xs font-bold rounded-xl border transition-all text-center"
+                                        :class="kanaRangeScope === 'seion' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'">
+                                    清音
+                                </button>
+                                <button type="button" @click="kanaRangeScope = 'dakuon'"
+                                        class="py-2 text-xs font-bold rounded-xl border transition-all text-center"
+                                        :class="kanaRangeScope === 'dakuon' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'">
+                                    浊/半浊
+                                </button>
+                                <button type="button" @click="kanaRangeScope = 'youon'"
+                                        class="py-2 text-xs font-bold rounded-xl border transition-all text-center"
+                                        :class="kanaRangeScope === 'youon' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'">
+                                    拗音
+                                </button>
+                                <button type="button" @click="kanaRangeScope = 'all'"
+                                        class="py-2 text-xs font-bold rounded-xl border transition-all text-center"
+                                        :class="kanaRangeScope === 'all' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'">
+                                    全假名
+                                </button>
+                                <button type="button" @click="kanaRangeScope = 'custom'"
+                                        class="py-2 text-xs font-bold rounded-xl border transition-all text-center"
+                                        :class="kanaRangeScope === 'custom' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'">
+                                    自选行
+                                </button>
+                            </div>
+
+                            <!-- 自选行折叠区 (仅当 custom 时展示) -->
+                            <div v-if="kanaRangeScope === 'custom'" class="p-3 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                                <div class="text-[11px] font-bold text-slate-500 flex justify-between">
+                                    <span>点击选择本次练习的行：</span>
+                                    <span>已选 {{ kanaSelectedRows.length }}/10 行</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button v-for="r in kanaRowOptions" :key="r.id" type="button" @click="toggleKanaRow(r.id)"
+                                            class="py-1.5 px-2.5 rounded-xl text-xs font-bold border transition-all flex items-center justify-between"
+                                            :class="kanaSelectedRows.includes(r.id) ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : 'bg-white text-slate-600 border-slate-200'">
+                                        <span>{{ r.name }}</span>
+                                        <span>{{ kanaSelectedRows.includes(r.id) ? '✓' : '+' }}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 题数选择卡片 -->
+                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 shadow-sm space-y-2">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-bold text-slate-700">每轮听写题数</h3>
+                                <span class="text-xs font-mono font-bold text-indigo-600">{{ kanaQuestionCount === 0 ? '全部题目' : kanaQuestionCount + ' 题' }}</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button" @click="kanaQuestionCount = 10"
+                                        class="py-2.5 rounded-xl text-xs font-bold border transition-all"
+                                        :class="kanaQuestionCount === 10 ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-700 border-slate-200'">
+                                    ⚡ 10 题 (快速练习)
+                                </button>
+                                <button type="button" @click="kanaQuestionCount = 20"
+                                        class="py-2.5 rounded-xl text-xs font-bold border transition-all"
+                                        :class="kanaQuestionCount === 20 ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-700 border-slate-200'">
+                                    🎯 20 题 (标准强化)
+                                </button>
+                                <button type="button" @click="kanaQuestionCount = 0"
+                                        class="py-2.5 rounded-xl text-xs font-bold border transition-all"
+                                        :class="kanaQuestionCount === 0 ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-700 border-slate-200'">
+                                    🔥 范围全部假名
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 启动听写练习大按钮 (立体触感按钮，参考 @hanzi) -->
+                        <button type="button" @click="startKanaPractice()"
+                                class="w-full py-4 px-5 rounded-2xl kid-btn-primary text-white font-black text-base sm:text-lg shadow-lg flex items-center justify-center space-x-2 active:scale-95 transition-all">
+                            <span>🔊</span>
+                            <span>开始假名听写练习</span>
+                            <span>➔</span>
+                        </button>
+                    </div>
+
+                    <!-- TAB 2: 假名错题本 -->
+                    <div v-if="kanaCurrentSubTab === 'wrong'" class="space-y-3.5">
+                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 shadow-sm space-y-3.5">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xl">📕</span>
+                                    <h3 class="text-sm font-black text-slate-800">假名错题强化本</h3>
+                                </div>
+                                <span class="text-xs text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-full border border-rose-100">
+                                    共 {{ kanaWrongList.length }} 个待巩固
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                                练习中写错或记混的平片假名会自动归集在这里，点击可随时听发音与针对性专项重练。
+                            </p>
+
+                            <!-- 错字列表 -->
+                            <div v-if="kanaWrongList.length > 0" class="flex flex-wrap gap-2 pt-1 max-h-60 overflow-y-auto">
+                                <div v-for="w in kanaWrongList" :key="w.key"
+                                     class="p-2.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center space-x-2 shadow-xs">
+                                    <div class="text-center">
+                                        <div class="text-lg font-black text-slate-800 kana-font leading-none">
+                                            {{ w.expectedChar }}
+                                        </div>
+                                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">
+                                            {{ w.romaji }}
+                                        </div>
+                                    </div>
+                                    <div class="border-l border-slate-200 pl-2 text-left">
+                                        <div class="text-[10px] font-bold" :class="w.targetType === 'katakana' ? 'text-amber-700' : 'text-indigo-700'">
+                                            {{ w.targetType === 'katakana' ? '片假名' : '平假名' }} (错{{ w.errorCount }}次)
+                                        </div>
+                                        <div class="text-[10px] text-slate-400">
+                                            对应: {{ w.pairedChar }}
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="playKanaAudio(w.hiragana)" class="text-sm text-indigo-600 hover:text-indigo-800 p-1" title="发音">
+                                        🔊
+                                    </button>
+                                    <button type="button" @click="removeFromWrongBook(w.key)" class="text-xs text-rose-400 hover:text-rose-600 p-1" title="移除">
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+                            <div v-else class="text-center py-8 text-slate-400 text-xs font-medium">
+                                🎉 太棒了！错题本为空，没有任何记错的假名！
+                            </div>
+
+                            <!-- 专项练习按钮 -->
+                            <div v-if="kanaWrongList.length > 0" class="pt-2 border-t border-slate-100 flex space-x-2">
+                                <button type="button" @click="practiceFromWrongBook"
+                                        class="flex-1 py-3.5 kid-btn-primary text-white text-sm font-black rounded-2xl shadow-md">
+                                    🔊 专项听写错题本假名 ({{ kanaWrongList.length }}字)
+                                </button>
+                                <button type="button" @click="clearWrongBook"
+                                        class="py-3.5 px-3 kid-btn-light text-slate-500 text-xs font-bold rounded-2xl">
+                                    清空
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: 五十音图速查表 (顶满全屏空间) -->
+                    <div v-if="kanaCurrentSubTab === 'chart'" class="flex-1 min-h-0 flex flex-col">
+                        <div class="flex-1 min-h-0 flex flex-col bg-white rounded-3xl border-2 border-slate-100 p-3 sm:p-4 shadow-sm space-y-2">
+                            <div class="flex items-center justify-between flex-shrink-0">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xl">📋</span>
+                                    <h3 class="text-sm font-black text-slate-800">五十音图速查对比表</h3>
+                                </div>
+                                <span class="text-[11px] text-slate-400">点击任意假名可朗读发音</span>
+                            </div>
+
+                            <!-- 分组切换: 清音 | 浊音・半浊音 | 拗音 -->
+                            <div class="grid grid-cols-3 gap-1.5 flex-shrink-0">
+                                <button type="button" @click="chartGroupTab = 'seion'"
+                                        class="py-2 text-xs font-bold rounded-xl border transition-all text-center"
+                                        :class="chartGroupTab === 'seion' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200'">
+                                    清音 (46)
+                                </button>
+                                <button type="button" @click="chartGroupTab = 'dakuon'"
+                                        class="py-2 text-xs font-bold rounded-xl border transition-all text-center"
+                                        :class="chartGroupTab === 'dakuon' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200'">
+                                    浊音・半浊音 (25)
+                                </button>
+                                <button type="button" @click="chartGroupTab = 'youon'"
+                                        class="py-2 text-xs font-bold rounded-xl border transition-all text-center"
+                                        :class="chartGroupTab === 'youon' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200'">
+                                    常用拗音 (33)
+                                </button>
+                            </div>
+
+                            <!-- 五十音图 5 列元音表头 (a, i, u, e, o) -->
+                            <div v-if="chartGroupTab !== 'youon'" class="grid grid-cols-5 gap-1 sm:gap-1.5 text-center text-[10px] sm:text-xs font-black text-slate-400 pb-1 border-b border-slate-100 flex-shrink-0">
+                                <div>a (あ段)</div>
+                                <div>i (い段)</div>
+                                <div>u (う段)</div>
+                                <div>e (え段)</div>
+                                <div>o (お段)</div>
+                            </div>
+
+                            <!-- 假名平片对照卡片网格 (无论屏幕大小恒定一行显示5个，自适应铺满底部) -->
+                            <div class="flex-1 min-h-0 grid grid-cols-5 gap-1 sm:gap-1.5 overflow-y-auto p-0.5">
+                                <template v-for="k in chartKanaList" :key="k.id">
+                                    <!-- 占位空白格 (如や行、わ行中缺失的格位) -->
+                                    <div v-if="k.isEmpty" class="p-1 sm:p-1.5 rounded-xl border border-dashed border-slate-200/80 bg-slate-50/40 flex items-center justify-center opacity-30 select-none min-h-[60px] sm:min-h-[68px]">
+                                        <span class="text-xs text-slate-300 font-mono">-</span>
+                                    </div>
+                                    <!-- 正常假名卡片 -->
+                                    <div v-else
+                                         @click="playKanaAudio(k.hiragana)"
+                                         class="p-1 sm:p-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition-all cursor-pointer text-center active:scale-95 relative group shadow-xs flex flex-col justify-between items-center min-h-[60px] sm:min-h-[68px]">
+                                        <div class="flex items-center justify-center space-x-1 leading-tight mt-0.5">
+                                            <!-- 平假名 -->
+                                            <span class="text-base sm:text-lg font-black text-indigo-700 kana-font">{{ k.hiragana }}</span>
+                                            <span class="text-slate-300 text-[10px]">/</span>
+                                            <!-- 片假名 -->
+                                            <span class="text-base sm:text-lg font-black text-amber-700 kana-font">{{ k.katakana }}</span>
+                                        </div>
+                                        <div class="text-[10px] sm:text-[11px] font-mono font-bold text-slate-500 mb-0.5 leading-none">
+                                            {{ k.romaji }}
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- 2. 听写进行中界面 (kanaPracticeState === 'writing'，核心大田字格手写，参考 @hanzi) -->
+                <div v-show="kanaPracticeState === 'writing'" class="h-full flex flex-col space-y-3 pb-4">
+                    
+                    <!-- 顶栏信息与退出按钮 -->
+                    <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between flex-shrink-0">
+                        <div class="text-sm font-black text-slate-800 flex items-center space-x-1.5">
+                            <span class="text-indigo-600">假名听写</span>
+                            <span>：第</span>
+                            <span class="text-indigo-600 font-black text-base font-mono">{{ currentKanaQuestionNumber }}</span>
+                            <span>/</span>
+                            <span class="font-mono">{{ totalKanaQuestions }}</span>
+                            <span>题</span>
+                            <!-- 模式徽章：区分平假名与片假名 -->
+                            <span v-if="currentKanaItem && currentKanaItem.targetType === 'katakana'"
+                                  class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full border border-amber-200 ml-1">
+                                ⚡ 片假名
+                            </span>
+                            <span v-else-if="currentKanaItem && currentKanaItem.targetType === 'hiragana'"
+                                  class="text-xs bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full border border-indigo-200 ml-1">
+                                🌸 平假名
+                            </span>
+                            <span v-else-if="currentKanaItem && currentKanaItem.targetType === 'conversion'"
+                                  class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-200 ml-1">
+                                🔄 {{ currentKanaItem.conversionDirection === 'hira_to_kata' ? '平 ➔ 片' : '片 ➔ 平' }}
+                            </span>
+                        </div>
+                        <button type="button" @click="quitKanaPractice"
+                                class="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-95 transition-all">
+                            退出本轮
+                        </button>
+                    </div>
+
+                    <!-- 进度条 -->
+                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden flex-shrink-0">
+                        <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-300"
+                             :style="{ width: kanaProgressPercent + '%' }"></div>
+                    </div>
+
+                    <!-- 听音与提示区 (大字罗马音与大喇叭发音按钮) -->
+                    <div class="bg-white p-3 sm:p-4 rounded-3xl border-2 border-slate-100 shadow-sm text-center flex-shrink-0">
+                        <div class="flex items-center justify-center space-x-5">
+                            <div class="text-left">
+                                <span class="text-[11px] text-slate-400 font-bold block">
+                                    {{ currentKanaItem && currentKanaItem.targetType === 'conversion' ? '对应转换题目' : '发音罗马音' }}
+                                </span>
+                                <div class="text-3xl sm:text-4xl font-black text-indigo-600 tracking-wider font-mono">
+                                    <template v-if="currentKanaItem && currentKanaItem.targetType === 'conversion'">
+                                        <span class="kana-font text-indigo-700 font-bold">{{ currentKanaItem.conversionDirection === 'hira_to_kata' ? currentKanaItem.hiragana : currentKanaItem.katakana }}</span>
+                                        <span class="text-base text-slate-400 font-normal ml-2">({{ currentKanaItem.romaji }})</span>
+                                    </template>
+                                    <template v-else>
+                                        {{ currentKanaItem ? currentKanaItem.romaji : '' }}
+                                    </template>
+                                </div>
+                            </div>
+                            <button type="button" @click="playCurrentKana"
+                                    class="w-13 h-13 sm:w-15 sm:h-15 rounded-2xl kid-btn-primary text-white flex items-center justify-center text-2xl sm:text-3xl shadow-lg active:scale-95"
+                                    title="播放读音">
+                                🔊
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-500 font-bold mt-2 leading-tight">
+                            <template v-if="currentKanaItem && currentKanaItem.targetType === 'conversion'">
+                                请在下方田字格写出对应的【{{ currentKanaItem.conversionDirection === 'hira_to_kata' ? '片假名' : '平假名' }}】
+                            </template>
+                            <template v-else-if="currentKanaItem && currentKanaItem.targetType === 'katakana'">
+                                听读音，在下方田字格手写对应的【片假名】；可点击大喇叭重听
+                            </template>
+                            <template v-else>
+                                听读音，在下方田字格手写对应的【平假名】；可点击大喇叭重听
+                            </template>
+                        </p>
+                    </div>
+
+                    <!-- 手写田字格区域 (HTML5 Canvas + 米字格辅助线，参考 @hanzi) -->
+                    <div class="bg-white p-3 sm:p-4 rounded-3xl border-2 border-slate-100 shadow-sm flex flex-col items-center space-y-2.5 flex-1 min-h-0 justify-center">
+                        <div class="text-xs font-black text-slate-700 flex items-center space-x-1">
+                            <span>✏️ 在田字格里写一写</span>
+                            <span :class="currentKanaItem && currentKanaItem.targetType === 'katakana' ? 'text-amber-600 font-bold' : 'text-indigo-600 font-bold'">
+                                (请写{{ currentKanaItem && (currentKanaItem.targetType === 'katakana' || currentKanaItem.conversionDirection === 'hira_to_kata') ? '【片假名】' : '【平假名】' }})
+                            </span>
+                        </div>
+                        <div class="kana-writing-board">
+                            <canvas ref="kanaCanvasRef" class="kana-writing-canvas"
+                                    @pointerdown="beginKanaStroke"
+                                    @pointermove="continueKanaStroke"
+                                    @pointerup="endKanaStroke"
+                                    @pointercancel="endKanaStroke"></canvas>
+                        </div>
+
+                        <!-- 两个功能按钮：撤销一笔 / 清空重写 -->
+                        <div class="w-full max-w-[320px] grid grid-cols-2 gap-2.5 pt-1">
+                            <button type="button" @click="undoKanaStroke"
+                                    class="py-2.5 px-3 kid-btn-warning text-xs sm:text-sm font-black rounded-2xl flex items-center justify-center space-x-1">
+                                <span>↩️</span>
+                                <span>撤销一笔</span>
+                            </button>
+                            <button type="button" @click="clearKanaWriting"
+                                    class="py-2.5 px-3 kid-btn-danger text-xs sm:text-sm font-black rounded-2xl flex items-center justify-center space-x-1">
+                                <span>🗑️</span>
+                                <span>清空重写</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 大核对按钮 (醒目大绿键，参考 @hanzi) -->
+                    <button type="button" @click="submitKanaWriting"
+                            class="w-full py-4 kid-btn-success text-white font-black text-base sm:text-lg rounded-2xl shadow-lg flex-shrink-0 active:scale-95 transition-all">
+                        ✨ 写好了，核对本题
+                    </button>
+                </div>
+
+
+                <!-- 3. 答案核对面板 (kanaPracticeState === 'checking'，对比手写与正确假名，强调平片区别) -->
+                <div v-show="kanaPracticeState === 'checking'" class="h-full flex flex-col space-y-3.5 pb-4 overflow-y-auto">
+                    
+                    <!-- 顶栏状态 -->
+                    <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between flex-shrink-0">
+                        <div class="text-sm font-black text-slate-800 flex items-center space-x-1.5">
+                            <span class="text-indigo-600">答案核对</span>
+                            <span>：第</span>
+                            <span class="text-indigo-600 font-black text-base font-mono">{{ currentKanaQuestionNumber }}</span>
+                            <span>/</span>
+                            <span class="font-mono">{{ totalKanaQuestions }}</span>
+                            <span>题</span>
+                            <span v-if="currentKanaItem && currentKanaItem.targetType === 'katakana'"
+                                  class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full border border-amber-200 ml-1">
+                                ⚡ 片假名
+                            </span>
+                            <span v-else
+                                  class="text-xs bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full border border-indigo-200 ml-1">
+                                🌸 平假名
+                            </span>
+                        </div>
+                        <button type="button" @click="quitKanaPractice"
+                                class="text-xs px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-95 transition-all">
+                            退出本轮
+                        </button>
+                    </div>
+
+                    <!-- 进度条 -->
+                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden flex-shrink-0">
+                        <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-300"
+                             :style="{ width: kanaProgressPercent + '%' }"></div>
+                    </div>
+
+                    <!-- 左右对比区：你手写的 vs 标准假名 -->
+                    <div class="bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm space-y-3 flex-shrink-0">
+                        <p class="text-xs text-slate-600 text-center font-bold">请核对字形与笔画，判定后进入下一题：</p>
+                        
+                        <div class="grid grid-cols-2 gap-3 pt-1">
+                            <!-- 左卡片：你写的 -->
+                            <div class="p-2.5 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center flex flex-col items-center justify-between">
+                                <strong class="block text-xs text-slate-600 mb-1 font-black">你手写的</strong>
+                                <div class="w-full aspect-square bg-white rounded-xl flex items-center justify-center border border-slate-200 overflow-hidden">
+                                    <img v-if="kanaCapturedWriting" :src="kanaCapturedWriting" class="w-full h-full object-contain" alt="手写预览" />
+                                    <span v-else class="text-xs text-slate-400 font-medium">（未手写）</span>
+                                </div>
+                                <span class="text-[10px] text-slate-400 mt-1">你的答卷笔迹</span>
+                            </div>
+
+                            <!-- 右卡片：标准假名 -->
+                            <div class="p-2.5 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center flex flex-col items-center justify-between">
+                                <strong class="block text-xs text-slate-600 mb-1 font-black">
+                                    正确【{{ currentKanaItem && (currentKanaItem.targetType === 'katakana' || currentKanaItem.conversionDirection === 'hira_to_kata') ? '片假名' : '平假名' }}】
+                                </strong>
+                                <div class="w-full aspect-square bg-white rounded-xl flex flex-col items-center justify-center border border-slate-200">
+                                    <span class="text-6xl font-black kana-font" :class="currentKanaItem && (currentKanaItem.targetType === 'katakana' || currentKanaItem.conversionDirection === 'hira_to_kata') ? 'text-amber-600' : 'text-indigo-600'">
+                                        {{ currentKanaExpectedChar }}
+                                    </span>
+                                    <span class="text-[11px] font-mono text-slate-400 mt-1">{{ currentKanaItem ? currentKanaItem.romaji : '' }}</span>
+                                </div>
+                                <button type="button" @click="playCurrentKana"
+                                        class="w-full mt-1 py-1.5 px-2 text-xs kid-btn-light rounded-xl font-black flex items-center justify-center space-x-1">
+                                    <span>🔊</span>
+                                    <span>重听发音</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 区别平假名与片假名 - 强化对比提示栏 -->
+                        <div class="p-3 bg-gradient-to-br from-indigo-50/80 to-purple-50/80 rounded-2xl border border-indigo-100 text-xs text-slate-700 space-y-1.5">
+                            <div class="flex items-center justify-between font-bold border-b border-indigo-100/60 pb-1">
+                                <span class="text-indigo-900 font-black">🔍 平假名 ⟷ 片假名 对照辨析</span>
+                                <span class="text-[11px] text-slate-500 font-mono">{{ currentKanaItem ? (currentKanaItem.rowName + ' · ' + currentKanaItem.groupName) : '' }}</span>
+                            </div>
+                            <div class="flex items-center justify-around text-center py-1">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block font-medium">平假名</span>
+                                    <span class="text-xl font-black text-indigo-700 kana-font">{{ currentKanaItem ? currentKanaItem.hiragana : '' }}</span>
+                                    <span class="text-[10px] text-slate-400 block font-mono">({{ currentKanaItem ? currentKanaItem.strokesHira : '' }}画)</span>
+                                </div>
+                                <span class="text-xl text-slate-300 font-bold">⇄</span>
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block font-medium">片假名</span>
+                                    <span class="text-xl font-black text-amber-700 kana-font">{{ currentKanaItem ? currentKanaItem.katakana : '' }}</span>
+                                    <span class="text-[10px] text-slate-400 block font-mono">({{ currentKanaItem ? currentKanaItem.strokesKata : '' }}画)</span>
+                                </div>
+                                <span class="text-xl text-slate-300 font-bold">⇄</span>
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block font-medium">罗马音</span>
+                                    <span class="text-lg font-black text-slate-700 font-mono">{{ currentKanaItem ? currentKanaItem.romaji : '' }}</span>
+                                </div>
+                            </div>
+                            <div class="text-[11px] text-slate-600 pt-1 border-t border-indigo-100/60 flex items-center justify-between">
+                                <span>📖 常用词：{{ currentKanaItem ? currentKanaItem.example : '' }}</span>
+                                <span class="text-slate-400 text-[10px]">{{ currentKanaItem ? currentKanaItem.exampleKata : '' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- 判定排期提示 -->
+                        <div class="p-2 bg-slate-50 rounded-xl text-center text-[11px] text-slate-500 font-medium">
+                            💡 记错或写错的假名将自动加入错题本，并在本轮末尾追加重练，直至完全掌握！
+                        </div>
+
+                        <!-- 两个超大判定按钮：错 / 对 (参考 @hanzi) -->
+                        <div class="grid grid-cols-2 gap-3 pt-1">
+                            <button type="button" @click="recordKanaAnswer(false)"
+                                    class="py-4 kid-btn-danger text-white font-black text-sm sm:text-base rounded-2xl shadow-lg active:scale-95 transition-all">
+                                ❌ 记错/写错 (重练)
+                            </button>
+                            <button type="button" @click="recordKanaAnswer(true)"
+                                    class="py-4 kid-btn-success text-white font-black text-sm sm:text-base rounded-2xl shadow-lg active:scale-95 transition-all">
+                                ✅ 写对啦 (顺延)
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- 4. 本轮练习通关结算界面 (kanaPracticeState === 'summary'，参考 @hanzi 结算通关) -->
+                <div v-show="kanaPracticeState === 'summary'" class="h-full flex flex-col justify-between space-y-4 pb-6 overflow-y-auto">
+                    
+                    <div class="bg-white rounded-3xl border-2 border-slate-100 p-5 sm:p-6 shadow-sm text-center space-y-3.5">
+                        <h2 class="text-xl font-black text-slate-800">🎉 本轮假名听写大通关！</h2>
+
+                        <!-- 得分环 -->
+                        <div class="score-ring" :style="{ background: 'conic-gradient(#4f46e5 ' + kanaAccuracyRate + '%, #e2e8f0 0)' }">
+                            <div class="score-ring-content">
+                                <strong>{{ kanaAccuracyRate }}%</strong>
+                                <span>正确率</span>
+                            </div>
+                        </div>
+
+                        <p class="text-sm sm:text-base font-bold text-slate-700 leading-relaxed max-w-xs mx-auto">
+                            {{ kanaSummaryMessage }}
+                        </p>
+
+                        <!-- 本轮结果列表 -->
+                        <div class="max-h-52 overflow-y-auto py-2 border-t border-b border-slate-100">
+                            <div class="text-xs font-bold text-slate-400 mb-2">本轮练习题单详情（点击可查看手写笔迹）</div>
+                            <div class="flex flex-wrap gap-2 justify-center">
+                                <div v-for="(ans, idx) in kanaAnswers" :key="idx"
+                                     @click="selectedKanaResultDetail = ans; showKanaResultDetailModal = true"
+                                     class="p-2 rounded-xl border text-center cursor-pointer transition-all active:scale-95 shadow-xs flex items-center space-x-1.5"
+                                     :class="ans.isCorrect ? 'bg-emerald-50/70 border-emerald-200 text-emerald-800' : 'bg-rose-50/70 border-rose-200 text-rose-800'">
+                                    <span class="text-base font-black kana-font">{{ ans.expectedChar }}</span>
+                                    <span class="text-[10px] font-mono text-slate-400">({{ ans.romaji }})</span>
+                                    <span class="text-xs font-bold">{{ ans.isCorrect ? '✅' : '❌' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮组 -->
+                    <div class="space-y-2.5">
+                        <!-- 再练本轮错字 (若有错字) -->
+                        <button v-if="kanaWrongCountInSession > 0" type="button" @click="retryWrongInSession"
+                                class="w-full py-4 kid-btn-warning text-white font-black text-base rounded-2xl shadow-md active:scale-95 transition-all">
+                            ⚡ 再练本轮错字 ({{ kanaWrongCountInSession }}个)
+                        </button>
+                        <button type="button" @click="startKanaPractice()"
+                                class="w-full py-4 kid-btn-primary text-white font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all">
+                            🔄 再来一轮练习
+                        </button>
+                        <button type="button" @click="quitKanaPractice"
+                                class="w-full py-3.5 kid-btn-light text-slate-700 font-black text-sm sm:text-base rounded-2xl active:scale-95 transition-all">
+                            🏠 返回假名练习首页
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
         </main>
 
-        <!-- App-like Bottom Navigation Bar -->
+        <!-- Kana Result Detail Modal (Vant Popup) -->
+        <van-popup v-model:show="showKanaResultDetailModal" position="bottom" round closeable :style="{ maxHeight: '80%' }" class="p-5">
+            <div v-if="selectedKanaResultDetail" class="space-y-3.5">
+                <div class="border-b pb-2">
+                    <h3 class="text-sm font-bold text-gray-800 flex items-center space-x-1.5">
+                        <span>📝 假名书写核对记录</span>
+                    </h3>
+                </div>
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <div class="p-2.5 bg-slate-50 rounded-2xl border text-center">
+                        <strong class="block text-xs text-slate-600 mb-1">你写的</strong>
+                        <div class="w-full aspect-square bg-white rounded-xl border flex items-center justify-center overflow-hidden">
+                            <img v-if="selectedKanaResultDetail.writingUrl" :src="selectedKanaResultDetail.writingUrl" class="w-full h-full object-contain" />
+                            <span v-else class="text-xs text-slate-400">（无手写）</span>
+                        </div>
+                    </div>
+                    <div class="p-2.5 bg-slate-50 rounded-2xl border text-center">
+                        <strong class="block text-xs text-slate-600 mb-1">标准形态</strong>
+                        <div class="w-full aspect-square bg-white rounded-xl border flex flex-col items-center justify-center">
+                            <span class="text-5xl font-black kana-font text-indigo-700">{{ selectedKanaResultDetail.expectedChar }}</span>
+                            <span class="text-xs font-mono text-slate-400 mt-1">{{ selectedKanaResultDetail.romaji }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3 bg-indigo-50 rounded-xl text-xs space-y-1">
+                    <div>平假名: <b>{{ selectedKanaResultDetail.item.hiragana }}</b> ⟷ 片假名: <b>{{ selectedKanaResultDetail.item.katakana }}</b></div>
+                    <div class="text-gray-500">词例: {{ selectedKanaResultDetail.example }} / {{ selectedKanaResultDetail.exampleKata }}</div>
+                </div>
+                <van-button block round type="primary" size="small" @click="showKanaResultDetailModal = false">
+                    关闭
+                </van-button>
+            </div>
+        </van-popup>
+
+        <!-- App-like Bottom Navigation Bar (4-columns) -->
         <nav class="flex-shrink-0 bg-white/95 backdrop-blur-md border-t border-gray-200/80 pb-[env(safe-area-inset-bottom)] z-20 select-none shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-            <div class="grid grid-cols-3 h-14 items-center">
+            <div class="grid grid-cols-4 h-14 items-center">
                 <!-- 单词听力 -->
                 <button @click="currentTab = 'practice'"
                         class="flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative"
@@ -948,6 +1591,22 @@
                     </div>
                     <span class="text-[11px] mt-0.5 tracking-tight">句子听力</span>
                     <span v-if="currentTab === 'sentence'" class="w-5 h-0.5 bg-indigo-600 rounded-full mt-0.5"></span>
+                    <span v-else class="w-5 h-0.5 bg-transparent rounded-full mt-0.5"></span>
+                </button>
+
+                <!-- 假名练习 -->
+                <button @click="currentTab = 'kana'"
+                        class="flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative"
+                        :class="currentTab === 'kana' ? 'text-indigo-600 font-bold' : 'text-gray-400 hover:text-gray-600 font-medium'">
+                    <div class="relative flex items-center justify-center">
+                        <span class="text-xl transition-transform kana-font font-black" :class="currentTab === 'kana' ? 'scale-110' : 'opacity-70'">あ</span>
+                        <span v-if="kanaWrongList.length > 0" 
+                              class="absolute -top-1 -right-3.5 px-1.5 py-0.2 min-w-[16px] h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm animate-pulse">
+                            {{ kanaWrongList.length > 99 ? '99+' : kanaWrongList.length }}
+                        </span>
+                    </div>
+                    <span class="text-[11px] mt-0.5 tracking-tight">假名练习</span>
+                    <span v-if="currentTab === 'kana'" class="w-5 h-0.5 bg-indigo-600 rounded-full mt-0.5"></span>
                     <span v-else class="w-5 h-0.5 bg-transparent rounded-full mt-0.5"></span>
                 </button>
 
