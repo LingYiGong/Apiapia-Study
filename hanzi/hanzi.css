@@ -99,66 +99,109 @@
 }
 
 /* ================== 听音选字选项卡片 ================== */
+.choice-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding-top: 4px;
+}
+
 .choice-option {
+    box-sizing: border-box;
     position: relative;
-    min-height: 120px;
-    border: 2.5px solid #e0e7ff;
-    border-bottom: 5px solid #c7d2fe;
-    border-radius: 24px;
+    /* 5个选项自然排布：第一行3个，第二行居中2个，且所有按钮尺寸与字体完全一致 */
+    width: calc((100% - 24px) / 3);
+    height: 94px;
+    min-height: 94px;
+    max-height: 94px;
+    max-width: 120px;
+    border: 3px solid #e0e7ff;
+    border-radius: 20px;
     background: #ffffff;
     color: var(--text);
     font-family: "KaiTi", "STKaiti", "楷体", "BiauKai", serif;
-    font-size: clamp(52px, 13vw, 80px);
+    font-size: clamp(40px, 10vw, 64px);
     font-weight: 800;
-    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.08);
-    transition: all 0.15s ease;
+    line-height: 1;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.06);
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    user-select: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.choice-option:hover {
+.choice-option:hover:not(:disabled) {
     border-color: #a5b4fc;
     background: #f8faff;
 }
 
-.choice-option:active {
-    transform: translateY(3px);
-    border-bottom-width: 2px;
+.choice-option:active:not(:disabled) {
+    background: #eef2ff;
+    /* 不变动任何边框大小或偏移，确保尺寸完全固定 */
+}
+
+.choice-option:focus,
+.choice-option:focus-visible {
+    outline: none;
+}
+
+.choice-option:disabled {
+    cursor: default;
+    opacity: 1;
 }
 
 .choice-option.wrong-choice {
-    border-color: #fda4af;
-    border-bottom-color: #f43f5e;
+    border: 3px solid #f43f5e;
     background: #fff1f2;
     color: #be123c;
-    animation: choice-shake 0.3s ease;
 }
 
 .choice-option.wrong-choice::after {
     content: "✕";
     position: absolute;
-    top: 8px;
-    right: 10px;
+    top: 6px;
+    right: 8px;
     display: grid;
     place-items: center;
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     color: #fff;
     background: #f43f5e;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 900;
-    box-shadow: 0 2px 6px rgba(244, 63, 94, 0.4);
+    box-shadow: 0 2px 4px rgba(244, 63, 94, 0.3);
 }
 
 .choice-option.correct-choice {
-    border-color: #86efac;
-    border-bottom-color: #10b981;
+    border: 3px solid #10b981;
     background: #f0fdf4;
     color: #15803d;
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.choice-option.correct-choice::after {
+    content: "✓";
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    color: #fff;
+    background: #10b981;
+    font-size: 13px;
+    font-weight: 900;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
 }
 
 @keyframes choice-shake {

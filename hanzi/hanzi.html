@@ -180,7 +180,7 @@
                                         <span>听音选字闯关</span>
                                         <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">🎮 趣味游戏</span>
                                     </div>
-                                    <p class="text-xs sm:text-sm text-slate-500 font-medium mt-1">仔细听发音与词意，从3个字里选出正确的字</p>
+                                    <p class="text-xs sm:text-sm text-slate-500 font-medium mt-1">仔细听发音与词意，从5个字里选出正确的字（常用字库随机干扰）</p>
                                 </div>
                             </div>
                             <span class="text-amber-400 group-hover:text-amber-600 transition-colors text-xl font-black pr-2">➔</span>
@@ -338,17 +338,23 @@
                 </div>
 
                 <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center space-y-5">
-                    <p class="text-xs sm:text-sm font-bold text-slate-500">仔细听读音，点击选出正确的汉字：</p>
+                    <p class="text-xs sm:text-sm font-bold text-slate-500">仔细听读音，从5个汉字中选出正确的字：</p>
                     
                     <button id="choiceSpeakBtn" class="px-7 py-4 kid-btn-primary text-white rounded-2xl font-black text-base sm:text-lg shadow-lg flex items-center space-x-2">
                         <span>🔊 再听一次发音</span>
                     </button>
 
-                    <div id="choiceOptions" class="w-full grid grid-cols-3 gap-3.5 pt-2 max-w-sm"></div>
+                    <div id="choiceOptions" class="choice-options"></div>
 
-                    <button id="choiceFeedback" class="w-full max-w-sm py-4 px-5 rounded-2xl kid-btn-success text-white font-black text-base sm:text-lg shadow-lg hidden text-center transition-all">
-                        ✅ 选对啦！点这里进入下一题 ➔
-                    </button>
+                    <!-- 底部操作槽位：保持固定高度56px，切换下一题按钮时整体布局绝不产生任何位移跳动 -->
+                    <div class="w-full max-w-sm h-14 min-h-[56px] flex items-center justify-center">
+                        <div id="choiceHint" class="text-xs sm:text-sm font-bold text-slate-400 text-center select-none py-3">
+                            💡 没听清可点击上方大喇叭再次重听
+                        </div>
+                        <button id="choiceFeedback" class="w-full h-full rounded-2xl kid-btn-success text-white font-black text-base sm:text-lg shadow-md hidden items-center justify-center transition-all active:scale-[0.98]">
+                            ✅ 选对啦！点这里进入下一题 ➔
+                        </button>
+                    </div>
                 </div>
             </section>
 

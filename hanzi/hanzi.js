@@ -1381,14 +1381,65 @@ function finishRecognition() {
     }
 }
 
+// 获取常用汉字集合中的随机汉字（从3500常用字中挑选，排除已学汉字和指定排除字符）
+function getRandomCommonHanzi(excludeSet) {
+    const pool = (typeof COMMON_HANZI === "string" && COMMON_HANZI.length > 0)
+        ? COMMON_HANZI
+        : "";
+
+    if (pool.length > 0) {
+        let attempts = 0;
+        while (attempts < 200) {
+            attempts++;
+            const idx = Math.floor(Math.random() * pool.length);
+            const char = pool[idx];
+            if (!excludeSet.has(char)) {
+                return char;
+            }
+        }
+    }
+
+    // 备用兜底策略（若字库未能正常加载，在标准 CJK 统一表意字区安全选取）
+    const MIN_CODE = 0x4e00;
+    const MAX_CODE = 0x9fa5;
+    while (true) {
+        const code = Math.floor(Math.random() * (MAX_CODE - MIN_CODE + 1)) + MIN_CODE;
+        const char = String.fromCharCode(code);
+        if (!excludeSet.has(char)) {
+            return char;
+        }
+    }
+}
+
 function getChoiceOptions(item) {
-    const sameCategory = shuffle(HANZI_DATA.filter(candidate =>
-        candidate.char !== item.char && candidate.category === item.category
-    ));
-    const otherItems = shuffle(HANZI_DATA.filter(candidate =>
-        candidate.char !== item.char && candidate.category !== item.category
-    ));
-    return shuffle([item, ...sameCategory, ...otherItems].slice(0, 3));
+    const excludeSet = new Set();
+    // 排除目标汉字
+    if (item && item.char) {
+        excludeSet.add(item.char);
+    }
+
+    // 排除所有已学过的汉字 (HANZI_DATA 与历史学习记录中存在的所有字)
+    if (typeof HANZI_DATA !== "undefined" && Array.isArray(HANZI_DATA)) {
+        HANZI_DATA.forEach(candidate => {
+            if (candidate && candidate.char) excludeSet.add(candidate.char);
+        });
+    }
+    try {
+        const stats = loadStats();
+        if (stats && stats.characters) {
+            Object.keys(stats.characters).forEach(c => excludeSet.add(c));
+        }
+    } catch (_) {}
+
+    // 1 个正确目标字 + 4 个从常用汉字库中随机抽取的未学干扰汉字 (共 5 个选项，难度适中且符合儿童认知)
+    const options = [item];
+    while (options.length < 5) {
+        const distractorChar = getRandomCommonHanzi(excludeSet);
+        excludeSet.add(distractorChar);
+        options.push({ char: distractorChar });
+    }
+
+    return shuffle(options);
 }
 
 function startChoice(customItems = null) {
@@ -1419,7 +1470,12 @@ function renderChoiceQuestion() {
     if (els.choiceLevelBadge) {
         updateLevelBadge(els.choiceLevelBadge, item.char);
     }
-    els.choiceFeedback?.classList.add("hidden");
+    if (els.choiceFeedback) {
+        els.choiceFeedback.classList.add("hidden");
+        els.choiceFeedback.classList.remove("flex");
+    }
+    const choiceHint = document.getElementById("choiceHint");
+    if (choiceHint) choiceHint.classList.remove("hidden");
     if (els.choiceOptions) {
         els.choiceOptions.innerHTML = "";
         getChoiceOptions(item).forEach(option => {
@@ -1494,7 +1550,12 @@ function chooseCharacter(option, button) {
     els.choiceOptions?.querySelectorAll("button").forEach(node => {
         node.disabled = true;
     });
-    els.choiceFeedback?.classList.remove("hidden");
+    const choiceHint = document.getElementById("choiceHint");
+    if (choiceHint) choiceHint.classList.add("hidden");
+    if (els.choiceFeedback) {
+        els.choiceFeedback.classList.remove("hidden");
+        els.choiceFeedback.classList.add("flex");
+    }
     const isFirstTryCorrect = !state.choiceHadMistake;
     state.choiceAnswers.push({item, isCorrect: isFirstTryCorrect});
     updateStatsForAnswer(item, isFirstTryCorrect);
@@ -2234,6 +2295,18 @@ document.addEventListener("keydown", event => {
     ) {
         if (event.key === "ArrowLeft") recordRecognitionAnswer(false);
         if (event.key === "ArrowRight") recordRecognitionAnswer(true);
+    }
+
+    if (choiceActive) {
+        const optionButtons = els.choiceOptions?.querySelectorAll("button.choice-option");
+        if (event.key >= "1" && event.key <= "5" && optionButtons) {
+            const idx = parseInt(event.key, 10) - 1;
+            if (optionButtons[idx] && !optionButtons[idx].disabled) {
+                optionButtons[idx].click();
+            }
+        } else if (event.key === "Enter" && els.choiceFeedback && !els.choiceFeedback.classList.contains("hidden")) {
+            nextChoiceQuestion();
+        }
     }
 
     if (strokeActive) {
