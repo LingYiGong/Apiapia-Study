@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>钢琴视奏与音高识别练习器 (Piano Sight-Reading & Pitch Detection)</title>
+  
+  <!-- 引入业界标准 VexFlow 乐谱渲染引擎 (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.3/build/cjs/vexflow.js"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --accent: #0284c7;
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      --card-bg: rgba(255, 255, 255, 0.96);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    /* 顶部标题区 */
+    header {
+      text-align: center;
+      margin-bottom: 12px;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    header h1 {
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #a5b4fc, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    header p {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* 主布局容器 (适配 iPad 横竖屏) */
+    .app-container {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* 卡片通用样式 */
+    .card {
+      background: var(--card-bg);
+      color: var(--text-main);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      padding: 16px 20px;
+      backdrop-filter: blur(16px);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* 控制栏工具条 */
+    .control-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .select-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    select {
+      padding: 7px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      font-size: 0.88rem;
+      font-weight: 600;
+      background: #f8fafc;
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+    }
+
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.18);
+    }
+
+    /* 启动按钮 (专为 iPad / 触屏设计的大按钮) */
+    .btn-start {
+      background: linear-gradient(135deg, #4f46e5, #3b82f6);
+      color: white;
+      font-size: 1.15rem;
+      font-weight: 700;
+      padding: 14px 28px;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.45);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+    }
+
+    .btn-start:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(79, 70, 229, 0.55);
+    }
+
+    .btn-start:active {
+      transform: translateY(1px);
+    }
+
+    .btn-start.listening {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.45);
+    }
+
+    /* 五线谱展示区 */
+    .staff-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 260px;
+      padding: 22px 14px 16px 14px;
+      overflow: hidden;
+    }
+
+    .target-badge {
+      position: absolute;
+      top: 14px;
+      left: 20px;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .target-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .target-solfege {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    #staff-output {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 190px;
+    }
+
+    /* 正确判定时的外框脉冲动画 */
+    .staff-card.success-flash {
+      animation: pulse-success 0.65s ease-out;
+    }
+
+    @keyframes pulse-success {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8); }
+      70% { box-shadow: 0 0 0 24px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35); }
+    }
+
+    /* 成功弹窗提示 (居中大对勾) */
+    .success-toast {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      background: rgba(16, 185, 129, 0.96);
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 800;
+      padding: 12px 28px;
+      border-radius: 9999px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .success-toast.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    /* 辅助功能操作条 (试听与跳过) */
+    .staff-actions {
+      display: flex;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+      transform: translateY(-1px);
+    }
+
+    /* 底部实时识别与音频诊断卡片 */
+    .status-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f8fafc;
+    }
+
+    @media (max-width: 580px) {
+      .status-card {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .status-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .status-label {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .detected-display {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #38bdf8;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      transition: color 0.15s;
+    }
+
+    .detected-display.match {
+      color: #34d399;
+      text-shadow: 0 0 14px rgba(52, 211, 153, 0.6);
+    }
+
+    .detected-sub {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    /* 麦克风输入电平 (判断麦克风是否收音正常) */
+    .meter-container {
+      width: 100%;
+      height: 9px;
+      background: #334155;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+      position: relative;
+    }
+
+    .meter-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      border-radius: 4px;
+      transition: width 0.08s ease;
+    }
+
+    /* 音准偏差指示器 (Cents Tuner) */
+    .tuner-track {
+      width: 100%;
+      height: 10px;
+      background: #334155;
+      border-radius: 5px;
+      position: relative;
+      margin-top: 8px;
+    }
+
+    .tuner-center {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background: #10b981;
+      transform: translateX(-50%);
+    }
+
+    .tuner-pointer {
+      position: absolute;
+      top: -3px;
+      left: 50%;
+      width: 6px;
+      height: 16px;
+      background: #f59e0b;
+      border-radius: 3px;
+      transform: translateX(-50%);
+      transition: left 0.1s ease;
+    }
+
+    .tuner-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* 答题统计 */
+    .stats-row {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 10px;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+    }
+
+    .stat-val {
+      font-weight: 700;
+      color: #38bdf8;
+      margin-left: 4px;
+    }
+
+    /* 底部运行环境提示 */
+    .notice-box {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      text-align: center;
+      line-height: 1.6;
+      padding: 0 8px;
+    }
+
+    .notice-box span {
+      color: #f59e0b;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 顶部导航栏 (返回学习中心首页) -->
+  <div style="width: 100%; max-width: 760px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 0 4px;">
+    <a href="../index.html" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.18); color: #ffffff; padding: 7px 16px; border-radius: 9999px; font-size: 0.88rem; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.28); backdrop-filter: blur(12px); box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.2s;" title="返回 Apiapia 学习中心首页">
+      <img src="../icons/apple-touch-icon.png" alt="Apiapia" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.6);" />
+      <span>返回首页</span>
+    </a>
+    <div style="font-size: 0.82rem; color: #cbd5e1; font-weight: 700; display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.1); padding: 5px 12px; border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.15);">
+      <span>🐱</span>
+      <span>Apiapia 音乐天地</span>
+    </div>
+  </div>
+
+  <header>
+    <h1>🎹 钢琴视奏与实时音高识别</h1>
+    <p>专为真实钢琴视奏练习打造 · 支持高音/低音谱表 · 麦克风高灵敏精准识音</p>
+  </header>
+
+  <div class="app-container">
+
+    <!-- 1. 顶部控制栏 (谱号选择、练习音域、判定容差) -->
+    <div class="card control-bar">
+      <div class="select-group">
+        <label for="clef-select">谱号：</label>
+        <select id="clef-select">
+          <option value="treble" selected>高音谱号 (Treble Clef)</option>
+          <option value="bass">低音谱号 (Bass Clef)</option>
+        </select>
+      </div>
+
+      <div class="select-group">
+        <label for="range-select">音域：</label>
+        <select id="range-select">
+          <option value="easy" selected>初级 (基础单八度)</option>
+          <option value="medium">进阶 (加线与双八度)</option>
+          <option value="accidentals">带升降号 (#/b)</option>
+        </select>
+      </div>
+
+      <div class="select-group">
+        <label for="tolerance-select">音准容差：</label>
+        <select id="tolerance-select">
+          <option value="15">±15 音分 (严格)</option>
+          <option value="25" selected>±25 音分 (标准钢琴)</option>
+          <option value="35">±35 音分 (宽松)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 2. 顶部开启麦克风按钮 (解决 iOS Safari / iPad AudioContext 策略) -->
+    <button id="btn-toggle-mic" class="btn-start">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" y1="19" x2="12" y2="22"></line>
+      </svg>
+      <span id="btn-text">点击开始练习（开启麦克风）</span>
+    </button>
+
+    <!-- 3. 核心区域：五线谱与随机音符展示 -->
+    <div class="card staff-card" id="staff-card">
+      <div class="target-badge">
+        <span>目标音符：</span>
+        <span class="target-name" id="target-note-name">C4</span>
+        <span class="target-solfege" id="target-note-solfege">(Do)</span>
+      </div>
+
+      <!-- 答对成功提示框 -->
+      <div class="success-toast" id="success-toast">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>正确！</span>
+      </div>
+
+      <!-- VexFlow 绘制画布容器 -->
+      <div id="staff-output"></div>
+
+      <!-- 辅助调试按钮 -->
+      <div class="staff-actions">
+        <button id="btn-play-target" class="btn-secondary" title="试听目标音的标准音高">
+          🔊 试听发音
+        </button>
+        <button id="btn-skip-target" class="btn-secondary" title="跳过当前音，随机换一个音符">
+          ⏭ 换一个音
+        </button>
+      </div>
+    </div>
+
+    <!-- 4. 底部实时识别与状态反馈卡片 -->
+    <div class="card status-card">
+      <!-- 实时识别音高与音量 -->
+      <div class="status-item">
+        <div class="status-label">
+          <span>实时听到的音高</span>
+          <span id="mic-status-tag" style="color: #f59e0b;">● 麦克风未启动</span>
+        </div>
+        <div class="detected-display" id="detected-note-text">
+          --
+          <span class="detected-sub" id="detected-freq-text">0.0 Hz</span>
+        </div>
+        <!-- 麦克风输入电平 (直观查看琴声是否被录入) -->
+        <div class="meter-container" title="麦克风输入能量大小">
+          <div class="meter-bar" id="mic-volume-bar"></div>
+        </div>
+      </div>
+
+      <!-- 音准偏差调音表 (Cents Tuner) -->
+      <div class="status-item">
+        <div class="status-label">
+          <span>音准偏离度 (Cents)</span>
+          <span id="cents-text">0 ¢</span>
+        </div>
+        <div class="tuner-track" title="音分偏差：中间绿色为绝对标准音高">
+          <div class="tuner-center"></div>
+          <div class="tuner-pointer" id="tuner-pointer" style="left: 50%;"></div>
+        </div>
+        <div class="tuner-labels">
+          <span>-50¢ (偏低)</span>
+          <span>准 (0¢)</span>
+          <span>+50¢ (偏高)</span>
+        </div>
+      </div>
+
+      <!-- 练习统计面板 -->
+      <div class="stats-row">
+        <div>累计答对: <span class="stat-val" id="stat-correct">0</span> 题</div>
+        <div>连续答对: <span class="stat-val" id="stat-streak">0</span> 连击 🔥</div>
+        <div>稳定度判定: <span class="stat-val" id="stat-stability">0%</span></div>
+      </div>
+    </div>
+
+    <!-- 5. 环境说明与注意事项 -->
+    <div class="notice-box">
+      ⚠️ <span>重要运行环境提示</span>：根据 Web 安全规范，麦克风录音权限仅在 <b>HTTPS</b> 网站或 <b>localhost</b> 本地测试环境下生效。<br/>
+      请在首次点击时允许“麦克风访问权限”。真钢弹奏时建议将 iPad 放置于钢琴谱架中央。
+    </div>
+
+  </div>
+
+  <script>
+    /**
+     * =========================================================================
+     * 1. 基础乐理定义与十二平均律频率映射表 (Pitch & Frequency Definitions)
+     * =========================================================================
+     * 
+     * 遵循国际标准的十二平均律 (12-Tone Equal Temperament, 12-TET)：
+     * A4 为基准音高 = 440.00 Hz，其 MIDI 编号为 69。
+     * 任意音高 MIDI 编号 n 对应的标准基频为：
+     *   f = 440 * 2^((n - 69) / 12)
+     * 
+     * 钢琴中央 C (Middle C) 为 C4，MIDI 编号 60，标准频率约为 261.63 Hz。
+     */
+    const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const SOLFEGE_MAP = {
+      "C": "Do", "C#": "Di", "D": "Re", "D#": "Ri", "E": "Mi", "F": "Fa",
+      "F#": "Fi", "G": "Sol", "G#": "Si", "A": "La", "A#": "Li", "B": "Ti"
+    };
+
+    /**
+     * 将实际检测出的物理频率 (Hz) 转换为标准音名与音分偏差 (Cents)
+     * 1 个半音 = 100 音分 (cents)
+     * @param {number} freq - 检测到的基频
+     * @returns {Object|null}
+     */
+    function frequencyToNote(freq) {
+      if (!freq || freq <= 0 || isNaN(freq)) return null;
+      // 算出连续浮点 MIDI 编号
+      const midiFloat = 69 + 12 * Math.log2(freq / 440);
+      const midiRound = Math.round(midiFloat);
+      // 计算音准偏差 cents: [-50, +50]
+      const cents = Math.round((midiFloat - midiRound) * 100);
+      // 解析音名与所在八度
+      const noteIndex = ((midiRound % 12) + 12) % 12;
+      const octave = Math.floor(midiRound / 12) - 1;
+      const noteName = NOTE_NAMES[noteIndex];
+      const standardFreq = 440 * Math.pow(2, (midiRound - 69) / 12);
+
+      return {
+        midi: midiRound,
+        noteName: noteName,
+        octave: octave,
+        fullName: `${noteName}${octave}`,
+        solfege: SOLFEGE_MAP[noteName] || "",
+        cents: cents,
+        standardFreq: standardFreq.toFixed(1),
+        actualFreq: freq.toFixed(1)
+      };
+    }
+
+    /**
+     * =========================================================================
+     * 2. 钢琴视奏出题音库 (Sight-Reading Note Pools)
+     * =========================================================================
+     */
+    // 高音谱号 (Treble Clef, G谱号) 音符库
+    const TREBLE_EASY = [
+      { name: "C", octave: 4 }, // 中央 C (下加一线)
+      { name: "D", octave: 4 }, // 下加一间
+      { name: "E", octave: 4 }, // 第一线
+      { name: "F", octave: 4 }, // 第一间
+      { name: "G", octave: 4 }, // 第二线
+      { name: "A", octave: 4 }, // 第二间
+      { name: "B", octave: 4 }, // 第三线
+      { name: "C", octave: 5 }, // 第三间
+      { name: "D", octave: 5 }, // 第四线
+      { name: "E", octave: 5 }  // 第四间
+    ];
+
+    const TREBLE_MEDIUM = [
+      ...TREBLE_EASY,
+      { name: "A", octave: 3 }, // 下加二间
+      { name: "B", octave: 3 }, // 下加二线
+      { name: "F", octave: 5 }, // 第五线
+      { name: "G", octave: 5 }, // 上加一间
+      { name: "A", octave: 5 }  // 上加一线
+    ];
+
+    // 低音谱号 (Bass Clef, F谱号) 音符库
+    const BASS_EASY = [
+      { name: "C", octave: 3 }, // 第二间
+      { name: "D", octave: 3 }, // 第三线
+      { name: "E", octave: 3 }, // 第三间
+      { name: "F", octave: 3 }, // 第四线
+      { name: "G", octave: 3 }, // 第四间
+      { name: "A", octave: 3 }, // 第五线
+      { name: "B", octave: 3 }, // 上加一间
+      { name: "C", octave: 4 }  // 中央 C (上加一线)
+    ];
+
+    const BASS_MEDIUM = [
+      ...BASS_EASY,
+      { name: "F", octave: 2 }, // 下加二间
+      { name: "G", octave: 2 }, // 第一线
+      { name: "A", octave: 2 }, // 第一间
+      { name: "B", octave: 2 }, // 第二线
+      { name: "D", octave: 4 }  // 上加一间 (高音区延伸)
+    ];
+
+    /**
+     * =========================================================================
+     * 3. 音频处理与高精度自相关算法 (Normalized Square Difference - MPM)
+     * =========================================================================
+     * 
+     * 钢琴声音的特点：击弦瞬间具有丰富的泛音（高频泛音能量有时甚至接近基频）。
+     * 传统的简单自相关容易产生“八度翻倍/减半 (Octave Jumps)”误判。
+     * 本实现采用广受赞誉的 McLeod Pitch Method (MPM) 归一化自相关算法：
+     * 1. 均方根 RMS 过滤环境噪音静音门限 (Noise Gate)；
+     * 2. 计算自相关归一化系数序列 NSDF；
+     * 3. 提取所有局部极大值峰值，并选取达到最高峰值 85% 的首个峰值（杜绝八度翻倍）；
+     * 4. 采用三点抛物线插值 (Parabolic Interpolation) 获得亚采样精度基频。
+     */
+    let audioContext = null;
+    let analyserNode = null;
+    let micStream = null;
+    let audioDataBuffer = null;
+    let isListening = false;
+    let animationFrameId = null;
+
+    function autoCorrelate(buffer, sampleRate) {
+      const SIZE = buffer.length;
+
+      // 1. 计算均方根振幅 (RMS) 作为静音门限
+      let sumSquares = 0;
+      for (let i = 0; i < SIZE; i++) {
+        sumSquares += buffer[i] * buffer[i];
+      }
+      const rms = Math.sqrt(sumSquares / SIZE);
+
+      // 如果音量太小（低于 0.015），判定为静音或微弱底噪
+      if (rms < 0.015) {
+        return { freq: -1, rms: rms };
+      }
+
+      // 钢琴视奏主要针对 65Hz (C2) ~ 2100Hz (C7) 范围
+      const minFreq = 65;
+      const maxFreq = 2100;
+      const maxPeriod = Math.min(Math.floor(sampleRate / minFreq), Math.floor(SIZE / 2));
+      const minPeriod = Math.floor(sampleRate / maxFreq);
+
+      // 2. 计算归一化自相关系数 (NSDF)
+      const nsdf = new Float32Array(maxPeriod + 1);
+      for (let tau = 0; tau <= maxPeriod; tau++) {
+        let acf = 0;
+        let divisor = 0;
+        for (let i = 0; i < SIZE - tau; i++) {
+          acf += buffer[i] * buffer[i + tau];
+          divisor += (buffer[i] * buffer[i] + buffer[i + tau] * buffer[i + tau]);
+        }
+        nsdf[tau] = divisor > 0 ? (2 * acf) / divisor : 0;
+      }
+
+      // 3. 寻找所有正向局部极大值 (峰值)
+      const peaks = [];
+      for (let tau = Math.max(1, minPeriod); tau < maxPeriod; tau++) {
+        if (nsdf[tau] > 0 && nsdf[tau] > nsdf[tau - 1] && nsdf[tau] >= nsdf[tau + 1]) {
+          peaks.push({ tau: tau, val: nsdf[tau] });
+        }
+      }
+
+      if (peaks.length === 0) {
+        return { freq: -1, rms: rms };
+      }
+
+      // 找到全局最高峰
+      let highestPeak = peaks[0];
+      for (let i = 1; i < peaks.length; i++) {
+        if (peaks[i].val > highestPeak.val) {
+          highestPeak = peaks[i];
+        }
+      }
+
+      // 若最高峰低于 0.50，说明声音波形无明显音高规律（如敲击桌子、杂音）
+      if (highestPeak.val < 0.50) {
+        return { freq: -1, rms: rms };
+      }
+
+      // 选出第一个达到最高峰 85% 的峰值，杜绝高次谐波/八度误判
+      const threshold = highestPeak.val * 0.85;
+      let chosenPeak = highestPeak;
+      for (let i = 0; i < peaks.length; i++) {
+        if (peaks[i].val >= threshold) {
+          chosenPeak = peaks[i];
+          break;
+        }
+      }
+
+      // 4. 抛物线顶点插值修正 (Parabolic Peak Interpolation)
+      let fineLag = chosenPeak.tau;
+      if (chosenPeak.tau > 0 && chosenPeak.tau < maxPeriod) {
+        const y0 = nsdf[chosenPeak.tau - 1];
+        const y1 = nsdf[chosenPeak.tau];
+        const y2 = nsdf[chosenPeak.tau + 1];
+        const denom = 2 * (2 * y1 - y0 - y2);
+        if (denom !== 0) {
+          const delta = (y2 - y0) / denom;
+          if (Math.abs(delta) < 1) {
+            fineLag += delta;
+          }
+        }
+      }
+
+      const freq = sampleRate / fineLag;
+      return { freq: freq, rms: rms, confidence: chosenPeak.val };
+    }
+
+    /**
+     * =========================================================================
+     * 4. 应用状态管理与游戏视奏逻辑 (App State & Logic)
+     * =========================================================================
+     */
+    const state = {
+      clef: "treble",       // 'treble' | 'bass'
+      range: "easy",        // 'easy' | 'medium' | 'accidentals'
+      tolerance: 25,        // 允许音分容差 (±cents)
+      currentNote: null,    // 当前目标题目音符
+      consecutiveMatches: 0,// 连续命中帧计数器
+      MATCH_REQUIRED_FRAMES: 4, // 连续匹配 4 帧 (~80-120ms) 判定为有效弹奏
+      isAdvancing: false,   // 是否正在切换题目
+      totalCorrect: 0,      // 答对总题数
+      currentStreak: 0      // 连击次数
+    };
+
+    // DOM 元素缓存
+    const dom = {
+      btnToggleMic: document.getElementById("btn-toggle-mic"),
+      btnText: document.getElementById("btn-text"),
+      clefSelect: document.getElementById("clef-select"),
+      rangeSelect: document.getElementById("range-select"),
+      toleranceSelect: document.getElementById("tolerance-select"),
+      staffOutput: document.getElementById("staff-output"),
+      staffCard: document.getElementById("staff-card"),
+      targetNoteName: document.getElementById("target-note-name"),
+      targetNoteSolfege: document.getElementById("target-note-solfege"),
+      successToast: document.getElementById("success-toast"),
+      btnPlayTarget: document.getElementById("btn-play-target"),
+      btnSkipTarget: document.getElementById("btn-skip-target"),
+      micStatusTag: document.getElementById("mic-status-tag"),
+      detectedNoteText: document.getElementById("detected-note-text"),
+      detectedFreqText: document.getElementById("detected-freq-text"),
+      micVolumeBar: document.getElementById("mic-volume-bar"),
+      centsText: document.getElementById("cents-text"),
+      tunerPointer: document.getElementById("tuner-pointer"),
+      statCorrect: document.getElementById("stat-correct"),
+      statStreak: document.getElementById("stat-streak"),
+      statStability: document.getElementById("stat-stability")
+    };
+
+    /**
+     * 随机抽取下一题音符
+     */
+    function pickNextNote() {
+      let pool = [];
+      if (state.clef === "treble") {
+        pool = (state.range === "easy") ? TREBLE_EASY : TREBLE_MEDIUM;
+      } else {
+        pool = (state.range === "easy") ? BASS_EASY : BASS_MEDIUM;
+      }
+
+      // 避免连续出相同的音
+      let next = null;
+      do {
+        const idx = Math.floor(Math.random() * pool.length);
+        next = { ...pool[idx] };
+      } while (pool.length > 1 && state.currentNote && 
+               state.currentNote.name === next.name && 
+               state.currentNote.octave === next.octave);
+
+      // 升降号练习模式
+      if (state.range === "accidentals") {
+        const addAccidental = Math.random() < 0.35;
+        if (addAccidental && ["C", "D", "F", "G", "A"].includes(next.name)) {
+          next.accidental = "#";
+        }
+      }
+
+      next.fullName = `${next.name}${next.accidental || ""}${next.octave}`;
+      next.baseName = `${next.name}${next.accidental || ""}`;
+      next.solfege = SOLFEGE_MAP[next.baseName] || SOLFEGE_MAP[next.name];
+
+      state.currentNote = next;
+      state.consecutiveMatches = 0;
+      updateTargetDisplay();
+      renderStaff(false);
+    }
+
+    /**
+     * 更新题目文字与唱名提示
+     */
+    function updateTargetDisplay() {
+      if (!state.currentNote) return;
+      dom.targetNoteName.textContent = state.currentNote.fullName;
+      dom.targetNoteSolfege.textContent = `(${state.currentNote.solfege})`;
+    }
+
+    /**
+     * =========================================================================
+     * 5. 五线谱渲染模块 (优先 VexFlow + 高度保真原生矢量 SVG 备用)
+     * =========================================================================
+     */
+    function renderStaff(isCorrect = false) {
+      if (!state.currentNote) return;
+
+      const container = dom.staffOutput;
+      container.innerHTML = "";
+
+      // 优先尝试标准 VexFlow 渲染
+      const rendered = renderWithVexFlow(container, state.currentNote, state.clef, isCorrect);
+      if (!rendered) {
+        // 当 CDN 网络受限或离线时，自动切换到原生高精度 SVG 渲染器
+        renderWithNativeSVG(container, state.currentNote, state.clef, isCorrect);
+      }
+    }
+
+    /**
+     * 使用 VexFlow 4.x 渲染五线谱
+     */
+    function renderWithVexFlow(container, noteInfo, clef, isCorrect) {
+      try {
+        const VF = window.Vex && (window.Vex.Flow || window.Vex);
+        if (!VF || !VF.Renderer || !VF.Stave || !VF.StaveNote) {
+          return false;
+        }
+
+        const width = Math.min(window.innerWidth - 48, 440);
+        const height = 180;
+
+        const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
+        renderer.resize(width, height);
+        const context = renderer.getContext();
+        context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
+
+        const staveWidth = Math.min(width - 30, 340);
+        const staveX = (width - staveWidth) / 2;
+        const staveY = 25;
+
+        const stave = new VF.Stave(staveX, staveY, staveWidth);
+        stave.addClef(clef);
+        stave.setContext(context).draw();
+
+        // 拼接 VexFlow 音符键名，如 "c/4", "f#/4"
+        const acc = noteInfo.accidental || "";
+        const vexKey = `${noteInfo.name.toLowerCase()}${acc}/${noteInfo.octave}`;
+
+        const staveNote = new VF.StaveNote({
+          clef: clef,
+          keys: [vexKey],
+          duration: "w" // 全音符 (视奏最清晰)
+        });
+
+        if (acc) {
+          staveNote.addAccidental(0, new VF.Accidental(acc));
+        }
+
+        const noteColor = isCorrect ? "#10b981" : "#0f172a";
+        staveNote.setStyle({ fillStyle: noteColor, strokeStyle: noteColor });
+
+        const voice = new VF.Voice({ num_beats: 4, beat_value: 4 });
+        voice.addTickables([staveNote]);
+
+        new VF.Formatter().joinVoices([voice]).format([voice], staveWidth - 110);
+        voice.draw(context, stave);
+
+        return true;
+      } catch (err) {
+        console.warn("VexFlow 渲染捕获异常，启用内置 SVG 引擎:", err);
+        return false;
+      }
+    }
+
+    /**
+     * 原生高精度矢量 SVG 五线谱备用渲染器
+     * （内置高音谱号、低音谱号、全音符椭圆与上下加线，完全不依赖任何第三方 CDN）
+     */
+    function renderWithNativeSVG(container, noteInfo, clef, isCorrect) {
+      const width = Math.min(window.innerWidth - 48, 400);
+      const height = 180;
+      const staffLineSpacing = 14;
+      const topStaffLineY = 55;
+      const staffWidth = width - 60;
+      const startX = 30;
+
+      // 乐理位置音级换算：C4=0, D4=1, E4=2...
+      const stepIndexMap = { "C": 0, "D": 1, "E": 2, "F": 3, "G": 4, "A": 5, "B": 6 };
+      const noteStep = stepIndexMap[noteInfo.name] + (noteInfo.octave - 4) * 7;
+
+      let refStep = (clef === "treble") ? 2 : -11; // 高音谱号第1线是 E4 (step=2)；低音谱号第1线是 G2 (step=-11)
+      let refY = topStaffLineY + 4 * staffLineSpacing; // 第1线所对应的 Y 坐标
+
+      // 每一个音级向上移动半个行距
+      const noteY = refY - (noteStep - refStep) * (staffLineSpacing / 2);
+      const noteX = startX + staffWidth * 0.56;
+      const noteColor = isCorrect ? "#10b981" : "#1e293b";
+
+      let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+
+      // 绘制五条基准线
+      for (let i = 0; i < 5; i++) {
+        const y = topStaffLineY + i * staffLineSpacing;
+        svg += `<line x1="${startX}" y1="${y}" x2="${startX + staffWidth}" y2="${y}" stroke="#334155" stroke-width="1.8" stroke-linecap="round"/>`;
+      }
+      // 谱表首尾竖向小节线
+      svg += `<line x1="${startX}" y1="${topStaffLineY}" x2="${startX}" y2="${topStaffLineY + 4 * staffLineSpacing}" stroke="#334155" stroke-width="2"/>`;
+      svg += `<line x1="${startX + staffWidth}" y1="${topStaffLineY}" x2="${startX + staffWidth}" y2="${topStaffLineY + 4 * staffLineSpacing}" stroke="#334155" stroke-width="2"/>`;
+
+      // 谱号图标
+      if (clef === "treble") {
+        svg += `<text x="${startX + 12}" y="${topStaffLineY + 3.8 * staffLineSpacing}" font-size="52" font-family="serif" fill="#1e293b" user-select="none">𝄞</text>`;
+      } else {
+        svg += `<text x="${startX + 12}" y="${topStaffLineY + 2.8 * staffLineSpacing}" font-size="44" font-family="serif" fill="#1e293b" user-select="none">𝄢</text>`;
+      }
+
+      // 上加线 / 下加线绘制 (Ledger Lines)
+      const bottomStaffLineY = topStaffLineY + 4 * staffLineSpacing;
+      // 下加线
+      if (noteY >= bottomStaffLineY + staffLineSpacing) {
+        for (let ly = bottomStaffLineY + staffLineSpacing; ly <= noteY + 2; ly += staffLineSpacing) {
+          svg += `<line x1="${noteX - 16}" y1="${ly}" x2="${noteX + 16}" y2="${ly}" stroke="#334155" stroke-width="1.8"/>`;
+        }
+      }
+      // 上加线
+      if (noteY <= topStaffLineY - staffLineSpacing) {
+        for (let ly = topStaffLineY - staffLineSpacing; ly >= noteY - 2; ly -= staffLineSpacing) {
+          svg += `<line x1="${noteX - 16}" y1="${ly}" x2="${noteX + 16}" y2="${ly}" stroke="#334155" stroke-width="1.8"/>`;
+        }
+      }
+
+      // 升降号绘制
+      if (noteInfo.accidental === "#") {
+        svg += `<text x="${noteX - 22}" y="${noteY + 7}" font-size="22" font-weight="bold" fill="${noteColor}">♯</text>`;
+      }
+
+      // 全音符椭圆 (带倾斜角的标准空心符头)
+      svg += `<ellipse cx="${noteX}" cy="${noteY}" rx="10.5" ry="7" transform="rotate(-22 ${noteX} ${noteY})" fill="none" stroke="${noteColor}" stroke-width="3.6" />`;
+
+      svg += `</svg>`;
+      container.innerHTML = svg;
+    }
+
+    /**
+     * =========================================================================
+     * 6. Web Audio 麦克风录音控制 (iOS Safari 关键适配)
+     * =========================================================================
+     */
+    async function startListening() {
+      try {
+        // iOS Safari 规则：AudioContext 必须由用户手势同步激活
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!audioContext) {
+          audioContext = new AudioCtx();
+        }
+        if (audioContext.state === "suspended") {
+          await audioContext.resume();
+        }
+
+        // 请求麦克风权限
+        // 关键设置：关闭回声消除与降噪算法，保留饱满的钢琴原音谐波
+        const constraints = {
+          audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false,
+            channelCount: 1
+          }
+        };
+
+        micStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const sourceNode = audioContext.createMediaStreamSource(micStream);
+
+        // 创建 Analyser 分析器节点
+        analyserNode = audioContext.createAnalyser();
+        analyserNode.fftSize = 2048; // 保证低频音域具备充足的时间分辨率
+        sourceNode.connect(analyserNode);
+
+        audioDataBuffer = new Float32Array(analyserNode.fftSize);
+        isListening = true;
+
+        // 更新按钮与状态标签
+        dom.btnToggleMic.classList.add("listening");
+        dom.btnText.textContent = "麦克风收音中 · 请在真钢琴上弹奏...";
+        dom.micStatusTag.textContent = "● 麦克风工作中";
+        dom.micStatusTag.style.color = "#10b981";
+
+        // 启动音频循环帧
+        processAudioLoop();
+
+      } catch (err) {
+        console.error("麦克风启动受阻:", err);
+        alert("无法访问麦克风。请检查以下事项：\n1. 请在 HTTPS 协议或 localhost 本地环境下运行本网页；\n2. 浏览器弹出权限请求时，请点击【允许】；\n3. 检查设备设置中 Safari / 浏览器的麦克风权限开关。\n\n技术详细信息: " + (err.message || err));
+      }
+    }
+
+    function stopListening() {
+      isListening = false;
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      if (micStream) {
+        micStream.getTracks().forEach(track => track.stop());
+        micStream = null;
+      }
+      dom.btnToggleMic.classList.remove("listening");
+      dom.btnText.textContent = "点击开始练习（开启麦克风）";
+      dom.micStatusTag.textContent = "● 麦克风已暂停";
+      dom.micStatusTag.style.color = "#f59e0b";
+      dom.micVolumeBar.style.width = "0%";
+      dom.detectedNoteText.innerHTML = `-- <span class="detected-sub">0.0 Hz</span>`;
+      dom.tunerPointer.style.left = "50%";
+      dom.centsText.textContent = "0 ¢";
+      dom.statStability.textContent = "0%";
+    }
+
+    /**
+     * 逐帧音频采集与基频识别驱动循环
+     */
+    function processAudioLoop() {
+      if (!isListening || !analyserNode) return;
+
+      analyserNode.getFloatTimeDomainData(audioDataBuffer);
+      const sampleRate = audioContext.sampleRate;
+
+      const result = autoCorrelate(audioDataBuffer, sampleRate);
+
+      // 1. 更新麦克风音量能量条 UI
+      const volumePercent = Math.min(100, Math.round(result.rms * 320));
+      dom.micVolumeBar.style.width = `${volumePercent}%`;
+
+      // 2. 识别音高处理
+      if (result.freq > 0 && result.rms >= 0.015) {
+        const detected = frequencyToNote(result.freq);
+        if (detected) {
+          handleDetectedNote(detected);
+        }
+      } else {
+        // 无琴声时平滑衰减命中计数器
+        if (state.consecutiveMatches > 0) {
+          state.consecutiveMatches = Math.max(0, state.consecutiveMatches - 1);
+        }
+      }
+
+      // 界面稳定度反馈
+      const stabilityPercent = Math.min(100, Math.round((state.consecutiveMatches / state.MATCH_REQUIRED_FRAMES) * 100));
+      dom.statStability.textContent = `${stabilityPercent}%`;
+
+      animationFrameId = requestAnimationFrame(processAudioLoop);
+    }
+
+    /**
+     * 实时检测到的音高与目标音符进行比对
+     */
+    function handleDetectedNote(detected) {
+      // 底部面板实时显示
+      dom.detectedNoteText.innerHTML = `
+        ${detected.fullName}
+        <span class="detected-sub">${detected.actualFreq} Hz (${detected.solfege})</span>
+      `;
+      dom.centsText.textContent = `${detected.cents > 0 ? "+" : ""}${detected.cents} ¢`;
+
+      // 调音指针对准 [-50, +50] 映射至 [0%, 100%]
+      const clampedCents = Math.max(-50, Math.min(50, detected.cents));
+      const pointerPos = 50 + (clampedCents / 50) * 45;
+      dom.tunerPointer.style.left = `${pointerPos}%`;
+
+      if (state.isAdvancing || !state.currentNote) return;
+
+      // 判定条件：
+      // 1. 音名相同 (如都是 C 或 C#)
+      // 2. 八度相同 (如都是 4)
+      // 3. 音分偏差在设定的容差内 (|cents| <= tolerance)
+      const targetBaseName = state.currentNote.baseName || state.currentNote.name;
+      const isNameMatch = (detected.noteName === targetBaseName);
+      const isOctaveMatch = (detected.octave === state.currentNote.octave);
+      const isPitchAccurate = Math.abs(detected.cents) <= state.tolerance;
+
+      if (isNameMatch && isOctaveMatch && isPitchAccurate) {
+        state.consecutiveMatches++;
+        dom.detectedNoteText.classList.add("match");
+
+        // 连续若干帧一致，触发“答对判定”
+        if (state.consecutiveMatches >= state.MATCH_REQUIRED_FRAMES) {
+          triggerSuccess();
+        }
+      } else {
+        dom.detectedNoteText.classList.remove("match");
+        if (state.consecutiveMatches > 0) {
+          state.consecutiveMatches--;
+        }
+      }
+    }
+
+    /**
+     * 答对成功反馈与自动切题
+     */
+    function triggerSuccess() {
+      state.isAdvancing = true;
+      state.totalCorrect++;
+      state.currentStreak++;
+
+      dom.statCorrect.textContent = state.totalCorrect;
+      dom.statStreak.textContent = state.currentStreak;
+
+      // 持久化保存学习中心足迹数据
+      try {
+        const saved = JSON.parse(localStorage.getItem('piano_app_stats') || '{}');
+        const maxStreak = Math.max(saved.maxStreak || 0, state.currentStreak);
+        localStorage.setItem('piano_app_stats', JSON.stringify({
+          totalCorrect: state.totalCorrect,
+          maxStreak: maxStreak,
+          lastUpdated: Date.now()
+        }));
+      } catch (e) {}
+
+      // 播放清脆的答对叮咚声
+      playSuccessChime();
+
+      // 视觉反馈：音符变绿，卡片发出绿色辉光
+      renderStaff(true);
+      dom.staffCard.classList.add("success-flash");
+      dom.successToast.classList.add("show");
+
+      // 停留 650ms，给演奏者充分的视觉正反馈后自动进入下一题
+      setTimeout(() => {
+        dom.staffCard.classList.remove("success-flash");
+        dom.successToast.classList.remove("show");
+        dom.detectedNoteText.classList.remove("match");
+        state.isAdvancing = false;
+        pickNextNote();
+      }, 650);
+    }
+
+    /**
+     * =========================================================================
+     * 7. 辅助音频发生器 (试听音与提示音)
+     * =========================================================================
+     */
+    function playTone(freq, duration = 0.8) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!audioContext) audioContext = new AudioCtx();
+      if (audioContext.state === "suspended") audioContext.resume();
+
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+
+      const now = audioContext.currentTime;
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.exponentialRampToValueAtTime(0.25, now + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+
+      osc.start(now);
+      osc.stop(now + duration);
+    }
+
+    function playSuccessChime() {
+      try {
+        playTone(523.25, 0.18); // C5
+        setTimeout(() => playTone(659.25, 0.32), 90); // E5
+      } catch (e) {}
+    }
+
+    /**
+     * =========================================================================
+     * 8. 交互事件绑定与初始化
+     * =========================================================================
+     */
+    // 麦克风启动/暂停
+    dom.btnToggleMic.addEventListener("click", () => {
+      if (!isListening) {
+        startListening();
+      } else {
+        stopListening();
+      }
+    });
+
+    // 谱号切换 (高音 / 低音)
+    dom.clefSelect.addEventListener("change", (e) => {
+      state.clef = e.target.value;
+      pickNextNote();
+    });
+
+    // 音域难度切换
+    dom.rangeSelect.addEventListener("change", (e) => {
+      state.range = e.target.value;
+      pickNextNote();
+    });
+
+    // 容差设置
+    dom.toleranceSelect.addEventListener("change", (e) => {
+      state.tolerance = parseInt(e.target.value, 10);
+    });
+
+    // 试听目标音标准发音
+    dom.btnPlayTarget.addEventListener("click", () => {
+      if (!state.currentNote) return;
+      const noteNameWithAcc = state.currentNote.name + (state.currentNote.accidental || "");
+      const noteIdx = NOTE_NAMES.indexOf(noteNameWithAcc);
+      const midi = (state.currentNote.octave + 1) * 12 + noteIdx;
+      const freq = 440 * Math.pow(2, (midi - 69) / 12);
+      playTone(freq, 0.9);
+    });
+
+    // 跳过/换题按钮
+    dom.btnSkipTarget.addEventListener("click", () => {
+      state.currentStreak = 0;
+      dom.statStreak.textContent = 0;
+      pickNextNote();
+    });
+
+    // 窗口尺寸自适应 (支持 iPad 横屏与竖屏切换)
+    window.addEventListener("resize", () => {
+      renderStaff(false);
+    });
+
+    // 读取历史答题统计
+    try {
+      const saved = JSON.parse(localStorage.getItem('piano_app_stats') || '{}');
+      if (saved && saved.totalCorrect) {
+        state.totalCorrect = saved.totalCorrect;
+        dom.statCorrect.textContent = state.totalCorrect;
+      }
+    } catch (e) {}
+
+    // 启动初始出题
+    pickNextNote();
+  </script>
+</body>
+</html>

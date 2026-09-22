@@ -2,7 +2,7 @@
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
 // 当前客户端内置基线版本号
-const BUILD_VERSION = '1.0.11';
+const BUILD_VERSION = '1.0.14';
 
 // Semver 版本比较辅助函数 (remote > current 返回 true)
 function isNewerVersion(remote, current) {
@@ -203,6 +203,35 @@ const app = createApp({
                 btnText: '进入汉字小能手'
             },
             {
+                id: 'music',
+                title: '钢琴视奏与识音',
+                subtitle: '高/低音五线谱 · 麦克风实时识音 · 智能纠错',
+                icon: '🎹',
+                iconBg: 'bg-cyan-50 text-cyan-600 border border-cyan-100',
+                barClass: 'bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500',
+                bulletClass: 'bg-cyan-500',
+                btnClass: 'kid-btn-primary',
+                desc: '专为 iPad 与真实钢琴打造的视奏与音高听测训练。屏幕随机呈现五线谱音符，通过麦克风实时捕获钢琴琴声并精准识别音高，弹对自动过关并记录连击。',
+                userProgressText: '高低音谱号 · 麦克风真钢识音',
+                dueCount: 0,
+                masteredCount: 0,
+                tags: [
+                    { text: '高/低音谱表视奏', color: '#0284c7' },
+                    { text: '麦克风真钢实时识音', color: '#10b981' },
+                    { text: 'MPM 音高检测算法', color: '#6366f1' },
+                    { text: '±25 音分调音容错', color: '#f59e0b' },
+                    { text: 'iPad 谱架沉浸练习', color: '#ec4899' }
+                ],
+                highlights: [
+                    '标准 VexFlow 五线谱与原生矢量乐谱双模渲染，高低音谱表自由切换',
+                    '基于 Web Audio API 与高精度自相关算法，实时识别真实钢琴击弦音高',
+                    '智能容错与防抖判定：弹对即时变绿反馈并播放清脆提示音，自动出下一题',
+                    '内置标准发音试听、音分偏差调音表与连击闯关统计'
+                ],
+                url: 'music/index.html',
+                btnText: '进入钢琴视奏'
+            },
+            {
                 id: 'english',
                 title: '英语核心动词卡',
                 subtitle: '100 高频动词 · 3D 双面翻牌 · 掌握度看板',
@@ -301,6 +330,25 @@ const app = createApp({
                 }
             } catch (e) {
                 console.warn('读取英语进度异常', e);
+            }
+
+            // 4. 钢琴视奏模块进度
+            try {
+                const musicRaw = localStorage.getItem('piano_app_stats');
+                const musicMod = modules.value.find(m => m.id === 'music');
+                if (musicMod) {
+                    if (musicRaw) {
+                        const stats = JSON.parse(musicRaw);
+                        if (stats && stats.totalCorrect > 0) {
+                            musicMod.masteredCount = stats.totalCorrect;
+                            musicMod.userProgressText = `已累计弹对 ${stats.totalCorrect} 题 · 最高连击 ${stats.maxStreak || stats.totalCorrect} 次 🔥`;
+                        } else {
+                            musicMod.userProgressText = '尚未开始练习，点击进入五线谱识音';
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('读取钢琴进度异常', e);
             }
         };
 

@@ -60,9 +60,10 @@
 
             <!-- 学习中心概览统计栏 (精准对齐项目实际数据规制) -->
             <div class="flex justify-between items-center h-8 mt-2.5 text-xs sm:text-sm opacity-95 border-t border-white/20 pt-2 font-bold leading-none">
-                <span class="flex items-center">🎌 日语: <b class="text-emerald-300 font-black ml-1 text-sm">1912</b> 词 · <b class="text-emerald-300 font-black ml-0.5 text-sm">226</b> 句</span>
-                <span class="flex items-center">✍️ 汉字: <b class="text-yellow-300 font-black ml-1 text-sm">170</b> 启蒙字</span>
-                <span class="flex items-center">🔤 英语: <b class="text-pink-300 font-black ml-1 text-sm">100</b> 动词</span>
+                <span class="flex items-center">🎌 日语: <b class="text-emerald-300 font-black ml-1 text-sm">1912</b> 词</span>
+                <span class="flex items-center">✍️ 汉字: <b class="text-yellow-300 font-black ml-1 text-sm">170</b> 字</span>
+                <span class="flex items-center">🎹 钢琴: <b class="text-cyan-300 font-black ml-1 text-sm">五线谱</b> 识音</span>
+                <span class="flex items-center">🔤 英语: <b class="text-pink-300 font-black ml-1 text-sm">100</b> 词</span>
             </div>
         </header>
 
@@ -98,7 +99,7 @@
                     <div class="space-y-1">
                         <h2 class="text-lg sm:text-xl font-black text-amber-950 tracking-tight leading-snug">喵！今天想和 Apiapia 学点什么？</h2>
                         <p class="text-xs sm:text-sm text-amber-900/80 font-medium leading-relaxed">
-                            精选日语五十音与核心词句、小学启蒙汉字笔顺动画、英语高频动词闪卡。猫咪 Apiapia 会全程陪着你，结合艾宾浩斯科学曲线，在轻松闯关中快乐掌握！
+                            精选日语五十音与核心词句、小学启蒙汉字笔顺动画、钢琴视奏真钢麦克风识音、英语高频动词闪卡。猫咪 Apiapia 会全程陪着你，结合艾宾浩斯科学曲线，在轻松闯关中快乐掌握！
                         </p>
                     </div>
                 </div>
@@ -128,7 +129,7 @@
                 </div>
             </div>
 
-            <!-- 三大学习模块卡片 (大圆角卡片 + 3D 立体触感大按钮) -->
+            <!-- 四大学习模块卡片 (大圆角卡片 + 3D 立体触感大按钮) -->
             <div class="space-y-4">
                 <div v-for="item in modules" :key="item.id"
                      @click="goToModule(item.url, item.id)"
@@ -232,6 +233,6 @@
     </div>
 
     <!-- 业务逻辑脚本 (Vue 3 + Vant 4) -->
-    <script src="app.js?v=1.0.11"></script>
+    <script src="app.js?v=1.0.14"></script>
 </body>
 </html>
