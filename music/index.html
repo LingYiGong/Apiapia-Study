@@ -454,9 +454,9 @@
       <div class="select-group">
         <label for="tolerance-select">音准容差：</label>
         <select id="tolerance-select">
-          <option value="15">±15 音分 (严格)</option>
-          <option value="25" selected>±25 音分 (标准钢琴)</option>
-          <option value="35">±35 音分 (宽松)</option>
+          <option value="25">±25 音分 (严格校准)</option>
+          <option value="35" selected>±35 音分 (标准真钢 · 推荐)</option>
+          <option value="45">±45 音分 (宽松视奏)</option>
         </select>
       </div>
 
@@ -692,8 +692,8 @@
       }
       const rms = Math.sqrt(sumSquares / SIZE);
 
-      // 经过前置增益放大后，门限定为 0.006，既能滤除环境纯底噪，又能灵敏捕捉真实钢琴琴声
-      if (rms < 0.006) {
+      // 经过前置增益放大后，门限定为 0.003，让极轻柔弱奏 (Pianissimo) 也能灵敏捕获
+      if (rms < 0.003) {
         return { freq: -1, rms: rms };
       }
 
@@ -735,17 +735,27 @@
         }
       }
 
-      // 若最高峰低于 0.50，说明声音波形无明显音高规律（如敲击桌子、杂音）
-      if (highestPeak.val < 0.50) {
+      // 降低判定最低置信度阈值至 0.25 (针对真实钢琴轻弹时谐波分散现象，不再强制要求0.50高门限)
+      if (highestPeak.val < 0.25) {
         return { freq: -1, rms: rms };
       }
 
-      // 选出第一个达到最高峰 85% 的峰值，杜绝高次谐波/八度误判
-      const threshold = highestPeak.val * 0.85;
+      // 智能基频周期决策：检查是否存在约 2 倍周期的基频波峰
+      // 真实钢琴在 C3~F4 区域，击弦瞬间 2 次泛音能量往往接近甚至高于基频
+      // 检查较长周期处是否存在强相关，防止将 C4 误当成 C5（八度高跳）
       let chosenPeak = highestPeak;
       for (let i = 0; i < peaks.length; i++) {
-        if (peaks[i].val >= threshold) {
-          chosenPeak = peaks[i];
+        const p1 = peaks[i];
+        if (p1.val >= highestPeak.val * 0.70) {
+          chosenPeak = p1;
+          // 检查是否存在约 2 倍周期（即低一个八度的真正基频）
+          const doubleTau = p1.tau * 2;
+          if (doubleTau <= maxPeriod) {
+            const subPeak = peaks.find(p => Math.abs(p.tau - doubleTau) <= Math.max(3, p1.tau * 0.08));
+            if (subPeak && subPeak.val >= 0.25 && subPeak.val >= p1.val * 0.40) {
+              chosenPeak = subPeak; // 锁定真正基频周期
+            }
+          }
           break;
         }
       }
@@ -777,11 +787,11 @@
     const state = {
       clef: "treble",       // 'treble' | 'bass'
       range: "easy",        // 'easy' | 'medium' | 'accidentals'
-      tolerance: 25,        // 允许音分容差 (±cents)
+      tolerance: 35,        // 允许音分容差 (±35 cents，适配真实钢琴拉伸律与温度漂移，避免用力重弹才认)
       micGain: 5.0,         // 前置软件增益放大倍数 (默认 5x，专门针对 iPad 麦克风灵敏度优化)
       currentNote: null,    // 当前目标题目音符
       consecutiveMatches: 0,// 连续命中帧计数器
-      MATCH_REQUIRED_FRAMES: 3, // 连续匹配 3 帧 (~60-90ms) 判定为有效弹奏
+      MATCH_REQUIRED_FRAMES: 2, // 连续匹配 2 帧 (~40-60ms) 即可判定，轻柔触键瞬间识别
       isAdvancing: false,   // 是否正在切换题目
       totalCorrect: 0,      // 答对总题数
       currentStreak: 0      // 连击次数
@@ -1155,18 +1165,20 @@
 
       // 判定条件：
       // 1. 音名相同 (如都是 C 或 C#)
-      // 2. 八度相同 (如都是 4)
+      // 2. 八度判定：优先精准匹配，同时包容真实钢琴因琴弦物理特性激发的 2 次强泛音 (±1个八度)
       // 3. 音分偏差在设定的容差内 (|cents| <= tolerance)
       const targetBaseName = state.currentNote.baseName || state.currentNote.name;
       const isNameMatch = (detected.noteName === targetBaseName);
-      const isOctaveMatch = (detected.octave === state.currentNote.octave);
+      const isOctaveExact = (detected.octave === state.currentNote.octave);
+      const isOctaveHarmonic = (Math.abs(detected.octave - state.currentNote.octave) === 1);
+      const isOctaveMatch = isOctaveExact || isOctaveHarmonic;
       const isPitchAccurate = Math.abs(detected.cents) <= state.tolerance;
 
       if (isNameMatch && isOctaveMatch && isPitchAccurate) {
         state.consecutiveMatches++;
         dom.detectedNoteText.classList.add("match");
 
-        // 连续若干帧一致，触发“答对判定”
+        // 连续匹配 2 帧 (~40ms)，轻弹触键即可瞬间触发“答对判定”
         if (state.consecutiveMatches >= state.MATCH_REQUIRED_FRAMES) {
           triggerSuccess();
         }
