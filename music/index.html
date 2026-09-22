@@ -69,22 +69,22 @@
       margin-top: 4px;
     }
 
-    /* 主布局容器 (适配 iPad 横竖屏) */
+    /* 主布局容器 (适配 iPad 横竖屏，放宽最大宽度让大乐谱更舒展) */
     .app-container {
       width: 100%;
-      max-width: 760px;
+      max-width: 820px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
     }
 
     /* 卡片通用样式 */
     .card {
       background: var(--card-bg);
       color: var(--text-main);
-      border-radius: 20px;
+      border-radius: 24px;
       box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
-      padding: 16px 20px;
+      padding: 18px 22px;
       backdrop-filter: blur(16px);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
@@ -102,17 +102,17 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
+      font-size: 0.95rem;
+      font-weight: 700;
       color: var(--text-main);
     }
 
     select {
-      padding: 7px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      font-size: 0.88rem;
-      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border-color);
+      font-size: 0.9rem;
+      font-weight: 700;
       background: #f8fafc;
       color: var(--text-main);
       outline: none;
@@ -128,13 +128,13 @@
     .btn-start {
       background: linear-gradient(135deg, #4f46e5, #3b82f6);
       color: white;
-      font-size: 1.15rem;
-      font-weight: 700;
-      padding: 14px 28px;
+      font-size: 1.22rem;
+      font-weight: 800;
+      padding: 16px 32px;
       border-radius: 9999px;
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.45);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -145,7 +145,7 @@
 
     .btn-start:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(79, 70, 229, 0.55);
+      box-shadow: 0 8px 26px rgba(79, 70, 229, 0.55);
     }
 
     .btn-start:active {
@@ -154,43 +154,50 @@
 
     .btn-start.listening {
       background: linear-gradient(135deg, #10b981, #059669);
-      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.45);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
     }
 
-    /* 五线谱展示区 */
+    /* 五线谱展示区 (专为儿童视奏加高、加大、更醒目) */
     .staff-card {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 260px;
-      padding: 22px 14px 16px 14px;
+      min-height: 330px;
+      padding: 24px 16px 20px 16px;
       overflow: hidden;
     }
 
     .target-badge {
       position: absolute;
       top: 14px;
-      left: 20px;
+      left: 18px;
       display: flex;
       align-items: baseline;
-      gap: 6px;
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      font-weight: 600;
+      gap: 8px;
+      font-size: 1rem;
+      color: #475569;
+      font-weight: 700;
+      background: rgba(241, 245, 249, 0.95);
+      padding: 6px 16px;
+      border-radius: 9999px;
+      border: 1.5px solid #cbd5e1;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
     .target-name {
-      font-size: 1.5rem;
-      font-weight: 800;
+      font-size: 2.2rem;
+      font-weight: 900;
       color: var(--primary);
+      line-height: 1;
     }
 
     .target-solfege {
-      font-size: 1.1rem;
-      font-weight: 700;
+      font-size: 1.35rem;
+      font-weight: 800;
       color: var(--accent);
+      line-height: 1;
     }
 
     #staff-output {
@@ -198,7 +205,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 190px;
+      min-height: 230px;
+      margin: 8px 0;
     }
 
     /* 正确判定时的外框脉冲动画 */
@@ -207,8 +215,8 @@
     }
 
     @keyframes pulse-success {
-      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8); }
-      70% { box-shadow: 0 0 0 24px rgba(16, 185, 129, 0); }
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.85); }
+      70% { box-shadow: 0 0 0 28px rgba(16, 185, 129, 0); }
       100% { box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35); }
     }
 
@@ -220,17 +228,17 @@
       transform: translate(-50%, -50%) scale(0.5);
       background: rgba(16, 185, 129, 0.96);
       color: white;
-      font-size: 1.5rem;
-      font-weight: 800;
-      padding: 12px 28px;
+      font-size: 1.8rem;
+      font-weight: 900;
+      padding: 16px 36px;
       border-radius: 9999px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
       opacity: 0;
       pointer-events: none;
       transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       z-index: 10;
     }
 
@@ -242,23 +250,24 @@
     /* 辅助功能操作条 (试听与跳过) */
     .staff-actions {
       display: flex;
-      gap: 14px;
+      gap: 16px;
       margin-top: 8px;
     }
 
     .btn-secondary {
       background: #f1f5f9;
       color: #334155;
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 8px 16px;
-      border-radius: 10px;
-      border: 1px solid #cbd5e1;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 10px 22px;
+      border-radius: 14px;
+      border: 1.5px solid #cbd5e1;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       transition: background 0.15s, transform 0.1s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
     .btn-secondary:hover {
@@ -890,7 +899,7 @@
     }
 
     /**
-     * 使用 VexFlow 4.x 渲染五线谱
+     * 使用 VexFlow 4.x 渲染五线谱 (按 1.35 倍矢量等比放大，专为儿童视奏定制)
      */
     function renderWithVexFlow(container, noteInfo, clef, isCorrect) {
       try {
@@ -899,17 +908,21 @@
           return false;
         }
 
-        const width = Math.min(window.innerWidth - 48, 440);
-        const height = 180;
+        const width = Math.min(window.innerWidth - 36, 560);
+        const height = 230;
 
         const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
         renderer.resize(width, height);
         const context = renderer.getContext();
-        context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
+        context.setFont("Arial", 11, "").setBackgroundFillStyle("#eed");
 
-        const staveWidth = Math.min(width - 30, 340);
-        const staveX = (width - staveWidth) / 2;
-        const staveY = 25;
+        // 核心：放大 1.35 倍，乐谱与音符清晰硕大，孩子坐在琴凳前轻松看清
+        const scale = 1.35;
+        context.scale(scale, scale);
+
+        const staveWidth = Math.min(Math.floor((width - 24) / scale), 360);
+        const staveX = Math.floor(((width / scale) - staveWidth) / 2);
+        const staveY = 22;
 
         const stave = new VF.Stave(staveX, staveY, staveWidth);
         stave.addClef(clef);
@@ -946,14 +959,14 @@
     }
 
     /**
-     * 原生高精度矢量 SVG 五线谱备用渲染器
-     * （内置高音谱号、低音谱号、全音符椭圆与上下加线，完全不依赖任何第三方 CDN）
+     * 原生高精度矢量 SVG 五线谱备用渲染器 (大字体、粗线条、超清晰儿童设计)
      */
     function renderWithNativeSVG(container, noteInfo, clef, isCorrect) {
-      const width = Math.min(window.innerWidth - 48, 400);
-      const height = 180;
-      const staffLineSpacing = 14;
-      const topStaffLineY = 55;
+      const width = Math.min(window.innerWidth - 36, 540);
+      const height = 230;
+      // 放大行距至 21px (加大 50%)，五线谱间距开阔，孩子数线、数间毫不费力
+      const staffLineSpacing = 21;
+      const topStaffLineY = 74;
       const staffWidth = width - 60;
       const startX = 30;
 
@@ -966,49 +979,49 @@
 
       // 每一个音级向上移动半个行距
       const noteY = refY - (noteStep - refStep) * (staffLineSpacing / 2);
-      const noteX = startX + staffWidth * 0.56;
+      const noteX = startX + staffWidth * 0.58;
       const noteColor = isCorrect ? "#10b981" : "#1e293b";
 
       let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
 
-      // 绘制五条基准线
+      // 绘制五条高对比粗基准线 (粗细 2.6px)
       for (let i = 0; i < 5; i++) {
         const y = topStaffLineY + i * staffLineSpacing;
-        svg += `<line x1="${startX}" y1="${y}" x2="${startX + staffWidth}" y2="${y}" stroke="#334155" stroke-width="1.8" stroke-linecap="round"/>`;
+        svg += `<line x1="${startX}" y1="${y}" x2="${startX + staffWidth}" y2="${y}" stroke="#1e293b" stroke-width="2.6" stroke-linecap="round"/>`;
       }
       // 谱表首尾竖向小节线
-      svg += `<line x1="${startX}" y1="${topStaffLineY}" x2="${startX}" y2="${topStaffLineY + 4 * staffLineSpacing}" stroke="#334155" stroke-width="2"/>`;
-      svg += `<line x1="${startX + staffWidth}" y1="${topStaffLineY}" x2="${startX + staffWidth}" y2="${topStaffLineY + 4 * staffLineSpacing}" stroke="#334155" stroke-width="2"/>`;
+      svg += `<line x1="${startX}" y1="${topStaffLineY}" x2="${startX}" y2="${topStaffLineY + 4 * staffLineSpacing}" stroke="#1e293b" stroke-width="3"/>`;
+      svg += `<line x1="${startX + staffWidth}" y1="${topStaffLineY}" x2="${startX + staffWidth}" y2="${topStaffLineY + 4 * staffLineSpacing}" stroke="#1e293b" stroke-width="3"/>`;
 
-      // 谱号图标
+      // 超大儿童矢量谱号
       if (clef === "treble") {
-        svg += `<text x="${startX + 12}" y="${topStaffLineY + 3.8 * staffLineSpacing}" font-size="52" font-family="serif" fill="#1e293b" user-select="none">𝄞</text>`;
+        svg += `<text x="${startX + 14}" y="${topStaffLineY + 3.85 * staffLineSpacing}" font-size="76" font-family="serif" fill="#1e293b" font-weight="bold" user-select="none">𝄞</text>`;
       } else {
-        svg += `<text x="${startX + 12}" y="${topStaffLineY + 2.8 * staffLineSpacing}" font-size="44" font-family="serif" fill="#1e293b" user-select="none">𝄢</text>`;
+        svg += `<text x="${startX + 14}" y="${topStaffLineY + 2.85 * staffLineSpacing}" font-size="64" font-family="serif" fill="#1e293b" font-weight="bold" user-select="none">𝄢</text>`;
       }
 
-      // 上加线 / 下加线绘制 (Ledger Lines)
+      // 上加线 / 下加线绘制 (加宽至 48px，清晰明了)
       const bottomStaffLineY = topStaffLineY + 4 * staffLineSpacing;
       // 下加线
       if (noteY >= bottomStaffLineY + staffLineSpacing) {
         for (let ly = bottomStaffLineY + staffLineSpacing; ly <= noteY + 2; ly += staffLineSpacing) {
-          svg += `<line x1="${noteX - 16}" y1="${ly}" x2="${noteX + 16}" y2="${ly}" stroke="#334155" stroke-width="1.8"/>`;
+          svg += `<line x1="${noteX - 24}" y1="${ly}" x2="${noteX + 24}" y2="${ly}" stroke="#1e293b" stroke-width="2.6"/>`;
         }
       }
       // 上加线
       if (noteY <= topStaffLineY - staffLineSpacing) {
         for (let ly = topStaffLineY - staffLineSpacing; ly >= noteY - 2; ly -= staffLineSpacing) {
-          svg += `<line x1="${noteX - 16}" y1="${ly}" x2="${noteX + 16}" y2="${ly}" stroke="#334155" stroke-width="1.8"/>`;
+          svg += `<line x1="${noteX - 24}" y1="${ly}" x2="${noteX + 24}" y2="${ly}" stroke="#1e293b" stroke-width="2.6"/>`;
         }
       }
 
-      // 升降号绘制
+      // 大号升降号绘制
       if (noteInfo.accidental === "#") {
-        svg += `<text x="${noteX - 22}" y="${noteY + 7}" font-size="22" font-weight="bold" fill="${noteColor}">♯</text>`;
+        svg += `<text x="${noteX - 32}" y="${noteY + 10}" font-size="32" font-weight="900" fill="${noteColor}">♯</text>`;
       }
 
-      // 全音符椭圆 (带倾斜角的标准空心符头)
-      svg += `<ellipse cx="${noteX}" cy="${noteY}" rx="10.5" ry="7" transform="rotate(-22 ${noteX} ${noteY})" fill="none" stroke="${noteColor}" stroke-width="3.6" />`;
+      // 超大儿童友好全音符符头 (rx=15.5, ry=10.5, 边框粗度 4.5px)
+      svg += `<ellipse cx="${noteX}" cy="${noteY}" rx="15.5" ry="10.5" transform="rotate(-22 ${noteX} ${noteY})" fill="none" stroke="${noteColor}" stroke-width="4.5" />`;
 
       svg += `</svg>`;
       container.innerHTML = svg;
