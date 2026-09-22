@@ -119,6 +119,7 @@
     max-height: 94px;
     max-width: 120px;
     border: 3px solid #e0e7ff;
+    border-bottom: 5px solid #c7d2fe;
     border-radius: 20px;
     background: #ffffff;
     color: var(--text);
@@ -126,8 +127,8 @@
     font-size: clamp(40px, 10vw, 64px);
     font-weight: 800;
     line-height: 1;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.06);
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+    transition: transform 0.08s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.08s ease, background-color 0.12s ease, border-color 0.12s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -135,16 +136,28 @@
     user-select: none;
     outline: none;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 .choice-option:hover:not(:disabled) {
     border-color: #a5b4fc;
+    border-bottom-color: #818cf8;
     background: #f8faff;
 }
 
 .choice-option:active:not(:disabled) {
-    background: #eef2ff;
-    /* 不变动任何边框大小或偏移，确保尺寸完全固定 */
+    transform: translateY(3px) scale(0.97) !important;
+    border-bottom-width: 2px !important;
+    box-shadow: 0 1px 3px rgba(79, 70, 229, 0.18) !important;
+    background: #eef2ff !important;
+    border-color: #818cf8 !important;
+}
+
+/* 首页模式大卡片点按凹陷手感 */
+#startBtn:active, #recognitionStartBtn:active, #readStartBtn:active, #storyStartBtn:active, #strokeStartBtn:active {
+    transform: scale(0.98) translateY(2px) !important;
+    filter: brightness(0.96);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
 }
 
 .choice-option:focus,

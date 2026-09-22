@@ -95,71 +95,105 @@ html, body {
     font-family: "Hiragino Mincho ProN", "Yu Mincho", "MS Mincho", "Noto Serif JP", "KaiTi", serif;
 }
 
-/* ================== 儿童立体触感按钮 (3D Push Effect) ================== */
+/* ================== 儿童立体触感按钮 (3D Push Effect & Tactile Feedback) ================== */
+/* 全局交互按键基础触控体验规范 */
+button, [role="button"], .van-button, a.btn, .choice-option, .clickable {
+    touch-action: manipulation;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+}
+
+/* 全局非 3D 按钮在点击/按压时的扎实物理下陷与微暗反馈，彻底解决“没点到”感 */
+button:not(.kid-btn-primary):not(.btn-3d-primary):not(.kid-btn-success):not(.btn-3d-success):not(.kid-btn-danger):not(.btn-3d-danger):not(.kid-btn-warning):not(.btn-3d-warning):not(.kid-btn-light):not(.btn-3d-light):not(.kid-btn-cyan):not(.btn-3d-cyan):active,
+[role="button"]:active,
+.van-button:active {
+    transform: scale(0.94) translateY(1.5px) !important;
+    filter: brightness(0.91) contrast(1.05);
+    transition: transform 0.05s ease, filter 0.05s ease !important;
+}
+
+/* 3D 按钮: 靛青主色大按钮 */
 .kid-btn-primary, .btn-3d-primary {
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     border-bottom: 4px solid #3730a3;
     color: #ffffff;
-    transition: all 0.12s ease;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.07s cubic-bezier(0.2, 0, 0, 1), border-bottom-width 0.07s ease, filter 0.07s ease;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.32);
+    transform: translateY(0);
 }
 .kid-btn-primary:active, .btn-3d-primary:active {
-    transform: translateY(3px);
-    border-bottom-width: 1px;
-    box-shadow: 0 1px 4px rgba(79, 70, 229, 0.2);
+    transform: translateY(3px) scale(0.985) !important;
+    border-bottom-width: 1px !important;
+    box-shadow: 0 1px 3px rgba(79, 70, 229, 0.25) !important;
+    filter: brightness(0.93);
 }
 
+/* 3D 按钮: 翡翠成功绿大按钮 */
 .kid-btn-success, .btn-3d-success {
     background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
     border-bottom: 4px solid #059669;
     color: #ffffff;
-    transition: all 0.12s ease;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.07s cubic-bezier(0.2, 0, 0, 1), border-bottom-width 0.07s ease, filter 0.07s ease;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.32);
+    transform: translateY(0);
 }
 .kid-btn-success:active, .btn-3d-success:active {
-    transform: translateY(3px);
-    border-bottom-width: 1px;
-    box-shadow: 0 1px 4px rgba(16, 185, 129, 0.2);
+    transform: translateY(3px) scale(0.985) !important;
+    border-bottom-width: 1px !important;
+    box-shadow: 0 1px 3px rgba(16, 185, 129, 0.25) !important;
+    filter: brightness(0.93);
 }
 
+/* 3D 按钮: 玫瑰告警红大按钮 */
 .kid-btn-danger, .btn-3d-danger {
     background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
     border-bottom: 4px solid #be123c;
     color: #ffffff;
-    transition: all 0.12s ease;
-    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
+    transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.07s cubic-bezier(0.2, 0, 0, 1), border-bottom-width 0.07s ease, filter 0.07s ease;
+    box-shadow: 0 4px 14px rgba(244, 63, 94, 0.32);
+    transform: translateY(0);
 }
 .kid-btn-danger:active, .btn-3d-danger:active {
-    transform: translateY(3px);
-    border-bottom-width: 1px;
-    box-shadow: 0 1px 4px rgba(244, 63, 94, 0.2);
+    transform: translateY(3px) scale(0.985) !important;
+    border-bottom-width: 1px !important;
+    box-shadow: 0 1px 3px rgba(244, 63, 94, 0.25) !important;
+    filter: brightness(0.93);
 }
 
+/* 3D 按钮: 琥珀活力橙大按钮 */
 .kid-btn-warning, .btn-3d-warning {
     background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
     border-bottom: 4px solid #b45309;
     color: #ffffff;
-    transition: all 0.12s ease;
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.07s cubic-bezier(0.2, 0, 0, 1), border-bottom-width 0.07s ease, filter 0.07s ease;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.32);
+    transform: translateY(0);
 }
 .kid-btn-warning:active, .btn-3d-warning:active {
-    transform: translateY(3px);
-    border-bottom-width: 1px;
-    box-shadow: 0 1px 4px rgba(245, 158, 11, 0.2);
+    transform: translateY(3px) scale(0.985) !important;
+    border-bottom-width: 1px !important;
+    box-shadow: 0 1px 3px rgba(245, 158, 11, 0.25) !important;
+    filter: brightness(0.93);
 }
 
+/* 3D 按钮: 浅灰明净辅助大按钮 */
 .kid-btn-light, .btn-3d-light {
     background: #ffffff;
     border: 2px solid #e2e8f0;
     border-bottom: 4px solid #cbd5e1;
     color: #334155;
-    transition: all 0.12s ease;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+    transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.07s cubic-bezier(0.2, 0, 0, 1), border-bottom-width 0.07s ease, filter 0.07s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+    transform: translateY(0);
 }
 .kid-btn-light:active, .btn-3d-light:active {
-    transform: translateY(2px);
-    border-bottom-width: 2px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transform: translateY(3px) scale(0.985) !important;
+    border-bottom-width: 1px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    filter: brightness(0.96);
 }
 
 /* 钢琴模块专用天青海蓝 3D 按钮 */
@@ -167,13 +201,21 @@ html, body {
     background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
     border-bottom: 4px solid #0369a1;
     color: #ffffff;
-    transition: all 0.12s ease;
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
+    transition: transform 0.07s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.07s cubic-bezier(0.2, 0, 0, 1), border-bottom-width 0.07s ease, filter 0.07s ease;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+    transform: translateY(0);
 }
 .kid-btn-cyan:active, .btn-3d-cyan:active {
-    transform: translateY(3px);
-    border-bottom-width: 1px;
-    box-shadow: 0 1px 4px rgba(2, 132, 199, 0.2);
+    transform: translateY(3px) scale(0.985) !important;
+    border-bottom-width: 1px !important;
+    box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25) !important;
+    filter: brightness(0.93);
+}
+
+/* 底部大导航栏按钮点按触感 */
+.app-bottom-nav button:active {
+    transform: scale(0.91) translateY(1.5px) !important;
+    filter: brightness(0.88);
 }
 
 /* ================== 柔和卡片与动效 ================== */

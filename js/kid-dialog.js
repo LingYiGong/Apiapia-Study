@@ -1184,4 +1184,161 @@
         }
     };
 
+    /* ============================================================
+     * Apiapia 全局按键物理点按与触感反馈系统 (Tap & Haptic Feedback Engine)
+     * 解决移动端 / 触屏 / 鼠标操作中按压感缺失、感觉“没点到”的问题
+     * ============================================================ */
+    (function initApiapiaTapFeedback() {
+        // 1. 唤醒 iOS Safari / WebKit 的 :active 伪类即时响应
+        if (typeof window !== 'undefined') {
+            const wakeActiveState = () => {};
+            window.addEventListener('touchstart', wakeActiveState, { passive: true });
+            window.addEventListener('pointerdown', wakeActiveState, { passive: true });
+        }
+
+        // 2. Web Audio 零外部资源依赖的轻快气泡按键音
+        let audioCtx = null;
+        let isAudioSupported = true;
+        let lastTapTime = 0;
+
+        function getAudioContext() {
+            if (!isAudioSupported) return null;
+            try {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) {
+                    isAudioSupported = false;
+                    return null;
+                }
+                if (!audioCtx) {
+                    audioCtx = new AudioContextClass();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume().catch(() => {});
+                }
+                return audioCtx;
+            } catch (e) {
+                isAudioSupported = false;
+                return null;
+            }
+        }
+
+        // 用户首次触摸/点击时预热激活 AudioContext，确保后续无任何延迟
+        const primeAudio = () => {
+            getAudioContext();
+            window.removeEventListener('pointerdown', primeAudio);
+            window.removeEventListener('touchstart', primeAudio);
+            window.removeEventListener('click', primeAudio);
+        };
+        window.addEventListener('pointerdown', primeAudio, { passive: true });
+        window.addEventListener('touchstart', primeAudio, { passive: true });
+        window.addEventListener('click', primeAudio, { passive: true });
+
+        // 播放轻快拟物按键音 (如气泡啵声/积木轻击音)
+        function playTapSound(type = 'default') {
+            try {
+                // 支持全局静音偏好
+                if (localStorage.getItem('apiapia_tap_sound_disabled') === 'true') {
+                    return;
+                }
+                const ctx = getAudioContext();
+                if (!ctx) return;
+
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                if (type === 'heavy' || type === 'confirm') {
+                    // 重点操作/确认大按钮: 饱满双音级或轻明亮音
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(680, now);
+                    osc.frequency.exponentialRampToValueAtTime(320, now + 0.045);
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.048);
+                } else {
+                    // 标准按键: 温和极短促气泡 pop 音 (时长仅 35ms，音量温和，清脆解压)
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(540, now);
+                    osc.frequency.exponentialRampToValueAtTime(180, now + 0.035);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.038);
+                }
+            } catch (e) {
+                // 忽略音频异常
+            }
+        }
+
+        // 触感微震动 (Haptic Vibration)
+        function triggerHaptic(type = 'light') {
+            try {
+                if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                    // 10ms 极短微震动，带来实体微开关阻尼感
+                    navigator.vibrate(type === 'heavy' ? 18 : 10);
+                }
+            } catch (e) {}
+        }
+
+        // 判断元素是否属于需要触感反馈的交互控件
+        function findInteractiveTarget(el) {
+            if (!el || el === document.body || el === document.documentElement) return null;
+            return el.closest(
+                'button, [role="button"], .choice-option, .clickable, ' +
+                '.kid-btn-primary, .kid-btn-success, .kid-btn-danger, .kid-btn-warning, .kid-btn-light, .kid-btn-cyan, ' +
+                '.btn-3d-primary, .btn-3d-success, .btn-3d-danger, .btn-3d-warning, .btn-3d-light, .btn-3d-cyan, ' +
+                '.van-button, .app-bottom-nav button, a.btn, input[type="button"], input[type="submit"], ' +
+                '#startBtn, #recognitionStartBtn, #readStartBtn, #storyStartBtn, #strokeStartBtn, ' +
+                '.kid-dialog-btn, .kid-reward-btn'
+            );
+        }
+
+        // 全局事件委托 (使用 pointerdown 优先获取即时下按时刻)
+        function handlePointerDown(e) {
+            const btn = findInteractiveTarget(e.target);
+            if (!btn) return;
+
+            // 检查禁用状态
+            if (btn.disabled || btn.getAttribute('aria-disabled') === 'true' || btn.classList.contains('disabled')) {
+                return;
+            }
+
+            const now = Date.now();
+            // 节流 45ms，避免多点触控或快速重复判定
+            if (now - lastTapTime < 45) return;
+            lastTapTime = now;
+
+            const isHeavy = btn.classList.contains('kid-btn-primary') ||
+                            btn.classList.contains('kid-btn-success') ||
+                            btn.classList.contains('kid-btn-danger') ||
+                            btn.classList.contains('btn-3d-primary') ||
+                            btn.classList.contains('kid-dialog-btn-primary');
+
+            playTapSound(isHeavy ? 'heavy' : 'default');
+            triggerHaptic(isHeavy ? 'heavy' : 'light');
+        }
+
+        // 注册全局指针下压监听
+        if (window.PointerEvent) {
+            document.addEventListener('pointerdown', handlePointerDown, { passive: true, capture: true });
+        } else {
+            document.addEventListener('touchstart', handlePointerDown, { passive: true, capture: true });
+            document.addEventListener('mousedown', handlePointerDown, { passive: true, capture: true });
+        }
+
+        // 挂载全局控制 API 到 window.KidTapFeedback
+        window.KidTapFeedback = {
+            play: playTapSound,
+            haptic: triggerHaptic,
+            enableSound: () => localStorage.removeItem('apiapia_tap_sound_disabled'),
+            disableSound: () => localStorage.setItem('apiapia_tap_sound_disabled', 'true'),
+            isSoundEnabled: () => localStorage.getItem('apiapia_tap_sound_disabled') !== 'true'
+        };
+    })();
+
 })();
