@@ -3,7 +3,6 @@
    Hanzi Learning Module Specific Styles (Extends ../style.css)
    ============================================================ */
 
-@import "../css/style.css";
 
 /* ================== 小学生标准田字格手写板 ================== */
 .writing-board {

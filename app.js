@@ -2,7 +2,7 @@
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
 // 当前客户端内置基线版本号
-const BUILD_VERSION = '1.0.14';
+const BUILD_VERSION = '1.0.15';
 
 // Semver 版本比较辅助函数 (remote > current 返回 true)
 function isNewerVersion(remote, current) {
@@ -152,9 +152,7 @@ const app = createApp({
                 iconBg: 'bg-indigo-50 text-indigo-600 border border-indigo-100',
                 barClass: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500',
                 cardBorder: 'border-indigo-200 hover:border-indigo-400',
-                bulletClass: 'bg-indigo-500',
                 btnClass: 'kid-btn-primary',
-                desc: '包含五十音标准田字格平假名/片假名听写与形态对照，1912个核心词汇与226句生活实用例句纯听力盲测，搭配 SM-2 艾宾浩斯间隔复习与云端同步。',
                 userProgressText: '1912 词 · 226 句 · 104 假名',
                 dueCount: 0,
                 masteredCount: 0,
@@ -162,12 +160,6 @@ const app = createApp({
                     { text: '五十音田字格手写', color: '#6366f1' },
                     { text: '1912 词纯盲听', color: '#10b981' },
                     { text: '情境例句点读', color: '#8b5cf6' }
-                ],
-                highlights: [
-                    '五十音平假名/片假名对照手写（支持笔画撤销、清空与标准形态对比）',
-                    '1912 个核心高频词汇纯盲听测试，自然语音语调与词库管理',
-                    '226 句日常实用对话例句听力，支持重点词汇单独点读',
-                    'SM-2 艾宾浩斯记忆曲线智能安排每日复习与云端备份'
                 ],
                 url: 'japanese/frontend/index.html',
                 btnText: '日语学习'
@@ -180,9 +172,7 @@ const app = createApp({
                 iconBg: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
                 barClass: 'bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500',
                 cardBorder: 'border-emerald-300 hover:border-emerald-500',
-                bulletClass: 'bg-emerald-500',
                 btnClass: 'kid-btn-success',
-                desc: '面向儿童汉字启蒙与小学低年级标准听写。精选 170 个高频基础生字，配备规范笔顺慢动作动画临摹、标准田字格手写板、同音提示词朗读及云端多端同步。',
                 userProgressText: '170 常用启蒙生字 · 规范笔顺',
                 dueCount: 0,
                 masteredCount: 0,
@@ -190,12 +180,6 @@ const app = createApp({
                     { text: '标准田字格', color: '#10b981' },
                     { text: '慢动作笔顺', color: '#f59e0b' },
                     { text: '5选1听音选字', color: '#6366f1' }
-                ],
-                highlights: [
-                    '标准田字格手写板，支持笔画一笔撤销、清空重写与答案核对',
-                    '生动笔顺动画临摹演示，拆解笔画与笔顺规范',
-                    '智能语音朗读：支持“汉字+提示词”（如：天，天空的天），告别同音字混淆',
-                    '云端密钥同步支持，手机、iPad 多设备练字打卡不丢失'
                 ],
                 url: 'hanzi/hanzi.html',
                 btnText: '汉字学习'
@@ -208,9 +192,7 @@ const app = createApp({
                 iconBg: 'bg-cyan-50 text-cyan-600 border border-cyan-100',
                 barClass: 'bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500',
                 cardBorder: 'border-cyan-300 hover:border-cyan-500',
-                bulletClass: 'bg-cyan-500',
                 btnClass: 'kid-btn-cyan',
-                desc: '专为 iPad 与真实钢琴打造的视奏与音高听测训练。屏幕随机呈现五线谱音符，通过麦克风实时捕获钢琴琴声并精准识别音高，弹对自动过关并记录连击。',
                 userProgressText: '高低音谱号 · 麦克风真钢识音',
                 dueCount: 0,
                 masteredCount: 0,
@@ -218,12 +200,6 @@ const app = createApp({
                     { text: '大字号五线谱', color: '#0284c7' },
                     { text: '真实钢琴音色', color: '#10b981' },
                     { text: '轻弹秒级识别', color: '#6366f1' }
-                ],
-                highlights: [
-                    '标准 VexFlow 五线谱与原生矢量乐谱双模渲染，高低音谱表自由切换',
-                    '基于 Web Audio API 与高精度自相关算法，实时识别真实钢琴击弦音高',
-                    '智能容错与防抖判定：弹对即时变绿反馈并播放清脆提示音，自动出下一题',
-                    '内置标准发音试听、音分偏差调音表与连击闯关统计'
                 ],
                 url: 'music/index.html',
                 btnText: '钢琴视奏'
@@ -236,9 +212,7 @@ const app = createApp({
                 iconBg: 'bg-rose-50 text-rose-600 border border-rose-100',
                 barClass: 'bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500',
                 cardBorder: 'border-rose-300 hover:border-rose-500',
-                bulletClass: 'bg-rose-500',
                 btnClass: 'kid-btn-danger',
-                desc: '精选英语日常对话最基础、最高频的 100 个核心生活与情态动词。采用 3D 双面立体翻牌卡片互动设计，支持标准真人发音与“已掌握/需复习”分类学习。',
                 userProgressText: '100 核心高频动词 · 3D 闪卡',
                 dueCount: 0,
                 masteredCount: 0,
@@ -246,11 +220,6 @@ const app = createApp({
                     { text: '3D立体翻牌', color: '#f43f5e' },
                     { text: '真人双语发音', color: '#0284c7' },
                     { text: '掌握度环看板', color: '#10b981' }
-                ],
-                highlights: [
-                    '经典 3D 双面翻牌闪卡：正面中文释义联想，背面英文发音揭晓',
-                    '“认识 / 不认识” 快速标记打卡与快捷键键盘支持',
-                    '学习进度看板与掌握度圆环，直观掌握 100 动词记忆情况'
                 ],
                 url: 'english/english.html',
                 btnText: '英语词卡'
