@@ -459,6 +459,16 @@
           <option value="35">±35 音分 (宽松)</option>
         </select>
       </div>
+
+      <div class="select-group">
+        <label for="gain-select">麦克风增益：</label>
+        <select id="gain-select">
+          <option value="5" selected>5x (iPad推荐 · 灵敏)</option>
+          <option value="8">8x (高增益 · 远距离)</option>
+          <option value="3">3x (标准增益)</option>
+          <option value="1">1x (原始无放大)</option>
+        </select>
+      </div>
     </div>
 
     <!-- 2. 顶部开启麦克风按钮 (解决 iOS Safari / iPad AudioContext 策略) -->
@@ -666,6 +676,7 @@
      */
     let audioContext = null;
     let analyserNode = null;
+    let micGainNode = null;     // 前置软件增益放大节点 (解决 iPad / 移动端麦克风收音过小问题)
     let micStream = null;
     let audioDataBuffer = null;
     let isListening = false;
@@ -681,8 +692,8 @@
       }
       const rms = Math.sqrt(sumSquares / SIZE);
 
-      // 如果音量太小（低于 0.015），判定为静音或微弱底噪
-      if (rms < 0.015) {
+      // 经过前置增益放大后，门限定为 0.006，既能滤除环境纯底噪，又能灵敏捕捉真实钢琴琴声
+      if (rms < 0.006) {
         return { freq: -1, rms: rms };
       }
 
@@ -767,9 +778,10 @@
       clef: "treble",       // 'treble' | 'bass'
       range: "easy",        // 'easy' | 'medium' | 'accidentals'
       tolerance: 25,        // 允许音分容差 (±cents)
+      micGain: 5.0,         // 前置软件增益放大倍数 (默认 5x，专门针对 iPad 麦克风灵敏度优化)
       currentNote: null,    // 当前目标题目音符
       consecutiveMatches: 0,// 连续命中帧计数器
-      MATCH_REQUIRED_FRAMES: 4, // 连续匹配 4 帧 (~80-120ms) 判定为有效弹奏
+      MATCH_REQUIRED_FRAMES: 3, // 连续匹配 3 帧 (~60-90ms) 判定为有效弹奏
       isAdvancing: false,   // 是否正在切换题目
       totalCorrect: 0,      // 答对总题数
       currentStreak: 0      // 连击次数
@@ -782,6 +794,7 @@
       clefSelect: document.getElementById("clef-select"),
       rangeSelect: document.getElementById("range-select"),
       toleranceSelect: document.getElementById("tolerance-select"),
+      gainSelect: document.getElementById("gain-select"),
       staffOutput: document.getElementById("staff-output"),
       staffCard: document.getElementById("staff-card"),
       targetNoteName: document.getElementById("target-note-name"),
@@ -1008,12 +1021,13 @@
         }
 
         // 请求麦克风权限
-        // 关键设置：关闭回声消除与降噪算法，保留饱满的钢琴原音谐波
+        // 关键设置：开启系统自动电平增益 (autoGainControl: true) 以激活 iPad 硬件前级放大
+        // 同时禁用回声抑制与语音压制，保留钢琴泛音
         const constraints = {
           audio: {
             echoCancellation: false,
             noiseSuppression: false,
-            autoGainControl: false,
+            autoGainControl: true,
             channelCount: 1
           }
         };
@@ -1021,10 +1035,18 @@
         micStream = await navigator.mediaDevices.getUserMedia(constraints);
         const sourceNode = audioContext.createMediaStreamSource(micStream);
 
+        // 创建前置放大器 GainNode (Pre-amp)：将麦克风输入信号线性放大 5 倍
+        // 专门解决 iPad 麦克风硬件电平极低、琴声无法被捕获的问题
+        micGainNode = audioContext.createGain();
+        micGainNode.gain.setValueAtTime(state.micGain, audioContext.currentTime);
+
         // 创建 Analyser 分析器节点
         analyserNode = audioContext.createAnalyser();
         analyserNode.fftSize = 2048; // 保证低频音域具备充足的时间分辨率
-        sourceNode.connect(analyserNode);
+
+        // 核心链路：麦克风源 -> 5倍前级放大 -> 音频频域分析 (不接扬声器，防止啸叫)
+        sourceNode.connect(micGainNode);
+        micGainNode.connect(analyserNode);
 
         audioDataBuffer = new Float32Array(analyserNode.fftSize);
         isListening = true;
@@ -1032,7 +1054,7 @@
         // 更新按钮与状态标签
         dom.btnToggleMic.classList.add("listening");
         dom.btnText.textContent = "麦克风收音中 · 请在真钢琴上弹奏...";
-        dom.micStatusTag.textContent = "● 麦克风工作中";
+        dom.micStatusTag.textContent = "● 麦克风工作中 (增益已增强)";
         dom.micStatusTag.style.color = "#10b981";
 
         // 启动音频循环帧
@@ -1049,6 +1071,10 @@
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
+      }
+      if (micGainNode) {
+        try { micGainNode.disconnect(); } catch (e) {}
+        micGainNode = null;
       }
       if (micStream) {
         micStream.getTracks().forEach(track => track.stop());
@@ -1076,12 +1102,21 @@
 
       const result = autoCorrelate(audioDataBuffer, sampleRate);
 
-      // 1. 更新麦克风音量能量条 UI
-      const volumePercent = Math.min(100, Math.round(result.rms * 320));
+      // 1. 更新麦克风音量能量条 UI (经过 5x 前级放大后，反应灵敏饱满)
+      const volumePercent = Math.min(100, Math.round(result.rms * 240));
       dom.micVolumeBar.style.width = `${volumePercent}%`;
 
+      // 状态标签实时响应
+      if (result.rms >= 0.008) {
+        dom.micStatusTag.textContent = "● 麦克风已接收琴声";
+        dom.micStatusTag.style.color = "#10b981";
+      } else {
+        dom.micStatusTag.textContent = "● 麦克风监听中 (等待琴声)";
+        dom.micStatusTag.style.color = "#38bdf8";
+      }
+
       // 2. 识别音高处理
-      if (result.freq > 0 && result.rms >= 0.015) {
+      if (result.freq > 0 && result.rms >= 0.006) {
         const detected = frequencyToNote(result.freq);
         if (detected) {
           handleDetectedNote(detected);
@@ -1185,36 +1220,100 @@
 
     /**
      * =========================================================================
-     * 7. 辅助音频发生器 (试听音与提示音)
+     * 7. 真实声学钢琴发音引擎 (Realistic Acoustic Piano Synthesizer)
      * =========================================================================
+     * 
+     * 针对真实声学钢琴（Acoustic Grand Piano）音色特征建模：
+     * 1. 击弦机械瞬态 (Hammer Strike Transient)：带通滤波噪声脉冲，模拟琴槌毛毡敲击钢丝的木质打击触感；
+     * 2. 双弦同音失谐拍频 (Unison String Detuning)：同音多根琴弦微失谐 (-0.7¢ 和 +0.6¢)，产生丰富温暖的声学混响合唱感；
+     * 3. 泛音列差异化衰减 (Harmonic Partials)：涵盖基频、八度、五度与明亮高次泛音，高次泛音快速消褪，基音保持自然余音。
      */
-    function playTone(freq, duration = 0.8) {
+    function playPianoSound(freq, duration = 1.4) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!audioContext) audioContext = new AudioCtx();
       if (audioContext.state === "suspended") audioContext.resume();
 
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, audioContext.currentTime);
-
       const now = audioContext.currentTime;
-      gain.gain.setValueAtTime(0.001, now);
-      gain.gain.exponentialRampToValueAtTime(0.25, now + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      const masterGain = audioContext.createGain();
+      masterGain.gain.setValueAtTime(0.85, now);
+      masterGain.connect(audioContext.destination);
 
-      osc.connect(gain);
-      gain.connect(audioContext.destination);
+      // 泛音配置表：[频率倍数, 初始振幅, 衰减相对时长]
+      const harmonics = [
+        { mult: 1.0,  amp: 0.58, decayRate: 1.0 },  // 基频：浑厚温暖的琴弦主体
+        { mult: 2.0,  amp: 0.28, decayRate: 0.65 }, // 二次泛音：八度，明亮木质感
+        { mult: 3.0,  amp: 0.14, decayRate: 0.42 }, // 三次泛音：纯五度，丰富琴腔共鸣
+        { mult: 4.0,  amp: 0.07, decayRate: 0.26 }  // 四次泛音：高频清脆泛音
+      ];
 
-      osc.start(now);
-      osc.stop(now + duration);
+      // 双弦微调 (模拟真钢同键琴弦声学失谐拍频)
+      const detunes = [-0.65, 0.55];
+
+      detunes.forEach(detuneCents => {
+        harmonics.forEach(h => {
+          const osc = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+
+          osc.type = "sine";
+          // 计入微弱非谐性微调
+          const partialFreq = freq * h.mult + (detuneCents * 0.12 * h.mult);
+          osc.frequency.setValueAtTime(partialFreq, now);
+
+          // 钢琴触键包络：极快起音 (2.5ms 瞬态 Attack)
+          const peakAmp = (h.amp / detunes.length);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(peakAmp, now + 0.0025);
+
+          // 击弦初始快速衰减，随后平缓自然余音消散
+          const partialDuration = duration * h.decayRate;
+          gain.gain.exponentialRampToValueAtTime(peakAmp * 0.35, now + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + partialDuration);
+
+          osc.connect(gain);
+          gain.connect(masterGain);
+
+          osc.start(now);
+          osc.stop(now + partialDuration);
+        });
+      });
+
+      // 琴槌击弦木质冲击瞬态 (Hammer Strike Click)
+      try {
+        const bufferSize = Math.floor(audioContext.sampleRate * 0.025);
+        const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.22));
+        }
+
+        const noise = audioContext.createBufferSource();
+        noise.buffer = noiseBuffer;
+
+        const filter = audioContext.createBiquadFilter();
+        filter.type = "bandpass";
+        filter.frequency.setValueAtTime(Math.min(freq * 2.2, 1300), now);
+        filter.Q.setValueAtTime(2.8, now);
+
+        const noiseGain = audioContext.createGain();
+        noiseGain.gain.setValueAtTime(0.20, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+
+        noise.connect(filter);
+        filter.connect(noiseGain);
+        noiseGain.connect(masterGain);
+
+        noise.start(now);
+        noise.stop(now + 0.025);
+      } catch (e) {}
     }
 
+    /**
+     * 答对时播放清脆悦耳的真实钢琴和弦双音 (C5 + G5)
+     */
     function playSuccessChime() {
       try {
-        playTone(523.25, 0.18); // C5
-        setTimeout(() => playTone(659.25, 0.32), 90); // E5
+        playPianoSound(523.25, 0.7); // C5 真实钢琴音
+        setTimeout(() => playPianoSound(783.99, 0.9), 110); // G5 真实钢琴音
       } catch (e) {}
     }
 
@@ -1249,14 +1348,22 @@
       state.tolerance = parseInt(e.target.value, 10);
     });
 
-    // 试听目标音标准发音
+    // 麦克风灵敏度/增益切换 (可随时在 iPad 演奏时调节)
+    dom.gainSelect.addEventListener("change", (e) => {
+      state.micGain = parseFloat(e.target.value);
+      if (micGainNode && audioContext) {
+        micGainNode.gain.setValueAtTime(state.micGain, audioContext.currentTime);
+      }
+    });
+
+    // 试听目标音标准钢琴发音
     dom.btnPlayTarget.addEventListener("click", () => {
       if (!state.currentNote) return;
       const noteNameWithAcc = state.currentNote.name + (state.currentNote.accidental || "");
       const noteIdx = NOTE_NAMES.indexOf(noteNameWithAcc);
       const midi = (state.currentNote.octave + 1) * 12 + noteIdx;
       const freq = 440 * Math.pow(2, (midi - 69) / 12);
-      playTone(freq, 0.9);
+      playPianoSound(freq, 1.4);
     });
 
     // 跳过/换题按钮
