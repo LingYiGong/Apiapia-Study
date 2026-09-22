@@ -151,6 +151,7 @@ const app = createApp({
                 icon: '🎌',
                 iconBg: 'bg-indigo-50 text-indigo-600 border border-indigo-100',
                 barClass: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500',
+                cardBorder: 'border-indigo-200 hover:border-indigo-400',
                 bulletClass: 'bg-indigo-500',
                 btnClass: 'kid-btn-primary',
                 desc: '包含五十音标准田字格平假名/片假名听写与形态对照，1912个核心词汇与226句生活实用例句纯听力盲测，搭配 SM-2 艾宾浩斯间隔复习与云端同步。',
@@ -159,10 +160,8 @@ const app = createApp({
                 masteredCount: 0,
                 tags: [
                     { text: '五十音田字格手写', color: '#6366f1' },
-                    { text: '1912 词纯听力盲测', color: '#10b981' },
-                    { text: '226 句情境例句点读', color: '#8b5cf6' },
-                    { text: '艾宾浩斯记忆算法', color: '#f59e0b' },
-                    { text: 'Cloudflare 云端同步', color: '#ec4899' }
+                    { text: '1912 词纯盲听', color: '#10b981' },
+                    { text: '情境例句点读', color: '#8b5cf6' }
                 ],
                 highlights: [
                     '五十音平假名/片假名对照手写（支持笔画撤销、清空与标准形态对比）',
@@ -171,15 +170,16 @@ const app = createApp({
                     'SM-2 艾宾浩斯记忆曲线智能安排每日复习与云端备份'
                 ],
                 url: 'japanese/frontend/index.html',
-                btnText: '进入日语小能手'
+                btnText: '日语学习'
             },
             {
                 id: 'hanzi',
                 title: '汉字听写与笔顺',
-                subtitle: '170 启蒙字 · 规范笔顺动画 · 同音提示朗读',
+                subtitle: '170 启蒙字 · 规范笔顺动画 · 选字',
                 icon: '✍️',
                 iconBg: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
                 barClass: 'bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500',
+                cardBorder: 'border-emerald-300 hover:border-emerald-500',
                 bulletClass: 'bg-emerald-500',
                 btnClass: 'kid-btn-success',
                 desc: '面向儿童汉字启蒙与小学低年级标准听写。精选 170 个高频基础生字，配备规范笔顺慢动作动画临摹、标准田字格手写板、同音提示词朗读及云端多端同步。',
@@ -187,11 +187,9 @@ const app = createApp({
                 dueCount: 0,
                 masteredCount: 0,
                 tags: [
-                    { text: '170 常用启蒙生字', color: '#10b981' },
-                    { text: '标准田字格手写板', color: '#6366f1' },
-                    { text: '规范慢动作笔顺临摹', color: '#f59e0b' },
-                    { text: '字+提示词防混淆朗读', color: '#ec4899' },
-                    { text: 'Cloudflare 云端同步', color: '#8b5cf6' }
+                    { text: '标准田字格', color: '#10b981' },
+                    { text: '慢动作笔顺', color: '#f59e0b' },
+                    { text: '5选1听音选字', color: '#6366f1' }
                 ],
                 highlights: [
                     '标准田字格手写板，支持笔画一笔撤销、清空重写与答案核对',
@@ -200,27 +198,26 @@ const app = createApp({
                     '云端密钥同步支持，手机、iPad 多设备练字打卡不丢失'
                 ],
                 url: 'hanzi/hanzi.html',
-                btnText: '进入汉字小能手'
+                btnText: '汉字学习'
             },
             {
                 id: 'music',
                 title: '钢琴视奏与识音',
-                subtitle: '高/低音五线谱 · 麦克风实时识音 · 智能纠错',
+                subtitle: '超大五线谱 · 麦克风真钢识音 · 纠错',
                 icon: '🎹',
                 iconBg: 'bg-cyan-50 text-cyan-600 border border-cyan-100',
                 barClass: 'bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500',
+                cardBorder: 'border-cyan-300 hover:border-cyan-500',
                 bulletClass: 'bg-cyan-500',
-                btnClass: 'kid-btn-primary',
+                btnClass: 'kid-btn-cyan',
                 desc: '专为 iPad 与真实钢琴打造的视奏与音高听测训练。屏幕随机呈现五线谱音符，通过麦克风实时捕获钢琴琴声并精准识别音高，弹对自动过关并记录连击。',
                 userProgressText: '高低音谱号 · 麦克风真钢识音',
                 dueCount: 0,
                 masteredCount: 0,
                 tags: [
-                    { text: '高/低音谱表视奏', color: '#0284c7' },
-                    { text: '麦克风真钢实时识音', color: '#10b981' },
-                    { text: 'MPM 音高检测算法', color: '#6366f1' },
-                    { text: '±25 音分调音容错', color: '#f59e0b' },
-                    { text: 'iPad 谱架沉浸练习', color: '#ec4899' }
+                    { text: '大字号五线谱', color: '#0284c7' },
+                    { text: '真实钢琴音色', color: '#10b981' },
+                    { text: '轻弹秒级识别', color: '#6366f1' }
                 ],
                 highlights: [
                     '标准 VexFlow 五线谱与原生矢量乐谱双模渲染，高低音谱表自由切换',
@@ -229,15 +226,16 @@ const app = createApp({
                     '内置标准发音试听、音分偏差调音表与连击闯关统计'
                 ],
                 url: 'music/index.html',
-                btnText: '进入钢琴视奏'
+                btnText: '钢琴视奏'
             },
             {
                 id: 'english',
                 title: '英语核心动词卡',
-                subtitle: '100 高频动词 · 3D 双面翻牌 · 掌握度看板',
+                subtitle: '100 高频动词 · 3D 双面翻牌 · 掌握度',
                 icon: '🔤',
                 iconBg: 'bg-rose-50 text-rose-600 border border-rose-100',
                 barClass: 'bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500',
+                cardBorder: 'border-rose-300 hover:border-rose-500',
                 bulletClass: 'bg-rose-500',
                 btnClass: 'kid-btn-danger',
                 desc: '精选英语日常对话最基础、最高频的 100 个核心生活与情态动词。采用 3D 双面立体翻牌卡片互动设计，支持标准真人发音与“已掌握/需复习”分类学习。',
@@ -245,10 +243,9 @@ const app = createApp({
                 dueCount: 0,
                 masteredCount: 0,
                 tags: [
-                    { text: '100 核心高频动词', color: '#f43f5e' },
-                    { text: '3D 双面翻牌闪卡', color: '#8b5cf6' },
-                    { text: '标准真人发音朗读', color: '#0284c7' },
-                    { text: '掌握度进度看板', color: '#10b981' }
+                    { text: '3D立体翻牌', color: '#f43f5e' },
+                    { text: '真人双语发音', color: '#0284c7' },
+                    { text: '掌握度环看板', color: '#10b981' }
                 ],
                 highlights: [
                     '经典 3D 双面翻牌闪卡：正面中文释义联想，背面英文发音揭晓',
@@ -256,7 +253,7 @@ const app = createApp({
                     '学习进度看板与掌握度圆环，直观掌握 100 动词记忆情况'
                 ],
                 url: 'english/english.html',
-                btnText: '进入英语词卡'
+                btnText: '英语词卡'
             }
         ]);
 

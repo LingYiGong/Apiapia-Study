@@ -162,6 +162,20 @@ html, body {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
+/* 钢琴模块专用天青海蓝 3D 按钮 */
+.kid-btn-cyan, .btn-3d-cyan {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    border-bottom: 4px solid #0369a1;
+    color: #ffffff;
+    transition: all 0.12s ease;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
+}
+.kid-btn-cyan:active, .btn-3d-cyan:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 4px rgba(2, 132, 199, 0.2);
+}
+
 /* ================== 柔和卡片与动效 ================== */
 .kid-card {
     border-radius: 24px;
