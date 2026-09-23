@@ -1,5 +1,5 @@
 {
-  "version": "1.0.16",
-  "updatedAt": "2026-09-22",
-  "description": "全站按钮物理点按触感全面升级：增强 3D 机械下沉与物理下凹视觉、集成 Web Audio 拟物气泡按键音与设备微震动触感反馈、解决 iOS 触摸无响应，彻底告别点按不明确感"
+  "version": "1.0.17",
+  "updatedAt": "2026-09-23",
+  "description": "新增手机浏览器打开提示安装到手机桌面功能：支持 Android Chrome 一键添加桌面、iOS Safari 与微信专属图文安装指引、PWA 离线 Service Worker，免去输网址全屏沉浸自学"
 }

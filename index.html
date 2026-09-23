@@ -22,10 +22,10 @@
     <script src="https://unpkg.com/vant@4/lib/vant.min.js"></script>
 
     <!-- 全局统一儿童友好样式表 (统一 @hanzi 设计语言) -->
-    <link rel="stylesheet" href="css/style.css?v=1.0.16" />
+    <link rel="stylesheet" href="css/style.css?v=1.0.17" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
-    <script src="js/kid-dialog.js?v=1.0.16"></script>
+    <script src="js/kid-dialog.js?v=1.0.17"></script>
 
     <!-- 移动端与 iPad 视口自适应模块 -->
     <script src="js/viewport.js"></script>
@@ -163,13 +163,17 @@
                 </div>
             </div>
 
-            <!-- 底部版本与检查更新栏 (极简单行，与参考图完全一致) -->
+            <!-- 底部版本与检查更新栏 (增加非独立 App 状态下的安装到桌面入口) -->
             <div class="flex-shrink-0 flex items-center justify-between text-xs text-slate-400 font-bold px-2 py-0.5">
                 <div class="flex items-center space-x-1.5">
                     <span>🐱</span>
                     <span>Apiapia 学习中心</span>
                 </div>
-                <div class="flex items-center space-x-1.5">
+                <div class="flex items-center space-x-2">
+                    <button v-if="!isStandalone" @click="openInstallGuide" type="button" class="text-indigo-600 hover:text-indigo-800 font-black underline flex items-center space-x-1 transition-colors" title="将网页安装到手机桌面">
+                        <span>📲 安装到桌面</span>
+                    </button>
+                    <span v-if="!isStandalone">·</span>
                     <span>v{{ appVersion }}</span>
                     <span>·</span>
                     <button @click="manualCheckUpdate" type="button" class="underline hover:text-indigo-600 transition-colors">检查更新</button>
@@ -177,9 +181,120 @@
             </div>
         </main>
 
+        <!-- 底部手机桌面安装提示浮条 (仅在非独立 App 模式且满足提示条件时弹出) -->
+        <transition name="van-slide-up">
+            <div v-if="showInstallBanner" class="fixed bottom-3 left-3 right-3 max-w-md mx-auto z-40 bg-white/95 backdrop-blur-md border-2 border-indigo-200 shadow-2xl rounded-2xl p-3 flex items-center justify-between gap-3 animate-fade-in">
+                <div class="flex items-center space-x-2.5 min-w-0 flex-1">
+                    <img src="./icons/apple-touch-icon.png" alt="Apiapia" class="w-10 h-10 rounded-xl object-cover shadow-sm border border-indigo-100 flex-shrink-0" />
+                    <div class="min-w-0 flex-1">
+                        <div class="text-xs sm:text-sm font-black text-slate-800 truncate flex items-center space-x-1.5">
+                            <span>🐾 添加到手机桌面</span>
+                            <span class="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full font-bold">全屏更沉浸</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 font-medium truncate mt-0.5">像 App 一样随时自学，免去输网址</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-1.5 flex-shrink-0">
+                    <button @click="triggerInstall" type="button" class="px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-black shadow-sm text-xs active:scale-95 transition-all">
+                        <span>{{ canInstallDirectly ? '🚀 立即添加' : '📖 查看方法' }}</span>
+                    </button>
+                    <button @click="dismissInstallBanner" type="button" class="w-7 h-7 rounded-xl bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center text-xs font-black active:scale-90" title="稍后再说">
+                        ✕
+                    </button>
+                </div>
+            </div>
+        </transition>
+
+        <!-- 详细图文安装指引模态弹窗 -->
+        <div v-if="showInstallModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in" @click.self="closeInstallModal">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border-2 border-indigo-200 flex flex-col relative max-h-[90vh] overflow-y-auto">
+                <!-- 顶部关闭按钮 -->
+                <button @click="closeInstallModal" type="button" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center text-xs font-black active:scale-90">
+                    ✕
+                </button>
+
+                <!-- 头部可爱图标与标题 -->
+                <div class="flex items-center space-x-3 mb-3">
+                    <img src="./icons/apple-touch-icon.png" alt="Apiapia" class="w-12 h-12 rounded-2xl object-cover shadow-sm border border-indigo-100 flex-shrink-0" />
+                    <div>
+                        <h3 class="text-base font-black text-slate-800 flex items-center space-x-1">
+                            <span>安装 Apiapia 到桌面</span>
+                        </h3>
+                        <p class="text-xs text-indigo-600 font-bold mt-0.5">全屏沉浸 · 离线缓存 · 随开随学</p>
+                    </div>
+                </div>
+
+                <!-- 微信环境特别提示 -->
+                <div v-if="isWechat" class="bg-amber-50 border border-amber-200 rounded-2xl p-3 mb-3 text-xs text-amber-900">
+                    <div class="font-black flex items-center space-x-1 text-amber-800 mb-1">
+                        <span>💡 检测到您正在微信中打开：</span>
+                    </div>
+                    <p class="leading-relaxed">
+                        请点击右上角 <b>【···】</b>，选择 <b>【在默认浏览器中打开】</b>，然后再按下方步骤添加到桌面哦！
+                    </p>
+                </div>
+
+                <!-- iOS Safari 专属指引 -->
+                <div v-if="isIOS" class="space-y-2.5 my-1 text-xs text-slate-700">
+                    <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5">
+                        <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-xs flex-shrink-0">1</span>
+                        <div class="min-w-0">
+                            <p class="font-black text-slate-800">点击 Safari 底部（或顶部）的【分享】按钮</p>
+                            <p class="text-slate-500 text-[11px] mt-0.5">即方形带有向上箭头图标：<span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-1 py-0.5 rounded border border-indigo-200">⎋ 分享</span></p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5">
+                        <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-xs flex-shrink-0">2</span>
+                        <div class="min-w-0">
+                            <p class="font-black text-slate-800">在菜单面板中向下滚动，找到并点击：</p>
+                            <p class="text-slate-500 text-[11px] mt-0.5 font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200 inline-block">➕ 添加到主屏幕</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5">
+                        <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-xs flex-shrink-0">3</span>
+                        <div class="min-w-0">
+                            <p class="font-black text-slate-800">点击右上角【添加】</p>
+                            <p class="text-slate-500 text-[11px] mt-0.5">桌面即刻生成萌宠小猫图标，全屏无地址栏！</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 安卓 / 现代浏览器通用指引 -->
+                <div v-else class="space-y-2.5 my-1 text-xs text-slate-700">
+                    <div v-if="canInstallDirectly" class="bg-indigo-50 border border-indigo-200 rounded-2xl p-3 text-center">
+                        <p class="text-xs font-black text-indigo-800 mb-2">您的浏览器支持一键自动安装</p>
+                        <button @click="triggerInstall" type="button" class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-black text-sm shadow-md active:scale-95 transition-all">
+                            🚀 立即调起系统添加
+                        </button>
+                    </div>
+                    <div v-else class="space-y-2">
+                        <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-xs flex-shrink-0">1</span>
+                            <div class="min-w-0">
+                                <p class="font-black text-slate-800">点击浏览器菜单</p>
+                                <p class="text-slate-500 text-[11px] mt-0.5">通常位于右上角或底部的三点 <b>⋮</b> 或三道杠 <b>☰</b></p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-xs flex-shrink-0">2</span>
+                            <div class="min-w-0">
+                                <p class="font-black text-slate-800">选择【添加到主屏幕】或【安装应用】</p>
+                                <p class="text-slate-500 text-[11px] mt-0.5">确认后，手机桌面便会生成独立 App 图标！</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 底部确认关闭大按钮 -->
+                <button @click="closeInstallModal" type="button" class="mt-4 w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl text-xs sm:text-sm shadow-md active:scale-95 transition-all flex items-center justify-center space-x-1.5">
+                    <span>我知道啦，去试试！🐾</span>
+                </button>
+            </div>
+        </div>
+
     </div>
 
     <!-- 业务逻辑脚本 (Vue 3 + Vant 4) -->
-    <script src="app.js?v=1.0.16"></script>
+    <script src="app.js?v=1.0.17"></script>
 </body>
 </html>

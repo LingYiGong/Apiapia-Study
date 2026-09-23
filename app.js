@@ -2,7 +2,7 @@
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
 // 当前客户端内置基线版本号
-const BUILD_VERSION = '1.0.16';
+const BUILD_VERSION = '1.0.17';
 
 // Semver 版本比较辅助函数 (remote > current 返回 true)
 function isNewerVersion(remote, current) {
@@ -123,11 +123,105 @@ const app = createApp({
             }
         };
 
+        // ==========================================
+        // 手机桌面安装与 PWA 引导支持
+        // ==========================================
+        const ua = navigator.userAgent || '';
+        const isIOS = ref(/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+        const isWechat = ref(/MicroMessenger/i.test(ua));
+        const isMobile = ref(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
 
+        // 检测是否已经在独立桌面 App 模式运行 (PWA standalone 或 iOS WebClip)
+        const isStandalone = ref(
+            window.matchMedia('(display-mode: standalone)').matches ||
+            window.navigator.standalone === true ||
+            document.referrer.includes('android-app://')
+        );
 
-        onUnmounted(() => {
-            document.removeEventListener('visibilitychange', onVisibilityChange);
-        });
+        const canInstallDirectly = ref(false); // 是否获得 beforeinstallprompt 原生调起支持
+        const showInstallBanner = ref(false);  // 底部可爱安装横幅
+        const showInstallModal = ref(false);   // 详细安装引导弹窗
+        let deferredInstallPrompt = null;
+
+        // 检查是否应当自动弹出安装提示（智能防打扰）
+        const checkAutoShowInstallPrompt = () => {
+            // 1. 已在桌面图标模式打开，绝不弹窗打扰
+            if (isStandalone.value) return;
+
+            // 2. 本地已标记已安装过，绝不弹窗打扰
+            if (localStorage.getItem('apiapia_installed_flag') === 'true') return;
+
+            // 3. 检查用户关闭后的冷却期（7天内不再主动打扰）
+            const dismissedUntil = localStorage.getItem('apiapia_install_dismissed_until');
+            if (dismissedUntil && Date.now() < parseInt(dismissedUntil, 10)) {
+                return;
+            }
+
+            // 4. 移动端或已就绪时展示底部安装横幅
+            if (isMobile.value || canInstallDirectly.value) {
+                showInstallBanner.value = true;
+            }
+        };
+
+        // 用户点击横幅或按钮触发安装
+        const triggerInstall = async () => {
+            if (canInstallDirectly.value && deferredInstallPrompt) {
+                try {
+                    deferredInstallPrompt.prompt();
+                    const choiceResult = await deferredInstallPrompt.userChoice;
+                    if (choiceResult && choiceResult.outcome === 'accepted') {
+                        localStorage.setItem('apiapia_installed_flag', 'true');
+                        showInstallBanner.value = false;
+                        showInstallModal.value = false;
+                        if (window.kidToast) {
+                            window.kidToast('🎉 太棒啦！已添加到桌面，欢迎随时打开自学！', 'success');
+                        }
+                    } else {
+                        dismissInstallBanner();
+                    }
+                    deferredInstallPrompt = null;
+                    canInstallDirectly.value = false;
+                } catch (e) {
+                    console.warn('调起安装异常:', e);
+                    showInstallModal.value = true;
+                }
+            } else {
+                // iOS Safari、微信或其它浏览器展示图文指引
+                showInstallModal.value = true;
+            }
+        };
+
+        const openInstallGuide = () => {
+            showInstallModal.value = true;
+        };
+
+        const closeInstallModal = () => {
+            showInstallModal.value = false;
+        };
+
+        const dismissInstallBanner = () => {
+            showInstallBanner.value = false;
+            // 记录 7 天冷却期
+            localStorage.setItem('apiapia_install_dismissed_until', (Date.now() + 7 * 24 * 60 * 60 * 1000).toString());
+        };
+
+        const onBeforeInstallPrompt = (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            canInstallDirectly.value = true;
+            checkAutoShowInstallPrompt();
+        };
+
+        const onAppInstalled = () => {
+            deferredInstallPrompt = null;
+            canInstallDirectly.value = false;
+            showInstallBanner.value = false;
+            showInstallModal.value = false;
+            localStorage.setItem('apiapia_installed_flag', 'true');
+            if (window.kidToast) {
+                window.kidToast('🎉 太棒啦！已成功安装到手机桌面！', 'success');
+            }
+        };
 
         // 上次学习记录
         const lastVisitedModule = ref(localStorage.getItem('study_hub_last_module') || '');
@@ -335,6 +429,32 @@ const app = createApp({
                 checkForUpdates(false);
                 refreshModuleProgress();
             });
+
+            // 注册 PWA ServiceWorker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js?v=' + BUILD_VERSION).then((reg) => {
+                        console.log('[SW] PWA ServiceWorker registered with scope:', reg.scope);
+                    }).catch(err => {
+                        console.warn('[SW] Registration failed:', err);
+                    });
+                });
+            }
+
+            // 注册 PWA 桌面安装与完成事件
+            window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+            window.addEventListener('appinstalled', onAppInstalled);
+
+            // 延迟 1.5 秒检查是否弹出安装提示（不与页面初始载入抢焦点）
+            setTimeout(() => {
+                checkAutoShowInstallPrompt();
+            }, 1500);
+        });
+
+        onUnmounted(() => {
+            document.removeEventListener('visibilitychange', onVisibilityChange);
+            window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', onAppInstalled);
         });
 
         return {
@@ -348,7 +468,19 @@ const app = createApp({
             lastVisitedModule,
             currentDateText,
             modules,
-            goToModule
+            goToModule,
+            // PWA 安装与桌面引导相关
+            isStandalone,
+            isIOS,
+            isWechat,
+            isMobile,
+            canInstallDirectly,
+            showInstallBanner,
+            showInstallModal,
+            triggerInstall,
+            openInstallGuide,
+            closeInstallModal,
+            dismissInstallBanner
         };
     }
 });
