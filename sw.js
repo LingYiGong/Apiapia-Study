@@ -1,5 +1,5 @@
 // Apiapia 学习中心 - PWA Service Worker
-const CACHE_NAME = 'apiapia-pwa-v1.0.24';
+const CACHE_NAME = 'apiapia-pwa-v1.0.25';
 
 // 基础核心缓存资源（已完全本地化，无外部 CDN 依赖）
 const CORE_ASSETS = [
@@ -22,7 +22,9 @@ const CORE_ASSETS = [
     './icons/favicon.ico',
     './icons/apple-touch-icon.png',
     './icons/icon-192.png',
-    './icons/icon-512.png'
+    './icons/icon-512.png',
+    './icons/apiapia-real.jpg',
+    './icons/apiapia-cartoon.jpg'
 ];
 
 // 安装阶段：预缓存核心静态文件

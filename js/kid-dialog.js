@@ -873,12 +873,12 @@
         let prefix = './icons/';
         if (path.includes('/japanese/frontend')) {
             prefix = '../../icons/';
-        } else if (path.includes('/hanzi/') || path.includes('/english/')) {
+        } else if (path.includes('/hanzi/') || path.includes('/english/') || path.includes('/music/')) {
             prefix = '../icons/';
         }
         return {
-            real: prefix + 'apiapia-real.png',
-            cartoon: prefix + 'apiapia-cartoon.png'
+            real: prefix + 'apiapia-real.jpg',
+            cartoon: prefix + 'apiapia-cartoon.jpg'
         };
     }
 
