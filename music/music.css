@@ -1,0 +1,33 @@
+/* 钢琴视奏小能手专属样式表 */
+
+/* 钢琴模块专属大乐谱与调音动画样式 */
+.staff-card-wrap {
+    min-height: 330px;
+}
+
+/* 成功判定时卡片外轮廓明快绿色光波 */
+.success-flash {
+    animation: kidStaffPulse 0.65s ease-out;
+}
+@keyframes kidStaffPulse {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.85); }
+    70% { box-shadow: 0 0 0 26px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06); }
+}
+
+/* 成功对勾大浮层 */
+.success-pop {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.success-pop.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+/* 调音偏离度指针 */
+.tuner-pointer {
+    transition: left 0.08s ease-out;
+}
