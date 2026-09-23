@@ -7,6 +7,7 @@ const SPEECH_SETTINGS_KEY = "hanziSpeechSettingsV1";
 const SYNC_KEY_STORAGE = "hanziSyncKeyV1";
 const AUTO_SYNC_STORAGE = "hanziAutoSyncV1";
 const LAST_SYNC_TIME_KEY = "hanziLastSyncTimeV1";
+const STORY_PROGRESS_KEY = "hanziStoryProgressV1";
 
 let debounceSyncTimer = null;
 
@@ -32,6 +33,7 @@ const state = {
     answerStrokeWriter: null,
     answerStrokeRenderToken: 0,
     currentStory: "",
+    storyIndex: 0,
     strokeSession: [],
     strokeIndex: 0,
     strokeWriter: null,
@@ -137,10 +139,13 @@ const els = {
     quitChoiceBtn: document.getElementById("quitChoiceBtn"),
 
     storyScreen: document.getElementById("storyScreen"),
+    storyCurrentNumber: document.getElementById("storyCurrentNumber"),
+    storyTotalNumber: document.getElementById("storyTotalNumber"),
     storyText: document.getElementById("storyText"),
     storyPinyin: document.getElementById("storyPinyin"),
     storyPinyinBtn: document.getElementById("storyPinyinBtn"),
     storySpeakBtn: document.getElementById("storySpeakBtn"),
+    storyPrevBtn: document.getElementById("storyPrevBtn"),
     storyNextBtn: document.getElementById("storyNextBtn"),
     quitStoryBtn: document.getElementById("quitStoryBtn"),
 
@@ -1939,31 +1944,66 @@ async function quitStrokePractice() {
     showScreen("setup");
 }
 
-function makeRandomStory() {
-    let story = "";
-    let attempts = 0;
+function renderStoryParagraph(index) {
+    if (typeof STORY_SENTENCES === "undefined" || !Array.isArray(STORY_SENTENCES) || STORY_SENTENCES.length === 0) {
+        return;
+    }
+    if (index < 0) index = 0;
+    if (index >= STORY_SENTENCES.length) index = STORY_SENTENCES.length - 1;
+    state.storyIndex = index;
+    try {
+        localStorage.setItem(STORY_PROGRESS_KEY, String(index));
+    } catch (_) {}
 
-    do {
-        story = STORY_SENTENCES[Math.floor(Math.random() * STORY_SENTENCES.length)];
-        attempts += 1;
-    } while (story === state.currentStory && attempts < 5);
+    window.speechSynthesis?.cancel?.();
+    state.currentStory = STORY_SENTENCES[index];
+    if (els.storyText) els.storyText.textContent = state.currentStory;
+    if (els.storyPinyin) {
+        els.storyPinyin.textContent = Array.from(state.currentStory)
+            .map(char => PINYIN_MAP[char] || char)
+            .join(" ");
+        els.storyPinyin.classList.add("hidden");
+    }
+    if (els.storyPinyinBtn) els.storyPinyinBtn.textContent = "显示拼音";
 
-    return story;
+    if (els.storyCurrentNumber) els.storyCurrentNumber.textContent = index + 1;
+    if (els.storyTotalNumber) els.storyTotalNumber.textContent = STORY_SENTENCES.length;
+
+    if (els.storyPrevBtn) {
+        const isFirst = (index === 0);
+        els.storyPrevBtn.disabled = isFirst;
+        els.storyPrevBtn.classList.toggle("opacity-50", isFirst);
+        els.storyPrevBtn.classList.toggle("cursor-not-allowed", isFirst);
+    }
+    if (els.storyNextBtn) {
+        const isLast = (index === STORY_SENTENCES.length - 1);
+        els.storyNextBtn.textContent = isLast ? "🎉 重新开始" : "下一段 →";
+    }
 }
 
-function renderRandomStory() {
-    window.speechSynthesis?.cancel?.();
-    state.currentStory = makeRandomStory();
-    els.storyText.textContent = state.currentStory;
-    els.storyPinyin.textContent = Array.from(state.currentStory)
-        .map(char => PINYIN_MAP[char] || char)
-        .join(" ");
-    els.storyPinyin.classList.add("hidden");
-    els.storyPinyinBtn.textContent = "显示拼音";
+function nextStoryParagraph() {
+    if (state.storyIndex >= STORY_SENTENCES.length - 1) {
+        renderStoryParagraph(0);
+    } else {
+        renderStoryParagraph(state.storyIndex + 1);
+    }
+}
+
+function prevStoryParagraph() {
+    if (state.storyIndex > 0) {
+        renderStoryParagraph(state.storyIndex - 1);
+    }
 }
 
 function startStory() {
-    renderRandomStory();
+    let savedIndex = 0;
+    try {
+        savedIndex = parseInt(localStorage.getItem(STORY_PROGRESS_KEY) || "0", 10);
+    } catch (_) {}
+    if (isNaN(savedIndex) || savedIndex < 0 || (typeof STORY_SENTENCES !== "undefined" && savedIndex >= STORY_SENTENCES.length)) {
+        savedIndex = 0;
+    }
+    renderStoryParagraph(savedIndex);
     showScreen("story");
 }
 
@@ -2112,7 +2152,8 @@ els.choiceFeedback.addEventListener("click", nextChoiceQuestion);
 els.quitChoiceBtn.addEventListener("click", quitChoice);
 els.storyPinyinBtn.addEventListener("click", toggleStoryPinyin);
 els.storySpeakBtn.addEventListener("click", speakStory);
-els.storyNextBtn.addEventListener("click", renderRandomStory);
+els.storyPrevBtn?.addEventListener("click", prevStoryParagraph);
+els.storyNextBtn?.addEventListener("click", nextStoryParagraph);
 els.quitStoryBtn.addEventListener("click", () => {
     window.speechSynthesis?.cancel?.();
     showScreen("setup");
@@ -2312,6 +2353,11 @@ document.addEventListener("keydown", event => {
     if (strokeActive) {
         if (event.key === "ArrowLeft") showPreviousStrokeCharacter();
         if (event.key === "ArrowRight") showNextStrokeCharacter();
+    }
+
+    if (storyActive) {
+        if (event.key === "ArrowLeft") prevStoryParagraph();
+        if (event.key === "ArrowRight") nextStoryParagraph();
     }
 });
 
