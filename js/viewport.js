@@ -57,4 +57,39 @@
         updateAppHeight();
     }
     updateAppHeight();
+
+    // ============================================================
+    // SPA 单页 App 容器微前端通信桥接
+    // ============================================================
+    if (window.self !== window.top) {
+        // 全局捕获阶段拦截所有返回根 index.html 首页的链接与按钮
+        document.addEventListener('click', function (e) {
+            var target = e.target;
+            var link = target && target.closest ? target.closest('a') : null;
+            if (link) {
+                var href = link.getAttribute('href') || '';
+                if (href.endsWith('index.html') || href.indexOf('../index.html') !== -1 || href.indexOf('../../index.html') !== -1) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    try {
+                        window.parent.postMessage({ type: 'SPA_NAVIGATE_HOME' }, '*');
+                    } catch (err) {
+                        console.warn('[SPA-Bridge] postMessage error:', err);
+                    }
+                }
+            }
+        }, true);
+
+        // 接收父级 SPA 容器广播的失焦/隐藏生命周期事件
+        window.addEventListener('message', function (event) {
+            if (event.data && event.data.type === 'SPA_MODULE_DEACTIVATED') {
+                // 停止可能正在朗读的 TTS 语音合成
+                try {
+                    if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                        window.speechSynthesis.cancel();
+                    }
+                } catch (e) {}
+            }
+        });
+    }
 })();

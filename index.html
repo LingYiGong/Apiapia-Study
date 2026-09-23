@@ -22,16 +22,21 @@
     <script src="https://unpkg.com/vant@4/lib/vant.min.js"></script>
 
     <!-- 全局统一儿童友好样式表 (统一 @hanzi 设计语言) -->
-    <link rel="stylesheet" href="css/style.css?v=1.0.17" />
+    <link rel="stylesheet" href="css/style.css?v=1.0.23" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
-    <script src="js/kid-dialog.js?v=1.0.17"></script>
+    <script src="js/kid-dialog.js?v=1.0.23"></script>
 
     <!-- 移动端与 iPad 视口自适应模块 -->
-    <script src="js/viewport.js"></script>
+    <script src="js/viewport.js?v=1.0.23"></script>
 </head>
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" v-cloak class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
+
+        <!-- 页面切换全局顶部动态流光进度条 -->
+        <div class="global-page-progress" :class="{ 'opacity-100': isProgressActive, 'opacity-0': !isProgressActive }">
+            <div class="global-page-progress-bar" :style="{ width: pageProgress + '%' }"></div>
+        </div>
 
         <!-- 顶部导航栏 (统一儿童风格明快渐变色，与 @hanzi 完全一致) -->
         <header class="app-header bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-4 sm:px-6 pt-3 pb-3 shadow-md z-10 flex-shrink-0">
@@ -292,9 +297,49 @@
             </div>
         </div>
 
+        <!-- SPA 单页应用全屏视图容器 (无缝全屏滑入，保持子页面音视频手写沙箱，支持多任务无刷新秒开) -->
+        <transition name="spa-slide">
+            <div v-if="currentModuleId" class="spa-view-container flex flex-col overflow-hidden">
+                <!-- 正在进入提示卡片与下方可爱动态进度条 -->
+                <transition name="van-fade">
+                    <div v-if="isCurrentModuleLoading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#f8fafc]/95 backdrop-blur-xs select-none">
+                        <div class="w-16 h-16 rounded-3xl bg-indigo-50 border-2 border-indigo-200 flex items-center justify-center text-3xl shadow-md animate-bounce mb-3">
+                            <span>{{ currentModuleMeta?.icon || '🐱' }}</span>
+                        </div>
+                        <p class="text-base font-black text-slate-800">正在进入 {{ currentModuleMeta?.title }}...</p>
+                        <p class="text-xs text-slate-500 font-bold mt-1.5">Apiapia 正在为您准备学习天地 ✨</p>
+
+                        <!-- 下方的圆润动态进度条 -->
+                        <div class="w-52 h-2.5 bg-slate-200/90 rounded-full overflow-hidden mt-4 p-0.5 shadow-inner">
+                            <div class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-150 ease-out"
+                                 :style="{ width: pageProgress + '%' }"></div>
+                        </div>
+                        <div class="mt-2 text-[11px] text-slate-400 font-black">
+                            <span>{{ pageProgress }}%</span>
+                        </div>
+                    </div>
+                </transition>
+
+                <!-- 子模块全屏 Iframe 容器池 (多任务保活，切换不丢失进度) -->
+                <div class="flex-1 w-full h-full relative overflow-hidden bg-[#f8fafc]">
+                    <iframe
+                        v-for="mod in activeModulesList"
+                        :key="mod.id"
+                        :id="'iframe-' + mod.id"
+                        :src="mod.url"
+                        v-show="currentModuleId === mod.id"
+                        @load="onModuleIframeLoaded(mod.id)"
+                        class="w-full h-full border-0 absolute inset-0 block bg-[#f8fafc]"
+                        allow="autoplay; microphone; camera; clipboard-write;"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals">
+                    </iframe>
+                </div>
+            </div>
+        </transition>
+
     </div>
 
     <!-- 业务逻辑脚本 (Vue 3 + Vant 4) -->
-    <script src="app.js?v=1.0.17"></script>
+    <script src="app.js?v=1.0.23"></script>
 </body>
 </html>

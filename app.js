@@ -2,7 +2,7 @@
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
 // 当前客户端内置基线版本号
-const BUILD_VERSION = '1.0.17';
+const BUILD_VERSION = '1.0.23';
 
 // Semver 版本比较辅助函数 (remote > current 返回 true)
 function isNewerVersion(remote, current) {
@@ -412,13 +412,147 @@ const app = createApp({
             }
         };
 
-        // 模块跳转与记录
-        const goToModule = (url, id) => {
+        // ==========================================
+        // 页面切换进度条与正在进入控制器
+        // ==========================================
+        const pageProgress = ref(0);
+        const isProgressActive = ref(false);
+        const isCurrentModuleLoading = ref(false);
+        let progressTimer = null;
+
+        const startEnteringProgress = () => {
+            if (progressTimer) clearInterval(progressTimer);
+            pageProgress.value = 25;
+            isProgressActive.value = true;
+            isCurrentModuleLoading.value = true;
+            progressTimer = setInterval(() => {
+                if (pageProgress.value < 88) {
+                    const diff = 88 - pageProgress.value;
+                    const step = Math.max(3, diff * 0.25);
+                    pageProgress.value = Math.min(88, Math.round(pageProgress.value + step));
+                }
+            }, 50);
+        };
+
+        const finishEnteringProgress = () => {
+            if (progressTimer) clearInterval(progressTimer);
+            pageProgress.value = 100;
+            setTimeout(() => {
+                isCurrentModuleLoading.value = false;
+                setTimeout(() => {
+                    isProgressActive.value = false;
+                    pageProgress.value = 0;
+                }, 200);
+            }, 160);
+        };
+
+        // ==========================================
+        // SPA 单页 App 路由与全屏视图容器控制器
+        // ==========================================
+        const currentModuleId = ref('');
+        const activeModulesList = ref([]);
+        const loadedModulesMap = ref({});
+
+        const currentModuleMeta = computed(() => {
+            return modules.value.find(m => m.id === currentModuleId.value) || null;
+        });
+
+        const openModuleSPA = (id) => {
+            const targetMod = modules.value.find(m => m.id === id);
+            if (!targetMod) return;
+
+            // 启动正在进入提示卡片与进度条
+            startEnteringProgress();
+
             try {
                 localStorage.setItem('study_hub_last_module', id);
                 lastVisitedModule.value = id;
             } catch (e) {}
-            window.location.href = url;
+
+            const isAlreadyLoaded = loadedModulesMap.value[id] === true;
+
+            // 若尚未加入活动容器池，则加入
+            if (!activeModulesList.value.some(m => m.id === id)) {
+                activeModulesList.value.push(targetMod);
+            }
+
+            // 立即切换当前模块，直接全屏滑入呈现
+            currentModuleId.value = id;
+
+            // 同步修改 Hash，支持手机系统返回键与浏览器前进后退自然生效
+            const targetHash = '#/' + id;
+            if (window.location.hash !== targetHash) {
+                history.pushState(null, '', targetHash);
+            }
+
+            // 若该模块此前已加载就绪，伴随滑入动效完成进度条冲刺
+            if (isAlreadyLoaded) {
+                setTimeout(() => {
+                    finishEnteringProgress();
+                }, 260);
+            }
+        };
+
+        const onModuleIframeLoaded = (id) => {
+            loadedModulesMap.value[id] = true;
+            finishEnteringProgress();
+        };
+
+        // 统一平滑返回学习中心首页
+        const navigateHome = () => {
+            if (!currentModuleId.value) return;
+
+            // 广播通知子应用已失焦（可停止朗读等）
+            document.querySelectorAll('iframe').forEach(iframe => {
+                try {
+                    iframe.contentWindow?.postMessage({ type: 'SPA_MODULE_DEACTIVATED' }, '*');
+                } catch (e) {}
+            });
+
+            currentModuleId.value = '';
+
+            // 更新 Hash
+            if (window.location.hash && window.location.hash !== '#/' && window.location.hash !== '#') {
+                history.pushState(null, '', '#/');
+            }
+
+            // 实时同步各个模块最新学习进度
+            refreshModuleProgress();
+        };
+
+        // 重新加载当前子模块（当出现网络卡顿时，一键刷新）
+        const reloadCurrentModule = () => {
+            if (!currentModuleId.value) return;
+            const iframe = document.getElementById('iframe-' + currentModuleId.value);
+            if (iframe) {
+                moduleLoadingMap.value[currentModuleId.value] = false;
+                iframe.src = iframe.src;
+            }
+        };
+
+        // 响应 Hash 路由变化 (支持点击、后退、手势返回)
+        const syncRouteFromHash = () => {
+            const hash = window.location.hash.replace(/^#\/?/, '').trim();
+            if (hash && modules.value.some(m => m.id === hash)) {
+                if (currentModuleId.value !== hash) {
+                    openModuleSPA(hash);
+                }
+            } else {
+                if (currentModuleId.value) {
+                    navigateHome();
+                }
+            }
+        };
+
+        const onWindowMessage = (event) => {
+            if (event.data && event.data.type === 'SPA_NAVIGATE_HOME') {
+                navigateHome();
+            }
+        };
+
+        // 模块卡片点击入口 (由传统链接跳转改造为 SPA 无缝切换)
+        const goToModule = (url, id) => {
+            openModuleSPA(id);
         };
 
         onMounted(() => {
@@ -445,6 +579,14 @@ const app = createApp({
             window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt);
             window.addEventListener('appinstalled', onAppInstalled);
 
+            // 注册 SPA 路由与父子通信监听
+            window.addEventListener('hashchange', syncRouteFromHash);
+            window.addEventListener('popstate', syncRouteFromHash);
+            window.addEventListener('message', onWindowMessage);
+
+            // 初始化根据当前 Hash 恢复视图
+            syncRouteFromHash();
+
             // 延迟 1.5 秒检查是否弹出安装提示（不与页面初始载入抢焦点）
             setTimeout(() => {
                 checkAutoShowInstallPrompt();
@@ -452,9 +594,13 @@ const app = createApp({
         });
 
         onUnmounted(() => {
+            if (progressTimer) clearInterval(progressTimer);
             document.removeEventListener('visibilitychange', onVisibilityChange);
             window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
             window.removeEventListener('appinstalled', onAppInstalled);
+            window.removeEventListener('hashchange', syncRouteFromHash);
+            window.removeEventListener('popstate', syncRouteFromHash);
+            window.removeEventListener('message', onWindowMessage);
         });
 
         return {
@@ -469,6 +615,10 @@ const app = createApp({
             currentDateText,
             modules,
             goToModule,
+            // 顶部流光与正在进入提示状态
+            pageProgress,
+            isProgressActive,
+            isCurrentModuleLoading,
             // PWA 安装与桌面引导相关
             isStandalone,
             isIOS,
@@ -480,7 +630,14 @@ const app = createApp({
             triggerInstall,
             openInstallGuide,
             closeInstallModal,
-            dismissInstallBanner
+            dismissInstallBanner,
+            // SPA 单页应用控制器导出
+            currentModuleId,
+            currentModuleMeta,
+            activeModulesList,
+            onModuleIframeLoaded,
+            navigateHome,
+            reloadCurrentModule
         };
     }
 });
