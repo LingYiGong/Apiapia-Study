@@ -1,7 +1,7 @@
 // Apiapia 学习中心 - PWA Service Worker
-const CACHE_NAME = 'apiapia-pwa-v1.0.23';
+const CACHE_NAME = 'apiapia-pwa-v1.0.24';
 
-// 基础核心缓存资源
+// 基础核心缓存资源（已完全本地化，无外部 CDN 依赖）
 const CORE_ASSETS = [
     './',
     './index.html',
@@ -10,6 +10,15 @@ const CORE_ASSETS = [
     './css/style.css',
     './js/kid-dialog.js',
     './js/viewport.js',
+    './libs/vue.global.prod.js',
+    './libs/vant.min.js',
+    './libs/vant.min.css',
+    './libs/tailwindcss.js',
+    './libs/hanzi-writer.min.js',
+    './libs/vexflow.js',
+    './libs/quicksand.css',
+    './libs/fonts/quicksand-600.woff2',
+    './libs/fonts/quicksand-700.woff2',
     './icons/favicon.ico',
     './icons/apple-touch-icon.png',
     './icons/icon-192.png',

@@ -3,7 +3,8 @@
    Global Child-Friendly Design System for Apiapia Study Hub
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700;800&display=swap');
+/* 本地 Quicksand 儿童友好圆润字体 */
+@import url('../libs/quicksand.css');
 
 :root {
     --app-height: 100dvh;
