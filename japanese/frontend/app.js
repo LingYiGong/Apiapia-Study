@@ -747,15 +747,27 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                 });
 
                 // Built-in import method
-                const importBuiltin = () => {
+                const importBuiltin = async () => {
                     const toImport = window.BUILTIN_VOCAB || window.BUILTIN_VOCAB_ALL || [];
                     if (toImport.length === 0) {
-                        showToast('未找到内置词库数据文件');
+                        showToast('未找到内置词库数据文件', 'warning');
                         return;
                     }
 
                     if (words.value.length > 0) {
-                        const confirmAppend = confirm(`当前已有 ${words.value.length} 个词汇。\n点击【确定】进行合并追加（去重），点击【取消】放弃。`);
+                        let confirmAppend = false;
+                        if (window.kidConfirm) {
+                            confirmAppend = await window.kidConfirm({
+                                title: '合并词库',
+                                message: `当前已有 ${words.value.length} 个词汇。点击【确定】进行合并追加（去重），点击【取消】放弃。`,
+                                icon: '📚',
+                                type: 'primary',
+                                confirmText: '确定合并',
+                                cancelText: '取消'
+                            });
+                        } else {
+                            confirmAppend = confirm(`当前已有 ${words.value.length} 个词汇。\n点击【确定】进行合并追加（去重），点击【取消】放弃。`);
+                        }
                         if (!confirmAppend) return;
 
                         // Merge & de-duplicate by word + kana, updating missing meanings
@@ -834,7 +846,16 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                                     })).filter(i => i.word);
 
                                     if (imported.length === 0) {
-                                        alert('未能从 JSON 数组中识别出有效词汇。');
+                                        if (window.kidAlert) {
+                                            window.kidAlert({
+                                                title: '导入提示',
+                                                message: '未能从 JSON 数组中识别出有效词汇。',
+                                                icon: '⚠️',
+                                                type: 'warning'
+                                            });
+                                        } else {
+                                            alert('未能从 JSON 数组中识别出有效词汇。');
+                                        }
                                         return;
                                     }
 
@@ -849,7 +870,7 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                                         }
                                     });
                                     saveData();
-                                    showToast(`文件解析成功，已导入 ${added} 个新词汇！`);
+                                    showToast(`文件解析成功，已导入 ${added} 个新词汇！`, 'success');
                                     return;
                                 }
                             }
@@ -872,7 +893,16 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                             });
 
                             if (imported.length === 0) {
-                                alert('未能从文件中识别出有效词汇。请确保文件格式为「单词(假名)」或 JSON。');
+                                if (window.kidAlert) {
+                                    window.kidAlert({
+                                        title: '导入提示',
+                                        message: '未能从文件中识别出有效词汇。请确保文件格式为「单词(假名)」或 JSON。',
+                                        icon: '⚠️',
+                                        type: 'warning'
+                                    });
+                                } else {
+                                    alert('未能从文件中识别出有效词汇。请确保文件格式为「单词(假名)」或 JSON。');
+                                }
                                 return;
                             }
 
@@ -888,10 +918,19 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                                 }
                             });
                             saveData();
-                            showToast(`文件解析成功，已导入 ${added} 个新词汇！`);
+                            showToast(`文件解析成功，已导入 ${added} 个新词汇！`, 'success');
                         } catch (err) {
                             console.error(err);
-                            alert('解析文件失败：' + err.message);
+                            if (window.kidAlert) {
+                                window.kidAlert({
+                                    title: '解析失败',
+                                    message: '解析文件失败：' + (err.message || '未知错误'),
+                                    icon: '❌',
+                                    type: 'danger'
+                                });
+                            } else {
+                                alert('解析文件失败：' + err.message);
+                            }
                         }
                     };
                     reader.readAsText(file, 'UTF-8');
@@ -1034,15 +1073,28 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     }
                 };
 
-                const promptEditMeaning = (word) => {
-                    const newMeaning = prompt(`请为「${word.word} (${word.kana})」输入中文释义：`, word.meaning || '');
+                const promptEditMeaning = async (word) => {
+                    let newMeaning = null;
+                    if (window.kidPrompt) {
+                        newMeaning = await window.kidPrompt({
+                            title: '补充 / 修改释义',
+                            message: `为「${word.word} (${word.kana})」输入中文释义：`,
+                            placeholder: '输入中文释义...',
+                            defaultValue: word.meaning || '',
+                            icon: '✏️',
+                            confirmText: '保存释义',
+                            cancelText: '取消'
+                        });
+                    } else {
+                        newMeaning = prompt(`请为「${word.word} (${word.kana})」输入中文释义：`, word.meaning || '');
+                    }
                     if (newMeaning !== null) {
                         word.meaning = newMeaning.trim();
                         const idx = words.value.findIndex(w => w.id === word.id);
                         if (idx !== -1) {
                             words.value[idx].meaning = word.meaning;
                             saveData();
-                            showToast('释义已更新！');
+                            showToast('释义已更新！', 'success');
                         }
                     }
                 };

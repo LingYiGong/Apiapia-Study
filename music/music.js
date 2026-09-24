@@ -455,8 +455,14 @@ async function startListening() {
     processAudioLoop();
 
   } catch (err) {
-    console.error("麦克风启动受阻:", err);
-    if (window.kidToast) {
+    if (window.kidAlert) {
+      window.kidAlert({
+        title: "麦克风权限提示",
+        message: "无法访问麦克风。请确保当前在 HTTPS 或 localhost 环境下，并在浏览器弹窗中允许麦克风访问。",
+        icon: "🎙️",
+        type: "warning"
+      });
+    } else if (window.kidToast) {
       window.kidToast("无法访问麦克风，请在浏览器权限提示中点击【允许】", "error");
     } else {
       alert("无法访问麦克风。请确保当前在 HTTPS 或 localhost 环境下，并允许麦克风权限。");

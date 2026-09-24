@@ -657,9 +657,22 @@ async function pullFromCloud(silent = false) {
     }
 }
 
+function alertSpeechNotSupported() {
+    if (window.kidAlert) {
+        window.kidAlert({
+            title: "语音未就绪",
+            message: "当前浏览器不支持语音朗读。建议使用 Chrome、Edge、Safari 或手机自带浏览器。",
+            icon: "🔊",
+            type: "warning"
+        });
+    } else {
+        alert("当前浏览器不支持语音朗读。建议使用 Chrome、Edge、Safari 或手机自带浏览器。");
+    }
+}
+
 function previewSpeech() {
     if (!("speechSynthesis" in window)) {
-        alert("当前浏览器不支持语音朗读。建议使用 Chrome、Edge、Safari 或手机自带浏览器。");
+        alertSpeechNotSupported();
         return;
     }
     window.speechSynthesis.cancel();
@@ -896,13 +909,21 @@ function createSession() {
     if (selectedCategory === "due") {
         pool = getDueCharacters(stats);
         if (pool.length === 0) {
-            alert("🎉 今日艾宾浩斯待复习汉字已全部完成！已为您切换至全部汉字练习。");
+            if (window.kidToast) {
+                window.kidToast("🎉 今日艾宾浩斯待复习汉字已全部完成！已切换至全部汉字练习", "success");
+            } else {
+                alert("🎉 今日艾宾浩斯待复习汉字已全部完成！已为您切换至全部汉字练习。");
+            }
             pool = [...HANZI_DATA];
         }
     } else if (selectedCategory === "wrong") {
         pool = getWrongCharacters(stats);
         if (pool.length === 0) {
-            alert("错字本还是空的，太棒了！已为您切换至今日待复习。");
+            if (window.kidToast) {
+                window.kidToast("错字本还是空的，太棒了！已为您切换至今日待复习 👏", "success");
+            } else {
+                alert("错字本还是空的，太棒了！已为您切换至今日待复习。");
+            }
             pool = getDueCharacters(stats);
             if (pool.length === 0) pool = [...HANZI_DATA];
         }
@@ -1060,8 +1081,9 @@ function getChineseVoice() {
 function speakCurrent() {
     const item = state.session[state.currentIndex];
 
-    if (!item || !("speechSynthesis" in window)) {
-        alert("当前浏览器不支持语音朗读。建议使用 Chrome、Edge、Safari 或手机自带浏览器。");
+    if (!item) return;
+    if (!("speechSynthesis" in window)) {
+        alertSpeechNotSupported();
         return;
     }
 
@@ -1258,8 +1280,9 @@ function renderRecognitionQuestion() {
 function speakRecognitionCurrent() {
     const item = state.recognitionSession[state.recognitionIndex];
 
-    if (!item || !("speechSynthesis" in window)) {
-        alert("当前浏览器不支持语音朗读。建议使用 Chrome、Edge、Safari 或手机自带浏览器。");
+    if (!item) return;
+    if (!("speechSynthesis" in window)) {
+        alertSpeechNotSupported();
         return;
     }
 
@@ -2015,7 +2038,7 @@ function toggleStoryPinyin() {
 
 function speakStory() {
     if (!("speechSynthesis" in window)) {
-        alert("当前浏览器不支持语音朗读。建议使用 Chrome、Edge、Safari 或手机自带浏览器。");
+        alertSpeechNotSupported();
         return;
     }
 
@@ -2409,7 +2432,11 @@ document.getElementById("practiceWrongFromTabBtn")?.addEventListener("click", ()
     const stats = loadStats();
     const wrongChars = getWrongCharacters(stats);
     if (wrongChars.length === 0) {
-        alert("错字本目前为空，太棒啦！");
+        if (window.kidToast) {
+            window.kidToast("错字本目前为空，太棒啦！🎉", "success");
+        } else {
+            alert("错字本目前为空，太棒啦！");
+        }
         return;
     }
     startSession(wrongChars);

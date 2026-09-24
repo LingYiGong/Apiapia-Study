@@ -104,6 +104,32 @@
                 word-break: break-word;
             }
 
+            .kid-dialog-input {
+                width: 100%;
+                box-sizing: border-box;
+                font-family: inherit;
+                font-size: 0.95rem;
+                font-weight: 700;
+                padding: 12px 14px;
+                border-radius: 14px;
+                border: 2px solid #e2e8f0;
+                background: #f8fafc;
+                color: #1e293b;
+                outline: none;
+                margin: -8px 0 20px;
+                transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+                -webkit-appearance: none;
+            }
+            .kid-dialog-input:focus {
+                border-color: #6366f1;
+                background: #ffffff;
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+            }
+            .kid-dialog-input::placeholder {
+                color: #94a3b8;
+                font-weight: 500;
+            }
+
             .kid-dialog-actions {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -804,6 +830,125 @@
             document.body.appendChild(overlay);
 
             confirmBtn.focus();
+        });
+    };
+
+    /**
+     * 儿童友好统一单行文本输入弹窗 (Promise 接口，替代原生 prompt)
+     * @param {Object|string} options
+     * @returns {Promise<string|null>} 确认时返回输入的字符串，取消或关闭时返回 null
+     */
+    window.kidPrompt = function(options = {}) {
+        const {
+            title = '请输入内容',
+            message = '',
+            placeholder = '',
+            defaultValue = '',
+            icon = '✏️',
+            type = 'primary',
+            confirmText = '确定',
+            cancelText = '取消',
+            inputType = 'text'
+        } = typeof options === 'string' ? { message: options } : options;
+
+        return new Promise((resolve) => {
+            const theme = getTheme(type, icon);
+
+            const overlay = document.createElement('div');
+            overlay.className = 'kid-dialog-overlay';
+
+            const card = document.createElement('div');
+            card.className = 'kid-dialog-card';
+
+            const iconEl = document.createElement('div');
+            iconEl.className = 'kid-dialog-icon-wrapper';
+            iconEl.style.cssText = theme.bg;
+            renderDialogIcon(iconEl, theme.icon);
+
+            const titleEl = document.createElement('h3');
+            titleEl.className = 'kid-dialog-title';
+            titleEl.textContent = title;
+
+            let msgEl = null;
+            if (message) {
+                msgEl = document.createElement('div');
+                msgEl.className = 'kid-dialog-message';
+                msgEl.textContent = message;
+            }
+
+            const inputEl = document.createElement('input');
+            inputEl.type = inputType;
+            inputEl.className = 'kid-dialog-input';
+            inputEl.placeholder = placeholder;
+            inputEl.value = defaultValue;
+            inputEl.autocomplete = 'off';
+
+            const actions = document.createElement('div');
+            actions.className = 'kid-dialog-actions';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.className = 'kid-dialog-btn kid-dialog-btn-cancel';
+            cancelBtn.textContent = cancelText;
+
+            const confirmBtn = document.createElement('button');
+            confirmBtn.type = 'button';
+            const btnClass = type === 'danger'
+                ? 'kid-dialog-btn-danger'
+                : type === 'warning' || type === 'exit'
+                ? 'kid-dialog-btn-warning'
+                : type === 'success'
+                ? 'kid-dialog-btn-success'
+                : 'kid-dialog-btn-primary';
+            confirmBtn.className = `kid-dialog-btn ${btnClass}`;
+            confirmBtn.textContent = confirmText;
+
+            const closeWithResult = (result) => {
+                overlay.classList.add('kid-closing');
+                setTimeout(() => {
+                    if (overlay.parentNode) {
+                        overlay.parentNode.removeChild(overlay);
+                    }
+                    resolve(result);
+                }, 150);
+            };
+
+            cancelBtn.onclick = () => closeWithResult(null);
+            confirmBtn.onclick = () => closeWithResult(inputEl.value.trim());
+
+            // 键盘事件监听
+            const keyHandler = (e) => {
+                if (e.key === 'Escape') {
+                    window.removeEventListener('keydown', keyHandler);
+                    closeWithResult(null);
+                } else if (e.key === 'Enter') {
+                    window.removeEventListener('keydown', keyHandler);
+                    closeWithResult(inputEl.value.trim());
+                }
+            };
+            window.addEventListener('keydown', keyHandler);
+
+            actions.appendChild(cancelBtn);
+            actions.appendChild(confirmBtn);
+
+            card.appendChild(iconEl);
+            card.appendChild(titleEl);
+            if (msgEl) {
+                card.appendChild(msgEl);
+            }
+            card.appendChild(inputEl);
+            card.appendChild(actions);
+
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+
+            // 自动聚焦与全选
+            setTimeout(() => {
+                inputEl.focus();
+                if (defaultValue) {
+                    inputEl.select();
+                }
+            }, 50);
         });
     };
 
