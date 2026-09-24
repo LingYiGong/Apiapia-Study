@@ -397,3 +397,21 @@ button:not(.kid-btn-primary):not(.btn-3d-primary):not(.kid-btn-success):not(.btn
     transition: width 0.18s cubic-bezier(0.1, 0.9, 0.2, 1);
     border-radius: 0 2px 2px 0;
 }
+
+/* ================== 窄屏幕文本防折行与自适应优化 ================== */
+.nowrap-item, .stat-pill, .badge-pill, .tag-pill {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+/* 按钮及胶囊内文字默认保持单行，防止像素拥挤时文字落单换行 */
+button, .van-button {
+    white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+    .app-header {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}

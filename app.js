@@ -2,7 +2,7 @@
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
 // 当前客户端内置基线版本号
-const BUILD_VERSION = '2.0.1';
+const BUILD_VERSION = '2.0.2';
 
 // Semver 版本比较辅助函数 (remote > current 返回 true)
 function isNewerVersion(remote, current) {
@@ -251,9 +251,9 @@ const app = createApp({
                 dueCount: 0,
                 masteredCount: 0,
                 tags: [
-                    { text: '五十音田字格手写', color: '#6366f1' },
-                    { text: '1912 词纯盲听', color: '#10b981' },
-                    { text: '情境例句点读', color: '#8b5cf6' }
+                    { text: '五十音田字格', color: '#6366f1' },
+                    { text: '1912词盲听', color: '#10b981' },
+                    { text: '情境例句', color: '#8b5cf6' }
                 ],
                 url: 'japanese/frontend/index.html',
                 btnText: '日语学习'
@@ -273,7 +273,7 @@ const app = createApp({
                 tags: [
                     { text: '标准田字格', color: '#10b981' },
                     { text: '慢动作笔顺', color: '#f59e0b' },
-                    { text: '5选1听音选字', color: '#6366f1' }
+                    { text: '5选1选字', color: '#6366f1' }
                 ],
                 url: 'hanzi/hanzi.html',
                 btnText: '汉字学习'
@@ -292,8 +292,8 @@ const app = createApp({
                 masteredCount: 0,
                 tags: [
                     { text: '大字号五线谱', color: '#0284c7' },
-                    { text: '真实钢琴音色', color: '#10b981' },
-                    { text: '轻弹秒级识别', color: '#6366f1' }
+                    { text: '真钢琴音色', color: '#10b981' },
+                    { text: '轻弹秒识别', color: '#6366f1' }
                 ],
                 url: 'music/index.html',
                 btnText: '钢琴视奏'
@@ -307,13 +307,13 @@ const app = createApp({
                 barClass: 'bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500',
                 cardBorder: 'border-rose-300 hover:border-rose-500',
                 btnClass: 'kid-btn-danger',
-                userProgressText: '100 核心高频动词 · 3D 闪卡',
+                userProgressText: '100 核心动词 · 3D 闪卡',
                 dueCount: 0,
                 masteredCount: 0,
                 tags: [
                     { text: '3D立体翻牌', color: '#f43f5e' },
                     { text: '真人双语发音', color: '#0284c7' },
-                    { text: '掌握度环看板', color: '#10b981' }
+                    { text: '掌握度看板', color: '#10b981' }
                 ],
                 url: 'english/english.html',
                 btnText: '英语词卡'

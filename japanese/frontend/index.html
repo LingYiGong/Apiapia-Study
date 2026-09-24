@@ -42,26 +42,26 @@
     <div id="app" v-cloak class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
 
         <!-- 顶部导航栏 (统一儿童风格明快渐变色，带 app-header 安全区防遮挡) -->
-        <header class="app-header bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-4 sm:px-6 pb-3 shadow-md z-10 flex-shrink-0">
+        <header class="app-header bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-3 sm:px-6 pb-3 shadow-md z-10 flex-shrink-0">
             <div class="flex items-center justify-between h-9">
-                <div class="flex items-center space-x-2">
-                    <a href="../../index.html" class="h-8 text-xs sm:text-sm px-2.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center space-x-1.5 border border-white/30 transition-all active:scale-95 shadow-sm" title="返回 Apiapia 学习中心">
+                <div class="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
+                    <a href="../../index.html" class="h-8 text-xs sm:text-sm px-2.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center space-x-1 sm:space-x-1.5 border border-white/30 transition-all active:scale-95 shadow-sm whitespace-nowrap flex-shrink-0" title="返回 Apiapia 学习中心">
                         <img src="../../icons/apple-touch-icon.png" alt="Apiapia" class="w-5 h-5 rounded-full object-cover border border-white/50 flex-shrink-0" />
                         <span>首页</span>
                     </a>
-                    <h1 class="text-base sm:text-lg font-black tracking-wide flex items-center space-x-1.5 leading-none">
+                    <h1 class="text-base sm:text-lg font-black tracking-wide flex items-center space-x-1 leading-none whitespace-nowrap">
                         <span>🎌</span>
                         <span>日语小能手</span>
                     </h1>
                 </div>
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-1.5 sm:space-x-2 flex-shrink-0">
                     <button type="button" @click="showSyncModal = true"
-                            class="h-8 px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1"
+                            class="h-8 px-2.5 sm:px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1 whitespace-nowrap flex-shrink-0"
                             title="云端多端同步">
                         <span>☁️ {{ syncStatus === 'syncing' ? '同步中' : '同步' }}</span>
                     </button>
                     <button type="button" @click="showAudioSettings = true"
-                            class="h-8 px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1"
+                            class="h-8 px-2.5 sm:px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1 whitespace-nowrap flex-shrink-0"
                             title="发音设置">
                         <span>🔊 发音</span>
                     </button>
@@ -69,15 +69,15 @@
             </div>
 
             <!-- 顶部统计概览栏 (加大字体与可爱图标，与 @hanzi 完全统一) -->
-            <div v-if="currentTab === 'kana'" class="flex justify-between items-center h-8 mt-2.5 text-xs sm:text-sm opacity-95 border-t border-white/20 pt-2 font-bold leading-none">
-                <span class="flex items-center">🌟 假名总数: <b class="text-emerald-300 font-black ml-1 text-sm">{{ kanaData.length }}</b> 字</span>
-                <span class="flex items-center">📝 错题本: <b class="text-rose-200 font-black ml-1 text-sm">{{ kanaWrongList.length }}</b> 字</span>
-                <span class="flex items-center">🎯 模式: <b class="text-white font-black ml-1 text-sm">{{ kanaTypeModeLabel }}</b></span>
+            <div v-if="currentTab === 'kana'" class="flex justify-between items-center h-8 mt-2.5 text-[11px] sm:text-xs opacity-95 border-t border-white/20 pt-2 font-bold leading-none overflow-x-auto no-scrollbar gap-1.5 sm:gap-2">
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">🌟 假名: <b class="text-emerald-300 font-black ml-1 text-xs sm:text-sm">{{ kanaData.length }}</b> 字</span>
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">📝 错题: <b class="text-rose-200 font-black ml-1 text-xs sm:text-sm">{{ kanaWrongList.length }}</b> 字</span>
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">🎯 模式: <b class="text-white font-black ml-1 text-xs sm:text-sm">{{ kanaTypeModeLabel }}</b></span>
             </div>
-            <div v-else class="flex justify-between items-center h-8 mt-2.5 text-xs sm:text-sm opacity-95 border-t border-white/20 pt-2 font-bold leading-none">
-                <span class="flex items-center">🌟 待复习: 词<b class="text-yellow-300 font-black ml-1 text-sm">{{ todayDueCount }}</b> | 句<b class="text-yellow-300 font-black ml-1 text-sm">{{ sentenceDueCount }}</b></span>
-                <span class="flex items-center">🏆 已掌握: <b class="text-white font-black ml-1 text-sm">{{ masteredCount }}</b> 词</span>
-                <span class="flex items-center">📖 已学词汇: <b class="text-emerald-300 font-black ml-1 text-sm">{{ learnedWordsCount }}</b>/{{ words.length }}</span>
+            <div v-else class="flex justify-between items-center h-8 mt-2.5 text-[11px] sm:text-xs opacity-95 border-t border-white/20 pt-2 font-bold leading-none overflow-x-auto no-scrollbar gap-1.5 sm:gap-2">
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">🌟 待复习: 词<b class="text-yellow-300 font-black ml-0.5 text-xs sm:text-sm">{{ todayDueCount }}</b> | 句<b class="text-yellow-300 font-black ml-0.5 text-xs sm:text-sm">{{ sentenceDueCount }}</b></span>
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">🏆 已掌握: <b class="text-white font-black ml-1 text-xs sm:text-sm">{{ masteredCount }}</b> 词</span>
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">📖 已学: <b class="text-emerald-300 font-black ml-1 text-xs sm:text-sm">{{ learnedWordsCount }}</b>/{{ words.length }}</span>
             </div>
         </header>
 

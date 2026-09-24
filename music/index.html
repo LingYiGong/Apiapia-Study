@@ -36,34 +36,34 @@
     <div id="app" class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
 
         <!-- 顶部导航栏 (统一儿童风格明快渐变色：天青蓝至靛青，贴合钢琴音乐主题) -->
-        <header class="app-header bg-gradient-to-r from-sky-600 via-cyan-500 to-indigo-600 text-white px-4 sm:px-6 pt-3 pb-3 shadow-md z-10 flex-shrink-0">
+        <header class="app-header bg-gradient-to-r from-sky-600 via-cyan-500 to-indigo-600 text-white px-3 sm:px-6 pt-3 pb-3 shadow-md z-10 flex-shrink-0">
             <div class="flex items-center justify-between h-9">
-                <div class="flex items-center space-x-2">
-                    <a href="../index.html" class="h-8 text-xs sm:text-sm px-2.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center space-x-1.5 border border-white/30 transition-all active:scale-95 shadow-sm" title="返回 Apiapia 学习中心">
+                <div class="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
+                    <a href="../index.html" class="h-8 text-xs sm:text-sm px-2.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center space-x-1 sm:space-x-1.5 border border-white/30 transition-all active:scale-95 shadow-sm whitespace-nowrap flex-shrink-0" title="返回 Apiapia 学习中心">
                         <img src="../icons/apple-touch-icon.png" alt="Apiapia" class="w-5 h-5 rounded-full object-cover border border-white/50 flex-shrink-0" />
                         <span>首页</span>
                     </a>
-                    <h1 class="text-base sm:text-lg font-black tracking-wide flex items-center space-x-1.5 leading-none">
+                    <h1 class="text-base sm:text-lg font-black tracking-wide flex items-center space-x-1 leading-none whitespace-nowrap">
                         <span>🎹</span>
                         <span>钢琴小能手</span>
                     </h1>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button id="btn-header-play" type="button" class="h-8 px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1" title="试听目标音真实钢琴发音">
+                <div class="flex items-center space-x-1.5 sm:space-x-2 flex-shrink-0">
+                    <button id="btn-header-play" type="button" class="h-8 px-2.5 sm:px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1 whitespace-nowrap flex-shrink-0" title="试听目标音真实钢琴发音">
                         <span>🔊 试听</span>
                     </button>
-                    <button id="btn-header-skip" type="button" class="h-8 px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1" title="跳过当前音，随机换一个音符">
+                    <button id="btn-header-skip" type="button" class="h-8 px-2.5 sm:px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1 whitespace-nowrap flex-shrink-0" title="跳过当前音，随机换一个音符">
                         <span>⏭ 换音</span>
                     </button>
                 </div>
             </div>
 
             <!-- 顶部统计概览栏 (统一设计：加大字体、大彩色徽章) -->
-            <div class="flex justify-between items-center h-8 mt-2.5 text-xs sm:text-sm opacity-95 border-t border-white/20 pt-2 font-bold leading-none">
-                <span class="flex items-center">🎯 目标: <b id="hdr-target" class="text-yellow-300 font-black ml-1 text-sm">C4 (Do)</b></span>
-                <span class="flex items-center">🎤 麦克风: <b id="hdr-mic-status" class="text-cyan-200 font-black ml-1 text-sm">未开启</b></span>
-                <span class="flex items-center">🏆 累计: <b id="hdr-correct" class="text-emerald-300 font-black ml-1 text-sm">0</b> 题</span>
-                <span class="flex items-center">🔥 连击: <b id="hdr-streak" class="text-pink-300 font-black ml-1 text-sm">0</b> 次</span>
+            <div class="flex justify-between items-center h-8 mt-2.5 text-[11px] sm:text-xs opacity-95 border-t border-white/20 pt-2 font-bold leading-none overflow-x-auto no-scrollbar gap-1 sm:gap-2">
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">🎯 目标: <b id="hdr-target" class="text-yellow-300 font-black ml-1 text-xs sm:text-sm">C4 (Do)</b></span>
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">🎤 麦克风: <b id="hdr-mic-status" class="text-cyan-200 font-black ml-1 text-xs sm:text-sm">未开启</b></span>
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">🏆 累计: <b id="hdr-correct" class="text-emerald-300 font-black ml-1 text-xs sm:text-sm">0</b> 题</span>
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">🔥 连击: <b id="hdr-streak" class="text-pink-300 font-black ml-1 text-xs sm:text-sm">0</b> 次</span>
             </div>
         </header>
 
