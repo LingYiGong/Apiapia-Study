@@ -211,8 +211,8 @@
         </transition>
 
         <!-- 详细图文安装指引模态弹窗 -->
-        <div v-if="showInstallModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in" @click.self="closeInstallModal">
-            <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border-2 border-indigo-200 flex flex-col relative max-h-[90vh] overflow-y-auto">
+        <div v-if="showInstallModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-fade-in" @click.self="closeInstallModal">
+            <div class="bg-white w-full max-w-md rounded-3xl p-4 sm:p-5 shadow-2xl border-2 border-indigo-200 flex flex-col relative max-h-[90vh] overflow-y-auto">
                 <!-- 顶部关闭按钮 -->
                 <button @click="closeInstallModal" type="button" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center text-xs font-black active:scale-90">
                     ✕

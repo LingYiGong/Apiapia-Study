@@ -49,7 +49,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 20px;
+                padding: 12px;
                 animation: kidFadeIn 0.18s ease-out forwards;
                 user-select: none;
                 -webkit-user-select: none;
@@ -61,11 +61,11 @@
             .kid-dialog-card {
                 background: #ffffff;
                 width: 100%;
-                max-width: 360px;
-                border-radius: 28px;
+                max-width: min(440px, calc(100vw - 20px));
+                border-radius: 26px;
                 box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
                 border: 3px solid #f1f5f9;
-                padding: 24px 22px 20px;
+                padding: 22px 18px 18px;
                 text-align: center;
                 animation: kidPopIn 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
                 font-family: "Quicksand", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
@@ -194,29 +194,34 @@
                 box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
             }
 
-            /* 全局统一 Toast 气泡样式 */
+            /* 全局统一 Toast 气泡样式 (窄屏加宽、拒绝中间拘束) */
             .kid-toast-pill {
                 position: fixed;
-                top: calc(18px + env(safe-area-inset-top, 0px));
+                top: calc(14px + env(safe-area-inset-top, 0px));
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 100000;
-                padding: 10px 22px;
-                border-radius: 9999px;
+                padding: 12px 18px;
+                border-radius: 20px;
                 font-family: "Quicksand", -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-                font-size: 0.9rem;
+                font-size: 0.92rem;
                 font-weight: 800;
-                display: inline-flex;
+                display: flex;
                 align-items: center;
+                justify-content: center;
                 gap: 8px;
-                box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0,0,0,0.08);
+                box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0,0,0,0.1);
                 animation: kidToastSlideDown 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
                 user-select: none;
                 -webkit-user-select: none;
                 pointer-events: none;
-                max-width: 90vw;
+                width: auto;
+                min-width: min(300px, calc(100vw - 24px));
+                max-width: min(560px, calc(100vw - 20px));
                 text-align: center;
-                border: 2px solid rgba(255,255,255,0.25);
+                line-height: 1.45;
+                word-break: break-word;
+                border: 2px solid rgba(255,255,255,0.3);
             }
             .kid-toast-pill.kid-closing {
                 animation: kidToastSlideUp 0.18s ease-in forwards;
