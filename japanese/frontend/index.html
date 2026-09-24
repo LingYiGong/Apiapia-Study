@@ -24,18 +24,19 @@
     <!-- 引入内置词库、句子库与假名库数据 -->
     <script src="vocab_data.js"></script>
     <script src="sentence_data.js"></script>
+    <script src="sentence_generator.js?v=2.0.1"></script>
     <script src="kana_data.js"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 -->
-    <link rel="stylesheet" href="../../css/style.css?v=2.0.0" />
+    <link rel="stylesheet" href="../../css/style.css?v=2.0.1" />
     <!-- 日语模块专属手写板样式 -->
-    <link rel="stylesheet" href="style.css?v=2.0.0" />
+    <link rel="stylesheet" href="style.css?v=2.0.1" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
-    <script src="../../js/kid-dialog.js?v=2.0.0"></script>
+    <script src="../../js/kid-dialog.js?v=2.0.1"></script>
 
     <!-- 移动端与 iPad 视口自适应模块 -->
-    <script src="../../js/viewport.js?v=2.0.0"></script>
+    <script src="../../js/viewport.js?v=2.0.1"></script>
 </head>
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" v-cloak class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
@@ -373,6 +374,14 @@
                                     </button>
                                     <p class="mt-4 sm:mt-6 text-slate-800 font-black text-lg sm:text-2xl md:text-3xl">👂 请仔细听发音</p>
                                     <p class="mt-1.5 text-xs sm:text-sm text-slate-400 font-bold">点击大喇叭可重复听</p>
+
+                                    <!-- 听例句辅助辨音按钮 -->
+                                    <div v-if="currentWordSentence" class="mt-4">
+                                        <button type="button" @click="playCurrentWordSentence"
+                                                class="py-2.5 px-4 bg-indigo-50 hover:bg-indigo-100/80 text-indigo-700 border-2 border-indigo-200/80 rounded-2xl text-xs sm:text-sm font-black flex items-center space-x-1.5 transition-all active:scale-95 shadow-xs">
+                                            <span>💬 听日常/职场例句辅助辨音</span>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <!-- 阶段 2: 答案揭晓 (大字体与释义卡) -->
@@ -388,15 +397,61 @@
                                         {{ currentPracticeWord.meaning || '（暂无中文释义）' }}
                                     </div>
 
-                                    <div class="flex items-center space-x-3 mt-4 sm:mt-5">
+                                    <div class="flex items-center space-x-3 mt-3.5 sm:mt-4">
                                         <button type="button" @click="playCurrent"
                                                 class="py-2.5 px-4 text-xs sm:text-sm kid-btn-light rounded-2xl font-black flex items-center space-x-1.5">
-                                            <span>🔊 重播发音</span>
+                                            <span>🔊 重播单词</span>
                                         </button>
                                         <button type="button" @click="promptEditMeaning(currentPracticeWord)"
                                                 class="py-2.5 px-4 text-xs sm:text-sm kid-btn-light rounded-2xl font-black flex items-center space-x-1.5">
                                             <span>✏️ 补充释义</span>
                                         </button>
+                                    </div>
+
+                                    <!-- 语境造句展示与播放句子按钮 -->
+                                    <div v-if="currentWordSentence" class="w-full max-w-lg mt-4 sm:mt-5 p-4 sm:p-5 bg-gradient-to-br from-indigo-50/95 via-indigo-50/50 to-purple-50/60 border-2 border-indigo-100 rounded-3xl text-left shadow-xs transition-all">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="text-xs sm:text-sm font-black text-indigo-900 flex items-center space-x-1.5">
+                                                    <span>🎯</span>
+                                                    <span>常用背诵例句</span>
+                                                </span>
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                                      :class="currentWordSentence.category === 'work' ? 'bg-indigo-100 text-indigo-700 border border-indigo-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'">
+                                                    {{ currentWordSentence.category === 'work' ? '💼 职场高频' : '☕ 生活高频' }}
+                                                </span>
+                                            </div>
+                                            <button v-if="currentWordSentenceList.length > 1" type="button" @click="nextWordSentence"
+                                                    class="text-[11px] sm:text-xs text-indigo-600 hover:text-indigo-800 font-bold px-2.5 py-1 bg-white/90 hover:bg-white rounded-full border border-indigo-200 transition-colors flex items-center space-x-1 shadow-2xs">
+                                                <span>🔄</span>
+                                                <span>换一句 ({{ currentWordSentenceIndex + 1 }}/{{ currentWordSentenceList.length }})</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- 句子日文原文 -->
+                                        <div class="text-base sm:text-lg md:text-xl font-black text-slate-800 kana-font leading-relaxed select-text">
+                                            {{ currentWordSentence.japanese }}
+                                        </div>
+
+                                        <!-- 假名注音 -->
+                                        <div class="text-xs sm:text-sm font-bold text-indigo-600 kana-font mt-1 leading-relaxed select-text">
+                                            {{ currentWordSentence.kana }}
+                                        </div>
+
+                                        <!-- 中文翻译 -->
+                                        <div class="text-xs sm:text-sm font-semibold text-slate-600 mt-1 leading-relaxed select-text">
+                                            {{ currentWordSentence.chinese }}
+                                        </div>
+
+                                        <!-- 下方的播放句子按钮 -->
+                                        <div class="mt-3 pt-2.5 border-t border-indigo-100/80 flex items-center justify-between">
+                                            <button type="button" @click="playCurrentWordSentence"
+                                                    class="py-2.5 px-4 sm:px-5 kid-btn-primary text-white text-xs sm:text-sm font-black rounded-2xl shadow-md flex items-center space-x-2 active:scale-95 transition-all">
+                                                <span>🔊</span>
+                                                <span>播放句子</span>
+                                            </button>
+                                            <span class="text-[11px] text-slate-400 font-medium">💡 地道实战，建议随听随背</span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1622,6 +1677,6 @@
     </div>
 
     <!-- 核心业务逻辑脚本 -->
-    <script src="app.js?v=2.0.0"></script>
+    <script src="app.js?v=2.0.1"></script>
 </body>
 </html>

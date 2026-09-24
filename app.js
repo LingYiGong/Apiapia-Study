@@ -2,7 +2,7 @@
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
 // 当前客户端内置基线版本号
-const BUILD_VERSION = '1.0.25';
+const BUILD_VERSION = '2.0.1';
 
 // Semver 版本比较辅助函数 (remote > current 返回 true)
 function isNewerVersion(remote, current) {

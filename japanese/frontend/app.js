@@ -1058,6 +1058,45 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     return todayQueue.value.length > 0 ? todayQueue.value[0] : null;
                 });
 
+                // 单词语境动态造句与例句播放系统
+                const currentWordSentenceIndex = ref(0);
+
+                const currentWordSentenceList = computed(() => {
+                    const word = currentPracticeWord.value;
+                    if (!word) return [];
+                    if (window.SentenceGenerator && typeof window.SentenceGenerator.getAllSentencesForWord === 'function') {
+                        return window.SentenceGenerator.getAllSentencesForWord(word, sentences.value);
+                    }
+                    if (typeof window.generateSentenceForWord === 'function') {
+                        const s = window.generateSentenceForWord(word, sentences.value);
+                        return s ? [s] : [];
+                    }
+                    return [];
+                });
+
+                const currentWordSentence = computed(() => {
+                    const list = currentWordSentenceList.value;
+                    if (list.length === 0) return null;
+                    const idx = Math.abs(currentWordSentenceIndex.value) % list.length;
+                    return list[idx];
+                });
+
+                const nextWordSentence = () => {
+                    if (currentWordSentenceList.value.length > 1) {
+                        currentWordSentenceIndex.value = (currentWordSentenceIndex.value + 1) % currentWordSentenceList.value.length;
+                    }
+                };
+
+                const playCurrentWordSentence = () => {
+                    if (currentWordSentence.value) {
+                        playSentence(currentWordSentence.value);
+                    }
+                };
+
+                watch(currentPracticeWord, () => {
+                    currentWordSentenceIndex.value = 0;
+                });
+
                 const startPractice = (forceRandom = false) => {
                     let queue = [];
                     const now = Date.now();
@@ -2382,7 +2421,14 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     startPractice,
                     handleKnown,
                     handleUnknown,
-                    nextWord
+                    nextWord,
+
+                    // 单词造句与例句播放
+                    currentWordSentence,
+                    currentWordSentenceList,
+                    currentWordSentenceIndex,
+                    nextWordSentence,
+                    playCurrentWordSentence
                 };
             }
         });
