@@ -22,10 +22,9 @@
     <script src="../../libs/vant.min.js"></script>
 
     <!-- 引入内置词库、句子库与假名库数据 -->
-    <script src="vocab_data.js"></script>
-    <script src="sentence_data.js"></script>
-    <script src="sentence_generator.js?v=2.0.1"></script>
-    <script src="kana_data.js"></script>
+    <script src="vocab_data.js?v=2.0.6"></script>
+    <script src="sentence_data.js?v=2.0.6"></script>
+    <script src="kana_data.js?v=2.0.6"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 -->
     <link rel="stylesheet" href="../../css/style.css?v=2.0.3" />
@@ -379,7 +378,7 @@
                                     <div v-if="currentWordSentence" class="mt-4">
                                         <button type="button" @click="playCurrentWordSentence"
                                                 class="py-2.5 px-4 bg-indigo-50 hover:bg-indigo-100/80 text-indigo-700 border-2 border-indigo-200/80 rounded-2xl text-xs sm:text-sm font-black flex items-center space-x-1.5 transition-all active:scale-95 shadow-xs">
-                                            <span>💬 听日常/职场例句辅助辨音</span>
+                                            <span>💬 听例句辅助辨音</span>
                                         </button>
                                     </div>
                                 </div>
@@ -408,17 +407,21 @@
                                         </button>
                                     </div>
 
-                                    <!-- 语境造句展示与播放句子按钮 -->
+                                    <!-- 语境例句展示与播放句子按钮 -->
                                     <div v-if="currentWordSentence" class="w-full max-w-lg mt-4 sm:mt-5 p-4 sm:p-5 bg-gradient-to-br from-indigo-50/95 via-indigo-50/50 to-purple-50/60 border-2 border-indigo-100 rounded-3xl text-left shadow-xs transition-all">
                                         <div class="flex items-center justify-between mb-2">
                                             <div class="flex items-center space-x-2">
                                                 <span class="text-xs sm:text-sm font-black text-indigo-900 flex items-center space-x-1.5">
                                                     <span>🎯</span>
-                                                    <span>常用背诵例句</span>
+                                                    <span v-if="currentWordSentence.source === 'daily_conversation' || currentWordSentence.source === 'smart_fallback'">生活日常会话</span>
+                                                    <span v-else>教材经典例句</span>
                                                 </span>
-                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                                <span v-if="currentWordSentence.category" class="text-[10px] font-bold px-2 py-0.5 rounded-full"
                                                       :class="currentWordSentence.category === 'work' ? 'bg-indigo-100 text-indigo-700 border border-indigo-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'">
-                                                    {{ currentWordSentence.category === 'work' ? '💼 职场高频' : '☕ 生活高频' }}
+                                                    {{ currentWordSentence.category === 'work' ? '💼 职场交流' : '☕ 真实生活会话' }}
+                                                </span>
+                                                <span v-else class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    📖 标准例句
                                                 </span>
                                             </div>
                                             <button v-if="currentWordSentenceList.length > 1" type="button" @click="nextWordSentence"
@@ -450,7 +453,7 @@
                                                 <span>🔊</span>
                                                 <span>播放句子</span>
                                             </button>
-                                            <span class="text-[11px] text-slate-400 font-medium">💡 地道实战，建议随听随背</span>
+                                            <span class="text-[11px] text-slate-400 font-medium">💡 经典例句，建议随听随背</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1677,6 +1680,6 @@
     </div>
 
     <!-- 核心业务逻辑脚本 -->
-    <script src="app.js?v=2.0.1"></script>
+    <script src="app.js?v=2.0.6"></script>
 </body>
 </html>

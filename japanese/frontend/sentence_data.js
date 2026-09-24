@@ -6,7 +6,7 @@ window.BUILTIN_SENTENCES = [
     "chinese": "我是迈克·米勒。",
     "words": [
       "わたし",
-      "です"
+      "私"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -18,7 +18,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "米勒先生是公司职员。",
     "words": [
       "会社員",
-      "です"
+      "会社",
+      "さん"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -29,7 +30,8 @@ window.BUILTIN_SENTENCES = [
     "kana": "わんさんは いしゃじゃ ありません。",
     "chinese": "王先生不是医生。",
     "words": [
-      "医者"
+      "医者",
+      "さん"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -40,9 +42,10 @@ window.BUILTIN_SENTENCES = [
     "kana": "あのかたは どなたですか。",
     "chinese": "那位是谁？",
     "words": [
-      "方",
       "あの方",
-      "どなた"
+      "方",
+      "どなた",
+      "あの"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -68,7 +71,8 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "それ",
       "日本語",
-      "本"
+      "本",
+      "日本"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -79,6 +83,7 @@ window.BUILTIN_SENTENCES = [
     "kana": "この かさは だれの ですか。",
     "chinese": "这把雨伞是谁的？",
     "words": [
+      "この",
       "傘",
       "だれ"
     ],
@@ -127,6 +132,7 @@ window.BUILTIN_SENTENCES = [
     "kana": "この くつは いくらですか。",
     "chinese": "这双鞋多少钱？",
     "words": [
+      "この",
       "靴",
       "いくら"
     ],
@@ -140,9 +146,11 @@ window.BUILTIN_SENTENCES = [
     "chinese": "现在几点？七点半。",
     "words": [
       "いま",
+      "今",
       "何時",
       "七時",
-      "半"
+      "半",
+      "何"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -154,8 +162,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "每天早晨六点起床。",
     "words": [
       "毎朝",
-      "起きる",
-      "六時"
+      "六時",
+      "起きる"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -182,7 +190,8 @@ window.BUILTIN_SENTENCES = [
       "銀行",
       "何時",
       "から",
-      "まで"
+      "まで",
+      "何"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -194,7 +203,9 @@ window.BUILTIN_SENTENCES = [
     "chinese": "午休从十二点开始。",
     "words": [
       "昼休み",
-      "十二時"
+      "十二時",
+      "から",
+      "休み"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -207,7 +218,8 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "毎日",
       "日本語",
-      "勉強"
+      "勉強",
+      "日本"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -219,8 +231,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "明天去京都。",
     "words": [
       "明日",
-      "行く",
-      "京都"
+      "京都",
+      "行く"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -353,6 +365,7 @@ window.BUILTIN_SENTENCES = [
     "chinese": "要不要一起喝杯咖啡？",
     "words": [
       "いっしょに",
+      "一緒に",
       "コーヒー",
       "飲む"
     ],
@@ -392,7 +405,8 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "日本語",
       "レポート",
-      "書く"
+      "書く",
+      "日本"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -406,7 +420,8 @@ window.BUILTIN_SENTENCES = [
       "母",
       "誕生日",
       "花",
-      "あげる"
+      "あげる",
+      "上げる"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -471,7 +486,7 @@ window.BUILTIN_SENTENCES = [
     "chinese": "北京现在非常冷。",
     "words": [
       "北京",
-      "いま",
+      "今",
       "とても",
       "寒い"
     ],
@@ -498,7 +513,9 @@ window.BUILTIN_SENTENCES = [
     "kana": "あの れすとらんは とても しずかで、きれいです。",
     "chinese": "那家餐厅非常安静，也很漂亮。",
     "words": [
+      "あの",
       "レストラン",
+      "とても",
       "静か",
       "きれい"
     ],
@@ -511,6 +528,8 @@ window.BUILTIN_SENTENCES = [
     "kana": "わたしは あたらしい ぱそこんが ほしいです。",
     "chinese": "我想要一台新电脑。",
     "words": [
+      "わたし",
+      "私",
       "新しい",
       "パソコン",
       "欲しい"
@@ -525,9 +544,9 @@ window.BUILTIN_SENTENCES = [
     "chinese": "周末想去日本旅行。",
     "words": [
       "週末",
+      "日本",
       "旅行",
-      "行く",
-      "行きたい"
+      "行く"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -541,7 +560,8 @@ window.BUILTIN_SENTENCES = [
       "のど",
       "乾く",
       "水",
-      "飲む"
+      "飲む",
+      "から"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -579,6 +599,7 @@ window.BUILTIN_SENTENCES = [
     "kana": "ここに なまえと じゅうしょを かいてください。",
     "chinese": "请在这里写上姓名和住址。",
     "words": [
+      "ここ",
       "名前",
       "住所",
       "書く"
@@ -605,6 +626,7 @@ window.BUILTIN_SENTENCES = [
     "kana": "ここで しゃしんを とっても いいですか。",
     "chinese": "可以在这里拍照吗？",
     "words": [
+      "ここ",
       "写真",
       "撮る",
       "いい"
@@ -632,8 +654,9 @@ window.BUILTIN_SENTENCES = [
     "kana": "たなかさんの でんわばんごうを しっていますか。",
     "chinese": "你知道田中先生的电话号码吗？",
     "words": [
-      "田中",
+      "さん",
       "電話番号",
+      "電話",
       "知る"
     ],
     "level": 0,
@@ -663,6 +686,7 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "コンサート",
       "終わる",
+      "から",
       "レストラン",
       "行く"
     ],
@@ -675,6 +699,7 @@ window.BUILTIN_SENTENCES = [
     "kana": "あの かみが ながくて、せが たかいひとは だれですか。",
     "chinese": "那个长头发、高个子的人是谁？",
     "words": [
+      "あの",
       "髪",
       "長い",
       "背",
@@ -693,6 +718,7 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "お金",
       "入れる",
+      "から",
       "ボタン",
       "押す"
     ],
@@ -706,6 +732,9 @@ window.BUILTIN_SENTENCES = [
     "chinese": "因为在发烧，请不要泡澡。",
     "words": [
       "熱",
+      "ある",
+      "有る",
+      "から",
       "お風呂",
       "入る"
     ],
@@ -733,7 +762,8 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "日曜日",
       "早い",
-      "起きる"
+      "起きる",
+      "いい"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -756,9 +786,11 @@ window.BUILTIN_SENTENCES = [
     "kana": "みらーさんは かんじを よむことが できます。",
     "chinese": "米勒先生会读汉字。",
     "words": [
+      "さん",
       "漢字",
       "読む",
-      "できる"
+      "できる",
+      "出来る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -769,6 +801,8 @@ window.BUILTIN_SENTENCES = [
     "kana": "わたしの しゅみは おんがくを きくことです。",
     "chinese": "我的爱好是听音乐。",
     "words": [
+      "わたし",
+      "私",
       "趣味",
       "音楽",
       "聞く"
@@ -796,9 +830,11 @@ window.BUILTIN_SENTENCES = [
     "kana": "にほんりょうりを たべたことが ありますか。",
     "chinese": "你吃过日本料理吗？",
     "words": [
-      "日本料理",
+      "日本",
+      "料理",
       "食べる",
-      "ある"
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -826,6 +862,7 @@ window.BUILTIN_SENTENCES = [
       "だんだん",
       "暖かい",
       "なる",
+      "成る",
       "来る"
     ],
     "level": 0,
@@ -838,8 +875,10 @@ window.BUILTIN_SENTENCES = [
     "chinese": "我想让日语变得更好。",
     "words": [
       "日本語",
+      "日本",
       "上手",
-      "なる"
+      "なる",
+      "成る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -852,7 +891,8 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "明日",
       "時間",
-      "ある"
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -863,6 +903,7 @@ window.BUILTIN_SENTENCES = [
     "kana": "みらーさんは もう かえったと おもいます。",
     "chinese": "我想米勒先生已经回去了。",
     "words": [
+      "さん",
       "もう",
       "帰る",
       "思う"
@@ -876,8 +917,9 @@ window.BUILTIN_SENTENCES = [
     "kana": "にほんの ぶっかについて どう おもいますか。",
     "chinese": "关于日本的物价你怎么看？",
     "words": [
+      "日本",
       "物価",
-      "について",
+      "どう",
       "思う"
     ],
     "level": 0,
@@ -903,6 +945,9 @@ window.BUILTIN_SENTENCES = [
     "kana": "これは わたしが きのう とった しゃしんです。",
     "chinese": "这是我昨天拍的照片。",
     "words": [
+      "これ",
+      "わたし",
+      "私",
       "昨日",
       "撮る",
       "写真"
@@ -918,7 +963,8 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "眼鏡",
       "かける",
-      "人"
+      "人",
+      "さん"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -931,7 +977,9 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "朝",
       "起きる",
-      "時間"
+      "時間",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -958,7 +1006,7 @@ window.BUILTIN_SENTENCES = [
       "図書館",
       "本",
       "借りる",
-      "とき",
+      "カード",
       "要る"
     ],
     "level": 0,
@@ -970,11 +1018,11 @@ window.BUILTIN_SENTENCES = [
     "kana": "この ぼたんを おすと、おつりが でます。",
     "chinese": "一按这个按钮，找零就会出来。",
     "words": [
+      "この",
       "ボタン",
       "押す",
       "お釣り",
-      "出る",
-      "出す"
+      "出る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -989,7 +1037,8 @@ window.BUILTIN_SENTENCES = [
       "右",
       "曲がる",
       "銀行",
-      "ある"
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1014,8 +1063,7 @@ window.BUILTIN_SENTENCES = [
     "chinese": "要是便宜的话，就想买。",
     "words": [
       "安い",
-      "買う",
-      "買いたい"
+      "買う"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1028,6 +1076,7 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "いくら",
       "高い",
+      "この",
       "辞書",
       "必要"
     ],
@@ -1070,7 +1119,6 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "市役所",
       "行く",
-      "行きたい",
       "どこ"
     ],
     "level": 0,
@@ -1097,10 +1145,10 @@ window.BUILTIN_SENTENCES = [
     "kana": "わたしは ひらがなしか かけません。",
     "chinese": "我只会写平假名。",
     "words": [
+      "わたし",
+      "私",
       "ひらがな",
-      "しか",
-      "書く",
-      "書ける"
+      "書く"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1111,7 +1159,9 @@ window.BUILTIN_SENTENCES = [
     "kana": "この へやから うみが みえます。",
     "chinese": "从这个房间能看得到大海。",
     "words": [
+      "この",
       "部屋",
+      "から",
       "海",
       "見える"
     ],
@@ -1128,7 +1178,8 @@ window.BUILTIN_SENTENCES = [
       "前",
       "大きい",
       "スーパー",
-      "できる"
+      "できる",
+      "出来る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1141,8 +1192,8 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "音楽",
       "聞く",
-      "ながら",
-      "食事"
+      "食事",
+      "する"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1182,8 +1233,7 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "電車",
       "傘",
-      "忘れる",
-      "しまう"
+      "忘れる"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1197,7 +1247,8 @@ window.BUILTIN_SENTENCES = [
       "壁",
       "カレンダー",
       "掛ける",
-      "ある"
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1211,8 +1262,7 @@ window.BUILTIN_SENTENCES = [
       "旅行",
       "前",
       "ホテル",
-      "予約",
-      "おく"
+      "予約"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1225,7 +1275,7 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "ハサミ",
       "使う",
-      "元",
+      "元の所",
       "所",
       "戻す"
     ],
@@ -1240,8 +1290,7 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "来年",
       "日本",
-      "留学",
-      "つもり"
+      "留学"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1268,7 +1317,6 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "毎日",
       "運動",
-      "ほう",
       "いい"
     ],
     "level": 0,
@@ -1282,7 +1330,6 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "無理",
       "する",
-      "ほう",
       "いい"
     ],
     "level": 0,
@@ -1296,8 +1343,7 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "明日",
       "雨",
-      "降る",
-      "でしょう"
+      "降る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1310,8 +1356,7 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "約束",
       "時間",
-      "遅れる",
-      "かもしれない"
+      "遅れる"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1322,8 +1367,8 @@ window.BUILTIN_SENTENCES = [
     "kana": "この まーくは どういう いみですか。",
     "chinese": "这个标志是什么意思？",
     "words": [
+      "この",
       "マーク",
-      "どういう",
       "意味"
     ],
     "level": 0,
@@ -1364,6 +1409,7 @@ window.BUILTIN_SENTENCES = [
       "仕事",
       "終わる",
       "あと",
+      "後",
       "飲む",
       "行く"
     ],
@@ -1404,10 +1450,9 @@ window.BUILTIN_SENTENCES = [
     "chinese": "越练习就会越熟练。",
     "words": [
       "練習",
-      "する",
-      "ほど",
       "上手",
-      "なる"
+      "なる",
+      "成る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1420,7 +1465,6 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "早い",
       "起きる",
-      "ように",
       "目覚まし時計",
       "かける"
     ],
@@ -1434,10 +1478,11 @@ window.BUILTIN_SENTENCES = [
     "chinese": "慢慢能读懂日文报纸了。",
     "words": [
       "日本語",
+      "日本",
       "新聞",
       "読む",
-      "読める",
-      "ようになる"
+      "なる",
+      "成る"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1450,8 +1495,7 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "毎日",
       "野菜",
-      "食べる",
-      "ようにする"
+      "食べる"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1462,10 +1506,11 @@ window.BUILTIN_SENTENCES = [
     "kana": "わたしは いぬに てを かまれました。",
     "chinese": "我的手被狗咬了。",
     "words": [
+      "わたし",
+      "私",
       "犬",
       "手",
-      "噛む",
-      "噛まれる"
+      "噛む"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1479,8 +1524,7 @@ window.BUILTIN_SENTENCES = [
       "電車",
       "中",
       "足",
-      "踏む",
-      "踏まれる"
+      "踏む"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1491,10 +1535,11 @@ window.BUILTIN_SENTENCES = [
     "kana": "この おてらは ごひゃくねんまえに たてられました。",
     "chinese": "这座寺庙是五百年前建成的。",
     "words": [
+      "この",
+      "お寺",
       "寺",
       "前",
-      "建てる",
-      "建てられる"
+      "建てる"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1508,8 +1553,7 @@ window.BUILTIN_SENTENCES = [
       "日本",
       "車",
       "世界",
-      "輸出",
-      "される"
+      "輸出"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1521,8 +1565,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "部长让米勒先生去出差了。",
     "words": [
       "部長",
-      "出張",
-      "させる"
+      "さん",
+      "出張"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1536,8 +1580,7 @@ window.BUILTIN_SENTENCES = [
       "先生",
       "学生",
       "本",
-      "読む",
-      "読ませる"
+      "読む"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1563,7 +1606,8 @@ window.BUILTIN_SENTENCES = [
     "kana": "こころから みなさまに かんしゃもうしあげます。",
     "chinese": "打心底里向各位表示由衷的感谢。",
     "words": [
-      "心から",
+      "心",
+      "から",
       "皆様",
       "感謝",
       "申し上げる"
@@ -1579,8 +1623,7 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "祖父",
       "病気",
-      "入院",
-      "なる"
+      "入院"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1608,8 +1651,8 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "雨",
       "止む",
-      "ここ",
-      "する"
+      "まで",
+      "ここ"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1623,8 +1666,7 @@ window.BUILTIN_SENTENCES = [
       "新しい",
       "技術",
       "一生懸命",
-      "勉強",
-      "する"
+      "勉強"
     ],
     "level": 0,
     "next_review_date": 1789531875140
@@ -1638,7 +1680,7 @@ window.BUILTIN_SENTENCES = [
       "本日",
       "時間",
       "いただく",
-      "ありがとうございます"
+      "ありがとう"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -1662,7 +1704,7 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "本日",
       "よろしく",
-      "お願いいたします"
+      "お願い"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -1692,7 +1734,8 @@ window.BUILTIN_SENTENCES = [
       "終了",
       "次",
       "派遣先",
-      "探す"
+      "探す",
+      "もらう"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -1703,9 +1746,9 @@ window.BUILTIN_SENTENCES = [
     "kana": "そのため、げんざいは たいきちゅうです。",
     "chinese": "因此目前处于待机状态。",
     "words": [
-      "そのため",
       "現在",
-      "待機中"
+      "待機中",
+      "待機"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -1716,10 +1759,15 @@ window.BUILTIN_SENTENCES = [
     "kana": "このきかいに、じぶんでも にほんきぎょうへの てんしょくかつどうを はじめたいと かんがえました。",
     "chinese": "趁此机会，我也想自己开始面向日本企业的求职活动。",
     "words": [
+      "この",
       "機会",
       "自分",
       "日本企業",
+      "日本",
+      "企業",
       "転職活動",
+      "転職",
+      "活動",
       "始める",
       "考える"
     ],
@@ -1748,6 +1796,7 @@ window.BUILTIN_SENTENCES = [
     "kana": "これまでの うぇぶかいはつけいけんを いかして、さらに すきるを たかめたいです。",
     "chinese": "希望能发挥以往的Web开发经验，进一步提升自己的技术技能。",
     "words": [
+      "これまで",
       "開発",
       "経験",
       "生かす",
@@ -1767,6 +1816,7 @@ window.BUILTIN_SENTENCES = [
       "使う",
       "環境",
       "働く",
+      "コミュニケーション",
       "向上",
       "考える"
     ],
@@ -1792,11 +1842,13 @@ window.BUILTIN_SENTENCES = [
     "kana": "そのさい、にほんの せいかつかんきょうや こどもの きょういくかんきょうに みりょくを かんじました。",
     "chinese": "当时，我感受到了日本的生活环境和孩子的教育环境非常有吸引力。",
     "words": [
-      "際",
       "日本",
       "生活環境",
+      "生活",
+      "環境",
       "子ども",
-      "教育環境",
+      "子供",
+      "教育",
       "魅力",
       "感じる"
     ],
@@ -1810,6 +1862,7 @@ window.BUILTIN_SENTENCES = [
     "chinese": "后来，我妻子考入了日本的专门学校。",
     "words": [
       "その後",
+      "後",
       "妻",
       "日本",
       "専門学校",
@@ -1825,8 +1878,10 @@ window.BUILTIN_SENTENCES = [
     "chinese": "我也和家人一起来到了日本。",
     "words": [
       "私",
+      "わたし",
       "家族",
-      "一緒",
+      "いっしょに",
+      "一緒に",
       "日本",
       "来る"
     ],
@@ -1859,7 +1914,10 @@ window.BUILTIN_SENTENCES = [
       "中国",
       "エンジニア",
       "以上",
-      "実務経験"
+      "実務経験",
+      "経験",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -1871,8 +1929,11 @@ window.BUILTIN_SENTENCES = [
     "chinese": "以往主要一直从事前端开发工作。",
     "words": [
       "主",
+      "フロントエンド",
+      "フロント",
       "開発",
-      "携わる"
+      "携わる",
+      "来る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -1885,7 +1946,9 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "使う",
       "開発",
-      "経験"
+      "経験",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -1910,11 +1973,12 @@ window.BUILTIN_SENTENCES = [
     "kana": "また、せいせいえーあいを かつようした かいはつけいけんも あります。",
     "chinese": "此外，我也有活用生成式AI辅助开发的经验。",
     "words": [
-      "また",
       "生成AI",
       "活用",
       "開発",
-      "経験"
+      "経験",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -1926,7 +1990,10 @@ window.BUILTIN_SENTENCES = [
     "chinese": "在技术层面我有充分的自信。",
     "words": [
       "技術面",
-      "自信"
+      "技術",
+      "自信",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -1954,8 +2021,11 @@ window.BUILTIN_SENTENCES = [
     "kana": "ふろんとえんどかいはつを だいいちきぼうと しています。",
     "chinese": "我将前端开发岗位作为第一志愿。",
     "words": [
+      "フロントエンド",
+      "フロント",
       "開発",
-      "第一希望"
+      "第一希望",
+      "希望"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -1968,8 +2038,11 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "特に",
       "使う",
+      "サービス",
       "開発",
-      "興味"
+      "興味",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -1981,8 +2054,12 @@ window.BUILTIN_SENTENCES = [
     "chinese": "从长远来看，我以成为兼具前端与后端开发能力的全栈工程师为目标。",
     "words": [
       "将来的",
+      "フロントエンド",
+      "バックエンド",
       "両方",
       "対応",
+      "できる",
+      "出来る",
       "エンジニア",
       "目指す"
     ],
@@ -2010,6 +2087,7 @@ window.BUILTIN_SENTENCES = [
       "現在",
       "程度",
       "会話力",
+      "会話",
       "考える"
     ],
     "level": 0,
@@ -2082,8 +2160,10 @@ window.BUILTIN_SENTENCES = [
     "chinese": "工作地点我首选第一志愿是东京。",
     "words": [
       "勤務地",
+      "勤務",
       "東京",
-      "第一希望"
+      "第一希望",
+      "希望"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2095,6 +2175,7 @@ window.BUILTIN_SENTENCES = [
     "chinese": "第二志愿是大阪。",
     "words": [
       "第二希望",
+      "希望",
       "大阪"
     ],
     "level": 0,
@@ -2120,6 +2201,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "期望的年薪在500万日元以上。",
     "words": [
       "希望年収",
+      "希望",
+      "年収",
       "以上"
     ],
     "level": 0,
@@ -2131,9 +2214,12 @@ window.BUILTIN_SENTENCES = [
     "kana": "ただ、しごとないようや せいちょうできる かんきょうを じゅうししています。",
     "chinese": "不过，我也非常看重具体的工作内容和能够获得成长的技术环境。",
     "words": [
-      "ただ",
       "仕事内容",
+      "仕事",
+      "内容",
       "成長",
+      "できる",
+      "出来る",
       "環境",
       "重視"
     ],
@@ -2146,9 +2232,9 @@ window.BUILTIN_SENTENCES = [
     "kana": "そのため、じょうけんについては そうだんかのうです。",
     "chinese": "因此，关于薪酬条件方面是可以灵活协商的。",
     "words": [
-      "そのため",
       "条件",
-      "相談可能"
+      "相談可能",
+      "相談"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2160,9 +2246,13 @@ window.BUILTIN_SENTENCES = [
     "chinese": "入职时间方面，我可以尽早入职。",
     "words": [
       "入社時期",
+      "入社",
+      "時期",
       "できるだけ",
       "早い",
-      "対応"
+      "対応",
+      "できる",
+      "出来る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2175,10 +2265,12 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "最短",
       "入社時期",
+      "入社",
       "御社",
       "都合",
       "合わせる",
-      "相談可能"
+      "相談可能",
+      "相談"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2208,6 +2300,8 @@ window.BUILTIN_SENTENCES = [
       "日本",
       "本格的",
       "転職活動",
+      "転職",
+      "活動",
       "始める",
       "最初",
       "段階"
@@ -2221,6 +2315,7 @@ window.BUILTIN_SENTENCES = [
     "kana": "はい、さいしんばんの りれきしょと しょくむけいれきしょを よういしています。",
     "chinese": "是的，我已经准备好了最新版的简历和职务经历书。",
     "words": [
+      "はい",
       "最新版",
       "履歴書",
       "職務経歴書",
@@ -2237,7 +2332,9 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "面談",
       "終了",
-      "お送りする"
+      "後",
+      "メール",
+      "送る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2248,8 +2345,12 @@ window.BUILTIN_SENTENCES = [
     "kana": "すみません、もういちど おねがいできますか。",
     "chinese": "不好意思，能请您再说一遍吗？（没听清时礼貌用语）",
     "words": [
+      "すみません",
+      "もう一度",
       "一度",
-      "お願い"
+      "お願い",
+      "できる",
+      "出来る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2260,9 +2361,12 @@ window.BUILTIN_SENTENCES = [
     "kana": "すみません、もうすこし ゆっくり はなしていただけますか。",
     "chinese": "不好意思，能请您说得稍微慢一点吗？",
     "words": [
+      "すみません",
+      "もう少し",
       "少し",
       "ゆっくり",
-      "話す"
+      "話す",
+      "いただく"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2273,10 +2377,13 @@ window.BUILTIN_SENTENCES = [
     "kana": "すみません、しつもんの いみを もういちど かくにんしても よろしいでしょうか。",
     "chinese": "不好意思，我可以再次确认一下刚才提问的意思吗？",
     "words": [
+      "すみません",
       "質問",
       "意味",
+      "もう一度",
       "一度",
-      "確認"
+      "確認",
+      "いい"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2287,6 +2394,7 @@ window.BUILTIN_SENTENCES = [
     "kana": "すみません、しつもんを かんちがいしました。",
     "chinese": "不好意思，我刚才理解错问题的意思了。",
     "words": [
+      "すみません",
       "質問",
       "勘違い"
     ],
@@ -2299,6 +2407,8 @@ window.BUILTIN_SENTENCES = [
     "kana": "はい、その にんしきで あっています。",
     "chinese": "是的，正如您所理解的那样。",
     "words": [
+      "はい",
+      "その",
       "認識",
       "合う"
     ],
@@ -2311,6 +2421,8 @@ window.BUILTIN_SENTENCES = [
     "kana": "はい、そのとおりです。",
     "chinese": "是的，正如您所说。",
     "words": [
+      "はい",
+      "その",
       "通り"
     ],
     "level": 0,
@@ -2324,11 +2436,14 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "現在",
       "私",
+      "わたし",
       "日本語力",
+      "日本語",
       "技術",
       "経験",
       "踏まえる",
       "企業",
+      "ポジション",
       "最も",
       "可能性",
       "高い"
@@ -2343,10 +2458,14 @@ window.BUILTIN_SENTENCES = [
     "chinese": "在正式面试之前，如果有特别需要提前准备的内容，能请您指导我一下吗？（向猎头提问）",
     "words": [
       "面接",
+      "まで",
       "特に",
       "準備",
       "内容",
-      "教える"
+      "ある",
+      "有る",
+      "教える",
+      "いただく"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2358,6 +2477,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "请告诉我您的转职（离职）理由。【面试官提问】",
     "words": [
       "転職理由",
+      "転職",
+      "理由",
       "教える"
     ],
     "level": 0,
@@ -2370,6 +2491,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "能请教一下您的离职跳槽原因吗？【面试官提问】",
     "words": [
       "転職理由",
+      "転職",
+      "理由",
       "伺う"
     ],
     "level": 0,
@@ -2409,6 +2532,8 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "今回",
       "転職活動",
+      "転職",
+      "活動",
       "始める",
       "理由",
       "教える"
@@ -2461,7 +2586,7 @@ window.BUILTIN_SENTENCES = [
     "chinese": "您期望去什么样的公司？【面试官提问】",
     "words": [
       "会社",
-      "良い"
+      "いい"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2496,7 +2621,8 @@ window.BUILTIN_SENTENCES = [
     "kana": "どういう しごとを したいですか。",
     "chinese": "您想从事什么样的工作？【面试官提问】",
     "words": [
-      "仕事"
+      "仕事",
+      "する"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2508,7 +2634,9 @@ window.BUILTIN_SENTENCES = [
     "chinese": "有您期望的具体职位/岗位吗？【面试官提问】",
     "words": [
       "希望",
-      "ポジション"
+      "ポジション",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2519,6 +2647,7 @@ window.BUILTIN_SENTENCES = [
     "kana": "これまでの けいけんに ついて おしえてください。",
     "chinese": "请谈谈您以往的工作经验。【面试官提问】",
     "words": [
+      "これまで",
       "経験",
       "教える"
     ],
@@ -2532,7 +2661,9 @@ window.BUILTIN_SENTENCES = [
     "chinese": "至今为止您做过哪些类型的系统开发？【面试官提问】",
     "words": [
       "今まで",
-      "開発"
+      "開発",
+      "する",
+      "来る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2556,9 +2687,11 @@ window.BUILTIN_SENTENCES = [
     "kana": "これまで おもに どのような ぎょうむを たんとうしてきましたか。",
     "chinese": "以往您主要负责什么业务职责？【面试官提问】",
     "words": [
+      "これまで",
       "主",
       "業務",
-      "担当"
+      "担当",
+      "来る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2570,6 +2703,7 @@ window.BUILTIN_SENTENCES = [
     "chinese": "您平时是如何学习日语的？【面试官提问】",
     "words": [
       "日本語",
+      "日本",
       "勉強"
     ],
     "level": 0,
@@ -2581,7 +2715,8 @@ window.BUILTIN_SENTENCES = [
     "kana": "じぇいえるぴーてぃーは じゅけんしましたか。",
     "chinese": "参加过JLPT日本语能力考吗？【面试官提问】",
     "words": [
-      "受験"
+      "受験",
+      "する"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2593,7 +2728,9 @@ window.BUILTIN_SENTENCES = [
     "chinese": "有计划参加JLPT考试吗？【面试官提问】",
     "words": [
       "受験",
-      "予定"
+      "予定",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2605,7 +2742,12 @@ window.BUILTIN_SENTENCES = [
     "chinese": "有使用日语进行实际业务的经验吗？【面试官提问】",
     "words": [
       "日本語",
-      "業務経験"
+      "日本",
+      "業務経験",
+      "業務",
+      "経験",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2629,7 +2771,11 @@ window.BUILTIN_SENTENCES = [
     "kana": "きぼうきんむちは どちらですか。",
     "chinese": "您期望的工作地点是哪里？【面试官提问】",
     "words": [
-      "希望勤務地"
+      "希望勤務地",
+      "希望",
+      "勤務地",
+      "勤務",
+      "どちら"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2643,7 +2789,10 @@ window.BUILTIN_SENTENCES = [
       "東京",
       "以外",
       "勤務可能",
-      "地域"
+      "勤務",
+      "地域",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2655,7 +2804,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "您目前的年薪是多少？【面试官提问】",
     "words": [
       "現在",
-      "年収"
+      "年収",
+      "いくら"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2666,7 +2816,10 @@ window.BUILTIN_SENTENCES = [
     "kana": "きぼうねんしゅうは いくらですか。",
     "chinese": "您期望的年薪是多少？【面试官提问】",
     "words": [
-      "希望年収"
+      "希望年収",
+      "希望",
+      "年収",
+      "いくら"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2678,7 +2831,10 @@ window.BUILTIN_SENTENCES = [
     "chinese": "您的最低底线期望年薪是多少？【面试官提问】",
     "words": [
       "最低",
-      "希望年収"
+      "希望年収",
+      "希望",
+      "年収",
+      "いくら"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2690,7 +2846,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "年薪薪酬方面可以协商吗？【面试官提问】",
     "words": [
       "年収",
-      "相談可能"
+      "相談可能",
+      "相談"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2702,7 +2859,10 @@ window.BUILTIN_SENTENCES = [
     "chinese": "大约什么时期可以入职？【面试官提问】",
     "words": [
       "入社時期",
-      "良い"
+      "入社",
+      "時期",
+      "いつ",
+      "いい"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2713,7 +2873,11 @@ window.BUILTIN_SENTENCES = [
     "kana": "いつから にゅうしゃできますか。",
     "chinese": "最快从什么时候开始能够入职？【面试官提问】",
     "words": [
-      "入社"
+      "いつ",
+      "から",
+      "入社",
+      "できる",
+      "出来る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2739,7 +2903,9 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "他",
       "応募",
-      "企業"
+      "企業",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2752,7 +2918,9 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "現在",
       "進む",
-      "選考"
+      "選考",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2765,7 +2933,11 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "今",
       "時点",
-      "質問"
+      "何か",
+      "何",
+      "質問",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2777,7 +2949,9 @@ window.BUILTIN_SENTENCES = [
     "chinese": "最后您有什么想提问确认的吗？【面试官提问】",
     "words": [
       "最後",
-      "質問"
+      "質問",
+      "ある",
+      "有る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2789,6 +2963,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "因为想提高日语能力，所以每天都在努力学习。",
     "words": [
       "日本語力",
+      "日本語",
+      "日本",
       "高める",
       "毎日",
       "勉強"
@@ -2805,7 +2981,9 @@ window.BUILTIN_SENTENCES = [
       "長期的",
       "日本",
       "働く",
-      "転職活動"
+      "転職活動",
+      "転職",
+      "活動"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2831,7 +3009,9 @@ window.BUILTIN_SENTENCES = [
     "chinese": "有的企业即便只有N3水平也可以应聘。",
     "words": [
       "企業",
-      "応募"
+      "応募",
+      "できる",
+      "出来る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2843,6 +3023,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "不仅是技术层面，我也希望能够提升沟通协作能力。",
     "words": [
       "技術面",
+      "技術",
+      "コミュニケーション",
       "高める"
     ],
     "level": 0,
@@ -2871,6 +3053,8 @@ window.BUILTIN_SENTENCES = [
       "中心",
       "企業",
       "可能性",
+      "ある",
+      "有る",
       "思う"
     ],
     "level": 0,
@@ -2884,7 +3068,8 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "年収",
       "場合",
-      "検討可能"
+      "検討可能",
+      "検討"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2896,6 +3081,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "我会去确认一下是否能够申请应聘。",
     "words": [
       "応募",
+      "できる",
+      "出来る",
       "確認"
     ],
     "level": 0,
@@ -2908,8 +3095,12 @@ window.BUILTIN_SENTENCES = [
     "chinese": "我的日语慢慢变得能够开口交流了。",
     "words": [
       "日本語",
+      "日本",
       "少しずつ",
-      "話す"
+      "少し",
+      "話す",
+      "なる",
+      "成る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2921,7 +3112,9 @@ window.BUILTIN_SENTENCES = [
     "chinese": "我有意识地提醒自己在听清提问后再做回答。",
     "words": [
       "質問",
+      "よく",
       "聞く",
+      "から",
       "答える"
     ],
     "level": 0,
@@ -2948,6 +3141,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "如果进一步提升日语，我认为工作的选择机会会更多。",
     "words": [
       "日本語",
+      "日本",
+      "もっと",
       "勉強",
       "選択肢",
       "増える",
@@ -2963,6 +3158,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "一旦确认无误，我将第一时间联系您。",
     "words": [
       "確認",
+      "できる",
+      "出来る",
       "連絡"
     ],
     "level": 0,
@@ -2976,7 +3173,9 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "東京",
       "第一希望",
-      "理解"
+      "希望",
+      "理解",
+      "いい"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2988,7 +3187,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "也就是说，目前处于待机状态对吧。",
     "words": [
       "現在",
-      "待機中"
+      "待機中",
+      "待機"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -2999,7 +3199,8 @@ window.BUILTIN_SENTENCES = [
     "kana": "かのうせいが ぜろという ことでは ありません。",
     "chinese": "这并不意味着成功的可能性为零。",
     "words": [
-      "可能性"
+      "可能性",
+      "ゼロ"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -3012,8 +3213,12 @@ window.BUILTIN_SENTENCES = [
     "words": [
       "現在",
       "日本語力",
+      "日本語",
+      "日本",
       "考える",
+      "もう少し",
       "少し",
+      "もう",
       "勉強",
       "必要"
     ],
@@ -3026,8 +3231,13 @@ window.BUILTIN_SENTENCES = [
     "kana": "ふろんとえんどを ちゅうしんに、ばっくえんどにも たいおうできます。",
     "chinese": "以前端为核心，同时也能够胜任后端接口开发。",
     "words": [
+      "フロントエンド",
+      "フロント",
       "中心",
-      "対応"
+      "バックエンド",
+      "対応",
+      "できる",
+      "出来る"
     ],
     "level": 0,
     "next_review_date": 1789540373343
@@ -3039,6 +3249,8 @@ window.BUILTIN_SENTENCES = [
     "chinese": "我正以进入日本企业工作为目标开展转职活动。",
     "words": [
       "日本企業",
+      "日本",
+      "企業",
       "転職",
       "目指す"
     ],

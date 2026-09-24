@@ -5649,7 +5649,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_707",
-    "word": "之",
+    "word": "これ",
     "kana": "これ",
     "meaning": "这个（近称指示代词）",
     "level": 0,
@@ -15292,6 +15292,1022 @@ window.BUILTIN_VOCAB = [
     "word": "とのことですが",
     "kana": "とのことですが",
     "meaning": "刚才您提到…… [商务表达]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1913",
+    "word": "日本",
+    "kana": "にほん",
+    "meaning": "日本",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1914",
+    "word": "東京",
+    "kana": "とうきょう",
+    "meaning": "东京",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1915",
+    "word": "京都",
+    "kana": "きょうと",
+    "meaning": "京都",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1916",
+    "word": "大阪",
+    "kana": "おおさか",
+    "meaning": "大阪",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1917",
+    "word": "北京",
+    "kana": "ぺきん",
+    "meaning": "北京",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1918",
+    "word": "富士山",
+    "kana": "ふじさん",
+    "meaning": "富士山",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1919",
+    "word": "旅行",
+    "kana": "りょこう",
+    "meaning": "旅行",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1920",
+    "word": "電話番号",
+    "kana": "でんわばんごう",
+    "meaning": "电话号码",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1921",
+    "word": "背",
+    "kana": "せ",
+    "meaning": "个子、身高；背部",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1922",
+    "word": "ボタン",
+    "kana": "ぼたん",
+    "meaning": "按钮；纽扣",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1923",
+    "word": "お釣り",
+    "kana": "おつり",
+    "meaning": "找零、找回的钱",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1924",
+    "word": "理解",
+    "kana": "りかい",
+    "meaning": "理解、领会",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1925",
+    "word": "企業",
+    "kana": "きぎょう",
+    "meaning": "企业、公司",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1926",
+    "word": "日本企業",
+    "kana": "にほんきぎょう",
+    "meaning": "日资企业、日本企业",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1927",
+    "word": "業務",
+    "kana": "ぎょうむ",
+    "meaning": "业务、工作",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1928",
+    "word": "業務経験",
+    "kana": "ぎょうむけいけん",
+    "meaning": "业务经验",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1929",
+    "word": "正社員",
+    "kana": "せいしゃいん",
+    "meaning": "正式员工、正社员",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1930",
+    "word": "御社",
+    "kana": "おんしゃ",
+    "meaning": "贵公司 (尊称)",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1931",
+    "word": "担当",
+    "kana": "たんとう",
+    "meaning": "负责、担当",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1932",
+    "word": "対応",
+    "kana": "たいおう",
+    "meaning": "应对、对应处理",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1933",
+    "word": "開発",
+    "kana": "かいはつ",
+    "meaning": "开发",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1934",
+    "word": "作成",
+    "kana": "さくせい",
+    "meaning": "制作、编写、作成",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1935",
+    "word": "進学",
+    "kana": "しんがく",
+    "meaning": "升学",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1936",
+    "word": "受験",
+    "kana": "じゅけん",
+    "meaning": "应试、参加考试",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1937",
+    "word": "向上",
+    "kana": "こうじょう",
+    "meaning": "提高、向上",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1938",
+    "word": "活用",
+    "kana": "かつよう",
+    "meaning": "运用、活用",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1939",
+    "word": "生活環境",
+    "kana": "せいかつかんきょう",
+    "meaning": "生活环境",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1940",
+    "word": "子ども",
+    "kana": "こども",
+    "meaning": "孩子、小孩",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1941",
+    "word": "専門学校",
+    "kana": "せんもんがっこう",
+    "meaning": "专门学校",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1942",
+    "word": "自信",
+    "kana": "じしん",
+    "meaning": "自信",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1943",
+    "word": "区役所",
+    "kana": "くやくしょ",
+    "meaning": "区政府、区役所",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1944",
+    "word": "取得",
+    "kana": "しゅとく",
+    "meaning": "取得、获取",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1945",
+    "word": "重視",
+    "kana": "じゅうし",
+    "meaning": "重视",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1946",
+    "word": "都合",
+    "kana": "つごう",
+    "meaning": "情况、方便与否",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1947",
+    "word": "勘違い",
+    "kana": "かんちがい",
+    "meaning": "误解、弄错",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1948",
+    "word": "認識",
+    "kana": "にんしき",
+    "meaning": "认识、理解",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1949",
+    "word": "勤務",
+    "kana": "きんむ",
+    "meaning": "工作、勤务",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1950",
+    "word": "待機",
+    "kana": "たいき",
+    "meaning": "待机、等待项目",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1951",
+    "word": "朝ごはん",
+    "kana": "あさごはん",
+    "meaning": "早饭",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1952",
+    "word": "晩ごはん",
+    "kana": "ばんごはん",
+    "meaning": "晚饭",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1953",
+    "word": "あの方",
+    "kana": "あのかた",
+    "meaning": "那位 (敬称)",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1954",
+    "word": "どなた",
+    "kana": "どなた",
+    "meaning": "哪位、谁 (敬称)",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1955",
+    "word": "だれ",
+    "kana": "だれ",
+    "meaning": "谁",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1956",
+    "word": "いくら",
+    "kana": "いくら",
+    "meaning": "多少钱",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1957",
+    "word": "いま",
+    "kana": "いま",
+    "meaning": "现在",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1958",
+    "word": "できる",
+    "kana": "できる",
+    "meaning": "能、会",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1959",
+    "word": "あげる",
+    "kana": "あげる",
+    "meaning": "给、送给",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1960",
+    "word": "なる",
+    "kana": "なる",
+    "meaning": "成为、变成",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1961",
+    "word": "ある",
+    "kana": "ある",
+    "meaning": "有、在",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1962",
+    "word": "いっしょに",
+    "kana": "いっしょに",
+    "meaning": "一起",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1963",
+    "word": "わたし",
+    "kana": "わたし",
+    "meaning": "我",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1964",
+    "word": "少しずつ",
+    "kana": "すこしずつ",
+    "meaning": "一点一点地、渐渐",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1965",
+    "word": "今まで",
+    "kana": "いままで",
+    "meaning": "到现在为止、迄今",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1966",
+    "word": "ポジション",
+    "kana": "ぽじしょん",
+    "meaning": "职位、岗位",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1967",
+    "word": "最も",
+    "kana": "もっとも",
+    "meaning": "最、顶",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1968",
+    "word": "以外",
+    "kana": "いがい",
+    "meaning": "以外",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1969",
+    "word": "地域",
+    "kana": "ちいき",
+    "meaning": "地域、地区",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1970",
+    "word": "中心",
+    "kana": "ちゅうしん",
+    "meaning": "中心",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1971",
+    "word": "のど",
+    "kana": "のど",
+    "meaning": "喉咙、嗓子",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1972",
+    "word": "寺",
+    "kana": "てら",
+    "meaning": "寺院、寺庙",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1973",
+    "word": "七月",
+    "kana": "しちがつ",
+    "meaning": "七月",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1974",
+    "word": "七時",
+    "kana": "しちじ",
+    "meaning": "七点",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1975",
+    "word": "六時",
+    "kana": "ろくじ",
+    "meaning": "六点",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1976",
+    "word": "十二時",
+    "kana": "じゅうにじ",
+    "meaning": "十二点",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1977",
+    "word": "あちら",
+    "kana": "あちら",
+    "meaning": "那边、那一位 (敬称)",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1978",
+    "word": "そちら",
+    "kana": "そちら",
+    "meaning": "那边、那一位 (中称敬称)",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1979",
+    "word": "どちら",
+    "kana": "どちら",
+    "meaning": "哪边、哪位 (敬称)",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1980",
+    "word": "どこ",
+    "kana": "どこ",
+    "meaning": "哪里、何处",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1981",
+    "word": "あそこ",
+    "kana": "あそこ",
+    "meaning": "那里 (远称)",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1982",
+    "word": "まで",
+    "kana": "まで",
+    "meaning": "到……为止",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1983",
+    "word": "うち",
+    "kana": "うち",
+    "meaning": "家、家里",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1984",
+    "word": "だんだん",
+    "kana": "だんだん",
+    "meaning": "逐渐、渐渐",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1985",
+    "word": "本日",
+    "kana": "ほんじつ",
+    "meaning": "今天，今日 [礼貌语]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1986",
+    "word": "よろしく",
+    "kana": "よろしく",
+    "meaning": "请多关照，妥善",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1987",
+    "word": "お願い",
+    "kana": "おねがい",
+    "meaning": "拜托，请求",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1988",
+    "word": "もう一度",
+    "kana": "もういちど",
+    "meaning": "再一次，重来一次",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1989",
+    "word": "約",
+    "kana": "やく",
+    "meaning": "大约，大概",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1990",
+    "word": "踏まえる",
+    "kana": "ふまえる",
+    "meaning": "立足于，基于，结合 [IT面试]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1991",
+    "word": "勤務可能",
+    "kana": "きんむかのう",
+    "meaning": "能够出勤，可工作 [求职]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1992",
+    "word": "検討可能",
+    "kana": "けんとうかのう",
+    "meaning": "可商量考虑，可探讨 [求职/商务]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1993",
+    "word": "検討",
+    "kana": "けんとう",
+    "meaning": "探讨，研究，考虑",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1994",
+    "word": "フロントエンド",
+    "kana": "ふろんとえんど",
+    "meaning": "前端开发 [IT技术]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1995",
+    "word": "バックエンド",
+    "kana": "ばっくえんど",
+    "meaning": "后端开发 [IT技术]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1996",
+    "word": "両方",
+    "kana": "りょうほう",
+    "meaning": "双方，两方面",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1997",
+    "word": "スキル",
+    "kana": "すきる",
+    "meaning": "技能，技术能力 [IT/职场]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1998",
+    "word": "感じる",
+    "kana": "かんじる",
+    "meaning": "感到，觉得",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_1999",
+    "word": "生成AI",
+    "kana": "せいせいえーあい",
+    "meaning": "生成式AI [IT前沿]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2000",
+    "word": "終了",
+    "kana": "しゅうりょう",
+    "meaning": "结束，完结",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2001",
+    "word": "生かす",
+    "kana": "いかす",
+    "meaning": "发挥，善用",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2002",
+    "word": "勘違い",
+    "kana": "かんちがい",
+    "meaning": "误解，看错",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2003",
+    "word": "面談",
+    "kana": "めんだん",
+    "meaning": "面谈，面接沟通 [求职]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2004",
+    "word": "最短",
+    "kana": "さいたん",
+    "meaning": "最短",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2005",
+    "word": "取り入れる",
+    "kana": "とりいれる",
+    "meaning": "采用，引进，吸收",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2006",
+    "word": "戻す",
+    "kana": "もどす",
+    "meaning": "放回，还回",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2007",
+    "word": "無理",
+    "kana": "むり",
+    "meaning": "勉强，行不通",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2008",
+    "word": "とおり",
+    "kana": "とおり",
+    "meaning": "照着，按着",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2009",
+    "word": "噛む",
+    "kana": "かむ",
+    "meaning": "咬",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2010",
+    "word": "建てる",
+    "kana": "たてる",
+    "meaning": "建造",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2011",
+    "word": "気分",
+    "kana": "きぶん",
+    "meaning": "情绪，身体感受",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2012",
+    "word": "皆様",
+    "kana": "みなさま",
+    "meaning": "各位，大家 [礼貌敬语]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2013",
+    "word": "申し上げる",
+    "kana": "もうしあげる",
+    "meaning": "致以，说 [敬语/自谦]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2014",
+    "word": "長期的",
+    "kana": "ちょうきてき",
+    "meaning": "长期的，稳定长久的 [IT求职]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2015",
+    "word": "これまで",
+    "kana": "これまで",
+    "meaning": "至今为止，以往 [求职]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2016",
+    "word": "コミュニケーション",
+    "kana": "こみゅにけーしょん",
+    "meaning": "沟通，交流 [职场技能]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2017",
+    "word": "中国",
+    "kana": "ちゅうごく",
+    "meaning": "中国",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2018",
+    "word": "主",
+    "kana": "おも",
+    "meaning": "主要",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2019",
+    "word": "得意",
+    "kana": "とくい",
+    "meaning": "擅长，拿手",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2020",
+    "word": "特に",
+    "kana": "とくに",
+    "meaning": "特别，尤其",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2021",
+    "word": "将来的",
+    "kana": "しょうらいてき",
+    "meaning": "将来的，从长远来看 [职场规划]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2022",
+    "word": "仕事内容",
+    "kana": "しごとないよう",
+    "meaning": "工作职责与具体内容 [求职]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2023",
+    "word": "成長",
+    "kana": "せいちょう",
+    "meaning": "成长，发展 [职场]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2024",
+    "word": "相談可能",
+    "kana": "そうだんかのう",
+    "meaning": "可协商沟通 [求职条件]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2025",
+    "word": "時期",
+    "kana": "じき",
+    "meaning": "时期，时间节点",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2026",
+    "word": "合わせる",
+    "kana": "あわせる",
+    "meaning": "配合，对齐",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2027",
+    "word": "今回",
+    "kana": "こんかい",
+    "meaning": "这次，本次",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2028",
+    "word": "本格的",
+    "kana": "ほんかくてき",
+    "meaning": "正式的，真正全面的",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2029",
+    "word": "最初",
+    "kana": "さいしょ",
+    "meaning": "最初，开始",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2030",
+    "word": "メール",
+    "kana": "めーる",
+    "meaning": "电子邮件",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2031",
+    "word": "確認",
+    "kana": "かくにん",
+    "meaning": "确认，核实",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2032",
+    "word": "通り",
+    "kana": "とおり",
+    "meaning": "正如...一样",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2033",
+    "word": "他",
+    "kana": "ほか",
+    "meaning": "其他，别的",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2034",
+    "word": "進む",
+    "kana": "すすむ",
+    "meaning": "推进，进展",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2035",
+    "word": "時点",
+    "kana": "じてん",
+    "meaning": "时间点，阶段",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2036",
+    "word": "最後",
+    "kana": "さいご",
+    "meaning": "最后",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2037",
+    "word": "派遣",
+    "kana": "はけん",
+    "meaning": "派遣 [工作形态]",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2038",
+    "word": "場合",
+    "kana": "ばあい",
+    "meaning": "情况，场合",
+    "level": 0,
+    "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2039",
+    "word": "ゼロ",
+    "kana": "ぜろ",
+    "meaning": "零，从零开始",
     "level": 0,
     "next_review_date": 1789540373343
   }
