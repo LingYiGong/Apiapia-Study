@@ -56,6 +56,7 @@ const HANZI_DATA = [
     {char: "空", hint: "天空的空", category: "自然天气"},
     {char: "明", hint: "明天的明", category: "自然天气"},
     {char: "今", hint: "今天的今", category: "自然天气"},
+    {char: "岛", hint: "小岛的岛", category: "自然天气"},
 
     {char: "牛", hint: "小牛的牛", category: "动物植物"},
     {char: "马", hint: "白马的马", category: "动物植物"},
@@ -72,6 +73,11 @@ const HANZI_DATA = [
     {char: "禾", hint: "禾苗的禾", category: "动物植物"},
     {char: "竹", hint: "竹子的竹", category: "动物植物"},
     {char: "尾", hint: "尾巴的尾", category: "动物植物"},
+    {char: "苗", hint: "禾苗的苗", category: "动物植物"},
+    {char: "叶", hint: "树叶的叶", category: "动物植物"},
+    {char: "林", hint: "树林的林", category: "动物植物"},
+    {char: "森", hint: "森林的森", category: "动物植物"},
+    {char: "草", hint: "小草的草", category: "动物植物"},
 
     {char: "男", hint: "男生的男", category: "人物身体"},
     {char: "女", hint: "女生的女", category: "人物身体"},
@@ -88,8 +94,8 @@ const HANZI_DATA = [
     {char: "儿", hint: "儿女的儿", category: "人物身体"},
     {char: "发", hint: "头发的发", category: "人物身体"},
     {char: "衣", hint: "衣服的衣", category: "人物身体"},
-    {char: "他", hint: "他们的他", category: "人物身体"},
-    {char: "她", hint: "她们的她", category: "人物身体"},
+    {char: "他", hint: "男生的他", category: "人物身体"},
+    {char: "她", hint: "女生的她", category: "人物身体"},
     {char: "你", hint: "你们的你", category: "人物身体"},
     {char: "毛", hint: "毛发的毛", category: "人物身体"},
     {char: "朋", hint: "朋友的朋", category: "人物身体"},
@@ -116,6 +122,7 @@ const HANZI_DATA = [
     {char: "车", hint: "汽车的车", category: "物品动作"},
     {char: "门", hint: "大门的门", category: "物品动作"},
     {char: "开", hint: "开门的开", category: "物品动作"},
+    {char: "关", hint: "关门的关", category: "物品动作"},
     {char: "打", hint: "打球的打", category: "物品动作"},
     {char: "飞", hint: "飞机的飞", category: "物品动作"},
     {char: "问", hint: "问题的问", category: "物品动作"},
@@ -183,7 +190,7 @@ const HANZI_DATA = [
     {char: "黑", hint: "黑色的黑", category: "常用字"},
     {char: "色", hint: "颜色的色", category: "常用字"},
     {char: "香", hint: "香味的香", category: "常用字"},
-    {char: "它", hint: "它们的它", category: "常用字"},
+    {char: "它", hint: "动物的它", category: "常用字"},
     {char: "兴", hint: "高兴的兴", category: "常用字"},
     {char: "呀", hint: "好呀的呀", category: "常用字"},
     {char: "吗", hint: "好吗的吗", category: "常用字"},
@@ -191,7 +198,12 @@ const HANZI_DATA = [
     {char: "很", hint: "很好的很", category: "常用字"},
     {char: "太", hint: "太好了的太", category: "常用字"},
     {char: "宝", hint: "宝贝的宝", category: "常用字"},
-    {char: "贝", hint: "宝贝的贝", category: "常用字"}
+    {char: "贝", hint: "宝贝的贝", category: "常用字"},
+    {char: "和", hint: "和平的和", category: "常用字"},
+    {char: "公", hint: "公园的公", category: "常用字"},
+    {char: "园", hint: "公园的园", category: "常用字"},
+    {char: "生", hint: "生日的生", category: "常用字"},
+    {char: "先", hint: "先后的先", category: "常用字"}
 ];
 
 // 采用当前字词提示中的常用读音。多音字按本练习中的用法标注。
@@ -222,7 +234,8 @@ const PINYIN_MAP = {
     "明": "míng", "走": "zǒu", "兴": "xìng", "空": "kōng", "两": "liǎng", "哭": "kū", "牙": "yá",
     "肚": "dù", "尾": "wěi", "你": "nǐ", "脸": "liǎn", "黑": "hēi", "呀": "ya", "七": "qī",
     "八": "bā", "九": "jiǔ", "十": "shí", "吗": "ma", "又": "yòu", "很": "hěn", "太": "tài",
-    "宝": "bǎo", "贝": "bèi"
+    "宝": "bǎo", "贝": "bèi", "和": "hé", "关": "guān", "园": "yuán", "生": "shēng", "公": "gōng",
+    "苗": "miáo", "叶": "yè", "林": "lín", "草": "cǎo", "先": "xiān", "岛": "dǎo", "森": "sēn"
 };
 
 // 完整连贯故事《小宝贝丁丁的美好一天》，严格仅使用全部已学汉字（100%全字覆盖）。
