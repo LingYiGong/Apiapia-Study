@@ -34,6 +34,9 @@ const state = {
     answerStrokeRenderToken: 0,
     currentStory: "",
     storyIndex: 0,
+    showStoryPinyin: false,
+    storySpeakingCharIndex: -1,
+    storyCharHighlightTimer: null,
     strokeSession: [],
     strokeIndex: 0,
     strokeWriter: null,
@@ -1756,6 +1759,9 @@ function finishSession() {
 }
 
 function showScreen(name) {
+    if (typeof clearStoryCharHighlights === "function") {
+        clearStoryCharHighlights();
+    }
     els.setupScreen?.classList.toggle("hidden", name !== "setup");
     els.dictationScreen?.classList.toggle("hidden", name !== "dictation");
     els.recognitionScreen?.classList.toggle("hidden", name !== "recognition");
@@ -1970,6 +1976,57 @@ async function quitStrokePractice() {
     showScreen("setup");
 }
 
+function clearStoryCharHighlights() {
+    if (state.storyCharHighlightTimer) {
+        clearTimeout(state.storyCharHighlightTimer);
+        state.storyCharHighlightTimer = null;
+    }
+    state.storySpeakingCharIndex = -1;
+    if (els.storyText) {
+        els.storyText.querySelectorAll(".story-ruby.story-char-speaking, .story-char.story-char-speaking").forEach(el => {
+            el.classList.remove("story-char-speaking");
+        });
+    }
+}
+
+function speakStoryCharacter(char, index) {
+    if (!char || !("speechSynthesis" in window)) return;
+    const isHanzi = /[\u4e00-\u9fa5]/.test(char) || Boolean(PINYIN_MAP[char]);
+    if (!isHanzi) return;
+
+    window.speechSynthesis.cancel();
+    clearStoryCharHighlights();
+
+    if (typeof index === "number" && index >= 0) {
+        state.storySpeakingCharIndex = index;
+        const rubyEl = els.storyText?.querySelector(`.story-ruby[data-index="${index}"]`);
+        if (rubyEl) rubyEl.classList.add("story-char-speaking");
+    }
+
+    const utterance = new SpeechSynthesisUtterance(char);
+    utterance.lang = "zh-CN";
+    utterance.rate = Number(els.speechRate?.value) || 0.78;
+    utterance.pitch = 1.02;
+    utterance.volume = 1;
+
+    const voice = getChineseVoice();
+    if (voice) utterance.voice = voice;
+
+    utterance.onend = () => {
+        clearStoryCharHighlights();
+    };
+    utterance.onerror = event => {
+        console.warn("汉字读音播放失败：", event.error);
+        clearStoryCharHighlights();
+    };
+
+    state.storyCharHighlightTimer = setTimeout(() => {
+        clearStoryCharHighlights();
+    }, 1200);
+
+    window.speechSynthesis.speak(utterance);
+}
+
 function renderStoryParagraph(index) {
     if (typeof STORY_SENTENCES === "undefined" || !Array.isArray(STORY_SENTENCES) || STORY_SENTENCES.length === 0) {
         return;
@@ -1982,15 +2039,52 @@ function renderStoryParagraph(index) {
     } catch (_) {}
 
     window.speechSynthesis?.cancel?.();
+    clearStoryCharHighlights();
     state.currentStory = STORY_SENTENCES[index];
-    if (els.storyText) els.storyText.textContent = state.currentStory;
+    if (els.storyText) {
+        els.storyText.innerHTML = "";
+        els.storyText.classList.toggle("show-pinyin", Boolean(state.showStoryPinyin));
+        const chars = Array.from(state.currentStory);
+        chars.forEach((char, idx) => {
+            const isHanzi = /[\u4e00-\u9fa5]/.test(char) || Boolean(PINYIN_MAP[char]);
+            if (isHanzi) {
+                const ruby = document.createElement("ruby");
+                ruby.className = "story-ruby";
+                ruby.dataset.index = String(idx);
+                ruby.dataset.char = char;
+                ruby.setAttribute("role", "button");
+                ruby.setAttribute("tabindex", "0");
+
+                const span = document.createElement("span");
+                span.className = "story-char";
+                span.textContent = char;
+                ruby.appendChild(span);
+
+                const pinyin = PINYIN_MAP[char] || "";
+                const rt = document.createElement("rt");
+                rt.className = "story-rt";
+                rt.textContent = pinyin;
+                ruby.appendChild(rt);
+
+                ruby.title = pinyin ? `${char} [${pinyin}] 点击发音` : `${char} 点击发音`;
+                els.storyText.appendChild(ruby);
+            } else {
+                const punct = document.createElement("span");
+                punct.className = "story-punct";
+                punct.textContent = char;
+                els.storyText.appendChild(punct);
+            }
+        });
+    }
+
     if (els.storyPinyin) {
-        els.storyPinyin.textContent = Array.from(state.currentStory)
-            .map(char => PINYIN_MAP[char] || char)
-            .join(" ");
+        els.storyPinyin.innerHTML = "";
         els.storyPinyin.classList.add("hidden");
     }
-    if (els.storyPinyinBtn) els.storyPinyinBtn.textContent = "显示拼音";
+
+    if (els.storyPinyinBtn) {
+        els.storyPinyinBtn.textContent = state.showStoryPinyin ? "隐藏拼音" : "显示拼音";
+    }
 
     if (els.storyCurrentNumber) els.storyCurrentNumber.textContent = index + 1;
     if (els.storyTotalNumber) els.storyTotalNumber.textContent = STORY_SENTENCES.length;
@@ -2034,9 +2128,11 @@ function startStory() {
 }
 
 function toggleStoryPinyin() {
-    const willShow = els.storyPinyin.classList.contains("hidden");
-    els.storyPinyin.classList.toggle("hidden", !willShow);
-    els.storyPinyinBtn.textContent = willShow ? "隐藏拼音" : "显示拼音";
+    state.showStoryPinyin = !state.showStoryPinyin;
+    els.storyText?.classList.toggle("show-pinyin", state.showStoryPinyin);
+    if (els.storyPinyinBtn) {
+        els.storyPinyinBtn.textContent = state.showStoryPinyin ? "隐藏拼音" : "显示拼音";
+    }
 }
 
 function speakStory() {
@@ -2046,12 +2142,19 @@ function speakStory() {
     }
 
     window.speechSynthesis.cancel();
+    clearStoryCharHighlights();
     const utterance = new SpeechSynthesisUtterance(state.currentStory);
     utterance.lang = "zh-CN";
     utterance.rate = Number(els.speechRate.value) || 0.78;
     utterance.pitch = 1.02;
     const voice = getChineseVoice();
     if (voice) utterance.voice = voice;
+    utterance.onend = () => {
+        clearStoryCharHighlights();
+    };
+    utterance.onerror = () => {
+        clearStoryCharHighlights();
+    };
     window.speechSynthesis.speak(utterance);
 }
 
@@ -2182,7 +2285,28 @@ els.storyPrevBtn?.addEventListener("click", prevStoryParagraph);
 els.storyNextBtn?.addEventListener("click", nextStoryParagraph);
 els.quitStoryBtn.addEventListener("click", () => {
     window.speechSynthesis?.cancel?.();
+    clearStoryCharHighlights();
     showScreen("setup");
+});
+
+els.storyText?.addEventListener("click", event => {
+    const rubyEl = event.target.closest(".story-ruby");
+    if (!rubyEl) return;
+    const char = rubyEl.dataset.char;
+    const idx = parseInt(rubyEl.dataset.index, 10);
+    speakStoryCharacter(char, idx);
+});
+
+els.storyText?.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+        const rubyEl = event.target.closest(".story-ruby");
+        if (rubyEl) {
+            event.preventDefault();
+            const char = rubyEl.dataset.char;
+            const idx = parseInt(rubyEl.dataset.index, 10);
+            speakStoryCharacter(char, idx);
+        }
+    }
 });
 els.previousStrokeBtn.addEventListener("click", showPreviousStrokeCharacter);
 els.nextStrokeBtn.addEventListener("click", showNextStrokeCharacter);
