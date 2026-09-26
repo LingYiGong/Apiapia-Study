@@ -560,52 +560,177 @@ html.dark .text-gray-400 {
     color: #94a3b8 !important;
 }
 
-/* 5. 欢迎横幅与特殊彩条夜间护眼适配 */
-html.dark .text-amber-950 {
-    color: #fef3c7 !important;
+html.dark .text-slate-300 {
+    color: #64748b !important;
 }
 
+/* 4.1 彩色高对比夜间文字适配 (彻底解决白天清晰、夜间暗沉低对比问题) */
+html.dark .text-emerald-600,
+html.dark .text-emerald-700,
+html.dark .text-emerald-800,
+html.dark .text-emerald-900,
+html.dark .text-green-600,
+html.dark .text-green-700,
+html.dark .text-green-800 {
+    color: #6ee7b7 !important; /* 清新薄荷绿，深色背景下一目了然 */
+}
+
+html.dark .text-rose-600,
+html.dark .text-rose-700,
+html.dark .text-rose-800,
+html.dark .text-rose-900,
+html.dark .text-red-600,
+html.dark .text-red-700,
+html.dark .text-red-800 {
+    color: #fca5a5 !important; /* 柔和浅玫瑰红，告别暗红色盲区 */
+}
+
+html.dark .text-amber-600,
+html.dark .text-amber-700,
+html.dark .text-amber-800,
 html.dark .text-amber-900,
-html.dark .text-amber-900\/80 {
-    color: #fde68a !important;
+html.dark .text-amber-900\/80,
+html.dark .text-amber-950,
+html.dark .text-yellow-600,
+html.dark .text-yellow-700,
+html.dark .text-yellow-800 {
+    color: #fde68a !important; /* 明净暖金黄，假名与待复习高亮清晰 */
 }
 
+html.dark .text-indigo-600,
+html.dark .text-indigo-700,
+html.dark .text-indigo-800,
+html.dark .text-indigo-900,
+html.dark .text-indigo-950,
+html.dark .text-blue-600,
+html.dark .text-blue-700,
+html.dark .text-blue-800 {
+    color: #a5b4fc !important; /* 护眼淡紫靛蓝，柔和高对比 */
+}
+
+html.dark .text-purple-600,
+html.dark .text-purple-700,
+html.dark .text-purple-800,
+html.dark .text-purple-900 {
+    color: #d8b4fe !important; /* 浅紫罗兰色 */
+}
+
+html.dark .text-cyan-600,
+html.dark .text-cyan-700,
+html.dark .text-sky-600,
+html.dark .text-sky-700 {
+    color: #7dd3fc !important; /* 天空青蓝 */
+}
+
+/* 5. 欢迎横幅与特殊渐变卡片夜间护眼适配 */
 html.dark .bg-gradient-to-r.from-amber-100\/90,
 html.dark .from-amber-100\/90 {
     background: linear-gradient(135deg, rgba(120, 53, 15, 0.45) 0%, rgba(67, 20, 7, 0.45) 100%) !important;
     border-color: rgba(245, 158, 11, 0.35) !important;
 }
 
-/* 6. 彩色指示徽章与小胶囊夜间深色半透调和 */
-html.dark .bg-indigo-50 {
-    background-color: rgba(49, 46, 129, 0.5) !important;
-    color: #c7d2fe !important;
-    border-color: rgba(99, 102, 241, 0.4) !important;
+html.dark .from-indigo-50,
+html.dark .from-indigo-50\/80,
+html.dark .from-indigo-50\/90,
+html.dark .from-indigo-50\/95,
+html.dark .from-indigo-50\/50 {
+    --tw-gradient-from: rgba(49, 46, 129, 0.45) !important;
 }
-html.dark .text-indigo-600,
-html.dark .text-indigo-700 {
-    color: #a5b4fc !important;
+
+html.dark .to-indigo-100\/80,
+html.dark .to-purple-50\/60,
+html.dark .to-purple-50\/90 {
+    --tw-gradient-to: rgba(88, 28, 135, 0.45) !important;
 }
-html.dark .border-indigo-100,
-html.dark .border-indigo-200 {
+
+/* 6. 彩色指示徽章、提示框与小胶囊夜间深色半透调和 */
+html.dark .bg-indigo-50,
+html.dark .bg-indigo-50\/50,
+html.dark .bg-indigo-50\/60,
+html.dark .bg-indigo-50\/70,
+html.dark .bg-indigo-50\/80,
+html.dark .bg-indigo-50\/90,
+html.dark .bg-indigo-50\/95,
+html.dark .bg-indigo-100,
+html.dark .bg-indigo-100\/80 {
+    background-color: rgba(49, 46, 129, 0.45) !important;
     border-color: rgba(99, 102, 241, 0.35) !important;
 }
 
-html.dark .bg-emerald-100 {
-    background-color: rgba(6, 78, 59, 0.55) !important;
-    color: #a7f3d0 !important;
+html.dark .bg-emerald-50,
+html.dark .bg-emerald-50\/80,
+html.dark .bg-emerald-50\/90,
+html.dark .bg-emerald-100,
+html.dark .bg-emerald-200\/90 {
+    background-color: rgba(6, 78, 59, 0.45) !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
 }
 
+html.dark .bg-rose-50,
+html.dark .bg-rose-50\/80,
+html.dark .bg-rose-50\/90,
 html.dark .bg-rose-100 {
-    background-color: rgba(136, 19, 55, 0.55) !important;
-    color: #fecdd3 !important;
+    background-color: rgba(136, 19, 55, 0.45) !important;
+    border-color: rgba(244, 63, 94, 0.35) !important;
 }
 
-html.dark .bg-amber-100 {
-    background-color: rgba(120, 53, 15, 0.55) !important;
-    color: #fde68a !important;
-    border-color: rgba(245, 158, 11, 0.4) !important;
+html.dark .bg-amber-50,
+html.dark .bg-amber-50\/80,
+html.dark .bg-amber-50\/90,
+html.dark .bg-amber-100,
+html.dark .bg-orange-50 {
+    background-color: rgba(120, 53, 15, 0.45) !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
 }
+
+html.dark .bg-purple-50,
+html.dark .bg-purple-100 {
+    background-color: rgba(88, 28, 135, 0.45) !important;
+    border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+html.dark .bg-cyan-50,
+html.dark .bg-cyan-100 {
+    background-color: rgba(12, 74, 110, 0.45) !important;
+    border-color: rgba(14, 165, 233, 0.35) !important;
+}
+
+html.dark .bg-slate-200\/80,
+html.dark .bg-slate-300\/80 {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+html.dark .bg-slate-100\/90 {
+    background-color: rgba(30, 41, 59, 0.9) !important;
+    border-color: #334155 !important;
+}
+
+/* 6.1 带有透明度修饰符的彩色边框夜间适配 */
+html.dark .border-amber-200\/80,
+html.dark .border-amber-200 {
+    border-color: rgba(245, 158, 11, 0.35) !important;
+}
+html.dark .border-emerald-200\/80,
+html.dark .border-emerald-200,
+html.dark .border-emerald-100 {
+    border-color: rgba(16, 185, 129, 0.35) !important;
+}
+html.dark .border-rose-200\/80,
+html.dark .border-rose-200,
+html.dark .border-rose-100 {
+    border-color: rgba(244, 63, 94, 0.35) !important;
+}
+html.dark .border-indigo-200\/80,
+html.dark .border-indigo-100\/80,
+html.dark .border-indigo-200,
+html.dark .border-indigo-100 {
+    border-color: rgba(99, 102, 241, 0.35) !important;
+}
+html.dark .border-slate-200\/80 {
+    border-color: #334155 !important;
+}
+
 
 /* 7. 表单、输入框与下拉选择框 */
 html.dark input,
@@ -736,4 +861,161 @@ html.dark .van-toast {
 .theme-toggle-btn:active {
     transform: scale(0.92) !important;
 }
+
+/* 14. 页面底部导航栏 (app-bottom-nav) 与浮层夜间护眼适配 */
+html.dark .app-bottom-nav,
+html.dark nav.app-bottom-nav,
+html.dark .bg-white\/95,
+html.dark .bg-white\/90 {
+    background-color: rgba(30, 41, 59, 0.95) !important;
+    border-color: #334155 !important;
+    border-top-color: #334155 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.45) !important;
+}
+
+html.dark .app-bottom-nav {
+    border-top: 2px solid #334155 !important;
+}
+
+/* 导航栏未激活文字与图标颜色 */
+html.dark .app-bottom-nav button {
+    color: #94a3b8;
+}
+
+html.dark .app-bottom-nav button .text-slate-400,
+html.dark .app-bottom-nav .text-slate-400 {
+    color: #94a3b8 !important;
+}
+
+html.dark .app-bottom-nav button:hover,
+html.dark .app-bottom-nav button:hover .text-slate-400,
+html.dark .app-bottom-nav .hover\:text-slate-600:hover {
+    color: #f1f5f9 !important;
+}
+
+/* 导航栏激活状态高亮 (护眼 Indigo-400 浅蓝紫) */
+html.dark .app-bottom-nav button.text-indigo-600,
+html.dark .app-bottom-nav .text-indigo-600 {
+    color: #818cf8 !important;
+}
+
+/* 底部激活下划指示条 */
+html.dark .app-bottom-nav .nav-indicator.bg-indigo-600,
+html.dark .app-bottom-nav span.bg-indigo-600 {
+    background-color: #818cf8 !important;
+    box-shadow: 0 0 8px rgba(129, 140, 248, 0.6) !important;
+}
+
+/* 英文词卡翻转卡片夜间适配 */
+html.dark .card-front {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+html.dark .card-back {
+    background: linear-gradient(180deg, rgba(49, 46, 129, 0.35) 0%, #1e293b 50%, #1e293b 100%) !important;
+    border-color: #4338ca !important;
+}
+
+/* Vant Tabbar 夜间全局适配 */
+html.dark .van-tabbar {
+    background-color: rgba(30, 41, 59, 0.95) !important;
+    border-top-color: #334155 !important;
+}
+html.dark .van-tabbar-item {
+    background-color: transparent !important;
+    color: #94a3b8 !important;
+}
+html.dark .van-tabbar-item--active {
+    color: #818cf8 !important;
+}
+
+/* Vant 搜索栏、输入与分页夜间深度适配 */
+html.dark .van-search {
+    background: transparent !important;
+}
+html.dark .van-search__content {
+    background-color: #0f172a !important;
+    border: 1px solid #334155 !important;
+}
+html.dark .van-search .van-field__control {
+    color: #f8fafc !important;
+}
+html.dark .van-search .van-icon {
+    color: #94a3b8 !important;
+}
+
+html.dark .van-cell-group--inset {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+html.dark .van-cell {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+}
+html.dark .van-cell::after {
+    border-bottom-color: #334155 !important;
+}
+html.dark .van-cell__title,
+html.dark .van-cell__value,
+html.dark .van-field__label {
+    color: #cbd5e1 !important;
+}
+html.dark .van-field__control {
+    color: #f8fafc !important;
+}
+html.dark .van-field__control::placeholder {
+    color: #64748b !important;
+}
+
+html.dark .van-pagination {
+    color: #f8fafc !important;
+}
+html.dark .van-pagination__item {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+}
+html.dark .van-pagination__item--disabled {
+    background-color: #0f172a !important;
+    color: #64748b !important;
+    opacity: 0.6;
+}
+html.dark .van-pagination__page-desc {
+    color: #cbd5e1 !important;
+}
+
+html.dark .van-switch:not(.van-switch--on) {
+    background: #334155 !important;
+}
+html.dark .van-radio__label {
+    color: #f8fafc !important;
+}
+
+/* 弹窗中的暗色确认/关闭按钮适配 (避免融入背景) */
+html.dark #confirmSyncBtn {
+    background-color: #334155 !important;
+    color: #f8fafc !important;
+    border: 1px solid #475569 !important;
+}
+html.dark #confirmSyncBtn:hover {
+    background-color: #475569 !important;
+}
+
+/* 15. 全局夜间模式自定义细腻滚动条 (告别亮白原生滚动条刺眼) */
+html.dark ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+html.dark ::-webkit-scrollbar-track {
+    background: transparent;
+}
+html.dark ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 9999px;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
 
