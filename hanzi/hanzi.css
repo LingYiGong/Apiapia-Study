@@ -393,3 +393,92 @@
     font-weight: 700;
     font-family: "Quicksand", -apple-system, sans-serif;
 }
+
+/* ================== 汉字模块夜间护眼模式专属深度适配 ================== */
+html.dark .choice-option {
+    background: #1e293b;
+    border-color: #334155;
+    border-bottom-color: #475569;
+    color: #f8fafc;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+html.dark .choice-option:hover:not(:disabled) {
+    background: #312e81;
+    border-color: #6366f1;
+    border-bottom-color: #4f46e5;
+}
+
+html.dark .choice-option:active:not(:disabled) {
+    background: #3730a3 !important;
+    border-color: #818cf8 !important;
+}
+
+html.dark .choice-option.wrong-choice {
+    background: #4c0519;
+    border-color: #f43f5e;
+    color: #fecdd3;
+}
+
+html.dark .choice-option.correct-choice {
+    background: #064e3b;
+    border-color: #10b981;
+    color: #a7f3d0;
+}
+
+html.dark .story-paper {
+    background: linear-gradient(135deg, rgba(120, 53, 15, 0.25) 0%, rgba(30, 41, 59, 0.95) 100%);
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+html.dark .story-text {
+    color: #fde68a;
+}
+
+html.dark .story-pinyin {
+    color: #a5b4fc;
+}
+
+html.dark .comparison-box,
+html.dark .written-preview,
+html.dark .result-standard {
+    background: #131d2e;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+html.dark .wrong-item,
+html.dark .result-chip {
+    background: #1e293b;
+    border-color: #475569;
+    color: #f8fafc;
+}
+
+html.dark .result-chip.correct {
+    background: #064e3b;
+    border-color: #059669;
+    color: #6ee7b7;
+}
+
+html.dark .result-chip.wrong {
+    background: #4c0519;
+    border-color: #e11d48;
+    color: #fca5a5;
+}
+
+html.dark .dictation-result {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+html.dark .dictation-result.correct {
+    border-color: #059669;
+    background: rgba(6, 78, 59, 0.25);
+}
+
+html.dark .dictation-result.wrong {
+    border-color: #e11d48;
+    background: rgba(76, 5, 25, 0.25);
+}
+

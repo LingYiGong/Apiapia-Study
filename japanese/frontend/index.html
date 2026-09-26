@@ -16,7 +16,7 @@
     <link rel="manifest" href="../../manifest.json" />
 
     <!-- 全局夜间/护眼模式核心管理 (首屏加载杜绝闪烁) -->
-    <script src="../../js/theme.js?v=2.2.1"></script>
+    <script src="../../js/theme.js?v=2.2.2"></script>
 
     <!-- 本地引入 Vant 4 样式、Tailwind CSS 与 Vue 3 -->
     <link rel="stylesheet" href="../../libs/vant.min.css" />
@@ -30,7 +30,7 @@
     <script src="kana_data.js?v=2.0.6"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 -->
-    <link rel="stylesheet" href="../../css/style.css?v=2.2.1" />
+    <link rel="stylesheet" href="../../css/style.css?v=2.2.2" />
     <!-- 日语模块专属手写板样式 -->
     <link rel="stylesheet" href="style.css?v=2.0.3" />
 
@@ -1299,7 +1299,7 @@
                         <h2 class="text-2xl font-black text-slate-800">🎉 本轮假名听写大通关！</h2>
 
                         <!-- 得分环 (与 @hanzi 完全一致) -->
-                        <div class="score-ring" :style="{ background: 'conic-gradient(#4f46e5 ' + kanaAccuracyRate + '%, #e2e8f0 0)' }">
+                        <div class="score-ring" :style="{ background: 'conic-gradient(#4f46e5 ' + kanaAccuracyRate + '%, var(--ring-empty, #e2e8f0) 0)' }">
                             <div class="score-ring-content">
                                 <strong>{{ kanaAccuracyRate }}%</strong>
                                 <span>正确率</span>

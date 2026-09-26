@@ -24,6 +24,7 @@
     --text-muted: #64748b;
     --border: #e2e8f0;
     --surface: #f1f5f9;
+    --ring-empty: #e2e8f0;
 
     /* Vant 4 统一覆盖，符合儿童圆润大触控风格 */
     --van-primary-color: #4f46e5;
@@ -42,6 +43,7 @@ html.dark, :root.dark {
     --text-muted: #94a3b8;
     --border: #334155;
     --surface: #1e293b;
+    --ring-empty: #334155;
 
     /* Vant 4 夜间模式变量 */
     --van-text-color: #f8fafc;
@@ -503,7 +505,34 @@ html.dark iframe {
 }
 
 /* 2. 背景色调夜间自动反色映射 */
-html.dark .bg-\[\#f8fafc\] {
+html.dark .bg-\[\#f8fafc\],
+html.dark .bg-\[\#f8fafc\]\/95,
+html.dark .bg-\[\#f8fafc\]\/90,
+html.dark .bg-\[\#f8fafc\]\/80 {
+    background-color: #0f172a !important;
+}
+
+html.dark .spa-loading-overlay {
+    background-color: rgba(15, 23, 42, 0.96) !important;
+}
+html.dark .spa-loading-icon-box {
+    background-color: rgba(49, 46, 129, 0.45) !important;
+    border-color: rgba(99, 102, 241, 0.35) !important;
+}
+html.dark .spa-loading-title {
+    color: #f8fafc !important;
+}
+html.dark .spa-loading-desc {
+    color: #94a3b8 !important;
+}
+html.dark .spa-loading-progress-track {
+    background-color: #334155 !important;
+}
+html.dark .spa-loading-progress-text {
+    color: #94a3b8 !important;
+}
+html.dark .spa-iframe-pool,
+html.dark .spa-module-iframe {
     background-color: #0f172a !important;
 }
 
@@ -522,8 +551,10 @@ html.dark .bg-gray-100 {
 }
 
 html.dark .bg-slate-200,
+html.dark .bg-slate-200\/90,
+html.dark .bg-slate-200\/80,
 html.dark .bg-gray-200 {
-    background-color: #475569 !important;
+    background-color: #334155 !important;
 }
 
 /* 3. 边框线夜间柔化 (告别刺眼白线) */
@@ -531,6 +562,42 @@ html.dark .border-slate-100,
 html.dark .border-slate-200,
 html.dark .border-gray-200 {
     border-color: #334155 !important;
+}
+
+html.dark .border-purple-100,
+html.dark .border-purple-200,
+html.dark .border-purple-300 {
+    border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+html.dark .border-amber-100,
+html.dark .border-amber-200,
+html.dark .border-amber-300 {
+    border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+html.dark .border-cyan-100,
+html.dark .border-cyan-200,
+html.dark .border-cyan-300 {
+    border-color: rgba(14, 165, 233, 0.35) !important;
+}
+
+html.dark .border-indigo-100,
+html.dark .border-indigo-200,
+html.dark .border-indigo-300 {
+    border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+html.dark .border-emerald-100,
+html.dark .border-emerald-200,
+html.dark .border-emerald-300 {
+    border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+html.dark .border-rose-100,
+html.dark .border-rose-200,
+html.dark .border-rose-300 {
+    border-color: rgba(244, 63, 94, 0.35) !important;
 }
 
 html.dark .border-b:not(.app-header),
@@ -763,11 +830,11 @@ html.dark .kid-card {
 }
 
 /* 9. 模块得分环夜间适配 */
-html.dark .score-ring {
-    background: conic-gradient(var(--primary) 0%, #334155 0) !important;
-}
 html.dark .score-ring::after {
     background: #1e293b !important;
+}
+html.dark .score-ring-content strong {
+    color: #f8fafc !important;
 }
 html.dark .score-ring-content strong {
     color: #f8fafc !important;
@@ -1017,5 +1084,131 @@ html.dark ::-webkit-scrollbar-thumb {
 html.dark ::-webkit-scrollbar-thumb:hover {
     background: #475569;
 }
+
+/* ============================================================
+   16. 各学习内页组件夜间深度适配 (汉字/假名/五线谱/英语核心动词)
+   ============================================================ */
+
+/* 16.1 汉字听音选字 5 选 1 选项卡片与互动效果 */
+html.dark .choice-option {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    border-bottom-color: #475569 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45) !important;
+}
+html.dark .choice-option:hover:not(:disabled) {
+    background-color: #312e81 !important;
+    border-color: #6366f1 !important;
+    border-bottom-color: #4f46e5 !important;
+}
+html.dark .choice-option:active:not(:disabled) {
+    background-color: #3730a3 !important;
+    border-color: #818cf8 !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+html.dark .choice-option.wrong-choice {
+    background-color: #4c0519 !important;
+    border-color: #f43f5e !important;
+    color: #fecdd3 !important;
+}
+html.dark .choice-option.correct-choice {
+    background-color: #064e3b !important;
+    border-color: #10b981 !important;
+    color: #a7f3d0 !important;
+}
+
+/* 16.2 汉字趣味短文故事纸卡与文字 */
+html.dark .story-paper {
+    background: linear-gradient(135deg, rgba(120, 53, 15, 0.25) 0%, rgba(30, 41, 59, 0.95) 100%) !important;
+    border-color: rgba(245, 158, 11, 0.4) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+}
+html.dark .story-text {
+    color: #fde68a !important;
+}
+html.dark .story-pinyin {
+    color: #a5b4fc !important;
+}
+
+/* 16.3 汉字认读大卡片 */
+html.dark #recognitionCharBtn {
+    background: linear-gradient(180deg, rgba(49, 46, 129, 0.35) 0%, #1e293b 100%) !important;
+    border-color: rgba(99, 102, 241, 0.4) !important;
+}
+html.dark #recognitionChar {
+    color: #f8fafc !important;
+}
+
+/* 16.4 汉字与假名答卷对比框、标准展示框与手写预览 */
+html.dark .comparison-box,
+html.dark .written-preview,
+html.dark .result-standard,
+html.dark .aspect-square.bg-white {
+    background-color: #131d2e !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+/* 16.5 错字本/错题本芯片、卡片与结果清单项 */
+html.dark .wrong-item,
+html.dark .result-chip {
+    background-color: #1e293b !important;
+    border-color: #475569 !important;
+    color: #f8fafc !important;
+}
+html.dark .result-chip.correct {
+    background-color: #064e3b !important;
+    border-color: #059669 !important;
+    color: #6ee7b7 !important;
+}
+html.dark .result-chip.wrong {
+    background-color: #4c0519 !important;
+    border-color: #e11d48 !important;
+    color: #fca5a5 !important;
+}
+html.dark .dictation-result {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+html.dark .dictation-result.correct {
+    border-color: #059669 !important;
+    background-color: rgba(6, 78, 59, 0.25) !important;
+}
+html.dark .dictation-result.wrong {
+    border-color: #e11d48 !important;
+    background-color: rgba(76, 5, 25, 0.25) !important;
+}
+
+/* 16.6 五十音图表格速查与假名卡片 */
+html.dark .border-slate-200.bg-slate-50 {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+html.dark .border-slate-200\/80.bg-slate-50\/40 {
+    background-color: rgba(15, 23, 42, 0.6) !important;
+    border-color: #334155 !important;
+}
+
+/* 16.7 词汇与句子列表卡片与管理卡片 */
+html.dark li.border-slate-100.bg-white,
+html.dark .border-slate-100.bg-white {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* 16.8 弹窗内部暗色卡片及输入框 */
+html.dark #settingsModal > div > div.bg-white,
+html.dark #syncModal > div > div.bg-white {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+}
+html.dark #settingsModal .border-b,
+html.dark #settingsModal .border-t,
+html.dark #syncModal .border-b,
+html.dark #syncModal .border-t {
+    border-color: #334155 !important;
+}
+
 
 

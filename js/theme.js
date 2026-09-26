@@ -21,6 +21,30 @@
 
     // 1. 获取当前应采用的主题 ('dark' | 'light')
     function getPreferredTheme() {
+        // A. 优先检测 URL query 参数 (?theme=dark 或 ?theme=light)，确保跨 Iframe 秒级直通
+        try {
+            if (window.location && window.location.search) {
+                var urlParams = new URLSearchParams(window.location.search);
+                var urlTheme = urlParams.get('theme');
+                if (urlTheme === 'dark' || urlTheme === 'light') {
+                    return urlTheme;
+                }
+            }
+        } catch (e) {}
+
+        // B. 若处于子 Iframe 容器中，直接探测顶层父 SPA 的实时状态
+        if (window.self !== window.top) {
+            try {
+                if (window.parent && typeof window.parent.isDarkTheme === 'function') {
+                    return window.parent.isDarkTheme() ? 'dark' : 'light';
+                }
+                if (window.parent && window.parent.document && window.parent.document.documentElement) {
+                    return window.parent.document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+                }
+            } catch (e) {}
+        }
+
+        // C. 读取 LocalStorage 本地存储记忆
         try {
             var saved = localStorage.getItem(STORAGE_KEY);
             if (saved === 'dark' || saved === 'light') {
@@ -28,7 +52,7 @@
             }
         } catch (e) {}
 
-        // 若本地未主动指定，检测设备系统是否处于深色模式
+        // D. 若本地未主动指定，检测设备系统是否处于深色模式
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             return 'dark';
         }
@@ -191,9 +215,21 @@
             } catch (e) {}
         }
 
-        // B. 若处于父级 SPA，向所有活动中的子 Iframe 广播
+        // B. 若处于父级 SPA，向所有活动中的子 Iframe 广播并即时操作 DOM
         var iframes = document.querySelectorAll('iframe');
         iframes.forEach(function (frame) {
+            try {
+                if (frame.contentDocument && frame.contentDocument.documentElement) {
+                    if (theme === 'dark') {
+                        frame.contentDocument.documentElement.classList.add('dark');
+                        frame.contentDocument.documentElement.setAttribute('data-theme', 'dark');
+                    } else {
+                        frame.contentDocument.documentElement.classList.remove('dark');
+                        frame.contentDocument.documentElement.setAttribute('data-theme', 'light');
+                    }
+                }
+            } catch (e) {}
+
             try {
                 if (frame.contentWindow) {
                     frame.contentWindow.postMessage({

@@ -1355,7 +1355,7 @@ function finishRecognition() {
 
     els.scoreText.textContent = `${percentage}%`;
     els.scoreRing.style.background =
-        `conic-gradient(var(--primary) ${percentage}%, #e7ebf3 ${percentage}%)`;
+        `conic-gradient(var(--primary) ${percentage}%, var(--ring-empty, #e7ebf3) ${percentage}%)`;
 
     let message;
     if (percentage === 100) {
@@ -1609,7 +1609,7 @@ function finishChoice() {
     const wrongAnswers = state.choiceAnswers.filter(answer => !answer.isCorrect);
     els.scoreText.textContent = `${percentage}%`;
     els.scoreRing.style.background =
-        `conic-gradient(var(--primary) ${percentage}%, #e7ebf3 ${percentage}%)`;
+        `conic-gradient(var(--primary) ${percentage}%, var(--ring-empty, #e7ebf3) ${percentage}%)`;
     els.summaryMessage.textContent = percentage === 100
         ? `太棒了！${total} 个字全部一次选对！`
         : `完成啦！有 ${correctCount} 个字一次选对，没选对的再听听就会了。`;
@@ -1664,7 +1664,7 @@ function finishSession() {
     state.mode = "dictation";
     els.scoreText.textContent = `${percentage}%`;
     els.scoreRing.style.background =
-        `conic-gradient(var(--primary) ${percentage}%, #e7ebf3 ${percentage}%)`;
+        `conic-gradient(var(--primary) ${percentage}%, var(--ring-empty, #e7ebf3) ${percentage}%)`;
 
     let message;
     if (percentage === 100) {

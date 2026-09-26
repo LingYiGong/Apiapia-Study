@@ -2,7 +2,7 @@
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
 // 当前客户端内置基线版本号
-const BUILD_VERSION = '2.2.1';
+const BUILD_VERSION = '2.2.2';
 
 // Semver 版本比较辅助函数 (remote > current 返回 true)
 function isNewerVersion(remote, current) {
@@ -475,6 +475,12 @@ const app = createApp({
             return modules.value.find(m => m.id === currentModuleId.value) || null;
         });
 
+        const getModuleUrl = (mod) => {
+            if (!mod || !mod.url) return '';
+            const sep = mod.url.includes('?') ? '&' : '?';
+            return `${mod.url}${sep}theme=${isDark.value ? 'dark' : 'light'}`;
+        };
+
         const openModuleSPA = (id) => {
             const targetMod = modules.value.find(m => m.id === id);
             if (!targetMod) return;
@@ -497,6 +503,25 @@ const app = createApp({
             // 立即切换当前模块，直接全屏滑入呈现
             currentModuleId.value = id;
 
+            // 同步将当前夜间模式预注入目标 Iframe，彻底杜绝白闪
+            setTimeout(() => {
+                try {
+                    const iframe = document.getElementById('iframe-' + id);
+                    if (iframe) {
+                        if (iframe.contentDocument && iframe.contentDocument.documentElement) {
+                            iframe.contentDocument.documentElement.classList.toggle('dark', isDark.value);
+                            iframe.contentDocument.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light');
+                        }
+                        if (iframe.contentWindow) {
+                            iframe.contentWindow.postMessage({
+                                type: 'APIAPIA_SET_THEME',
+                                theme: isDark.value ? 'dark' : 'light'
+                            }, '*');
+                        }
+                    }
+                } catch (e) {}
+            }, 50);
+
             // 同步修改 Hash，支持手机系统返回键与浏览器前进后退自然生效
             const targetHash = '#/' + id;
             if (window.location.hash !== targetHash) {
@@ -518,11 +543,17 @@ const app = createApp({
             // 向新加载就绪的子模块即时同步当前夜间模式状态
             try {
                 const iframe = document.getElementById('iframe-' + id);
-                if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage({
-                        type: 'APIAPIA_SET_THEME',
-                        theme: isDark.value ? 'dark' : 'light'
-                    }, '*');
+                if (iframe) {
+                    if (iframe.contentDocument && iframe.contentDocument.documentElement) {
+                        iframe.contentDocument.documentElement.classList.toggle('dark', isDark.value);
+                        iframe.contentDocument.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light');
+                    }
+                    if (iframe.contentWindow) {
+                        iframe.contentWindow.postMessage({
+                            type: 'APIAPIA_SET_THEME',
+                            theme: isDark.value ? 'dark' : 'light'
+                        }, '*');
+                    }
                 }
             } catch (e) {}
         };
@@ -667,6 +698,7 @@ const app = createApp({
             currentModuleId,
             currentModuleMeta,
             activeModulesList,
+            getModuleUrl,
             onModuleIframeLoaded,
             navigateHome,
             reloadCurrentModule

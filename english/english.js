@@ -305,7 +305,9 @@ function updateStats() {
     const scoreRing = document.getElementById("scoreRing");
     if (scoreText) scoreText.textContent = `${percent}%`;
     if (scoreRing) {
-        scoreRing.style.background = `conic-gradient(#4f46e5 ${percent}%, #e2e8f0 0)`;
+        const isDark = typeof window.isDarkTheme === 'function' ? window.isDarkTheme() : document.documentElement.classList.contains('dark');
+        const emptyColor = isDark ? '#334155' : '#e2e8f0';
+        scoreRing.style.background = `conic-gradient(#4f46e5 ${percent}%, ${emptyColor} 0)`;
     }
 
     const statsSummaryMessage = document.getElementById("statsSummaryMessage");
@@ -498,3 +500,8 @@ document.addEventListener("DOMContentLoaded", function() {
     updateStats();
     renderList();
 });
+
+window.addEventListener("apiapia-theme-changed", function() {
+    updateStats();
+});
+
