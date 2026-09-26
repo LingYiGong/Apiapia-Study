@@ -537,10 +537,13 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     setTimeout(initVoices, 800);
                     setTimeout(initVoices, 1600);
 
-                    // 监听全局夜间护眼模式切换，即时刷新假名手写笔迹
+                    // 监听全局夜间护眼模式切换，即时刷新假名手写笔迹与对比预览
                     window.addEventListener('apiapia-theme-changed', () => {
                         if (typeof redrawKanaCanvas === 'function') {
                             redrawKanaCanvas();
+                        }
+                        if (kanaCapturedWriting.value && kanaStrokes.value && kanaStrokes.value.length > 0 && kanaCanvasRef.value) {
+                            kanaCapturedWriting.value = kanaCanvasRef.value.toDataURL('image/png');
                         }
                     });
 

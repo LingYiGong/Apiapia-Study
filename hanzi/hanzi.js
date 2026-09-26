@@ -2453,4 +2453,14 @@ window.addEventListener('apiapia-theme-changed', () => {
     if (state.strokeWriter && els.strokeWriter && !els.strokeModal.classList.contains("hidden")) {
         renderStrokeDetail();
     }
+    // 答题面板展示时，即时刷新标准笔顺动画色彩与手写答卷对比图
+    if (els.answerPanel && !els.answerPanel.classList.contains("hidden") && state.session && state.session[state.currentIndex]) {
+        if (typeof renderAnswerStroke === "function") {
+            renderAnswerStroke(state.session[state.currentIndex].char);
+        }
+        if (state.strokes.length > 0 && els.currentWritingPreview && !els.currentWritingPreview.classList.contains("hidden")) {
+            captureWriting();
+            els.currentWritingPreview.src = state.currentWriting;
+        }
+    }
 });
