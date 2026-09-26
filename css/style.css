@@ -34,6 +34,36 @@
     --van-font-bold: 800;
 }
 
+/* ================== 夜间护眼模式设计系统色彩 (Dark Mode Colors) ================== */
+html.dark, :root.dark {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #334155;
+    --surface: #1e293b;
+
+    /* Vant 4 夜间模式变量 */
+    --van-text-color: #f8fafc;
+    --van-text-color-2: #cbd5e1;
+    --van-text-color-3: #94a3b8;
+    --van-background: #0f172a;
+    --van-background-2: #1e293b;
+    --van-background-3: #334155;
+    --van-border-color: #334155;
+    --van-card-background: #1e293b;
+    --van-dialog-background: #1e293b;
+    --van-dialog-message-color: #cbd5e1;
+    --van-popup-background: #1e293b;
+    --van-toast-background: rgba(15, 23, 42, 0.95);
+    --van-toast-text-color: #f8fafc;
+    --van-cell-background: #1e293b;
+    --van-cell-text-color: #f8fafc;
+    --van-cell-value-color: #94a3b8;
+    --van-field-input-text-color: #f8fafc;
+    --van-radio-label-color: #f8fafc;
+}
+
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
@@ -452,3 +482,258 @@ button, .van-button {
     max-width: calc(100vw - 24px) !important;
     border-radius: 24px !important;
 }
+
+/* ============================================================
+   夜间护眼模式全站视觉适配体系 (Dark Mode Unified Theme System)
+   ============================================================ */
+
+/* 1. 基础容器与视口背景 */
+html.dark,
+html.dark body {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    color-scheme: dark;
+}
+
+html.dark #app,
+html.dark main,
+html.dark .spa-view-container,
+html.dark iframe {
+    background-color: #0f172a !important;
+}
+
+/* 2. 背景色调夜间自动反色映射 */
+html.dark .bg-\[\#f8fafc\] {
+    background-color: #0f172a !important;
+}
+
+html.dark .bg-white {
+    background-color: #1e293b !important;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-gray-50 {
+    background-color: #0f172a !important;
+}
+
+html.dark .bg-slate-100,
+html.dark .bg-gray-100 {
+    background-color: #334155 !important;
+}
+
+html.dark .bg-slate-200,
+html.dark .bg-gray-200 {
+    background-color: #475569 !important;
+}
+
+/* 3. 边框线夜间柔化 (告别刺眼白线) */
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-gray-200 {
+    border-color: #334155 !important;
+}
+
+html.dark .border-b:not(.app-header),
+html.dark .border-t:not(.app-header) {
+    border-color: #334155 !important;
+}
+
+/* 4. 文本层级与字色夜间高可读性适配 */
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-gray-900,
+html.dark .text-gray-800 {
+    color: #f8fafc !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600,
+html.dark .text-gray-700,
+html.dark .text-gray-600 {
+    color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-500,
+html.dark .text-slate-400,
+html.dark .text-gray-500,
+html.dark .text-gray-400 {
+    color: #94a3b8 !important;
+}
+
+/* 5. 欢迎横幅与特殊彩条夜间护眼适配 */
+html.dark .text-amber-950 {
+    color: #fef3c7 !important;
+}
+
+html.dark .text-amber-900,
+html.dark .text-amber-900\/80 {
+    color: #fde68a !important;
+}
+
+html.dark .bg-gradient-to-r.from-amber-100\/90,
+html.dark .from-amber-100\/90 {
+    background: linear-gradient(135deg, rgba(120, 53, 15, 0.45) 0%, rgba(67, 20, 7, 0.45) 100%) !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+/* 6. 彩色指示徽章与小胶囊夜间深色半透调和 */
+html.dark .bg-indigo-50 {
+    background-color: rgba(49, 46, 129, 0.5) !important;
+    color: #c7d2fe !important;
+    border-color: rgba(99, 102, 241, 0.4) !important;
+}
+html.dark .text-indigo-600,
+html.dark .text-indigo-700 {
+    color: #a5b4fc !important;
+}
+html.dark .border-indigo-100,
+html.dark .border-indigo-200 {
+    border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+html.dark .bg-emerald-100 {
+    background-color: rgba(6, 78, 59, 0.55) !important;
+    color: #a7f3d0 !important;
+}
+
+html.dark .bg-rose-100 {
+    background-color: rgba(136, 19, 55, 0.55) !important;
+    color: #fecdd3 !important;
+}
+
+html.dark .bg-amber-100 {
+    background-color: rgba(120, 53, 15, 0.55) !important;
+    color: #fde68a !important;
+    border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+/* 7. 表单、输入框与下拉选择框 */
+html.dark input,
+html.dark select,
+html.dark textarea {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html.dark select option {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+/* 8. 儿童友好 3D 按钮夜间轻量模式 */
+html.dark .kid-btn-light,
+html.dark .btn-3d-light {
+    background: #1e293b !important;
+    border: 2px solid #334155 !important;
+    border-bottom: 4px solid #1e293b !important;
+    color: #f1f5f9 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark .kid-card {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* 9. 模块得分环夜间适配 */
+html.dark .score-ring {
+    background: conic-gradient(var(--primary) 0%, #334155 0) !important;
+}
+html.dark .score-ring::after {
+    background: #1e293b !important;
+}
+html.dark .score-ring-content strong {
+    color: #f8fafc !important;
+}
+
+/* 10. 艾宾浩斯复习徽章 */
+html.dark .level-badge {
+    background: #312e81 !important;
+    color: #c7d2fe !important;
+    border-color: #4338ca !important;
+}
+html.dark .level-badge.level-mastered {
+    background: #064e3b !important;
+    color: #86efac !important;
+    border-color: #059669 !important;
+}
+html.dark .level-badge.level-due {
+    background: #78350f !important;
+    color: #fde68a !important;
+    border-color: #b45309 !important;
+}
+
+/* 11. 汉字与假名小学生标准田字格夜间护眼模式 */
+html.dark .writing-board,
+html.dark .kana-writing-board,
+html.dark .stroke-grid,
+html.dark .answer-stroke-grid {
+    background-color: #131d2e !important;
+    border-color: #991b1b !important;
+    background-image:
+        linear-gradient(to right, transparent calc(50% - 1.5px), #7f1d1d 50%, transparent calc(50% + 1.5px)),
+        linear-gradient(to bottom, transparent calc(50% - 1.5px), #7f1d1d 50%, transparent calc(50% + 1.5px)),
+        linear-gradient(45deg, transparent calc(50% - 1px), #450a0a 50%, transparent calc(50% + 1px)),
+        linear-gradient(-45deg, transparent calc(50% - 1px), #450a0a 50%, transparent calc(50% + 1px)) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+html.dark .stroke-status {
+    background: rgba(19, 29, 46, 0.94) !important;
+    color: #cbd5e1 !important;
+}
+
+/* 12. Vant 4 与 Kid-Dialog 弹窗夜间护眼重载 */
+html.dark .van-dialog,
+html.dark .kid-dialog-card {
+    background-color: #1e293b !important;
+    border: 2px solid #334155 !important;
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark .kid-dialog-title {
+    color: #f8fafc !important;
+}
+
+html.dark .kid-dialog-message {
+    color: #cbd5e1 !important;
+}
+
+html.dark .kid-dialog-input {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+html.dark .kid-dialog-btn-cancel {
+    background: #0f172a !important;
+    color: #cbd5e1 !important;
+    border-color: #334155 !important;
+    border-bottom: 4px solid #475569 !important;
+}
+
+html.dark .van-popup {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+html.dark .van-toast {
+    background-color: rgba(15, 23, 42, 0.95) !important;
+    border: 1px solid #334155 !important;
+    color: #f8fafc !important;
+}
+
+/* 13. 夜间模式切换按钮精致触控样式 */
+.theme-toggle-btn {
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, border-color 0.2s ease;
+}
+.theme-toggle-btn:active {
+    transform: scale(0.92) !important;
+}
+

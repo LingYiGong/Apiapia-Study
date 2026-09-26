@@ -308,12 +308,20 @@ function renderWithVexFlow(container, noteInfo, clef, isCorrect) {
     const scale = 1.35;
     context.scale(scale, scale);
 
+    const isDark = document.documentElement.classList.contains("dark");
+    const staveColor = isDark ? "#94a3b8" : "#0f172a";
+    if (context.setStrokeStyle) context.setStrokeStyle(staveColor);
+    if (context.setFillStyle) context.setFillStyle(staveColor);
+
     const staveWidth = Math.min(Math.floor((width - 24) / scale), 360);
     const staveX = Math.floor(((width / scale) - staveWidth) / 2);
     const staveY = 22;
 
     const stave = new VF.Stave(staveX, staveY, staveWidth);
     stave.addClef(clef);
+    if (stave.setOptions) {
+      stave.setOptions({ fill_style: staveColor, stroke_style: staveColor });
+    }
     stave.setContext(context).draw();
 
     const acc = noteInfo.accidental || "";
@@ -329,7 +337,7 @@ function renderWithVexFlow(container, noteInfo, clef, isCorrect) {
       staveNote.addAccidental(0, new VF.Accidental(acc));
     }
 
-    const noteColor = isCorrect ? "#10b981" : "#0f172a";
+    const noteColor = isCorrect ? "#10b981" : (isDark ? "#f8fafc" : "#0f172a");
     staveNote.setStyle({ fillStyle: noteColor, strokeStyle: noteColor });
 
     const voice = new VF.Voice({ num_beats: 4, beat_value: 4 });
@@ -361,35 +369,38 @@ function renderWithNativeSVG(container, noteInfo, clef, isCorrect) {
 
   const noteY = refY - (noteStep - refStep) * (staffLineSpacing / 2);
   const noteX = startX + staffWidth * 0.58;
-  const noteColor = isCorrect ? "#10b981" : "#1e293b";
+  const isDark = document.documentElement.classList.contains("dark");
+  const noteColor = isCorrect ? "#10b981" : (isDark ? "#f8fafc" : "#1e293b");
+  const staffLineColor = isDark ? "#94a3b8" : "#1e293b";
+  const clefColor = isDark ? "#f1f5f9" : "#1e293b";
 
   let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
 
   // 绘制五条加粗基准线 (粗度 2.6px)
   for (let i = 0; i < 5; i++) {
     const y = topStaffLineY + i * staffLineSpacing;
-    svg += `<line x1="${startX}" y1="${y}" x2="${startX + staffWidth}" y2="${y}" stroke="#1e293b" stroke-width="2.6" stroke-linecap="round"/>`;
+    svg += `<line x1="${startX}" y1="${y}" x2="${startX + staffWidth}" y2="${y}" stroke="${staffLineColor}" stroke-width="2.6" stroke-linecap="round"/>`;
   }
-  svg += `<line x1="${startX}" y1="${topStaffLineY}" x2="${startX}" y2="${topStaffLineY + 4 * staffLineSpacing}" stroke="#1e293b" stroke-width="3"/>`;
-  svg += `<line x1="${startX + staffWidth}" y1="${topStaffLineY}" x2="${startX + staffWidth}" y2="${topStaffLineY + 4 * staffLineSpacing}" stroke="#1e293b" stroke-width="3"/>`;
+  svg += `<line x1="${startX}" y1="${topStaffLineY}" x2="${startX}" y2="${topStaffLineY + 4 * staffLineSpacing}" stroke="${staffLineColor}" stroke-width="3"/>`;
+  svg += `<line x1="${startX + staffWidth}" y1="${topStaffLineY}" x2="${startX + staffWidth}" y2="${topStaffLineY + 4 * staffLineSpacing}" stroke="${staffLineColor}" stroke-width="3"/>`;
 
   // 大号儿童矢量谱号
   if (clef === "treble") {
-    svg += `<text x="${startX + 14}" y="${topStaffLineY + 3.85 * staffLineSpacing}" font-size="76" font-family="serif" fill="#1e293b" font-weight="bold" user-select="none">𝄞</text>`;
+    svg += `<text x="${startX + 14}" y="${topStaffLineY + 3.85 * staffLineSpacing}" font-size="76" font-family="serif" fill="${clefColor}" font-weight="bold" user-select="none">𝄞</text>`;
   } else {
-    svg += `<text x="${startX + 14}" y="${topStaffLineY + 2.85 * staffLineSpacing}" font-size="64" font-family="serif" fill="#1e293b" font-weight="bold" user-select="none">𝄢</text>`;
+    svg += `<text x="${startX + 14}" y="${topStaffLineY + 2.85 * staffLineSpacing}" font-size="64" font-family="serif" fill="${clefColor}" font-weight="bold" user-select="none">𝄢</text>`;
   }
 
   // 上加线 / 下加线
   const bottomStaffLineY = topStaffLineY + 4 * staffLineSpacing;
   if (noteY >= bottomStaffLineY + staffLineSpacing) {
     for (let ly = bottomStaffLineY + staffLineSpacing; ly <= noteY + 2; ly += staffLineSpacing) {
-      svg += `<line x1="${noteX - 24}" y1="${ly}" x2="${noteX + 24}" y2="${ly}" stroke="#1e293b" stroke-width="2.6"/>`;
+      svg += `<line x1="${noteX - 24}" y1="${ly}" x2="${noteX + 24}" y2="${ly}" stroke="${staffLineColor}" stroke-width="2.6"/>`;
     }
   }
   if (noteY <= topStaffLineY - staffLineSpacing) {
     for (let ly = topStaffLineY - staffLineSpacing; ly >= noteY - 2; ly -= staffLineSpacing) {
-      svg += `<line x1="${noteX - 24}" y1="${ly}" x2="${noteX + 24}" y2="${ly}" stroke="#1e293b" stroke-width="2.6"/>`;
+      svg += `<line x1="${noteX - 24}" y1="${ly}" x2="${noteX + 24}" y2="${ly}" stroke="${staffLineColor}" stroke-width="2.6"/>`;
     }
   }
 
@@ -740,6 +751,11 @@ dom.btnHeaderSkip.addEventListener("click", () => {
 });
 
 window.addEventListener("resize", () => {
+  renderStaff(false);
+});
+
+// 监听全局夜间护眼模式切换，即时刷新五线谱与谱号色彩
+window.addEventListener("apiapia-theme-changed", () => {
   renderStaff(false);
 });
 

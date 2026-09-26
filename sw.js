@@ -1,5 +1,5 @@
 // Apiapia 学习中心 - PWA Service Worker
-const CACHE_NAME = 'apiapia-pwa-v2.1.1';
+const CACHE_NAME = 'apiapia-pwa-v2.2.0';
 
 // 基础核心缓存资源（已完全本地化，无外部 CDN 依赖）
 const CORE_ASSETS = [
@@ -8,6 +8,7 @@ const CORE_ASSETS = [
     './app.js',
     './manifest.json',
     './css/style.css',
+    './js/theme.js',
     './js/kid-dialog.js',
     './js/viewport.js',
     './libs/vue.global.prod.js',

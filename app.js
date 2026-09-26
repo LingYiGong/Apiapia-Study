@@ -2,7 +2,7 @@
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
 // 当前客户端内置基线版本号
-const BUILD_VERSION = '2.1.1';
+const BUILD_VERSION = '2.2.0';
 
 // Semver 版本比较辅助函数 (remote > current 返回 true)
 function isNewerVersion(remote, current) {
@@ -20,6 +20,24 @@ function isNewerVersion(remote, current) {
 
 const app = createApp({
     setup() {
+        // 夜间护眼模式响应式状态与方法
+        const isDark = ref(window.isDarkTheme ? window.isDarkTheme() : false);
+        const toggleTheme = () => {
+            if (window.toggleTheme) {
+                window.toggleTheme({ showToast: true });
+                isDark.value = window.isDarkTheme();
+            }
+        };
+
+        const onThemeChanged = (e) => {
+            if (e && e.detail) {
+                isDark.value = e.detail.isDark;
+            } else if (window.isDarkTheme) {
+                isDark.value = window.isDarkTheme();
+            }
+        };
+        window.addEventListener('apiapia-theme-changed', onThemeChanged);
+
         // 当前版本与自动更新状态 (优先取本地已确认的最新版本，缺省采用 BUILD_VERSION)
         const storedVersion = localStorage.getItem('study_hub_version');
         // 若内置版本高于本地缓存版本，自动进位
@@ -496,6 +514,17 @@ const app = createApp({
         const onModuleIframeLoaded = (id) => {
             loadedModulesMap.value[id] = true;
             finishEnteringProgress();
+
+            // 向新加载就绪的子模块即时同步当前夜间模式状态
+            try {
+                const iframe = document.getElementById('iframe-' + id);
+                if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({
+                        type: 'APIAPIA_SET_THEME',
+                        theme: isDark.value ? 'dark' : 'light'
+                    }, '*');
+                }
+            } catch (e) {}
         };
 
         // 统一平滑返回学习中心首页
@@ -595,6 +624,7 @@ const app = createApp({
 
         onUnmounted(() => {
             if (progressTimer) clearInterval(progressTimer);
+            window.removeEventListener('apiapia-theme-changed', onThemeChanged);
             document.removeEventListener('visibilitychange', onVisibilityChange);
             window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
             window.removeEventListener('appinstalled', onAppInstalled);
@@ -604,6 +634,8 @@ const app = createApp({
         });
 
         return {
+            isDark,
+            toggleTheme,
             appVersion,
             hasUpdate,
             latestVersion,

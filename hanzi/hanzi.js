@@ -999,7 +999,8 @@ function redrawWriting() {
     const context = els.writingCanvas.getContext("2d");
     const rect = els.writingCanvas.getBoundingClientRect();
     context.clearRect(0, 0, rect.width, rect.height);
-    context.strokeStyle = "#1e293b";
+    const isDark = document.documentElement.classList.contains("dark");
+    context.strokeStyle = isDark ? "#f8fafc" : "#1e293b";
     context.lineCap = "round";
     context.lineJoin = "round";
 
@@ -1141,14 +1142,15 @@ function renderAnswerStroke(char) {
     const renderToken = ++state.answerStrokeRenderToken;
     const size = Math.round(els.answerStrokeWriter.getBoundingClientRect().width);
 
+    const isDark = document.documentElement.classList.contains("dark");
     state.answerStrokeWriter = HanziWriter.create(els.answerStrokeWriter, char, {
         width: size,
         height: size,
         padding: Math.round(size * 0.08),
         showOutline: true,
         showCharacter: false,
-        strokeColor: "#1e293b",
-        outlineColor: "#d7dbe3",
+        strokeColor: isDark ? "#60a5fa" : "#1e293b",
+        outlineColor: isDark ? "#475569" : "#d7dbe3",
         strokeAnimationSpeed: 0.8,
         delayBetweenStrokes: 400,
         delayBetweenLoops: 2000,
@@ -1890,14 +1892,15 @@ function renderStrokeCharacter() {
     }
 
     const size = Math.round(els.strokeGrid.getBoundingClientRect().width);
+    const isDark = document.documentElement.classList.contains("dark");
     state.strokeWriter = HanziWriter.create(els.strokeWriter, item.char, {
         width: size,
         height: size,
         padding: Math.round(size * 0.09),
         showOutline: true,
         showCharacter: false,
-        strokeColor: "#20242c",
-        outlineColor: "#d7dbe3",
+        strokeColor: isDark ? "#60a5fa" : "#20242c",
+        outlineColor: isDark ? "#475569" : "#d7dbe3",
         strokeAnimationSpeed: 0.65,
         delayBetweenStrokes: 650,
         delayBetweenLoops: 1800,
@@ -2442,3 +2445,12 @@ document.getElementById("practiceWrongFromTabBtn")?.addEventListener("click", ()
     startSession(wrongChars);
 });
 
+// 监听全局夜间护眼模式切换，即时刷新手写画笔与笔画演示色彩
+window.addEventListener('apiapia-theme-changed', () => {
+    if (typeof redrawWriting === "function" && els.writingCanvas) {
+        redrawWriting();
+    }
+    if (state.strokeWriter && els.strokeWriter && !els.strokeModal.classList.contains("hidden")) {
+        renderStrokeDetail();
+    }
+});

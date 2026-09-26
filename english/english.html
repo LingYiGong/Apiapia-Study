@@ -15,12 +15,15 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png" />
     <link rel="manifest" href="../manifest.json" />
 
+    <!-- 全局夜间/护眼模式核心管理 (首屏加载杜绝闪烁) -->
+    <script src="../js/theme.js?v=2.2.0"></script>
+
     <!-- 本地引入 Vant 4 样式与 Tailwind CSS -->
     <link rel="stylesheet" href="../libs/vant.min.css" />
     <script src="../libs/tailwindcss.js"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 -->
-    <link rel="stylesheet" href="../css/style.css?v=2.0.0" />
+    <link rel="stylesheet" href="../css/style.css?v=2.2.0" />
     <!-- 英语模块专属 3D 翻转卡片样式 -->
     <link rel="stylesheet" href="./english.css?v=2.0.0" />
 
@@ -47,6 +50,10 @@
                     </h1>
                 </div>
                 <div class="flex items-center space-x-1.5 sm:space-x-2 flex-shrink-0">
+                    <button type="button" class="theme-toggle-btn h-8 px-2.5 sm:px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1 whitespace-nowrap flex-shrink-0" title="切换夜间模式">
+                        <span class="theme-icon">🌙</span>
+                        <span class="theme-text text-xs hidden sm:inline">夜间</span>
+                    </button>
                     <button onclick="speakWord()" type="button" class="h-8 px-2.5 sm:px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1 whitespace-nowrap flex-shrink-0" title="朗读发音">
                         <span>🔊 发音</span>
                     </button>

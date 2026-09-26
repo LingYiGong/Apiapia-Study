@@ -537,6 +537,13 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     setTimeout(initVoices, 800);
                     setTimeout(initVoices, 1600);
 
+                    // 监听全局夜间护眼模式切换，即时刷新假名手写笔迹
+                    window.addEventListener('apiapia-theme-changed', () => {
+                        if (typeof redrawKanaCanvas === 'function') {
+                            redrawKanaCanvas();
+                        }
+                    });
+
                     // iPad / iOS WebKit audio & speech gesture unlocker
                     const unlockAudioAndTTS = () => {
                         if (synth) {
@@ -3235,7 +3242,8 @@ const currentWordSentenceIndex = ref(0);
                     const ctx = canvas.getContext('2d');
                     const rect = canvas.getBoundingClientRect();
                     ctx.clearRect(0, 0, rect.width, rect.height);
-                    ctx.strokeStyle = '#1e293b';
+                    const isDark = document.documentElement.classList.contains('dark');
+                    ctx.strokeStyle = isDark ? '#f8fafc' : '#1e293b';
                     ctx.lineCap = 'round';
                     ctx.lineJoin = 'round';
 
