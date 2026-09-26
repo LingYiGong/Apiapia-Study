@@ -1721,7 +1721,7 @@ function finishSession() {
         verdict.className = "result-verdict";
         const cs = getCharStats(stats, answer.item.char);
         const reviewText = cs.nextReviewDate ? formatDateDisplay(cs.nextReviewDate) : "待定";
-        verdict.innerHTML = `<span>${answer.isCorrect ? "✅ 写对了" : "❌ 写错了"}</span> <span class="level-badge ${cs.level >= 3 ? "level-mastered" : (cs.nextReviewDate <= Date.now() ? "level-due" : "")}" style="margin-left: 8px;">Lv.${cs.level}</span><span style="font-size: 0.82rem; color: #64748b; margin-left: 6px;">下次: ${reviewText}</span>`;
+        verdict.innerHTML = `<span>${answer.isCorrect ? "✅ 写对了" : "❌ 写错了"}</span> <span class="level-badge ${cs.level >= 3 ? "level-mastered" : (cs.nextReviewDate <= Date.now() ? "level-due" : "")}" style="margin-left: 8px;">Lv.${cs.level}</span><span class="verdict-review-time" style="font-size: 0.82rem; margin-left: 6px;">下次: ${reviewText}</span>`;
         card.append(comparison, verdict);
         els.resultList.appendChild(card);
     });

@@ -482,3 +482,12 @@ html.dark .dictation-result.wrong {
     background: rgba(76, 5, 25, 0.25);
 }
 
+html.dark .result-verdict {
+    color: #f8fafc;
+    border-top-color: #334155;
+}
+
+html.dark .verdict-review-time {
+    color: #94a3b8;
+}
+

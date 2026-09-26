@@ -623,58 +623,90 @@ html.dark .text-gray-600 {
 html.dark .text-slate-500,
 html.dark .text-slate-400,
 html.dark .text-gray-500,
-html.dark .text-gray-400 {
+html.dark .text-gray-400,
+html.dark .text-slate-400\/80,
+html.dark .text-slate-500\/80 {
     color: #94a3b8 !important;
 }
 
-html.dark .text-slate-300 {
-    color: #64748b !important;
+html.dark .text-slate-300,
+html.dark .text-gray-300 {
+    color: #94a3b8 !important;
 }
 
 /* 4.1 彩色高对比夜间文字适配 (彻底解决白天清晰、夜间暗沉低对比问题) */
+html.dark .text-emerald-400,
+html.dark .text-emerald-500,
 html.dark .text-emerald-600,
 html.dark .text-emerald-700,
 html.dark .text-emerald-800,
 html.dark .text-emerald-900,
+html.dark .text-green-400,
+html.dark .text-green-500,
 html.dark .text-green-600,
 html.dark .text-green-700,
 html.dark .text-green-800 {
     color: #6ee7b7 !important; /* 清新薄荷绿，深色背景下一目了然 */
 }
 
+html.dark .text-rose-400,
+html.dark .text-rose-500,
 html.dark .text-rose-600,
 html.dark .text-rose-700,
 html.dark .text-rose-800,
 html.dark .text-rose-900,
+html.dark .text-red-400,
+html.dark .text-red-500,
 html.dark .text-red-600,
 html.dark .text-red-700,
 html.dark .text-red-800 {
     color: #fca5a5 !important; /* 柔和浅玫瑰红，告别暗红色盲区 */
 }
 
+html.dark .text-amber-500,
 html.dark .text-amber-600,
 html.dark .text-amber-700,
 html.dark .text-amber-800,
 html.dark .text-amber-900,
-html.dark .text-amber-900\/80,
 html.dark .text-amber-950,
+html.dark .text-yellow-500,
 html.dark .text-yellow-600,
 html.dark .text-yellow-700,
 html.dark .text-yellow-800 {
     color: #fde68a !important; /* 明净暖金黄，假名与待复习高亮清晰 */
 }
 
+/* 琥珀色半透明次要描述文字 (如汉字模块学习横幅) */
+html.dark .text-amber-800\/80,
+html.dark .text-amber-900\/80 {
+    color: #fcd34d !important;
+}
+
+/* 橙色警告与强调色 */
+html.dark .text-orange-400,
+html.dark .text-orange-500,
+html.dark .text-orange-600,
+html.dark .text-orange-700 {
+    color: #fdba74 !important; /* 明亮柔和橙色 */
+}
+
+html.dark .text-indigo-400,
+html.dark .text-indigo-500,
 html.dark .text-indigo-600,
 html.dark .text-indigo-700,
 html.dark .text-indigo-800,
 html.dark .text-indigo-900,
 html.dark .text-indigo-950,
+html.dark .text-blue-400,
+html.dark .text-blue-500,
 html.dark .text-blue-600,
 html.dark .text-blue-700,
 html.dark .text-blue-800 {
     color: #a5b4fc !important; /* 护眼淡紫靛蓝，柔和高对比 */
 }
 
+html.dark .text-purple-400,
+html.dark .text-purple-500,
 html.dark .text-purple-600,
 html.dark .text-purple-700,
 html.dark .text-purple-800,
@@ -682,8 +714,12 @@ html.dark .text-purple-900 {
     color: #d8b4fe !important; /* 浅紫罗兰色 */
 }
 
+html.dark .text-cyan-400,
+html.dark .text-cyan-500,
 html.dark .text-cyan-600,
 html.dark .text-cyan-700,
+html.dark .text-sky-400,
+html.dark .text-sky-500,
 html.dark .text-sky-600,
 html.dark .text-sky-700 {
     color: #7dd3fc !important; /* 天空青蓝 */
@@ -808,9 +844,36 @@ html.dark textarea {
     border-color: #334155 !important;
 }
 
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
 html.dark select option {
     background-color: #1e293b !important;
     color: #f8fafc !important;
+}
+
+/* 7.1 特殊按钮与标签护眼对比适配 */
+html.dark .update-banner-btn {
+    background-color: #ffffff !important;
+    color: #ea580c !important;
+}
+html.dark .update-banner-btn:hover {
+    background-color: #fff7ed !important;
+}
+
+html.dark .module-feature-tag {
+    filter: brightness(1.25) saturate(1.1);
+}
+
+html.dark .result-verdict {
+    color: #f8fafc !important;
+    border-top-color: #334155 !important;
+}
+
+html.dark .verdict-review-time {
+    color: #94a3b8 !important;
 }
 
 /* 8. 儿童友好 3D 按钮夜间轻量模式 */
