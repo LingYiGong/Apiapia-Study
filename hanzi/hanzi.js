@@ -41,7 +41,12 @@ const state = {
     strokeIndex: 0,
     strokeWriter: null,
     strokeRenderToken: 0,
-    strokeStartToken: 0
+    strokeStartToken: 0,
+    reviewLocked: false,
+    reviewUnlockTimer: null,
+    questionUnlockTimer: null,
+    recognitionLocked: false,
+    recognitionUnlockTimer: null
 };
 
 const els = {
@@ -947,6 +952,16 @@ function startSession(customItems = null) {
     const items = customItems || createSession();
     if (!items || items.length === 0) return;
 
+    if (state.reviewUnlockTimer) {
+        clearTimeout(state.reviewUnlockTimer);
+        state.reviewUnlockTimer = null;
+    }
+    if (state.questionUnlockTimer) {
+        clearTimeout(state.questionUnlockTimer);
+        state.questionUnlockTimer = null;
+    }
+    state.reviewLocked = false;
+
     state.mode = "dictation";
     state.session = shuffle(items);
     state.currentIndex = 0;
@@ -965,6 +980,12 @@ function renderQuestion() {
     const item = state.session[state.currentIndex];
     if (!item) return;
 
+    if (state.reviewUnlockTimer) {
+        clearTimeout(state.reviewUnlockTimer);
+        state.reviewUnlockTimer = null;
+    }
+    state.reviewLocked = false;
+
     clearAnswerStroke();
     els.speakBtn.closest(".listen-area").classList.remove("hidden");
     els.currentNumber.textContent = state.currentIndex + 1;
@@ -979,6 +1000,16 @@ function renderQuestion() {
     els.answerPanel.classList.add("hidden");
     els.showAnswerBtn.classList.remove("hidden");
     els.showAnswerBtn.textContent = "✨ 写好了，核对本题";
+    // 防误触：新题目切出时短暂禁用核对按钮350ms，防止上一题连击误触
+    els.showAnswerBtn.disabled = true;
+    if (state.questionUnlockTimer) {
+        clearTimeout(state.questionUnlockTimer);
+    }
+    state.questionUnlockTimer = setTimeout(() => {
+        els.showAnswerBtn.disabled = false;
+        state.questionUnlockTimer = null;
+    }, 350);
+
     els.writingArea.classList.remove("hidden");
     els.answerHint.textContent = "";
     els.currentWritingPreview.removeAttribute("src");
@@ -1118,7 +1149,26 @@ function speakCurrent() {
     window.speechSynthesis.speak(utterance);
 }
 
+function lockVerdictButtons(duration = 650) {
+    if (state.reviewUnlockTimer) {
+        clearTimeout(state.reviewUnlockTimer);
+        state.reviewUnlockTimer = null;
+    }
+    state.reviewLocked = true;
+    if (els.wrongBtn) els.wrongBtn.disabled = true;
+    if (els.correctBtn) els.correctBtn.disabled = true;
+
+    state.reviewUnlockTimer = setTimeout(() => {
+        state.reviewLocked = false;
+        if (els.wrongBtn) els.wrongBtn.disabled = false;
+        if (els.correctBtn) els.correctBtn.disabled = false;
+        state.reviewUnlockTimer = null;
+    }, duration);
+}
+
 function submitWriting() {
+    if (els.showAnswerBtn.disabled) return;
+    els.showAnswerBtn.disabled = true;
     const writing = captureWriting();
     state.writings[state.currentIndex] = writing;
     renderReview();
@@ -1211,10 +1261,23 @@ function renderReview() {
     els.showAnswerBtn.classList.add("hidden");
     els.writingArea.classList.add("hidden");
     els.speakBtn.closest(".listen-area").classList.add("hidden");
+
+    // 防误触/防双击：展示核对答案面板时锁定对错按钮650ms，防止连击误点直接跳下一题
+    lockVerdictButtons(650);
+
     renderAnswerStroke(item.char);
 }
 
 function recordAnswer(isCorrect) {
+    if (state.reviewLocked) return;
+    state.reviewLocked = true;
+    if (state.reviewUnlockTimer) {
+        clearTimeout(state.reviewUnlockTimer);
+        state.reviewUnlockTimer = null;
+    }
+    if (els.wrongBtn) els.wrongBtn.disabled = true;
+    if (els.correctBtn) els.correctBtn.disabled = true;
+
     const item = state.session[state.currentIndex];
 
     state.answers.push({
@@ -1240,9 +1303,32 @@ function recordAnswer(isCorrect) {
 }
 
 
+function lockRecognitionButtons(duration = 500) {
+    if (state.recognitionUnlockTimer) {
+        clearTimeout(state.recognitionUnlockTimer);
+        state.recognitionUnlockTimer = null;
+    }
+    state.recognitionLocked = true;
+    if (els.recognitionWrongBtn) els.recognitionWrongBtn.disabled = true;
+    if (els.recognitionCorrectBtn) els.recognitionCorrectBtn.disabled = true;
+
+    state.recognitionUnlockTimer = setTimeout(() => {
+        state.recognitionLocked = false;
+        if (els.recognitionWrongBtn) els.recognitionWrongBtn.disabled = false;
+        if (els.recognitionCorrectBtn) els.recognitionCorrectBtn.disabled = false;
+        state.recognitionUnlockTimer = null;
+    }, duration);
+}
+
 function startRecognition(customItems = null) {
     const items = customItems || createSession();
     if (!items || items.length === 0) return;
+
+    if (state.recognitionUnlockTimer) {
+        clearTimeout(state.recognitionUnlockTimer);
+        state.recognitionUnlockTimer = null;
+    }
+    state.recognitionLocked = false;
 
     state.mode = "recognition";
     state.recognitionSession = shuffle(items);
@@ -1258,6 +1344,12 @@ function startRecognition(customItems = null) {
 function renderRecognitionQuestion() {
     const item = state.recognitionSession[state.recognitionIndex];
     if (!item) return;
+
+    if (state.recognitionUnlockTimer) {
+        clearTimeout(state.recognitionUnlockTimer);
+        state.recognitionUnlockTimer = null;
+    }
+    state.recognitionLocked = false;
 
     els.recognitionCurrentNumber.textContent = state.recognitionIndex + 1;
     els.recognitionTotalNumber.textContent = state.recognitionSession.length;
@@ -1321,9 +1413,20 @@ function speakRecognitionCurrent() {
     els.recognitionHint.textContent = item.hint;
     els.recognitionTapTip.textContent = "🔊 再点可以重听";
     els.recognitionReveal.classList.remove("hidden");
+    // 防误触：展开判定选项时锁定判定按钮500ms
+    lockRecognitionButtons(500);
 }
 
 function recordRecognitionAnswer(isCorrect) {
+    if (state.recognitionLocked) return;
+    state.recognitionLocked = true;
+    if (state.recognitionUnlockTimer) {
+        clearTimeout(state.recognitionUnlockTimer);
+        state.recognitionUnlockTimer = null;
+    }
+    if (els.recognitionWrongBtn) els.recognitionWrongBtn.disabled = true;
+    if (els.recognitionCorrectBtn) els.recognitionCorrectBtn.disabled = true;
+
     const item = state.recognitionSession[state.recognitionIndex];
 
     state.recognitionAnswers.push({
@@ -1347,6 +1450,11 @@ function recordRecognitionAnswer(isCorrect) {
 
 function finishRecognition() {
     window.speechSynthesis?.cancel?.();
+    if (state.recognitionUnlockTimer) {
+        clearTimeout(state.recognitionUnlockTimer);
+        state.recognitionUnlockTimer = null;
+    }
+    state.recognitionLocked = false;
 
     const correctCount =
         state.recognitionAnswers.filter(answer => answer.isCorrect).length;
@@ -1658,6 +1766,15 @@ function finishChoice() {
 function finishSession() {
     window.speechSynthesis?.cancel?.();
     clearAnswerStroke();
+    if (state.reviewUnlockTimer) {
+        clearTimeout(state.reviewUnlockTimer);
+        state.reviewUnlockTimer = null;
+    }
+    if (state.questionUnlockTimer) {
+        clearTimeout(state.questionUnlockTimer);
+        state.questionUnlockTimer = null;
+    }
+    state.reviewLocked = false;
 
     const correctCount = state.answers.filter(answer => answer.isCorrect).length;
     const total = state.answers.length;
@@ -2174,6 +2291,15 @@ async function quitSession() {
 
     window.speechSynthesis?.cancel?.();
     clearAnswerStroke();
+    if (state.reviewUnlockTimer) {
+        clearTimeout(state.reviewUnlockTimer);
+        state.reviewUnlockTimer = null;
+    }
+    if (state.questionUnlockTimer) {
+        clearTimeout(state.questionUnlockTimer);
+        state.questionUnlockTimer = null;
+    }
+    state.reviewLocked = false;
     showScreen("setup");
     refreshHomeStats();
 }
@@ -2194,6 +2320,11 @@ async function quitRecognition() {
     }
 
     window.speechSynthesis?.cancel?.();
+    if (state.recognitionUnlockTimer) {
+        clearTimeout(state.recognitionUnlockTimer);
+        state.recognitionUnlockTimer = null;
+    }
+    state.recognitionLocked = false;
     showScreen("setup");
     refreshHomeStats();
 }
@@ -2469,12 +2600,13 @@ document.addEventListener("keydown", event => {
     if (dictationActive) {
         if (
             event.key === "Enter" &&
-            !els.showAnswerBtn.classList.contains("hidden")
+            !els.showAnswerBtn.classList.contains("hidden") &&
+            !els.showAnswerBtn.disabled
         ) {
             submitWriting();
         }
 
-        if (!els.answerPanel.classList.contains("hidden")) {
+        if (!els.answerPanel.classList.contains("hidden") && !state.reviewLocked) {
             if (event.key === "ArrowLeft") recordAnswer(false);
             if (event.key === "ArrowRight") recordAnswer(true);
         }
@@ -2482,7 +2614,8 @@ document.addEventListener("keydown", event => {
 
     if (
         recognitionActive &&
-        !els.recognitionReveal.classList.contains("hidden")
+        !els.recognitionReveal.classList.contains("hidden") &&
+        !state.recognitionLocked
     ) {
         if (event.key === "ArrowLeft") recordRecognitionAnswer(false);
         if (event.key === "ArrowRight") recordRecognitionAnswer(true);

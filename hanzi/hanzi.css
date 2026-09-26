@@ -581,3 +581,29 @@ html.dark .verdict-review-time {
     color: #94a3b8;
 }
 
+/* ================== 防误触/防双击核对按钮锁定动效与状态 ================== */
+#showAnswerBtn,
+#wrongBtn,
+#correctBtn,
+#recognitionWrongBtn,
+#recognitionCorrectBtn {
+    transition: opacity 0.25s cubic-bezier(0.2, 0, 0, 1),
+                filter 0.25s cubic-bezier(0.2, 0, 0, 1),
+                transform 0.08s ease,
+                box-shadow 0.08s ease;
+}
+
+#showAnswerBtn:disabled,
+#wrongBtn:disabled,
+#correctBtn:disabled,
+#recognitionWrongBtn:disabled,
+#recognitionCorrectBtn:disabled {
+    opacity: 0.55 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+    filter: grayscale(0.25);
+}
+
+
