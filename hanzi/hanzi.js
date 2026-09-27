@@ -2162,6 +2162,8 @@ function renderStoryParagraph(index) {
         els.storyText.innerHTML = "";
         els.storyText.classList.toggle("show-pinyin", Boolean(state.showStoryPinyin));
         const chars = Array.from(state.currentStory);
+        const NO_BREAK_BEFORE = new Set(["，", "。", "！", "？", "、", "；", "：", "”", "’", "）", "》", "】", "…", "—", ",", ".", "!", "?", ";", ":", ")", "]", "}"]);
+        const NO_BREAK_AFTER = new Set(["“", "‘", "（", "《", "【", "(", "[", "{"]);
         chars.forEach((char, idx) => {
             const isHanzi = /[\u4e00-\u9fa5]/.test(char) || Boolean(PINYIN_MAP[char]);
             if (isHanzi) {
@@ -2190,6 +2192,14 @@ function renderStoryParagraph(index) {
                 punct.className = "story-punct";
                 punct.textContent = char;
                 els.storyText.appendChild(punct);
+            }
+
+            // 在相邻字符之间插入零宽换行断点 <wbr>，彻底解决 iOS Safari 下连续 ruby 元素被当作不可分割长词导致无法换行溢出的问题
+            if (idx < chars.length - 1) {
+                const nextChar = chars[idx + 1];
+                if (!NO_BREAK_AFTER.has(char) && !NO_BREAK_BEFORE.has(nextChar)) {
+                    els.storyText.appendChild(document.createElement("wbr"));
+                }
             }
         });
     }
