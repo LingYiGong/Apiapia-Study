@@ -8,6 +8,9 @@ directory = "."
 binding = "ASSETS"
 
 # Cloudflare KV 存储配置 (多端学习进度存储)
+# 开源安全提示：请在 Cloudflare Dashboard 创建 KV 命名空间后，
+# 将下面的 id 替换为你自己的 namespace id
+# 获取方式：`npx wrangler kv namespace list` 或 Dashboard -> KV
 [[kv_namespaces]]
 binding = "STUDY_KV"
 id = "ed094c7c103648d5839ccc31a54317f8"
