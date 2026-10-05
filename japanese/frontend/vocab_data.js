@@ -16310,6 +16310,1054 @@ window.BUILTIN_VOCAB = [
     "meaning": "零，从零开始",
     "level": 0,
     "next_review_date": 1789540373343
+  },
+  {
+    "id": "w_2040",
+    "word": "認証",
+    "kana": "にんしょう",
+    "meaning": "身份认证 (Authentication)；确认用户是谁",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2041",
+    "word": "認可",
+    "kana": "にんか",
+    "meaning": "权限授权 (Authorization)；确认用户有什么权限",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2042",
+    "word": "脆弱性",
+    "kana": "ぜいじゃくせい",
+    "meaning": "安全漏洞，脆弱性 (Vulnerability)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2043",
+    "word": "盗聴",
+    "kana": "とうちょう",
+    "meaning": "网络窃听，嗅探 (Sniffing, Wiretapping)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2044",
+    "word": "改ざん",
+    "kana": "かいざん",
+    "meaning": "篡改，非法篡改数据 (Tampering)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2045",
+    "word": "暗号化",
+    "kana": "あんごうか",
+    "meaning": "加密 (Encryption)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2046",
+    "word": "復号",
+    "kana": "ふくごう",
+    "meaning": "解密 (Decryption，注意日文是復号而非解号)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2047",
+    "word": "有効期限",
+    "kana": "ゆうこうきげん",
+    "meaning": "有效期限，过期时间 (Expiration date)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2048",
+    "word": "失効",
+    "kana": "しっこう",
+    "meaning": "失效，撤销作废 (Revocation, Invalidation)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2049",
+    "word": "依存性",
+    "kana": "いぞんせい",
+    "meaning": "依赖性 (Dependency)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2050",
+    "word": "連携",
+    "kana": "れんけい",
+    "meaning": "对接，联动，集成 (Integration)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2051",
+    "word": "接続",
+    "kana": "せつぞく",
+    "meaning": "连接，建立连接 (Connection)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2052",
+    "word": "整合性",
+    "kana": "せいごうせい",
+    "meaning": "一致性，完整性 (Consistency, Integrity)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2053",
+    "word": "排他制御",
+    "kana": "はいたせいぎょ",
+    "meaning": "互斥控制，排他并发控制 (Locking)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2054",
+    "word": "永続化",
+    "kana": "えいぞくか",
+    "meaning": "持久化 (Persistence)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2055",
+    "word": "破棄",
+    "kana": "はき",
+    "meaning": "销毁，废弃，释放 (Dispose, Drop)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2056",
+    "word": "競合",
+    "kana": "きょうごう",
+    "meaning": "竞态，冲突 (Conflict, Race condition)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2057",
+    "word": "制約",
+    "kana": "せいやく",
+    "meaning": "约束 (Constraint)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2058",
+    "word": "階層",
+    "kana": "かいそう",
+    "meaning": "层级，架构层 (Layer, Hierarchy)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2059",
+    "word": "原則",
+    "kana": "げんそく",
+    "meaning": "原则，准则 (Principle)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2060",
+    "word": "規約",
+    "kana": "きやく",
+    "meaning": "规范，约定 (Convention)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2061",
+    "word": "無状態",
+    "kana": "むじょうたい",
+    "meaning": "无状态 (Stateless)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2062",
+    "word": "統一",
+    "kana": "とういつ",
+    "meaning": "统一，标准化 (Uniform)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2063",
+    "word": "疎結合",
+    "kana": "そけつごう",
+    "meaning": "松耦合 (Loose coupling)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2064",
+    "word": "密結合",
+    "kana": "みつけつごう",
+    "meaning": "紧耦合 (Tight coupling)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2065",
+    "word": "拡張性",
+    "kana": "かくちょうせい",
+    "meaning": "可扩展性 (Scalability, Extensibility)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2066",
+    "word": "保守性",
+    "kana": "ほしゅせい",
+    "meaning": "可维护性 (Maintainability)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2067",
+    "word": "冪等性",
+    "kana": "べきとうせい",
+    "meaning": "幂等性 (Idempotence)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2068",
+    "word": "命名規則",
+    "kana": "めいめいきそく",
+    "meaning": "命名规则 (Naming convention)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2069",
+    "word": "複数形",
+    "kana": "ふくすうけい",
+    "meaning": "复数形式 (Plural form)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2070",
+    "word": "単数形",
+    "kana": "たんすうけい",
+    "meaning": "单数形式 (Singular form)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2071",
+    "word": "成果物",
+    "kana": "せいかぶつ",
+    "meaning": "交付成果物，工作输出物 (Deliverables)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2072",
+    "word": "始業",
+    "kana": "しぎょう",
+    "meaning": "上班，始业",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2073",
+    "word": "終業",
+    "kana": "しゅうぎょう",
+    "meaning": "下班，终业",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2074",
+    "word": "引数",
+    "kana": "ひきすう",
+    "meaning": "实参，参数 (Argument, Parameter)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2075",
+    "word": "戻り値",
+    "kana": "もどりち",
+    "meaning": "返回值 (Return value)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2076",
+    "word": "返り値",
+    "kana": "かえりち",
+    "meaning": "返回值 (Return value)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2077",
+    "word": "属性",
+    "kana": "ぞくせい",
+    "meaning": "属性，字段 (Attribute, Property)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2078",
+    "word": "必須",
+    "kana": "ひっす",
+    "meaning": "必填，必须 (Required, Mandatory)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2079",
+    "word": "任意",
+    "kana": "にんい",
+    "meaning": "可选，任意 (Optional)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2080",
+    "word": "埋め込む",
+    "kana": "うめこむ",
+    "meaning": "嵌入，植入 (Embed)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2081",
+    "word": "絞り込み",
+    "kana": "しぼりこみ",
+    "meaning": "过滤，筛选 (Filtering)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2082",
+    "word": "並べ替え",
+    "kana": "ならべかえ",
+    "meaning": "排序 (Sorting)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2083",
+    "word": "置換",
+    "kana": "ちかん",
+    "meaning": "替换，置换 (Replacement)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2084",
+    "word": "可用性",
+    "kana": "かようせい",
+    "meaning": "可用性 (Availability)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2085",
+    "word": "負荷",
+    "kana": "ふか",
+    "meaning": "负载，系统负荷 (Load, Overhead)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2086",
+    "word": "互換性",
+    "kana": "ごかんせい",
+    "meaning": "兼容性 (Compatibility)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2087",
+    "word": "正常系",
+    "kana": "せいじょうけい",
+    "meaning": "正常业务流，主用例 (Happy path)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2088",
+    "word": "異常系",
+    "kana": "いじょうけい",
+    "meaning": "异常处理流，容错用例 (Unhappy path)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2089",
+    "word": "境界値",
+    "kana": "きょうかいち",
+    "meaning": "边界值 (Boundary value)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2090",
+    "word": "疎通確認",
+    "kana": "そつうかくにん",
+    "meaning": "连通性测试 (Ping/Handshake test)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2091",
+    "word": "実装する",
+    "kana": "じっそうする",
+    "meaning": "实现，开发编码 (Implement)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2092",
+    "word": "抽出する",
+    "kana": "ちゅうしゅつする",
+    "meaning": "提取，抽取 (Extract)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2093",
+    "word": "検証する",
+    "kana": "けんしょうする",
+    "meaning": "验证，测试校验 (Verify)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2094",
+    "word": "保持する",
+    "kana": "ほじする",
+    "meaning": "保持，保留状态 (Hold, Retain)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2095",
+    "word": "準拠する",
+    "kana": "じゅんきょする",
+    "meaning": "遵循，依照标准 (Conform to)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2096",
+    "word": "遵守する",
+    "kana": "じゅんしゅする",
+    "meaning": "遵守规范 (Comply with)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2097",
+    "word": "担保する",
+    "kana": "たんぽする",
+    "meaning": "确保，保障 (Guarantee, Ensure)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2098",
+    "word": "経由する",
+    "kana": "けいゆする",
+    "meaning": "经由，通过 (Via, Go through)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2099",
+    "word": "紐づける",
+    "kana": "ひもづける",
+    "meaning": "关联，绑定 (Bind, Associate)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2100",
+    "word": "切り離す",
+    "kana": "きりはなす",
+    "meaning": "解耦，抽离 (Decouple)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2101",
+    "word": "受け渡す",
+    "kana": "うけわたす",
+    "meaning": "传递，交互传参 (Pass, Transfer)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2102",
+    "word": "割り当てる",
+    "kana": "わりあてる",
+    "meaning": "分配，指定 (Assign, Allocate)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2103",
+    "word": "回避する",
+    "kana": "かいひする",
+    "meaning": "规避风险，避开 (Avoid, Bypass)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2104",
+    "word": "切り替える",
+    "kana": "きりかえる",
+    "meaning": "切换 (Switch, Toggle)",
+    "level": 0,
+    "next_review_date": 1791160165552
+  },
+  {
+    "id": "w_2105",
+    "word": "ユーザー",
+    "kana": "ゆーざー",
+    "meaning": "用户 (User)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2106",
+    "word": "リクエスト",
+    "kana": "りくえすと",
+    "meaning": "请求 (Request)；如 HTTP 请求",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2107",
+    "word": "レスポンス",
+    "kana": "れすぽんす",
+    "meaning": "响应，响应报文 (Response)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2108",
+    "word": "トークン",
+    "kana": "とーくん",
+    "meaning": "令牌，Token (如 Bearer Token)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2109",
+    "word": "リソース",
+    "kana": "りそーす",
+    "meaning": "资源 (Resource)；如 URI 操作对象",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2110",
+    "word": "サーバー",
+    "kana": "さーばー",
+    "meaning": "服务器 (Server)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2111",
+    "word": "クライアント",
+    "kana": "くらいあんと",
+    "meaning": "客户端 (Client)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2112",
+    "word": "データベース",
+    "kana": "でーたべーす",
+    "meaning": "数据库 (Database)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2113",
+    "word": "モデル",
+    "kana": "もでる",
+    "meaning": "模型 (Model)；如 ORM 模型、Pydantic 模型",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2114",
+    "word": "エンドポイント",
+    "kana": "えんどぽいんと",
+    "meaning": "接口端点 (Endpoint)；如 /users/",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2115",
+    "word": "ヘッダー",
+    "kana": "へっだー",
+    "meaning": "报头，请求头 (Header)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2116",
+    "word": "パスワード",
+    "kana": "ぱすわーど",
+    "meaning": "密码 (Password)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2117",
+    "word": "メソッド",
+    "kana": "めそっど",
+    "meaning": "方法 (Method)；如 HTTP 方法、函数",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2118",
+    "word": "セッション",
+    "kana": "せっしょん",
+    "meaning": "会话 (Session)；如 DB Session",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2119",
+    "word": "スキーム",
+    "kana": "すきーむ",
+    "meaning": "方案，协议模式 (Scheme)；如 http, https, basic",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2120",
+    "word": "オブジェクト",
+    "kana": "おぶじぇくと",
+    "meaning": "对象 (Object)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2121",
+    "word": "ステータスコード",
+    "kana": "すてーたすこーど",
+    "meaning": "状态码 (Status code)；如 200, 404, 500",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2122",
+    "word": "ペイロード",
+    "kana": "ぺいろーど",
+    "meaning": "有效载荷，消息体 (Payload)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2123",
+    "word": "バリデーション",
+    "kana": "ばりでーしょん",
+    "meaning": "数据校验，合法性检查 (Validation)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2124",
+    "word": "アーキテクチャ",
+    "kana": "あーきてくちゃ",
+    "meaning": "架构，体系结构 (Architecture)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2125",
+    "word": "スケーラビリティ",
+    "kana": "すけーらびりてぃ",
+    "meaning": "可伸缩性，可扩展性 (Scalability)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2126",
+    "word": "シリアライズ",
+    "kana": "しりあらいず",
+    "meaning": "序列化 (Serialize)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2127",
+    "word": "キャッシュ",
+    "kana": "きゃっしゅ",
+    "meaning": "缓存 (Cache)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2128",
+    "word": "プレフィックス",
+    "kana": "ぷれふぃっくす",
+    "meaning": "前缀 (Prefix)；如 Bearer 前缀",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2129",
+    "word": "インメモリ",
+    "kana": "いんめもり",
+    "meaning": "内存中，内存存储 (In-memory)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2130",
+    "word": "定義",
+    "kana": "ていぎ",
+    "meaning": "定义 (Definition)；如函数定义、模型定义",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2131",
+    "word": "特定",
+    "kana": "とくてい",
+    "meaning": "特定，唯一定位；如特定リソース",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2132",
+    "word": "形式",
+    "kana": "けいしき",
+    "meaning": "格式，形式 (Format)；如 JSON 数据形式",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2133",
+    "word": "指定",
+    "kana": "してい",
+    "meaning": "指定，指明；如 ID を指定する",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2134",
+    "word": "送信",
+    "kana": "そうしん",
+    "meaning": "发送，传输 (Send, Transmit)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2135",
+    "word": "実行",
+    "kana": "じっこう",
+    "meaning": "执行，运行 (Execute, Run)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2136",
+    "word": "提供",
+    "kana": "ていきょう",
+    "meaning": "提供 (Provide)；如 API 提供",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2137",
+    "word": "保護",
+    "kana": "ほご",
+    "meaning": "保护，受保护 (Protect)；如保护端点",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2138",
+    "word": "更新",
+    "kana": "こうしん",
+    "meaning": "更新，修改 (Update)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2139",
+    "word": "削除",
+    "kana": "さくじょ",
+    "meaning": "删除 (Delete)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2140",
+    "word": "処理",
+    "kana": "しょり",
+    "meaning": "处理 (Process, Handling)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2141",
+    "word": "関数",
+    "kana": "かんすう",
+    "meaning": "函数 (Function)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2142",
+    "word": "起動",
+    "kana": "きどう",
+    "meaning": "启动 (Start up, Launch)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2143",
+    "word": "発行",
+    "kana": "はっこう",
+    "meaning": "签发，发行 (Issue)；如签发 Token",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2144",
+    "word": "権限",
+    "kana": "けんげん",
+    "meaning": "权限 (Permission, Authority)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2145",
+    "word": "変換",
+    "kana": "へんかん",
+    "meaning": "转换 (Convert, Transform)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2146",
+    "word": "構造",
+    "kana": "こうぞう",
+    "meaning": "结构 (Structure)；如 URI 构造、数据构造",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2147",
+    "word": "識別",
+    "kana": "しきべつ",
+    "meaning": "识别，辨识 (Identify)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2148",
+    "word": "概念",
+    "kana": "がいねん",
+    "meaning": "概念 (Concept)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2149",
+    "word": "混同",
+    "kana": "こんどう",
+    "meaning": "混淆，搞混 (Confuse, Mix up)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2150",
+    "word": "把握",
+    "kana": "はあく",
+    "meaning": "掌握，领会 (Grasp, Understand)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2151",
+    "word": "挙動",
+    "kana": "きょどう",
+    "meaning": "系统行为，动作表现 (Behavior)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2152",
+    "word": "振る舞い",
+    "kana": "ふるまい",
+    "meaning": "动作行为 (Behavior)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2153",
+    "word": "枯渇",
+    "kana": "こかつ",
+    "meaning": "耗尽，枯竭；如连接池枯竭",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2154",
+    "word": "漏洩",
+    "kana": "ろうえい",
+    "meaning": "泄露；如信息泄露、内存泄漏",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2155",
+    "word": "遮断",
+    "kana": "しゃだん",
+    "meaning": "拦截，阻断 (Block, Intercept)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2156",
+    "word": "拒否",
+    "kana": "きょひ",
+    "meaning": "拒绝 (Deny, Reject)；如 403 拒绝访问",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2157",
+    "word": "追跡",
+    "kana": "ついせき",
+    "meaning": "追踪，跟踪 (Trace, Track)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2158",
+    "word": "代替",
+    "kana": "だいたい",
+    "meaning": "代替，替代方案 (Alternative)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2159",
+    "word": "冗長",
+    "kana": "じょうちょう",
+    "meaning": "冗余 (Redundancy, Verbose)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2160",
+    "word": "軽減",
+    "kana": "けいげん",
+    "meaning": "减轻，缓解 (Mitigate, Reduce)；如减轻服务器负载",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2161",
+    "word": "導入",
+    "kana": "どうにゅう",
+    "meaning": "引入，导入 (Introduce, Adopt)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2162",
+    "word": "推奨",
+    "kana": "すいしょう",
+    "meaning": "推荐 (Recommend)；如官方推荐写法",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2163",
+    "word": "非推奨",
+    "kana": "ひすいしょう",
+    "meaning": "不推荐，已弃用 (Deprecated)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2164",
+    "word": "適用",
+    "kana": "てきよう",
+    "meaning": "应用，适用 (Apply)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2165",
+    "word": "参照",
+    "kana": "さんしょう",
+    "meaning": "参考，引用，查询 (Reference)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2166",
+    "word": "格納",
+    "kana": "かくのう",
+    "meaning": "存放，存入 (Store, Contain)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2167",
+    "word": "構築",
+    "kana": "こうちく",
+    "meaning": "构建，搭建 (Build, Construct)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2168",
+    "word": "疎通",
+    "kana": "そつう",
+    "meaning": "连通，互通 (Communication, Ping)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2169",
+    "word": "切断",
+    "kana": "せつだん",
+    "meaning": "断开，断开连接 (Disconnect)",
+    "level": 0,
+    "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2170",
+    "word": "確立",
+    "kana": "かくりつ",
+    "meaning": "建立，确立；如建立连接",
+    "level": 0,
+    "next_review_date": 1791160505501
   }
 ];
 
