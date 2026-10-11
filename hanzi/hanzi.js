@@ -1670,8 +1670,49 @@ function playErrorSound() {
     }
 }
 
+function speakOptionCharacter(option, button) {
+    if (!option || !option.char || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+
+    const char = option.char;
+    const item = state.choiceSession[state.choiceIndex];
+    let text = char;
+    // 如果点击的是当前本题目标汉字，且有词语提示，按照设置发音
+    if (item && char === item.char && item.hint && state.speechMode !== "char") {
+        text = `${char}。${item.hint}。`;
+    } else {
+        text = char;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "zh-CN";
+    utterance.rate = state.speechRate || Number(els.speechRate?.value) || 0.78;
+    utterance.pitch = 1.02;
+    utterance.volume = 1;
+
+    const voice = getChineseVoice();
+    if (voice) utterance.voice = voice;
+    utterance.onerror = event => {
+        console.warn("选字发音失败：", event.error);
+    };
+    window.speechSynthesis.speak(utterance);
+
+    if (button) {
+        button.classList.remove("choice-speaking");
+        void button.offsetWidth;
+        button.classList.add("choice-speaking");
+        setTimeout(() => {
+            button.classList.remove("choice-speaking");
+        }, 500);
+    }
+}
+
 function chooseCharacter(option, button) {
-    if (state.choiceLocked) return;
+    if (state.choiceLocked) {
+        // 选择正确后，再次点击选项中的汉字（包括其他干扰字或目标字），播放对应汉字的读音
+        speakOptionCharacter(option, button);
+        return;
+    }
     const item = state.choiceSession[state.choiceIndex];
 
     if (option.char !== item.char) {
@@ -1688,8 +1729,10 @@ function chooseCharacter(option, button) {
 
     state.choiceLocked = true;
     button.classList.add("correct-choice");
+    // 选对后，重新启用所有选项按钮，使点击其他任意汉字都能听到读音
     els.choiceOptions?.querySelectorAll("button").forEach(node => {
-        node.disabled = true;
+        node.disabled = false;
+        node.setAttribute("title", "点击听汉字读音");
     });
     const choiceHint = document.getElementById("choiceHint");
     if (choiceHint) choiceHint.classList.add("hidden");
