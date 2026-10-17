@@ -239,13 +239,29 @@
                                 <span class="text-2xl">📕</span>
                                 <h3 class="text-base font-black text-slate-800">错字强化复习本</h3>
                             </div>
-                            <span class="text-xs text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-full border border-rose-100">
-                                需重点强化
-                            </span>
+                            <div class="flex items-center space-x-2">
+                                <button id="clearWrongBookBtn" type="button" class="text-xs text-rose-500 hover:text-rose-700 font-bold bg-rose-50 hover:bg-rose-100 px-3 py-1 rounded-full border border-rose-200 transition-colors flex items-center space-x-1 hidden" title="清空错字本">
+                                    <span>🗑️</span>
+                                    <span>清空错字</span>
+                                </button>
+                                <span class="text-xs text-rose-600 font-bold bg-rose-50 px-2.5 py-1 rounded-full border border-rose-100">
+                                    需重点强化
+                                </span>
+                            </div>
                         </div>
                         <p class="text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
-                            练习中记错或写错的汉字会自动归集在这里，根据艾宾浩斯曲线优先安排巩固复习。
+                            练习中记错或写错的汉字会自动归集在这里，点击汉字可听发音，点击 × 可移出。通过针对性强化练习攻克后将自动移出！
                         </p>
+
+                        <!-- 空错字本友好提示 -->
+                        <div id="wrongbookEmptyState" class="py-10 px-4 text-center rounded-2xl bg-emerald-50/60 border border-dashed border-emerald-200 hidden">
+                            <div class="text-4xl mb-2">🎉</div>
+                            <div class="text-base font-black text-emerald-800 mb-1">错字本空空如也！</div>
+                            <p class="text-xs sm:text-sm text-emerald-600 max-w-sm mx-auto mb-4 font-medium">太棒啦！所有学过的汉字都已熟练掌握，没有积攒的错字。</p>
+                            <button id="emptyStateGoPracticeBtn" type="button" class="px-5 py-2.5 kid-btn-success text-white text-xs sm:text-sm font-black rounded-2xl shadow-sm">
+                                🌟 去练习新汉字或今日复习
+                            </button>
+                        </div>
 
                         <!-- 错字列表 -->
                         <div id="wrongbookSetup" class="wrongbook">
@@ -254,11 +270,22 @@
                             </div>
                         </div>
 
-                        <!-- 快捷操作按钮 (大按钮) -->
-                        <div class="pt-2 border-t border-slate-100">
-                            <button id="practiceWrongFromTabBtn" type="button" class="w-full py-4 kid-btn-primary text-white text-sm sm:text-base font-black rounded-2xl shadow-md">
-                                🔊 专项听写错字本汉字
+                        <!-- 快捷操作按钮组 (多模式复习) -->
+                        <div id="wrongbookActions" class="pt-2 border-t border-slate-100 space-y-2.5">
+                            <button id="practiceWrongFromTabBtn" type="button" class="w-full py-3.5 kid-btn-primary text-white text-sm sm:text-base font-black rounded-2xl shadow-md flex items-center justify-center space-x-2">
+                                <span>🔊</span>
+                                <span>专项听写错字本 (<span id="wrongTabCountBadge">0</span>)</span>
                             </button>
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <button id="practiceWrongRecognitionBtn" type="button" class="py-3 px-2 kid-btn-amber text-amber-900 text-xs sm:text-sm font-black rounded-2xl shadow-sm flex items-center justify-center space-x-1.5 border border-amber-300">
+                                    <span>👀</span>
+                                    <span>看字认读强化</span>
+                                </button>
+                                <button id="practiceWrongChoiceBtn" type="button" class="py-3 px-2 kid-btn-indigo text-indigo-900 text-xs sm:text-sm font-black rounded-2xl shadow-sm flex items-center justify-center space-x-1.5 border border-indigo-300">
+                                    <span>🎯</span>
+                                    <span>趣味辨字强化</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -799,6 +826,6 @@
     <!-- 脚本引入 -->
     <script src="../libs/hanzi-writer.min.js" defer></script>
     <script src="./hanzi-data.js?v=2.2.0" defer></script>
-    <script src="./hanzi.js?v=2.2.5" defer></script>
+    <script src="./hanzi.js?v=2.2.8" defer></script>
 </body>
 </html>

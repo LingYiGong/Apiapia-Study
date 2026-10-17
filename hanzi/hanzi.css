@@ -263,7 +263,65 @@
     gap: 8px;
 }
 
-.wrong-item,
+.wrong-item {
+    padding: 6px 10px 6px 14px;
+    border-radius: 16px;
+    background: #ffffff;
+    border: 2px solid #fecdd3;
+    color: #9f1239;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: "KaiTi", "STKaiti", "楷体", serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    user-select: none;
+}
+
+.wrong-item:hover {
+    border-color: #fb7185;
+    background: #fff5f7;
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.12);
+}
+
+.wrong-char-click {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.15s ease;
+}
+
+.wrong-char-click:hover {
+    color: #e11d48;
+}
+
+.wrong-remove-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 9999px;
+    border: none;
+    background: #ffe4e6;
+    color: #f43f5e;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    margin-left: 2px;
+    transition: all 0.15s ease;
+}
+
+.wrong-remove-btn:hover {
+    background: #f43f5e;
+    color: #ffffff;
+    transform: scale(1.12);
+}
+
 .result-chip {
     padding: 8px 14px;
     border-radius: 16px;
@@ -564,7 +622,31 @@ html.dark .result-standard {
     color: #f8fafc;
 }
 
-html.dark .wrong-item,
+html.dark .wrong-item {
+    background: #1e293b;
+    border-color: #881337;
+    color: #fecdd3;
+}
+
+html.dark .wrong-item:hover {
+    background: #281422;
+    border-color: #f43f5e;
+}
+
+html.dark .wrong-char-click:hover {
+    color: #fda4af;
+}
+
+html.dark .wrong-remove-btn {
+    background: #4c0519;
+    color: #fca5a5;
+}
+
+html.dark .wrong-remove-btn:hover {
+    background: #e11d48;
+    color: #ffffff;
+}
+
 html.dark .result-chip {
     background: #1e293b;
     border-color: #475569;

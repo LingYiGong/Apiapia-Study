@@ -13,6 +13,7 @@ let debounceSyncTimer = null;
 
 const state = {
     mode: "dictation",
+    isWrongPractice: false,
     session: [],
     currentIndex: 0,
     writings: [],
@@ -93,6 +94,13 @@ const els = {
     wrongCount: document.getElementById("wrongCount"),
     wrongbookSetup: document.getElementById("wrongbookSetup"),
     wrongbookListSetup: document.getElementById("wrongbookListSetup"),
+    wrongbookEmptyState: document.getElementById("wrongbookEmptyState"),
+    wrongbookActions: document.getElementById("wrongbookActions"),
+    wrongTabCountBadge: document.getElementById("wrongTabCountBadge"),
+    clearWrongBookBtn: document.getElementById("clearWrongBookBtn"),
+    emptyStateGoPracticeBtn: document.getElementById("emptyStateGoPracticeBtn"),
+    practiceWrongRecognitionBtn: document.getElementById("practiceWrongRecognitionBtn"),
+    practiceWrongChoiceBtn: document.getElementById("practiceWrongChoiceBtn"),
 
     currentNumber: document.getElementById("currentNumber"),
     totalNumber: document.getElementById("totalNumber"),
@@ -712,6 +720,9 @@ function previewSpeech() {
 
 function getCharStats(stats, char) {
     const saved = (stats && stats.characters && stats.characters[char]) || {};
+    const defaultInWrong = saved.inWrongBook !== undefined
+        ? Boolean(saved.inWrongBook)
+        : Boolean(saved.wrong > 0 && (saved.streak || 0) < 2 && (saved.level || 0) < 2);
     return {
         practiced: 0,
         correct: 0,
@@ -720,7 +731,8 @@ function getCharStats(stats, char) {
         lastPracticed: null,
         level: 1,
         nextReviewDate: Date.now(),
-        ...saved
+        ...saved,
+        inWrongBook: defaultInWrong
     };
 }
 
@@ -742,12 +754,17 @@ function updateStatsForAnswer(item, isCorrect) {
         newLevel = oldLevel + 1;
         charStats.level = newLevel;
         charStats.nextReviewDate = calculateNextReview(newLevel);
+        // 关键修复：如果在错字本专项练习中攻克，或连续答对 streak>=2 或升级至 Lv.2+，自动移出错字本！
+        if (state.isWrongPractice || charStats.streak >= 2 || newLevel >= 2) {
+            charStats.inWrongBook = false;
+        }
     } else {
         charStats.wrong += 1;
         charStats.streak = 0;
         newLevel = 0;
         charStats.level = 0;
         charStats.nextReviewDate = Date.now(); // 设为今日待复习
+        charStats.inWrongBook = true;
     }
 
     stats.characters[item.char] = charStats;
@@ -757,12 +774,93 @@ function updateStatsForAnswer(item, isCorrect) {
 
 function getWrongCharacters(stats = loadStats()) {
     return HANZI_DATA
-        .map(item => ({
-            ...item,
-            wrongScore: getCharStats(stats, item.char).wrong
-        }))
-        .filter(item => item.wrongScore > 0)
+        .map(item => {
+            const cs = getCharStats(stats, item.char);
+            return {
+                ...item,
+                inWrongBook: cs.inWrongBook,
+                wrongScore: cs.wrong,
+                streak: cs.streak || 0,
+                level: cs.level || 0
+            };
+        })
+        .filter(item => item.inWrongBook === true)
         .sort((a, b) => b.wrongScore - a.wrongScore);
+}
+
+function speakSingleCharacter(char) {
+    if (!char || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(char);
+    utterance.lang = "zh-CN";
+    utterance.rate = Number(els.speechRate ? els.speechRate.value : 0.78) || 0.78;
+    utterance.pitch = 1.02;
+    utterance.volume = 1;
+
+    const voice = getChineseVoice();
+    if (voice) utterance.voice = voice;
+    utterance.onerror = event => {
+        console.warn("读音失败：", event.error);
+    };
+    window.speechSynthesis.speak(utterance);
+}
+
+function removeFromWrongBook(char) {
+    const stats = loadStats();
+    const charStats = getCharStats(stats, char);
+    charStats.inWrongBook = false;
+    stats.characters[char] = charStats;
+    saveStats(stats);
+    refreshHomeStats();
+    if (window.kidToast) {
+        window.kidToast(`已将“${char}”移出错字本 👍`, "success");
+    }
+}
+
+async function clearWrongBook() {
+    const stats = loadStats();
+    const wrongChars = getWrongCharacters(stats);
+    if (wrongChars.length === 0) {
+        if (window.kidToast) window.kidToast("错字本已经是空的啦！🎉", "info");
+        return;
+    }
+
+    let ok = false;
+    if (window.kidConfirm) {
+        ok = await window.kidConfirm({
+            title: "清空错字本？",
+            message: `确定要清空全部 ${wrongChars.length} 个错字记录吗？清空后错字本将重置为空。`,
+            icon: "🗑️",
+            type: "danger",
+            confirmText: "确定清空",
+            cancelText: "取消"
+        });
+    } else {
+        ok = window.confirm(`确定要清空全部 ${wrongChars.length} 个错字记录吗？`);
+    }
+
+    if (ok) {
+        wrongChars.forEach(item => {
+            const cs = getCharStats(stats, item.char);
+            cs.inWrongBook = false;
+            stats.characters[item.char] = cs;
+        });
+        saveStats(stats);
+        refreshHomeStats();
+        if (window.kidToast) {
+            window.kidToast("已清空错字本！🎉", "success");
+        }
+    }
+}
+
+function getUniqueItems(items) {
+    const map = new Map();
+    (items || []).forEach(item => {
+        if (item && item.char && !map.has(item.char)) {
+            map.set(item.char, item);
+        }
+    });
+    return Array.from(map.values());
 }
 
 function getDueCharacters(stats = loadStats()) {
@@ -829,23 +927,56 @@ function refreshHomeStats() {
         }
     }
 
-    els.wrongbookListSetup.innerHTML = "";
+    if (els.wrongTabCountBadge) {
+        els.wrongTabCountBadge.textContent = wrongChars.length;
+    }
 
-    if (wrongChars.length === 0) {
-        els.wrongbookSetup.classList.add("hidden");
-    } else {
-        els.wrongbookSetup.classList.remove("hidden");
-        wrongChars.slice(0, 30).forEach(item => {
-            const chip = document.createElement("span");
-            chip.className = "wrong-item";
-            const charStats = getCharStats(stats, item.char);
-            chip.textContent = `${item.char} (Lv.${charStats.level || 0})`;
-            const wrongRate = charStats.practiced
-                ? Math.round((charStats.wrong / charStats.practiced) * 100)
-                : 0;
-            chip.title = `累计错误 ${charStats.wrong} 次，错误率 ${wrongRate}%`;
-            els.wrongbookListSetup.appendChild(chip);
-        });
+    if (els.wrongbookListSetup) {
+        els.wrongbookListSetup.innerHTML = "";
+
+        if (wrongChars.length === 0) {
+            if (els.wrongbookSetup) els.wrongbookSetup.classList.add("hidden");
+            if (els.wrongbookEmptyState) els.wrongbookEmptyState.classList.remove("hidden");
+            if (els.wrongbookActions) els.wrongbookActions.classList.add("hidden");
+            if (els.clearWrongBookBtn) els.clearWrongBookBtn.classList.add("hidden");
+        } else {
+            if (els.wrongbookSetup) els.wrongbookSetup.classList.remove("hidden");
+            if (els.wrongbookEmptyState) els.wrongbookEmptyState.classList.add("hidden");
+            if (els.wrongbookActions) els.wrongbookActions.classList.remove("hidden");
+            if (els.clearWrongBookBtn) els.clearWrongBookBtn.classList.remove("hidden");
+
+            wrongChars.forEach(item => {
+                const chip = document.createElement("div");
+                chip.className = "wrong-item";
+                const charStats = getCharStats(stats, item.char);
+                const wrongRate = charStats.practiced
+                    ? Math.round((charStats.wrong / charStats.practiced) * 100)
+                    : 0;
+
+                const charSpan = document.createElement("span");
+                charSpan.className = "wrong-char-click";
+                charSpan.title = `点击发音 🔊 | 累计错误 ${charStats.wrong} 次，错误率 ${wrongRate}%`;
+                charSpan.innerHTML = `<span>${item.char}</span> <span style="font-size: 0.72rem; font-family: ui-sans-serif, system-ui; opacity: 0.75; font-weight: normal;">Lv.${charStats.level || 0}</span>`;
+                charSpan.addEventListener("click", () => {
+                    speakSingleCharacter(item.char);
+                });
+
+                const removeBtn = document.createElement("button");
+                removeBtn.type = "button";
+                removeBtn.className = "wrong-remove-btn";
+                removeBtn.title = `将“${item.char}”移出错字本`;
+                removeBtn.setAttribute("aria-label", `移出“${item.char}”`);
+                removeBtn.innerHTML = "&times;";
+                removeBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    removeFromWrongBook(item.char);
+                });
+
+                chip.appendChild(charSpan);
+                chip.appendChild(removeBtn);
+                els.wrongbookListSetup.appendChild(chip);
+            });
+        }
     }
 
     buildCategoryOptions();
@@ -951,6 +1082,8 @@ function createSession() {
 function startSession(customItems = null) {
     const items = customItems || createSession();
     if (!items || items.length === 0) return;
+
+    state.isWrongPractice = Boolean(customItems) || (els.categorySelect && els.categorySelect.value === "wrong");
 
     if (state.reviewUnlockTimer) {
         clearTimeout(state.reviewUnlockTimer);
@@ -1324,6 +1457,8 @@ function startRecognition(customItems = null) {
     const items = customItems || createSession();
     if (!items || items.length === 0) return;
 
+    state.isWrongPractice = Boolean(customItems) || (els.categorySelect && els.categorySelect.value === "wrong");
+
     if (state.recognitionUnlockTimer) {
         clearTimeout(state.recognitionUnlockTimer);
         state.recognitionUnlockTimer = null;
@@ -1493,11 +1628,12 @@ function finishRecognition() {
         els.resultList.appendChild(chip);
     });
 
-    els.practiceWrongBtn.disabled = unfamiliarAnswers.length === 0;
+    const uniqueUnfamiliar = getUniqueItems(unfamiliarAnswers.map(a => a.item));
+    els.practiceWrongBtn.disabled = uniqueUnfamiliar.length === 0;
     els.practiceWrongBtn.textContent =
-        unfamiliarAnswers.length === 0
+        uniqueUnfamiliar.length === 0
             ? "本轮全部会读"
-            : `再练不会的字（${unfamiliarAnswers.length}个）`;
+            : `再练不会的字（${uniqueUnfamiliar.length}个）`;
 
     if (els.continueDueBtn) {
         const dueCount = getDueCharacters(stats).length;
@@ -1586,6 +1722,8 @@ function getChoiceOptions(item) {
 function startChoice(customItems = null) {
     const items = customItems || createSession();
     if (!items || items.length === 0) return;
+
+    state.isWrongPractice = Boolean(customItems) || (els.categorySelect && els.categorySelect.value === "wrong");
 
     state.mode = "choice";
     state.choiceSession = shuffle(items);
@@ -1778,9 +1916,10 @@ function finishChoice() {
         chip.title = `${answer.isCorrect ? "一次选对" : "再次尝试后选对"} · 当前 Lv.${cs.level}，下次复习: ${formatDateDisplay(cs.nextReviewDate)}`;
         els.resultList.appendChild(chip);
     });
-    els.practiceWrongBtn.disabled = wrongAnswers.length === 0;
-    els.practiceWrongBtn.textContent = wrongAnswers.length
-        ? `再练本轮易错字（${wrongAnswers.length}个）`
+    const uniqueWrong = getUniqueItems(wrongAnswers.map(a => a.item));
+    els.practiceWrongBtn.disabled = uniqueWrong.length === 0;
+    els.practiceWrongBtn.textContent = uniqueWrong.length
+        ? `再练本轮易错字（${uniqueWrong.length}个）`
         : "本轮全部一次选对";
 
     if (els.continueDueBtn) {
@@ -1889,11 +2028,12 @@ function finishSession() {
         els.resultList.appendChild(card);
     });
 
-    els.practiceWrongBtn.disabled = wrongAnswers.length === 0;
+    const uniqueWrong = getUniqueItems(wrongAnswers.map(a => a.item));
+    els.practiceWrongBtn.disabled = uniqueWrong.length === 0;
     els.practiceWrongBtn.textContent =
-        wrongAnswers.length === 0
+        uniqueWrong.length === 0
             ? "本轮没有错字"
-            : `再练本轮错字（${wrongAnswers.length}个）`;
+            : `再练本轮错字（${uniqueWrong.length}个）`;
 
     if (els.continueDueBtn) {
         const dueCount = getDueCharacters(stats).length;
@@ -2504,9 +2644,9 @@ els.backHomeBtn.addEventListener("click", () => {
 
 els.practiceWrongBtn.addEventListener("click", () => {
     if (state.mode === "recognition") {
-        const unfamiliarItems = state.recognitionAnswers
+        const unfamiliarItems = getUniqueItems(state.recognitionAnswers
             .filter(answer => !answer.isCorrect)
-            .map(answer => answer.item);
+            .map(answer => answer.item));
 
         if (unfamiliarItems.length > 0) {
             startRecognition(unfamiliarItems);
@@ -2515,16 +2655,16 @@ els.practiceWrongBtn.addEventListener("click", () => {
     }
 
     if (state.mode === "choice") {
-        const wrongItems = state.choiceAnswers
+        const wrongItems = getUniqueItems(state.choiceAnswers
             .filter(answer => !answer.isCorrect)
-            .map(answer => answer.item);
+            .map(answer => answer.item));
         if (wrongItems.length > 0) startChoice(wrongItems);
         return;
     }
 
-    const wrongItems = state.answers
+    const wrongItems = getUniqueItems(state.answers
         .filter(answer => !answer.isCorrect)
-        .map(answer => answer.item);
+        .map(answer => answer.item));
 
     if (wrongItems.length > 0) {
         startSession(wrongItems);
@@ -2753,6 +2893,42 @@ document.getElementById("practiceWrongFromTabBtn")?.addEventListener("click", ()
         return;
     }
     startSession(wrongChars);
+});
+
+document.getElementById("practiceWrongRecognitionBtn")?.addEventListener("click", () => {
+    const stats = loadStats();
+    const wrongChars = getWrongCharacters(stats);
+    if (wrongChars.length === 0) {
+        if (window.kidToast) {
+            window.kidToast("错字本目前为空，太棒啦！🎉", "success");
+        } else {
+            alert("错字本目前为空，太棒啦！");
+        }
+        return;
+    }
+    startRecognition(wrongChars);
+});
+
+document.getElementById("practiceWrongChoiceBtn")?.addEventListener("click", () => {
+    const stats = loadStats();
+    const wrongChars = getWrongCharacters(stats);
+    if (wrongChars.length === 0) {
+        if (window.kidToast) {
+            window.kidToast("错字本目前为空，太棒啦！🎉", "success");
+        } else {
+            alert("错字本目前为空，太棒啦！");
+        }
+        return;
+    }
+    startChoice(wrongChars);
+});
+
+document.getElementById("clearWrongBookBtn")?.addEventListener("click", () => {
+    clearWrongBook();
+});
+
+document.getElementById("emptyStateGoPracticeBtn")?.addEventListener("click", () => {
+    switchHomeTab("practice");
 });
 
 // 监听全局夜间护眼模式切换，即时刷新手写画笔与笔画演示色彩
