@@ -25,7 +25,7 @@
     <!-- 全局统一儿童友好设计系统样式表 -->
     <link rel="stylesheet" href="../css/style.css?v=2.2.3" />
     <!-- 汉字模块专属手写板与笔顺样式 -->
-    <link rel="stylesheet" href="./hanzi.css?v=2.2.5" />
+    <link rel="stylesheet" href="./hanzi.css?v=2.2.6" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
     <script src="../js/kid-dialog.js?v=2.0.3"></script>
@@ -522,7 +522,7 @@
                     <button id="recognitionCharBtn" class="w-full max-w-[280px] sm:max-w-[320px] aspect-square rounded-3xl bg-gradient-to-b from-indigo-50/70 to-white border-4 border-indigo-200/90 shadow-lg flex flex-col items-center justify-center active:scale-98 transition-all">
                         <span id="recognitionChar" class="text-8xl sm:text-9xl font-black text-slate-900 leading-none hanzi-font"></span>
                         <span id="recognitionTapTip" class="text-xs sm:text-sm font-black text-indigo-700 mt-4 px-4 py-1.5 rounded-full bg-indigo-100 flex items-center space-x-1 shadow-sm">
-                            <span>🔊 点一下听读音</span>
+                            <span>读完了？点我听听对不对 🔊</span>
                         </span>
                     </button>
 
@@ -557,7 +557,7 @@
                 <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
                     <div class="text-sm font-black text-slate-800 flex items-center space-x-1.5">
                         <span class="text-base">📖</span>
-                        <span>连贯故事：第 <strong id="storyCurrentNumber" class="text-indigo-600">1</strong> / <span id="storyTotalNumber">29</span> 段</span>
+                        <span>连贯故事：第 <strong id="storyCurrentNumber" class="text-indigo-600">1</strong> / <span id="storyTotalNumber">42</span> 段</span>
                     </div>
                     <button id="quitStoryBtn" class="text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-95 transition-all">
                         返回主页
@@ -566,7 +566,7 @@
 
                 <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col justify-between space-y-3">
                     <div class="flex items-center justify-between text-xs sm:text-sm text-slate-400 font-bold px-1">
-                        <span>《小宝贝丁丁的美好一天》</span>
+                        <span>《丁丁一家去公园》</span>
                         <span class="text-xs bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-1">
                             <span>👆</span> 点汉字听发音
                         </span>
@@ -624,10 +624,17 @@
                         <span id="strokeHint" class="text-xs sm:text-sm font-bold text-slate-500 mt-1 block"></span>
                     </div>
 
+                    <div class="stroke-mode-switch" role="group" aria-label="笔画练习方式">
+                        <button id="strokeWatchBtn" type="button" class="stroke-mode-btn active" aria-pressed="true">👀 看笔顺</button>
+                        <button id="strokeQuizBtn" type="button" class="stroke-mode-btn" aria-pressed="false">✍️ 我来写</button>
+                    </div>
+
                     <div id="strokeGrid" class="stroke-grid">
                         <div id="strokeWriter" class="stroke-writer"></div>
                         <div id="strokeStatus" class="stroke-status">准备动画中…</div>
                     </div>
+
+                    <div id="strokeFeedback" class="stroke-feedback" aria-live="polite"></div>
 
                     <div class="w-full max-w-[340px] grid grid-cols-2 gap-3 pt-2">
                         <button id="previousStrokeBtn" class="py-3.5 kid-btn-light text-slate-700 text-sm font-black rounded-2xl">
@@ -825,7 +832,7 @@
 
     <!-- 脚本引入 -->
     <script src="../libs/hanzi-writer.min.js" defer></script>
-    <script src="./hanzi-data.js?v=2.2.0" defer></script>
-    <script src="./hanzi.js?v=2.2.8" defer></script>
+    <script src="./hanzi-data.js?v=2.2.2" defer></script>
+    <script src="./hanzi.js?v=2.3.0" defer></script>
 </body>
 </html>

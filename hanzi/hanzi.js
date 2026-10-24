@@ -7,7 +7,7 @@ const SPEECH_SETTINGS_KEY = "hanziSpeechSettingsV1";
 const SYNC_KEY_STORAGE = "hanziSyncKeyV1";
 const AUTO_SYNC_STORAGE = "hanziAutoSyncV1";
 const LAST_SYNC_TIME_KEY = "hanziLastSyncTimeV1";
-const STORY_PROGRESS_KEY = "hanziStoryProgressV1";
+const STORY_PROGRESS_KEY = "hanziStoryProgressV2";
 
 let debounceSyncTimer = null;
 
@@ -38,10 +38,13 @@ const state = {
     showStoryPinyin: false,
     storySpeakingCharIndex: -1,
     storyCharHighlightTimer: null,
+    storyReadToken: 0,
+    currentUtterance: null,
     strokeSession: [],
     strokeIndex: 0,
     strokeWriter: null,
     strokeRenderToken: 0,
+    strokeMode: "watch",
     strokeStartToken: 0,
     reviewLocked: false,
     reviewUnlockTimer: null,
@@ -174,6 +177,9 @@ const els = {
     strokeGrid: document.getElementById("strokeGrid"),
     strokeWriter: document.getElementById("strokeWriter"),
     strokeStatus: document.getElementById("strokeStatus"),
+    strokeWatchBtn: document.getElementById("strokeWatchBtn"),
+    strokeQuizBtn: document.getElementById("strokeQuizBtn"),
+    strokeFeedback: document.getElementById("strokeFeedback"),
     previousStrokeBtn: document.getElementById("previousStrokeBtn"),
     nextStrokeBtn: document.getElementById("nextStrokeBtn"),
     quitStrokeBtn: document.getElementById("quitStrokeBtn"),
@@ -213,6 +219,19 @@ function getNextReviewDays(level) {
         case 5: return "30天后";
         default: return "60天后";
     }
+}
+
+function isDueForReview(charStats) {
+    return (Number(charStats.nextReviewDate) || 0) <= Date.now();
+}
+
+// 生成“答对/答错后会怎样”的提示文字
+function getReviewPredictText(charStats, correctVerb, wrongVerb) {
+    const level = Number(charStats.level) || 0;
+    const correctPart = isDueForReview(charStats)
+        ? `✅ ${correctVerb}升至 Lv.${level + 1}（${getNextReviewDays(level + 1)}复习）`
+        : `✅ ${correctVerb}保持 Lv.${level}（还没到复习时间，算加练）`;
+    return `${correctPart} · ❌ ${wrongVerb}重置为 Lv.0 并本轮追加重练`;
 }
 
 function formatDateDisplay(ts) {
@@ -260,7 +279,7 @@ function getDefaultStats() {
     };
 }
 
-function ensureAllCharactersLearned(stats) {
+function ensureAllCharactersLearned(stats, persist = true) {
     if (!stats.characters) stats.characters = {};
     let changed = false;
     const now = Date.now();
@@ -308,7 +327,7 @@ function ensureAllCharactersLearned(stats) {
         });
     }
 
-    if (changed) {
+    if (changed && persist) {
         saveStats(stats);
     }
     return stats;
@@ -327,6 +346,7 @@ function loadStats() {
         const stats = {
             totalPracticed: Number(parsed.totalPracticed) || 0,
             totalCorrect: Number(parsed.totalCorrect) || 0,
+            resetAt: Number(parsed.resetAt) || 0,
             characters: parsed.characters || {}
         };
         return ensureAllCharactersLearned(stats);
@@ -508,11 +528,26 @@ async function pushToCloud(silent = false) {
             if (raw) speechSettings = JSON.parse(raw);
         } catch (_) {}
 
-        const res = await fetch(`/api/hanzi/sync?key=${encodeURIComponent(key)}`, {
+        // 推送前先与云端合并，避免另一台设备上较新的进度被旧数据覆盖
+        let stats = loadStats();
+        try {
+            const cloudRes = await fetch("/api/hanzi/sync", {headers: {"X-Sync-Key": key}});
+            const cloudJson = await cloudRes.json();
+            const cloudStats = cloudJson?.success && cloudJson.data?.stats;
+            if (cloudStats && typeof cloudStats === "object") {
+                stats = mergeStats(stats, cloudStats);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+                refreshHomeStats();
+            }
+        } catch (error) {
+            console.warn("推送前读取云端数据失败，将直接推送本地数据：", error);
+        }
+
+        const res = await fetch("/api/hanzi/sync", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {"Content-Type": "application/json", "X-Sync-Key": key},
             body: JSON.stringify({
-                stats: loadStats(),
+                stats,
                 strokeProgress: strokeProg,
                 speechSettings: speechSettings,
                 syncKey: key
@@ -564,6 +599,50 @@ async function pushToCloud(silent = false) {
     }
 }
 
+function getRecordTime(record) {
+    if (!record) return 0;
+    return Number(record.updatedAt) || Date.parse(record.lastPracticed || "") || 0;
+}
+
+// 按字合并本地与云端记录：每个字取最近一次更新的那份，避免多设备之间互相覆盖丢失进度。
+// resetAt 之前的记录视为已被“清空全部记录”删除。
+function mergeStats(local, cloud) {
+    const resetAt = Math.max(Number(local.resetAt) || 0, Number(cloud.resetAt) || 0);
+    const localChars = local.characters || {};
+    const cloudChars = cloud.characters || {};
+    const characters = {};
+    new Set([...Object.keys(localChars), ...Object.keys(cloudChars)]).forEach(char => {
+        const candidates = [localChars[char], cloudChars[char]]
+            .filter(record => record && getRecordTime(record) >= resetAt);
+        if (candidates.length === 0) return;
+        candidates.sort((a, b) => getRecordTime(b) - getRecordTime(a));
+        characters[char] = candidates[0];
+    });
+
+    const pickTotals = source => (Number(source.resetAt) || 0) >= resetAt
+        ? {practiced: Number(source.totalPracticed) || 0, correct: Number(source.totalCorrect) || 0}
+        : {practiced: 0, correct: 0};
+    const localTotals = pickTotals(local);
+    const cloudTotals = pickTotals(cloud);
+    const useLocalTotals = localTotals.practiced >= cloudTotals.practiced;
+    const totals = useLocalTotals ? localTotals : cloudTotals;
+
+    return ensureAllCharactersLearned({
+        totalPracticed: totals.practiced,
+        totalCorrect: totals.correct,
+        resetAt,
+        characters
+    }, false);
+}
+
+function statsEqual(a, b) {
+    try {
+        return JSON.stringify(a) === JSON.stringify(b);
+    } catch (_) {
+        return false;
+    }
+}
+
 async function pullFromCloud(silent = false) {
     const key = (els.syncKeyInput ? els.syncKeyInput.value.trim() : "") || (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim();
     if (!key) {
@@ -596,13 +675,16 @@ async function pullFromCloud(silent = false) {
 
     setSyncStatus("syncing", "正在拉取...");
     try {
-        const res = await fetch(`/api/hanzi/sync?key=${encodeURIComponent(key)}`);
+        const res = await fetch("/api/hanzi/sync", {headers: {"X-Sync-Key": key}});
         const json = await res.json();
 
         if (json.success && json.data) {
             const cloudData = json.data;
             if (cloudData.stats && typeof cloudData.stats === "object") {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData.stats));
+                const merged = mergeStats(loadStats(), cloudData.stats);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+                // 本地有比云端更新的记录时，把合并结果推回云端
+                if (!statsEqual(merged, cloudData.stats)) triggerAutoSync();
             }
             if (cloudData.strokeProgress) {
                 localStorage.setItem(STROKE_PROGRESS_KEY, cloudData.strokeProgress);
@@ -691,31 +773,8 @@ function previewSpeech() {
         alertSpeechNotSupported();
         return;
     }
-    window.speechSynthesis.cancel();
-
-    const rate = Number(els.speechRate.value) || 0.78;
-    const mode = els.speechMode.value;
-    let text = "天。天空的天。";
-    if (mode === "char") {
-        text = "天";
-    } else if (mode === "twice") {
-        text = "天。天。";
-    }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "zh-CN";
-    utterance.rate = rate;
-    utterance.pitch = 1.02;
-    utterance.volume = 1;
-
-    const voice = getChineseVoice();
-    if (voice) utterance.voice = voice;
-
-    utterance.onerror = event => {
-        console.warn("试听播放失败：", event.error);
-    };
-
-    window.speechSynthesis.speak(utterance);
+    const sample = findItem("天") || {char: "天", hint: "天空的天"};
+    speakText(getItemSpeechText(sample, els.speechMode.value));
 }
 
 function getCharStats(stats, char) {
@@ -746,14 +805,18 @@ function updateStatsForAnswer(item, isCorrect) {
 
     const oldLevel = Number(charStats.level) || 0;
     let newLevel = oldLevel;
+    charStats.updatedAt = Date.now();
 
     if (isCorrect) {
         stats.totalCorrect += 1;
         charStats.correct += 1;
         charStats.streak += 1;
-        newLevel = oldLevel + 1;
-        charStats.level = newLevel;
-        charStats.nextReviewDate = calculateNextReview(newLevel);
+        // 只有到了复习时间再答对才升级；提前加练答对不改变排期，避免一天内连刷升到高等级后很久不复习
+        if (isDueForReview(charStats)) {
+            newLevel = oldLevel + 1;
+            charStats.level = newLevel;
+            charStats.nextReviewDate = calculateNextReview(newLevel);
+        }
         // 关键修复：如果在错字本专项练习中攻克，或连续答对 streak>=2 或升级至 Lv.2+，自动移出错字本！
         if (state.isWrongPractice || charStats.streak >= 2 || newLevel >= 2) {
             charStats.inWrongBook = false;
@@ -789,26 +852,15 @@ function getWrongCharacters(stats = loadStats()) {
 }
 
 function speakSingleCharacter(char) {
-    if (!char || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(char);
-    utterance.lang = "zh-CN";
-    utterance.rate = Number(els.speechRate ? els.speechRate.value : 0.78) || 0.78;
-    utterance.pitch = 1.02;
-    utterance.volume = 1;
-
-    const voice = getChineseVoice();
-    if (voice) utterance.voice = voice;
-    utterance.onerror = event => {
-        console.warn("读音失败：", event.error);
-    };
-    window.speechSynthesis.speak(utterance);
+    if (!char) return;
+    speakText(getCharSpeechText(char));
 }
 
 function removeFromWrongBook(char) {
     const stats = loadStats();
     const charStats = getCharStats(stats, char);
     charStats.inWrongBook = false;
+    charStats.updatedAt = Date.now();
     stats.characters[char] = charStats;
     saveStats(stats);
     refreshHomeStats();
@@ -843,6 +895,7 @@ async function clearWrongBook() {
         wrongChars.forEach(item => {
             const cs = getCharStats(stats, item.char);
             cs.inWrongBook = false;
+            cs.updatedAt = Date.now();
             stats.characters[item.char] = cs;
         });
         saveStats(stats);
@@ -1067,16 +1120,31 @@ function createSession() {
             if (pool.length === 0) pool = [...HANZI_DATA];
         }
     } else if (selectedCategory === "all") {
-        const due = getDueCharacters(stats);
-        const nonDue = HANZI_DATA.filter(item => !due.some(d => d.char === item.char));
-        pool = [...shuffle(due), ...shuffle(nonDue)];
+        pool = HANZI_DATA;
     } else {
         pool = HANZI_DATA.filter(item => item.category === selectedCategory);
     }
 
     const count = Math.min(requestedCount, pool.length);
 
-    return shuffle(pool).slice(0, count);
+    // 先挑到期的字（等级低、逾期久的优先），不足再补未到期的字；选出后打乱出题顺序
+    return shuffle(prioritizeForReview(pool, stats).slice(0, count));
+}
+
+function prioritizeForReview(items, stats) {
+    const now = Date.now();
+    return shuffle(items)
+        .map(item => ({item, cs: getCharStats(stats, item.char)}))
+        .sort((a, b) => {
+            const aDue = (a.cs.nextReviewDate || 0) <= now;
+            const bDue = (b.cs.nextReviewDate || 0) <= now;
+            if (aDue !== bDue) return aDue ? -1 : 1;
+            if (!aDue) return 0;
+            const levelDiff = (a.cs.level || 0) - (b.cs.level || 0);
+            if (levelDiff !== 0) return levelDiff;
+            return (a.cs.nextReviewDate || 0) - (b.cs.nextReviewDate || 0);
+        })
+        .map(entry => entry.item);
 }
 
 function startSession(customItems = null) {
@@ -1235,15 +1303,101 @@ function captureWriting() {
     return state.currentWriting;
 }
 
-function getChineseVoice() {
-    const voices = window.speechSynthesis?.getVoices?.() || [];
+let cachedChineseVoice;
 
-    return (
-        voices.find(voice => /^zh-CN/i.test(voice.lang)) ||
-        voices.find(voice => /^zh/i.test(voice.lang)) ||
-        voices[0] ||
-        null
-    );
+// 优先选择自然、清晰的普通话女声；排除粤语(zh-HK)，避免小朋友听到非普通话读音
+function getChineseVoice() {
+    if (cachedChineseVoice !== undefined) return cachedChineseVoice;
+    const voices = window.speechSynthesis?.getVoices?.() || [];
+    if (voices.length === 0) return null;
+
+    const scoreVoice = voice => {
+        const lang = (voice.lang || "").replace("_", "-");
+        const name = voice.name || "";
+        if (/HK|yue|Cantonese|粤/i.test(lang + name)) return -1;
+        let score;
+        if (/^(zh-CN|zh-Hans|cmn)/i.test(lang)) score = 100;
+        else if (/^zh-(TW|Hant)/i.test(lang)) score = 40;
+        else if (/^zh/i.test(lang)) score = 60;
+        else return -1;
+        if (/Natural|Online|Neural/i.test(name)) score += 30;
+        if (/Xiaoxiao|Xiaoyi|晓晓|晓伊/i.test(name)) score += 20;
+        if (/Google/i.test(name)) score += 15;
+        if (/Tingting|Ting-Ting|婷婷|Lili|Meijia/i.test(name)) score += 10;
+        return score;
+    };
+
+    const ranked = voices
+        .map(voice => ({voice, score: scoreVoice(voice)}))
+        .filter(entry => entry.score >= 0)
+        .sort((a, b) => b.score - a.score);
+    cachedChineseVoice = ranked.length > 0 ? ranked[0].voice : null;
+    return cachedChineseVoice;
+}
+
+function getSpeechRate() {
+    return Number(els.speechRate?.value) || state.speechRate || 0.78;
+}
+
+// 统一朗读入口：所有模式都通过这里发音，保证语音、语速一致
+function speakText(text, {rate, onstart, onend, interrupt = true} = {}) {
+    if (!text || !("speechSynthesis" in window)) return null;
+    if (interrupt) window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "zh-CN";
+    utterance.rate = rate || getSpeechRate();
+    utterance.pitch = 1.05;
+    utterance.volume = 1;
+    const voice = getChineseVoice();
+    if (voice) utterance.voice = voice;
+    if (onstart) utterance.onstart = onstart;
+    utterance.onend = () => onend?.();
+    utterance.onerror = event => {
+        if (event.error !== "interrupted" && event.error !== "canceled") {
+            console.warn("语音播放失败：", event.error);
+        }
+        onend?.();
+    };
+    // 保留引用，避免部分浏览器在播放中途回收对象导致 onend 不触发
+    state.currentUtterance = utterance;
+    window.speechSynthesis.speak(utterance);
+    return utterance;
+}
+
+function isPolyphone(char) {
+    return typeof POLYPHONE_CHARS === "string" && POLYPHONE_CHARS.includes(char);
+}
+
+// 从“头发的发”这类提示中取出词语“头发”
+function getHintWord(item) {
+    if (!item || !item.hint) return "";
+    const suffix = `的${item.char}`;
+    const word = item.hint.endsWith(suffix) ? item.hint.slice(0, -suffix.length) : "";
+    return word.includes(item.char) ? word : "";
+}
+
+function findItem(char) {
+    return HANZI_DATA.find(item => item.char === char) || null;
+}
+
+// 单字发音：多音字/轻声字改读词语，避免语音引擎读错
+function getCharSpeechText(char) {
+    const item = findItem(char);
+    if (item && isPolyphone(char)) {
+        const word = getHintWord(item);
+        if (word) return word;
+    }
+    return char;
+}
+
+// 按“朗读方式”设置生成题目读音
+function getItemSpeechText(item, mode = state.speechMode) {
+    const word = isPolyphone(item.char) ? getHintWord(item) : "";
+    const lead = word || item.char;
+    if (mode === "char") return lead;
+    if (mode === "twice") return `${lead}。${lead}。`;
+    return `${lead}。${item.hint}。`;
 }
 
 function speakCurrent() {
@@ -1254,32 +1408,7 @@ function speakCurrent() {
         alertSpeechNotSupported();
         return;
     }
-
-    window.speechSynthesis.cancel();
-
-    let text;
-    if (state.speechMode === "char") {
-        text = item.char;
-    } else if (state.speechMode === "twice") {
-        text = `${item.char}。${item.char}。`;
-    } else {
-        text = `${item.char}。${item.hint}。`;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "zh-CN";
-    utterance.rate = state.speechRate;
-    utterance.pitch = 1.02;
-    utterance.volume = 1;
-
-    const voice = getChineseVoice();
-    if (voice) utterance.voice = voice;
-
-    utterance.onerror = event => {
-        console.warn("语音播放失败：", event.error);
-    };
-
-    window.speechSynthesis.speak(utterance);
+    speakText(getItemSpeechText(item), {rate: state.speechRate});
 }
 
 function lockVerdictButtons(duration = 650) {
@@ -1384,10 +1513,8 @@ function renderReview() {
     // 艾宾浩斯排期预测提示
     const stats = loadStats();
     const cs = getCharStats(stats, item.char);
-    const curLevel = cs.level || 0;
-    const nextDays = getNextReviewDays(curLevel + 1);
     if (els.dictationEbPredictText) {
-        els.dictationEbPredictText.textContent = `✅ 写对了将升至 Lv.${curLevel + 1}（${nextDays}复习） · ❌ 记错了重置为 Lv.0 并本轮追加重练`;
+        els.dictationEbPredictText.textContent = getReviewPredictText(cs, "写对了将", "记错了");
     }
 
     els.answerPanel.classList.remove("hidden");
@@ -1420,6 +1547,7 @@ function recordAnswer(isCorrect) {
     });
 
     updateStatsForAnswer(item, isCorrect);
+    if (isCorrect) playSuccessSound();
 
     // 回答错误追加到本轮末尾重练，巩固记忆
     if (!isCorrect) {
@@ -1492,7 +1620,7 @@ function renderRecognitionQuestion() {
         `${((state.recognitionIndex + 1) / state.recognitionSession.length) * 100}%`;
 
     els.recognitionChar.textContent = item.char;
-    els.recognitionTapTip.textContent = "🔊 点一下听读音";
+    els.recognitionTapTip.textContent = "读完了？点我听听对不对 🔊";
     els.recognitionPinyin.textContent = "";
     els.recognitionHint.textContent = "";
 
@@ -1500,10 +1628,8 @@ function renderRecognitionQuestion() {
 
     const stats = loadStats();
     const cs = getCharStats(stats, item.char);
-    const curLevel = cs.level || 0;
-    const nextDays = getNextReviewDays(curLevel + 1);
     if (els.recognitionEbPredictText) {
-        els.recognitionEbPredictText.textContent = `✅ 读对了将升至 Lv.${curLevel + 1}（${nextDays}复习） · ❌ 没读出重置为 Lv.0 并本轮追加重练`;
+        els.recognitionEbPredictText.textContent = getReviewPredictText(cs, "读对了将", "没读出");
     }
 
     els.recognitionReveal.classList.add("hidden");
@@ -1518,31 +1644,7 @@ function speakRecognitionCurrent() {
         return;
     }
 
-    window.speechSynthesis.cancel();
-
-    let text;
-    if (state.speechMode === "char") {
-        text = item.char;
-    } else if (state.speechMode === "twice") {
-        text = `${item.char}。${item.char}。`;
-    } else {
-        text = `${item.char}。${item.hint}。`;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "zh-CN";
-    utterance.rate = state.speechRate;
-    utterance.pitch = 1.02;
-    utterance.volume = 1;
-
-    const voice = getChineseVoice();
-    if (voice) utterance.voice = voice;
-
-    utterance.onerror = event => {
-        console.warn("语音播放失败：", event.error);
-    };
-
-    window.speechSynthesis.speak(utterance);
+    speakText(getItemSpeechText(item), {rate: state.speechRate});
 
     els.recognitionPinyin.textContent = PINYIN_MAP[item.char] || "";
     els.recognitionHint.textContent = item.hint;
@@ -1570,6 +1672,7 @@ function recordRecognitionAnswer(isCorrect) {
     });
 
     updateStatsForAnswer(item, isCorrect);
+    if (isCorrect) playSuccessSound();
 
     if (!isCorrect) {
         state.recognitionSession.push(item);
@@ -1658,11 +1761,17 @@ function finishRecognition() {
     }
 }
 
+// COMMON_HANZI 前段是 2500 个一级常用字，“蔼”起是 1000 个次常用字（如“糠”“蔗”），
+// 对小朋友来说过于生僻，干扰项只从一级常用字里挑
+function getDistractorPool() {
+    if (typeof COMMON_HANZI !== "string" || COMMON_HANZI.length === 0) return "";
+    const secondaryStart = COMMON_HANZI.indexOf("蔼");
+    return secondaryStart > 0 ? COMMON_HANZI.slice(0, secondaryStart) : COMMON_HANZI;
+}
+
 // 获取常用汉字集合中的随机汉字（从3500常用字中挑选，排除已学汉字和指定排除字符）
 function getRandomCommonHanzi(excludeSet) {
-    const pool = (typeof COMMON_HANZI === "string" && COMMON_HANZI.length > 0)
-        ? COMMON_HANZI
-        : "";
+    const pool = getDistractorPool();
 
     if (pool.length > 0) {
         let attempts = 0;
@@ -1772,68 +1881,80 @@ function renderChoiceQuestion() {
 
 function speakChoiceCurrent() {
     const item = state.choiceSession[state.choiceIndex];
-    if (!item || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(`${item.char}。${item.hint}。`);
-    utterance.lang = "zh-CN";
-    utterance.rate = state.speechRate;
-    utterance.pitch = 1.02;
-    const voice = getChineseVoice();
-    if (voice) utterance.voice = voice;
-    window.speechSynthesis.speak(utterance);
+    if (!item) return;
+    // 选字题必须带提示词，才能区分同音字（如“青”和“清”）
+    speakText(getItemSpeechText(item, "hint"), {rate: state.speechRate});
+}
+
+let sharedAudioContext = null;
+
+function getAudioContext() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    if (!sharedAudioContext || sharedAudioContext.state === "closed") {
+        sharedAudioContext = new AudioContextClass();
+    }
+    sharedAudioContext.resume?.();
+    return sharedAudioContext;
+}
+
+// 答对时的“叮咚”上行音，给小朋友即时的正向鼓励
+function playSuccessSound() {
+    try {
+        const context = getAudioContext();
+        if (!context) return;
+        const start = context.currentTime + 0.01;
+        [523.25, 659.25, 783.99].forEach((freq, i) => {
+            const oscillator = context.createOscillator();
+            const gain = context.createGain();
+            const at = start + i * 0.09;
+            oscillator.type = "triangle";
+            oscillator.frequency.setValueAtTime(freq, at);
+            gain.gain.setValueAtTime(0.0001, at);
+            gain.gain.exponentialRampToValueAtTime(0.3, at + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.28);
+            oscillator.connect(gain).connect(context.destination);
+            oscillator.start(at);
+            oscillator.stop(at + 0.3);
+        });
+    } catch (error) {
+        console.warn("提示音播放失败：", error);
+    }
 }
 
 function playErrorSound() {
     try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContextClass) return;
-        const context = new AudioContextClass();
+        const context = getAudioContext();
+        if (!context) return;
         const oscillator = context.createOscillator();
         const gain = context.createGain();
         const startAt = context.currentTime + 0.01;
-        oscillator.type = "square";
-        oscillator.frequency.setValueAtTime(260, startAt);
-        oscillator.frequency.setValueAtTime(180, startAt + 0.14);
+        // 柔和的低音“嘟嘟”，提示选错但不吓到小朋友
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(330, startAt);
+        oscillator.frequency.setValueAtTime(247, startAt + 0.14);
         gain.gain.setValueAtTime(0.0001, context.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.48, startAt + 0.015);
-        gain.gain.setValueAtTime(0.48, startAt + 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.4, startAt + 0.015);
+        gain.gain.setValueAtTime(0.4, startAt + 0.12);
         gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.3);
         oscillator.connect(gain).connect(context.destination);
-        context.resume?.();
         oscillator.start(startAt);
         oscillator.stop(startAt + 0.31);
-        oscillator.addEventListener("ended", () => context.close());
     } catch (error) {
         console.warn("提示音播放失败：", error);
     }
 }
 
 function speakOptionCharacter(option, button) {
-    if (!option || !option.char || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
+    if (!option || !option.char) return;
 
     const char = option.char;
     const item = state.choiceSession[state.choiceIndex];
-    let text = char;
-    // 如果点击的是当前本题目标汉字，且有词语提示，按照设置发音
-    if (item && char === item.char && item.hint && state.speechMode !== "char") {
-        text = `${char}。${item.hint}。`;
-    } else {
-        text = char;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "zh-CN";
-    utterance.rate = state.speechRate || Number(els.speechRate?.value) || 0.78;
-    utterance.pitch = 1.02;
-    utterance.volume = 1;
-
-    const voice = getChineseVoice();
-    if (voice) utterance.voice = voice;
-    utterance.onerror = event => {
-        console.warn("选字发音失败：", event.error);
-    };
-    window.speechSynthesis.speak(utterance);
+    // 点到本题目标字时按设置带提示词朗读，其他干扰字只读字音
+    const text = item && char === item.char && item.hint
+        ? getItemSpeechText(item)
+        : getCharSpeechText(char);
+    speakText(text, {rate: state.speechRate});
 
     if (button) {
         button.classList.remove("choice-speaking");
@@ -1862,6 +1983,11 @@ function chooseCharacter(option, button) {
         button.setAttribute("aria-label", `选择汉字${option.char}，回答错误`);
         button.disabled = true;
         playErrorSound();
+        // 选错后自动再播一次正确读音，引导小朋友重新辨认
+        const choiceIndex = state.choiceIndex;
+        setTimeout(() => {
+            if (state.choiceIndex === choiceIndex && !state.choiceLocked) speakChoiceCurrent();
+        }, 650);
         return;
     }
 
@@ -1881,6 +2007,15 @@ function chooseCharacter(option, button) {
     const isFirstTryCorrect = !state.choiceHadMistake;
     state.choiceAnswers.push({item, isCorrect: isFirstTryCorrect});
     updateStatsForAnswer(item, isFirstTryCorrect);
+
+    // 选对后先响“叮咚”，再读一遍这个字，让字形和读音在脑中连起来
+    playSuccessSound();
+    const choiceIndex = state.choiceIndex;
+    setTimeout(() => {
+        if (state.choiceIndex === choiceIndex && !els.choiceScreen.classList.contains("hidden")) {
+            speakText(getCharSpeechText(item.char), {rate: state.speechRate});
+        }
+    }, 450);
 }
 
 function nextChoiceQuestion() {
@@ -2168,11 +2303,71 @@ async function startStrokePractice() {
     renderStrokeCharacter();
 }
 
-function renderStrokeCharacter() {
+function setStrokeMode(mode) {
+    if (state.strokeMode === mode) return;
+    state.strokeMode = mode;
+    renderStrokeCharacter({silent: true});
+}
+
+function updateStrokeModeButtons() {
+    const isQuiz = state.strokeMode === "quiz";
+    els.strokeWatchBtn?.classList.toggle("active", !isQuiz);
+    els.strokeQuizBtn?.classList.toggle("active", isQuiz);
+    els.strokeWatchBtn?.setAttribute("aria-pressed", String(!isQuiz));
+    els.strokeQuizBtn?.setAttribute("aria-pressed", String(isQuiz));
+}
+
+function setStrokeFeedback(text, type = "") {
+    if (!els.strokeFeedback) return;
+    els.strokeFeedback.textContent = text;
+    els.strokeFeedback.className = `stroke-feedback ${type}`;
+}
+
+// “我来写”：小朋友用手指在田字格里按笔顺描写，写错两次后自动提示下一笔
+function startStrokeQuiz(item, renderToken) {
+    const writer = state.strokeWriter;
+    if (!writer) return;
+    let strokeTotal = 0;
+    setStrokeFeedback("跟着灰色的字，一笔一笔写出来吧！", "");
+    writer.quiz({
+        leniency: 1.3,
+        showHintAfterMisses: 2,
+        highlightOnComplete: true,
+        onCorrectStroke: data => {
+            if (renderToken !== state.strokeRenderToken) return;
+            strokeTotal = data.strokeNum + 1 + data.strokesRemaining;
+            setStrokeFeedback(`写对了！第 ${data.strokeNum + 1} / ${strokeTotal} 笔 👍`, "good");
+        },
+        onMistake: data => {
+            if (renderToken !== state.strokeRenderToken) return;
+            const tip = data.mistakesOnStroke >= 2 ? "看看闪烁的提示，照着写～" : "笔顺不对哦，再试一次～";
+            setStrokeFeedback(tip, "oops");
+        },
+        onComplete: data => {
+            if (renderToken !== state.strokeRenderToken) return;
+            const perfect = data.totalMistakes === 0;
+            setStrokeFeedback(
+                perfect ? `太棒了！“${item.char}”一笔都没写错！🌟` : `写完啦！“${item.char}”写好了 🎉`,
+                "done"
+            );
+            playSuccessSound();
+            setTimeout(() => {
+                if (renderToken === state.strokeRenderToken) speakStrokeCharacter(item.char);
+            }, 500);
+        }
+    });
+}
+
+function renderStrokeCharacter({silent = false} = {}) {
     const item = state.strokeSession[state.strokeIndex];
     if (!item) return;
 
     const renderToken = ++state.strokeRenderToken;
+    const isQuiz = state.strokeMode === "quiz";
+    updateStrokeModeButtons();
+    els.strokeGrid.classList.toggle("quiz-mode", isQuiz);
+    setStrokeFeedback(isQuiz ? "" : "仔细看笔顺，跟着动画用手指在空中写一写。");
+    state.strokeWriter?.cancelQuiz?.();
     state.strokeWriter?.pauseAnimation?.();
     state.strokeWriter = null;
     els.strokeWriter.replaceChildren();
@@ -2190,7 +2385,7 @@ function renderStrokeCharacter() {
     els.nextStrokeBtn.textContent = state.strokeIndex === state.strokeSession.length - 1
         ? "回到第一字 ↺"
         : "下一字 →";
-    speakStrokeCharacter(item.char);
+    if (!silent) speakStrokeCharacter(item.char);
 
     if (typeof HanziWriter === "undefined") {
         els.strokeStatus.textContent = "笔画组件加载失败，请检查网络后刷新页面。";
@@ -2207,13 +2402,20 @@ function renderStrokeCharacter() {
         showCharacter: false,
         strokeColor: isDark ? "#60a5fa" : "#20242c",
         outlineColor: isDark ? "#475569" : "#d7dbe3",
+        drawingColor: isDark ? "#f8fafc" : "#1e293b",
+        drawingWidth: Math.max(14, Math.round(size / 18)),
+        highlightColor: "#f59e0b",
         strokeAnimationSpeed: 0.65,
         delayBetweenStrokes: 650,
         delayBetweenLoops: 1800,
         onLoadCharDataSuccess: () => {
             if (renderToken !== state.strokeRenderToken) return;
             els.strokeStatus.classList.add("hidden");
-            state.strokeWriter.loopCharacterAnimation();
+            if (isQuiz) {
+                startStrokeQuiz(item, renderToken);
+            } else {
+                state.strokeWriter.loopCharacterAnimation();
+            }
         },
         onLoadCharDataError: () => {
             if (renderToken !== state.strokeRenderToken) return;
@@ -2228,21 +2430,9 @@ function renderStrokeCharacter() {
 }
 
 function speakStrokeCharacter(char) {
-    if (!char || !("speechSynthesis" in window)) return;
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(char);
-    utterance.lang = "zh-CN";
-    utterance.rate = Number(els.speechRate.value) || 0.78;
-    utterance.pitch = 1.02;
-    utterance.volume = 1;
-
-    const voice = getChineseVoice();
-    if (voice) utterance.voice = voice;
-    utterance.onerror = event => {
-        console.warn("笔画练习读音失败：", event.error);
-    };
-    window.speechSynthesis.speak(utterance);
+    if (!char) return;
+    const item = findItem(char);
+    speakText(item ? getItemSpeechText(item, "hint") : char);
 }
 
 function showPreviousStrokeCharacter() {
@@ -2270,6 +2460,7 @@ async function quitStrokePractice() {
     }
     state.strokeStartToken += 1;
     state.strokeRenderToken += 1;
+    state.strokeWriter?.cancelQuiz?.();
     state.strokeWriter?.pauseAnimation?.();
     state.strokeWriter = null;
     window.speechSynthesis?.cancel?.();
@@ -2282,6 +2473,7 @@ function clearStoryCharHighlights() {
         state.storyCharHighlightTimer = null;
     }
     state.storySpeakingCharIndex = -1;
+    stopStoryReading();
     if (els.storyText) {
         els.storyText.querySelectorAll(".story-ruby.story-char-speaking, .story-char.story-char-speaking").forEach(el => {
             el.classList.remove("story-char-speaking");
@@ -2303,28 +2495,44 @@ function speakStoryCharacter(char, index) {
         if (rubyEl) rubyEl.classList.add("story-char-speaking");
     }
 
-    const utterance = new SpeechSynthesisUtterance(char);
-    utterance.lang = "zh-CN";
-    utterance.rate = Number(els.speechRate?.value) || 0.78;
-    utterance.pitch = 1.02;
-    utterance.volume = 1;
-
-    const voice = getChineseVoice();
-    if (voice) utterance.voice = voice;
-
-    utterance.onend = () => {
-        clearStoryCharHighlights();
-    };
-    utterance.onerror = event => {
-        console.warn("汉字读音播放失败：", event.error);
-        clearStoryCharHighlights();
-    };
-
     state.storyCharHighlightTimer = setTimeout(() => {
         clearStoryCharHighlights();
-    }, 1200);
+    }, 1500);
 
-    window.speechSynthesis.speak(utterance);
+    speakText(getCharSpeechText(char), {
+        interrupt: false,
+        onend: clearStoryCharHighlights
+    });
+}
+
+// 把一段故事按标点切成短句，逐句朗读并高亮，方便小朋友指读；
+// 同时避免部分浏览器朗读长文本超过约15秒被截断
+function splitStoryIntoChunks(text) {
+    const chunks = [];
+    const chars = Array.from(text);
+    let start = 0;
+    chars.forEach((char, idx) => {
+        if (/[，。！？；：、,.!?;]/.test(char) || idx === chars.length - 1) {
+            let end = idx + 1;
+            // 把紧跟的右引号并入本句
+            while (end < chars.length && /[”’」』）)]/.test(chars[end])) end += 1;
+            const piece = chars.slice(start, end).join("");
+            if (/[一-龥]/.test(piece)) chunks.push({text: piece, start, end});
+            start = end;
+        }
+    });
+    return chunks;
+}
+
+function highlightStoryRange(start, end) {
+    els.storyText?.querySelectorAll(".story-ruby.story-reading").forEach(el => {
+        el.classList.remove("story-reading");
+    });
+    if (start === undefined) return;
+    els.storyText?.querySelectorAll(".story-ruby").forEach(el => {
+        const idx = Number(el.dataset.index);
+        if (idx >= start && idx < end) el.classList.add("story-reading");
+    });
 }
 
 function renderStoryParagraph(index) {
@@ -2453,19 +2661,28 @@ function speakStory() {
 
     window.speechSynthesis.cancel();
     clearStoryCharHighlights();
-    const utterance = new SpeechSynthesisUtterance(state.currentStory);
-    utterance.lang = "zh-CN";
-    utterance.rate = Number(els.speechRate.value) || 0.78;
-    utterance.pitch = 1.02;
-    const voice = getChineseVoice();
-    if (voice) utterance.voice = voice;
-    utterance.onend = () => {
-        clearStoryCharHighlights();
+
+    const chunks = splitStoryIntoChunks(state.currentStory);
+    const readToken = ++state.storyReadToken;
+    const speakChunk = index => {
+        if (readToken !== state.storyReadToken) return;
+        if (index >= chunks.length) {
+            highlightStoryRange();
+            return;
+        }
+        const chunk = chunks[index];
+        highlightStoryRange(chunk.start, chunk.end);
+        speakText(chunk.text, {
+            interrupt: false,
+            onend: () => speakChunk(index + 1)
+        });
     };
-    utterance.onerror = () => {
-        clearStoryCharHighlights();
-    };
-    window.speechSynthesis.speak(utterance);
+    speakChunk(0);
+}
+
+function stopStoryReading() {
+    state.storyReadToken += 1;
+    highlightStoryRange();
 }
 
 async function quitSession() {
@@ -2558,10 +2775,12 @@ async function resetAllData() {
 
     if (!confirmed) return;
 
-    localStorage.removeItem(STORAGE_KEY);
+    // 记录清空时间，云端同步合并时会丢弃这之前的旧记录
+    const freshStats = getDefaultStats();
+    freshStats.resetAt = Date.now();
     localStorage.removeItem(STROKE_PROGRESS_KEY);
+    saveStats(freshStats);
     refreshHomeStats();
-    triggerAutoSync();
     if (window.kidToast) {
         window.kidToast("学习记录已经清空啦！", "success");
     } else {
@@ -2633,6 +2852,8 @@ els.storyText?.addEventListener("keydown", event => {
     }
 });
 els.previousStrokeBtn.addEventListener("click", showPreviousStrokeCharacter);
+els.strokeWatchBtn?.addEventListener("click", () => setStrokeMode("watch"));
+els.strokeQuizBtn?.addEventListener("click", () => setStrokeMode("quiz"));
 els.nextStrokeBtn.addEventListener("click", showNextStrokeCharacter);
 els.quitStrokeBtn.addEventListener("click", quitStrokePractice);
 
@@ -2840,7 +3061,8 @@ document.addEventListener("keydown", event => {
 if ("speechSynthesis" in window) {
     window.speechSynthesis.getVoices();
     window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.getVoices();
+        cachedChineseVoice = undefined;
+        getChineseVoice();
     };
 }
 
@@ -2936,8 +3158,8 @@ window.addEventListener('apiapia-theme-changed', () => {
     if (typeof redrawWriting === "function" && els.writingCanvas) {
         redrawWriting();
     }
-    if (state.strokeWriter && els.strokeWriter && !els.strokeModal.classList.contains("hidden")) {
-        renderStrokeDetail();
+    if (state.strokeWriter && !els.strokeScreen.classList.contains("hidden")) {
+        renderStrokeCharacter({silent: true});
     }
     // 答题面板展示时，即时刷新标准笔顺动画色彩与手写答卷对比图
     if (els.answerPanel && !els.answerPanel.classList.contains("hidden") && state.session && state.session[state.currentIndex]) {

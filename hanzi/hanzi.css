@@ -714,4 +714,107 @@ html.dark .verdict-review-time {
     filter: grayscale(0.25);
 }
 
+/* ================== 笔画练习：看笔顺 / 我来写 切换 ================== */
+.stroke-mode-switch {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    border: 2px solid #e2e8f0;
+}
 
+.stroke-mode-btn {
+    min-width: 108px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 900;
+    color: #64748b;
+    background: transparent;
+    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.stroke-mode-btn:active {
+    transform: scale(0.96);
+}
+
+.stroke-mode-btn.active {
+    background: #ffffff;
+    color: #e11d48;
+    box-shadow: 0 2px 8px rgba(225, 29, 72, 0.18);
+}
+
+/* 描写时禁止页面滚动/缩放，手指只用来写字 */
+.stroke-grid.quiz-mode {
+    touch-action: none;
+    cursor: crosshair;
+    border-color: #f59e0b;
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.2);
+}
+
+.stroke-feedback {
+    min-height: 24px;
+    font-size: 15px;
+    font-weight: 800;
+    color: #64748b;
+    text-align: center;
+    transition: color 0.15s ease;
+}
+
+.stroke-feedback.good {
+    color: #059669;
+}
+
+.stroke-feedback.oops {
+    color: #ea580c;
+    animation: choice-shake 0.35s ease;
+}
+
+.stroke-feedback.done {
+    color: #db2777;
+    font-size: 17px;
+}
+
+/* ================== 故事朗读：逐句跟读高亮 ================== */
+.story-ruby.story-reading .story-char {
+    background-color: rgba(250, 204, 21, 0.35);
+    color: #92400e;
+}
+
+html.dark .stroke-mode-switch {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+html.dark .stroke-mode-btn {
+    color: #94a3b8;
+}
+
+html.dark .stroke-mode-btn.active {
+    background: #1e293b;
+    color: #fda4af;
+}
+
+html.dark .stroke-feedback {
+    color: #94a3b8;
+}
+
+html.dark .stroke-feedback.good {
+    color: #6ee7b7;
+}
+
+html.dark .stroke-feedback.oops {
+    color: #fdba74;
+}
+
+html.dark .stroke-feedback.done {
+    color: #f9a8d4;
+}
+
+html.dark .story-ruby.story-reading .story-char {
+    background-color: rgba(250, 204, 21, 0.22);
+    color: #fef08a;
+}
