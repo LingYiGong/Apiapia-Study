@@ -7,8 +7,6 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                 // Main State
                 const currentTab = ref('practice');
                 const words = ref([]);
-                const toastMessage = ref('');
-                let toastTimer = null;
 
                 const showToast = (msg, type = 'info') => {
                     if (window.kidToast) {
@@ -16,11 +14,6 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     } else if (typeof vant !== 'undefined' && vant.showToast) {
                         vant.showToast({ message: msg, position: 'top', duration: 2200 });
                     }
-                    toastMessage.value = msg;
-                    clearTimeout(toastTimer);
-                    toastTimer = setTimeout(() => {
-                        toastMessage.value = '';
-                    }, 3000);
                 };
 
                 // Form & Management State
@@ -2712,8 +2705,7 @@ const currentWordSentenceIndex = ref(0);
                     showToast('正在播放句子发音...');
                 };
 
-                // Backward-compatibility aliases
-                const speakWord = (item) => playWord(item);
+                // Backward-compatibility alias
                 const speakCurrent = () => playCurrent();
 
                 const calculateNextReview = (level) => {
@@ -3577,30 +3569,6 @@ const currentWordSentenceIndex = ref(0);
                 };
 
                 // 练习中退出二次确认 handlers
-                const confirmReturnHome = async (e) => {
-                    if (e && e.preventDefault) e.preventDefault();
-                    const isPracticing = practiceState.value !== 'idle' ||
-                                         sentencePracticeState.value !== 'idle' ||
-                                         kanaPracticeState.value === 'writing';
-                    if (isPracticing) {
-                        if (window.kidConfirmExitPractice) {
-                            const ok = await window.kidConfirmExitPractice({
-                                title: '返回学习中心？',
-                                message: '当前正在练习中，确定要退出练习并返回首页吗？',
-                                confirmText: '确定退出',
-                                cancelText: '继续练习'
-                            });
-                            if (ok) {
-                                window.location.href = '../../index.html';
-                            }
-                        } else {
-                            window.location.href = '../../index.html';
-                        }
-                    } else {
-                        window.location.href = '../../index.html';
-                    }
-                };
-
                 const confirmExitWordPractice = async () => {
                     if (window.kidConfirmExitPractice) {
                         const ok = await window.kidConfirmExitPractice({
@@ -3636,7 +3604,6 @@ const currentWordSentenceIndex = ref(0);
                 return {
                     currentTab,
                     words,
-                    toastMessage,
                     showAddForm,
                     form,
                     editingId,
@@ -3664,8 +3631,6 @@ const currentWordSentenceIndex = ref(0);
                     toggleKanaRow,
                     kanaQuestionCount,
                     kanaPracticeState,
-                    kanaSession,
-                    kanaCurrentIndex,
                     currentKanaQuestionNumber,
                     totalKanaQuestions,
                     kanaRemainingCount,
@@ -3674,21 +3639,17 @@ const currentWordSentenceIndex = ref(0);
                     kanaWrongList,
                     currentKanaItem,
                     currentKanaExpectedChar,
-                    currentKanaPairedChar,
                     kanaAccuracyRate,
                     kanaWrongCountInSession,
                     kanaSummaryMessage,
                     chartGroupTab,
                     chartKanaList,
                     kanaCanvasRef,
-                    kanaStrokes,
                     kanaCapturedWriting,
                     showKanaResultDetailModal,
                     selectedKanaResultDetail,
                     playKanaAudio,
                     playCurrentKana,
-                    initKanaCanvas,
-                    redrawKanaCanvas,
                     beginKanaStroke,
                     continueKanaStroke,
                     endKanaStroke,
@@ -3702,7 +3663,6 @@ const currentWordSentenceIndex = ref(0);
                     removeFromWrongBook,
                     clearWrongBook,
                     quitKanaPractice,
-                    confirmReturnHome,
                     confirmExitWordPractice,
                     confirmExitSentencePractice,
 
@@ -3730,8 +3690,6 @@ const currentWordSentenceIndex = ref(0);
                     playCurrent,
                     testAudio,
                     testSentenceAudio,
-                    speakWord,
-                    speakCurrent,
 
                     // Sentence Practice
                     sentences,

@@ -16,22 +16,22 @@
     <link rel="manifest" href="../manifest.json" />
 
     <!-- 全局夜间/护眼模式核心管理 (首屏加载杜绝闪烁) -->
-    <script src="../js/theme.js?v=2.2.3"></script>
+    <script src="../js/theme.js?v=2.3.0"></script>
 
     <!-- 本地引入 Vant 4 样式与 Tailwind CSS -->
     <link rel="stylesheet" href="../libs/vant.min.css" />
     <script src="../libs/tailwindcss.js"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 -->
-    <link rel="stylesheet" href="../css/style.css?v=2.2.3" />
+    <link rel="stylesheet" href="../css/style.css?v=2.3.0" />
     <!-- 汉字模块专属手写板与笔顺样式 -->
-    <link rel="stylesheet" href="./hanzi.css?v=2.2.6" />
+    <link rel="stylesheet" href="./hanzi.css?v=2.3.0" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
-    <script src="../js/kid-dialog.js?v=2.0.3"></script>
+    <script src="../js/kid-dialog.js?v=2.3.0"></script>
 
     <!-- 移动端与 iPad 视口自适应模块 -->
-    <script src="../js/viewport.js?v=2.0.3"></script>
+    <script src="../js/viewport.js?v=2.3.0"></script>
 </head>
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
@@ -102,7 +102,7 @@
                     </div>
 
                     <!-- 练习设置 (范围与字数，大下拉框与大字体) -->
-                    <div class="bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm space-y-3">
+                    <div class="bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm space-y-3 card-panel">
                         <div class="flex items-center justify-between text-sm font-black text-slate-700">
                             <div class="flex items-center space-x-1.5">
                                 <span class="text-base">📝</span>
@@ -115,14 +115,14 @@
                             <div class="space-y-1.5">
                                 <label for="categorySelect" class="block text-xs font-bold text-slate-600">练习范围</label>
                                 <div class="relative">
-                                    <select id="categorySelect" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold focus:border-indigo-500 focus:bg-white outline-none transition-colors">
+                                    <select id="categorySelect" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold focus:border-indigo-500 focus:bg-white outline-none transition-colors card-subtle">
                                     </select>
                                 </div>
                             </div>
                             <div class="space-y-1.5">
                                 <label for="countSelect" class="block text-xs font-bold text-slate-600">每轮字数</label>
                                 <div class="relative">
-                                    <select id="countSelect" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold focus:border-indigo-500 focus:bg-white outline-none transition-colors">
+                                    <select id="countSelect" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold focus:border-indigo-500 focus:bg-white outline-none transition-colors card-subtle">
                                         <option value="10" selected>10 个字 (轻松快刷)</option>
                                         <option value="20">20 个字 (标准巩固)</option>
                                         <option value="30">30 个字 (强化挑战)</option>
@@ -233,7 +233,7 @@
 
                 <!-- TAB 2: 错字本面板 -->
                 <div id="tabWrongView" class="space-y-3.5 hidden">
-                    <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3.5">
+                    <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3.5 card-panel">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
                                 <span class="text-2xl">📕</span>
@@ -293,7 +293,7 @@
                 <!-- TAB 3: 学习统计与管理面板 -->
                 <div id="tabStatsView" class="space-y-3.5 hidden">
                     <!-- 4 大指标概览卡 -->
-                    <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3.5">
+                    <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3.5 card-panel">
                         <div class="flex items-center justify-between">
                             <h3 class="text-base font-black text-slate-800 flex items-center space-x-2">
                                 <span>📊</span>
@@ -330,7 +330,7 @@
                     </div>
 
                     <!-- 使用提示 -->
-                    <div class="p-4 bg-white border-2 border-slate-100 rounded-3xl flex items-start space-x-3 text-xs sm:text-sm text-slate-600 shadow-sm font-medium">
+                    <div class="p-4 bg-white border-2 border-slate-100 rounded-3xl flex items-start space-x-3 text-xs sm:text-sm text-slate-600 shadow-sm font-medium card-panel">
                         <span class="text-2xl flex-shrink-0">💡</span>
                         <div class="space-y-1">
                             <div class="font-bold text-slate-800 text-sm">听写使用小建议</div>
@@ -353,7 +353,7 @@
 
             <!-- ================= 听音选字界面 (趣味闯关) ================= -->
             <section id="choiceScreen" class="h-full flex flex-col space-y-3.5 hidden">
-                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
+                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between card-panel">
                     <div class="text-sm font-black text-slate-800 flex items-center space-x-1">
                         <span>🎧 选字：第</span>
                         <span id="choiceCurrentNumber" class="text-indigo-600 font-black text-base">1</span>
@@ -371,7 +371,7 @@
                     <div id="choiceProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-300" style="width: 10%"></div>
                 </div>
 
-                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center space-y-5">
+                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center space-y-5 card-panel">
                     <p class="text-xs sm:text-sm font-bold text-slate-500">仔细听读音，从5个汉字中选出正确的字：</p>
                     
                     <button id="choiceSpeakBtn" class="px-7 py-4 kid-btn-primary text-white rounded-2xl font-black text-base sm:text-lg shadow-lg flex items-center space-x-2">
@@ -395,7 +395,7 @@
 
             <!-- ================= 听写练习界面 (核心大田字格手写) ================= -->
             <section id="dictationScreen" class="h-full flex flex-col space-y-3.5 hidden">
-                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
+                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between card-panel">
                     <div class="text-sm font-black text-slate-800 flex items-center space-x-1">
                         <span id="dictationStageLabel">听写</span>
                         <span>：第</span>
@@ -415,7 +415,7 @@
                 </div>
 
                 <!-- 听音与拼音提示区 (大字拼音与大喇叭按钮) -->
-                <div class="listen-area bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm text-center">
+                <div class="listen-area bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm text-center card-panel">
                     <div class="flex items-center justify-center space-x-4">
                         <div class="text-left">
                             <span class="text-xs text-slate-400 font-bold block">本题拼音</span>
@@ -431,7 +431,7 @@
                 </div>
 
                 <!-- 手写田字格区域 -->
-                <div id="writingArea" class="bg-white p-3.5 sm:p-4 rounded-3xl border-2 border-slate-100 shadow-sm flex flex-col items-center space-y-3">
+                <div id="writingArea" class="bg-white p-3.5 sm:p-4 rounded-3xl border-2 border-slate-100 shadow-sm flex flex-col items-center space-y-3 card-panel">
                     <div class="text-xs sm:text-sm font-black text-slate-700">✏️ 在田字格里写一写</div>
                     <div id="writingBoard" class="writing-board">
                         <canvas id="writingCanvas"></canvas>
@@ -455,15 +455,15 @@
                 </button>
 
                 <!-- 答案核对面板 -->
-                <div id="answerPanel" class="bg-white p-4 sm:p-5 rounded-3xl border-2 border-slate-100 shadow-sm space-y-3.5 hidden">
+                <div id="answerPanel" class="bg-white p-4 sm:p-5 rounded-3xl border-2 border-slate-100 shadow-sm space-y-3.5 hidden card-panel">
                     <p class="text-xs sm:text-sm text-slate-600 text-center font-bold">请核对笔顺与字形，判断后进入下一题：</p>
                     
                     <div class="grid grid-cols-2 gap-3 pt-1">
-                        <div class="p-2.5 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center">
+                        <div class="p-2.5 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center card-subtle">
                             <strong class="block text-xs text-slate-600 mb-2 font-black">孩子写的</strong>
-                            <img id="currentWritingPreview" class="w-full aspect-square object-contain rounded-xl bg-white hidden" alt="手写预览" />
+                            <img id="currentWritingPreview" class="w-full aspect-square object-contain rounded-xl bg-white hidden card-square" alt="手写预览" />
                         </div>
-                        <div class="p-2.5 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center flex flex-col justify-between">
+                        <div class="p-2.5 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center flex flex-col justify-between card-subtle">
                             <strong class="block text-xs text-slate-600 mb-2 font-black">正确笔顺动画</strong>
                             <div class="answer-stroke-grid">
                                 <div id="answerStrokeWriter" class="answer-stroke-writer"></div>
@@ -497,7 +497,7 @@
 
             <!-- ================= 看字认读界面 (大字卡片) ================= -->
             <section id="recognitionScreen" class="h-full flex flex-col space-y-3.5 hidden">
-                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
+                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between card-panel">
                     <div class="text-sm font-black text-slate-800 flex items-center space-x-1">
                         <span>👀 认读：第</span>
                         <span id="recognitionCurrentNumber" class="text-indigo-600 font-black text-base">1</span>
@@ -515,7 +515,7 @@
                     <div id="recognitionProgressBar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full transition-all duration-300" style="width: 10%"></div>
                 </div>
 
-                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center space-y-4">
+                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center space-y-4 card-panel">
                     <p class="text-xs sm:text-sm font-bold text-slate-400">先自己大声读一遍，再轻点汉字听标准发音：</p>
 
                     <!-- 大汉字卡片 (大字体、立体触感) -->
@@ -554,7 +554,7 @@
 
             <!-- ================= 趣味短文阅读界面 ================= -->
             <section id="storyScreen" class="h-full flex flex-col space-y-3.5 hidden">
-                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
+                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between card-panel">
                     <div class="text-sm font-black text-slate-800 flex items-center space-x-1.5">
                         <span class="text-base">📖</span>
                         <span>连贯故事：第 <strong id="storyCurrentNumber" class="text-indigo-600">1</strong> / <span id="storyTotalNumber">42</span> 段</span>
@@ -564,7 +564,7 @@
                     </button>
                 </div>
 
-                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col justify-between space-y-3">
+                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col justify-between space-y-3 card-panel">
                     <div class="flex items-center justify-between text-xs sm:text-sm text-slate-400 font-bold px-1">
                         <span>《丁丁一家去公园》</span>
                         <span class="text-xs bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-1">
@@ -601,7 +601,7 @@
 
             <!-- ================= 笔画笔顺临摹界面 ================= -->
             <section id="strokeScreen" class="h-full flex flex-col space-y-3.5 hidden">
-                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
+                <div class="bg-white p-3.5 rounded-3xl border-2 border-slate-100 shadow-sm flex items-center justify-between card-panel">
                     <div class="text-sm font-black text-slate-800 flex items-center space-x-1">
                         <span>✍️ 笔画练习：第</span>
                         <span id="strokeCurrentNumber" class="text-indigo-600 font-black text-base">1</span>
@@ -618,7 +618,7 @@
                     <div id="strokeProgressBar" class="h-full bg-gradient-to-r from-rose-500 to-indigo-600 rounded-full transition-all duration-300" style="width: 10%"></div>
                 </div>
 
-                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center space-y-4">
+                <div class="flex-1 min-h-0 bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center space-y-4 card-panel">
                     <div class="text-center">
                         <strong id="strokePinyin" class="text-3xl font-black text-indigo-600 block"></strong>
                         <span id="strokeHint" class="text-xs sm:text-sm font-bold text-slate-500 mt-1 block"></span>
@@ -650,7 +650,7 @@
 
             <!-- ================= 本轮完成结算界面 ================= -->
             <section id="summaryScreen" class="summary-screen h-full min-h-0 flex flex-col justify-between space-y-3 sm:space-y-4 hidden pb-2">
-                <div class="summary-card bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-6 shadow-sm text-center flex flex-col flex-1 min-h-0 space-y-3">
+                <div class="summary-card bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-6 shadow-sm text-center flex flex-col flex-1 min-h-0 space-y-3 card-panel">
                     <h2 class="text-xl font-black text-slate-800 flex-shrink-0">🎉 本轮练习大通关！</h2>
 
                     <div id="scoreRing" class="score-ring flex-shrink-0 my-1 sm:my-2">
@@ -737,7 +737,7 @@
                 <div class="space-y-3.5">
                     <div class="space-y-1.5">
                         <label for="speechMode" class="block text-xs sm:text-sm font-bold text-slate-700">朗读方式</label>
-                        <select id="speechMode" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold outline-none">
+                        <select id="speechMode" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold outline-none card-subtle">
                             <option value="hint" selected>汉字 + 提示词 (例: 天，天空的天，推荐)</option>
                             <option value="char">只读汉字 (例: 天)</option>
                             <option value="twice">汉字读两遍 (例: 天，天)</option>
@@ -747,7 +747,7 @@
 
                     <div class="space-y-1.5 pt-1">
                         <label for="speechRate" class="block text-xs sm:text-sm font-bold text-slate-700">朗读语速</label>
-                        <select id="speechRate" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold outline-none">
+                        <select id="speechRate" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold outline-none card-subtle">
                             <option value="0.65">很慢 (0.65x 适合低年级小幼幼)</option>
                             <option value="0.78" selected>较慢清晰 (0.78x，推荐小朋友)</option>
                             <option value="0.9">正常语速 (0.90x)</option>
@@ -785,13 +785,13 @@
                 <div class="space-y-3.5">
                     <div class="space-y-1.5">
                         <label for="syncKeyInput" class="block text-xs sm:text-sm font-bold text-slate-700">专属同步密钥 (Sync Key)</label>
-                        <input type="text" id="syncKeyInput" placeholder="输入专属同步口令 (例如: baby888)" autocomplete="off" spellcheck="false" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-mono outline-none focus:border-indigo-500 focus:bg-white" />
+                        <input type="text" id="syncKeyInput" placeholder="输入专属同步口令 (例如: baby888)" autocomplete="off" spellcheck="false" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-mono outline-none focus:border-indigo-500 focus:bg-white card-subtle" />
                         <p class="text-xs text-slate-400 leading-tight font-medium">
                             💡 手机、平板与电脑输入相同的密钥，学习进度即可自动打通！
                         </p>
                     </div>
 
-                    <div class="p-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div class="p-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50 flex items-center justify-between card-subtle">
                         <div>
                             <div class="text-xs sm:text-sm font-bold text-slate-800">开启练习后自动云同步</div>
                             <div class="text-xs text-slate-400 font-medium">打卡后自动保存学习进度</div>
@@ -808,7 +808,7 @@
                         </button>
                     </div>
 
-                    <div class="text-xs text-slate-600 bg-slate-50 p-3 rounded-2xl space-y-1.5 border border-slate-200 font-medium">
+                    <div class="text-xs text-slate-600 bg-slate-50 p-3 rounded-2xl space-y-1.5 border border-slate-200 font-medium card-subtle">
                         <div class="flex justify-between">
                             <span>同步状态：</span>
                             <strong id="syncStatusLabel" class="sync-status-val">空闲</strong>
@@ -832,7 +832,7 @@
 
     <!-- 脚本引入 -->
     <script src="../libs/hanzi-writer.min.js" defer></script>
-    <script src="./hanzi-data.js?v=2.2.2" defer></script>
+    <script src="./hanzi-data.js?v=2.3.0" defer></script>
     <script src="./hanzi.js?v=2.3.0" defer></script>
 </body>
 </html>

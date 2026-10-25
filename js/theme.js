@@ -125,18 +125,6 @@
         return document.documentElement.classList.contains('dark');
     };
 
-    window.getTheme = function () {
-        return window.isDarkTheme() ? 'dark' : 'light';
-    };
-
-    window.isSystemThemeMode = function () {
-        try {
-            return !localStorage.getItem(STORAGE_KEY);
-        } catch (e) {
-            return false;
-        }
-    };
-
     // 重置为跟随系统模式 (清除手动记忆，随设备深色/浅色自动同步)
     window.resetThemeToSystem = function (options) {
         options = options || {};

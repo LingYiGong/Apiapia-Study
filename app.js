@@ -2,7 +2,7 @@
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
 // 当前客户端内置基线版本号
-const BUILD_VERSION = '2.2.6';
+const BUILD_VERSION = '2.3.0';
 
 // Semver 版本比较辅助函数 (remote > current 返回 true)
 function isNewerVersion(remote, current) {
@@ -580,16 +580,6 @@ const app = createApp({
             refreshModuleProgress();
         };
 
-        // 重新加载当前子模块（当出现网络卡顿时，一键刷新）
-        const reloadCurrentModule = () => {
-            if (!currentModuleId.value) return;
-            const iframe = document.getElementById('iframe-' + currentModuleId.value);
-            if (iframe) {
-                moduleLoadingMap.value[currentModuleId.value] = false;
-                iframe.src = iframe.src;
-            }
-        };
-
         // 响应 Hash 路由变化 (支持点击、后退、手势返回)
         const syncRouteFromHash = () => {
             const hash = window.location.hash.replace(/^#\/?/, '').trim();
@@ -686,7 +676,6 @@ const app = createApp({
             isStandalone,
             isIOS,
             isWechat,
-            isMobile,
             canInstallDirectly,
             showInstallBanner,
             showInstallModal,
@@ -699,9 +688,7 @@ const app = createApp({
             currentModuleMeta,
             activeModulesList,
             getModuleUrl,
-            onModuleIframeLoaded,
-            navigateHome,
-            reloadCurrentModule
+            onModuleIframeLoaded
         };
     }
 });

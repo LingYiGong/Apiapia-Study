@@ -16,22 +16,22 @@
     <link rel="manifest" href="../manifest.json" />
 
     <!-- 全局夜间/护眼模式核心管理 (首屏加载杜绝闪烁) -->
-    <script src="../js/theme.js?v=2.2.3"></script>
+    <script src="../js/theme.js?v=2.3.0"></script>
 
     <!-- 本地引入 Vant 4 样式与 Tailwind CSS -->
     <link rel="stylesheet" href="../libs/vant.min.css" />
     <script src="../libs/tailwindcss.js"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 -->
-    <link rel="stylesheet" href="../css/style.css?v=2.2.3" />
+    <link rel="stylesheet" href="../css/style.css?v=2.3.0" />
     <!-- 英语模块专属 3D 翻转卡片样式 -->
-    <link rel="stylesheet" href="./english.css?v=2.0.0" />
+    <link rel="stylesheet" href="./english.css?v=2.3.0" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
-    <script src="../js/kid-dialog.js?v=2.0.3"></script>
+    <script src="../js/kid-dialog.js?v=2.3.0"></script>
 
     <!-- 移动端与 iPad 视口自适应模块 -->
-    <script src="../js/viewport.js?v=2.0.3"></script>
+    <script src="../js/viewport.js?v=2.3.0"></script>
 </head>
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
@@ -79,7 +79,7 @@
             <div id="tabCardView" class="h-full flex flex-col justify-between space-y-3.5">
                 
                 <!-- 顶部进度条与当前序号 (大圆角卡片) -->
-                <div class="bg-white p-3.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between">
+                <div class="bg-white p-3.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between card-panel">
                     <div class="text-xs sm:text-sm font-black text-slate-800 flex items-center space-x-2">
                         <span id="cardNumberBadge" class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 font-mono font-black text-xs border border-indigo-200">
                             Word #101
@@ -193,7 +193,7 @@
             <div id="tabListView" class="space-y-4 hidden pb-8">
                 
                 <!-- 筛选标签胶囊 -->
-                <div class="bg-white p-1.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between space-x-2">
+                <div class="bg-white p-1.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between space-x-2 card-panel">
                     <button onclick="showList('all')" id="tabBtnAll" class="flex-1 py-2 text-xs sm:text-sm font-black rounded-xl transition-all text-white kid-btn-primary shadow-sm">
                         全部 (100)
                     </button>
@@ -206,7 +206,7 @@
                 </div>
 
                 <!-- 词库卡片列表 (大圆角卡片) -->
-                <div class="bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-5">
+                <div class="bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-5 card-panel">
                     <div class="pb-3 mb-3 border-b-2 border-slate-100 flex items-center justify-between">
                         <h2 id="listTitle" class="text-sm sm:text-base font-black text-slate-800">全部核心动词 (100)</h2>
                         <span class="text-xs text-slate-400 font-medium">轻点单词可直接切入卡片学习</span>
@@ -223,7 +223,7 @@
             <div id="tabStatsView" class="space-y-4 hidden pb-8">
                 
                 <!-- 掌握度进度圆环卡片 (与 @hanzi 完全统一) -->
-                <div class="bg-white rounded-3xl border-2 border-slate-100 p-6 shadow-sm text-center space-y-4">
+                <div class="bg-white rounded-3xl border-2 border-slate-100 p-6 shadow-sm text-center space-y-4 card-panel">
                     <h3 class="text-base font-black text-slate-800 flex items-center justify-center space-x-2">
                         <span>📊</span>
                         <span>学习进度看板</span>
@@ -262,7 +262,7 @@
                 </div>
 
                 <!-- 学习建议卡片 -->
-                <div class="p-4 sm:p-5 bg-white border-2 border-slate-100 rounded-3xl flex items-start space-x-3.5 text-xs sm:text-sm text-slate-600 shadow-sm font-medium">
+                <div class="p-4 sm:p-5 bg-white border-2 border-slate-100 rounded-3xl flex items-start space-x-3.5 text-xs sm:text-sm text-slate-600 shadow-sm font-medium card-panel">
                     <span class="text-2xl flex-shrink-0">💡</span>
                     <div class="space-y-1">
                         <div class="font-black text-slate-800 text-xs sm:text-sm">动词闪卡记忆法</div>
@@ -324,6 +324,6 @@
     </div>
 
     <!-- 逻辑脚本引入 -->
-    <script src="./english.js?v=2.0.0" defer></script>
+    <script src="./english.js?v=2.3.0" defer></script>
 </body>
 </html>

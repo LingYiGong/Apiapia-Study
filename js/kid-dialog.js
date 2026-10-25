@@ -1291,8 +1291,6 @@
             document.body.appendChild(lbOverlay);
         }
 
-        window.openApiapiaPhotoLightbox = openPhotoLightbox;
-
         const cartoonBox = card.querySelector('.kid-photo-cartoon');
         if (cartoonBox) {
             cartoonBox.onclick = () => openPhotoLightbox('cartoon');
@@ -1335,9 +1333,6 @@
     };
 
     /* ============================================================
-     * Apiapia 全局按键物理点按与触感反馈系统 (Tap & Haptic Feedback Engine)
-     * 解决移动端 / 触屏 / 鼠标操作中按压感缺失、感觉“没点到”的问题
-    /* ============================================================
      * Apiapia 全局按键物理点按与触感反馈系统 (Tactile & Haptic Engine)
      * 提供扎实的视觉下沉按压感与移动端触感微震动，已彻底关闭点击发音
      * ============================================================ */
@@ -1368,7 +1363,7 @@
                 '.kid-btn-primary, .kid-btn-success, .kid-btn-danger, .kid-btn-warning, .kid-btn-light, .kid-btn-cyan, ' +
                 '.btn-3d-primary, .btn-3d-success, .btn-3d-danger, .btn-3d-warning, .btn-3d-light, .btn-3d-cyan, ' +
                 '.van-button, .app-bottom-nav button, a.btn, input[type="button"], input[type="submit"], ' +
-                '#startBtn, #recognitionStartBtn, #readStartBtn, #storyStartBtn, #strokeStartBtn, ' +
+                '#startBtn, #recognitionStartBtn, #storyStartBtn, #strokeStartBtn, ' +
                 '.kid-dialog-btn, .kid-reward-btn'
             );
         }
@@ -1401,12 +1396,6 @@
             document.addEventListener('touchstart', handlePointerDown, { passive: true, capture: true });
             document.addEventListener('mousedown', handlePointerDown, { passive: true, capture: true });
         }
-
-        // 挂载全局控制 API
-        window.KidTapFeedback = {
-            play: () => {}, // 已关闭声音
-            haptic: triggerHaptic
-        };
     })();
 
 })();

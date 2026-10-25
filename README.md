@@ -14,7 +14,7 @@
 - 📦 **零外部 CDN 全本地化与极速离线**：Vue 3、Vant 4、Tailwind、HanziWriter、VexFlow 与儿童字族 100% 本地自托管，彻底根治国内访问阻塞与网络波动；
 - 📱 **PWA 手机/平板桌面安装**：配置 Service Worker 离线缓存与多资源预热，支持 Android 原生安装气泡与 iOS Safari 图文手把手添加到主屏幕引导；
 - 🍎 **移动端 / iPad 深度适配**：支持 PWA / 添加到主屏幕全屏独立运行，针对 iOS/iPadOS Safari 视口上移、留白 bug、Web Audio 麦克风灵敏度增益与 WebKit 音频进行了全方位深度优化；
-- 🔄 **自动感知平滑更新**：内置版本监测机制（当前 `v2.2.6`），新版发布后在首页无感感知并提醒一键击穿缓存刷新。
+- 🔄 **自动感知平滑更新**：内置版本监测机制（当前 `v2.3.0`），新版发布后在首页无感感知并提醒一键击穿缓存刷新。
 
 ---
 
@@ -143,14 +143,13 @@ study/
 │   ├── tailwindcss.js         # 🌊 Tailwind CSS 运行时
 │   ├── hanzi-writer.min.js    # ✍️ HanziWriter 汉字笔画动态渲染引擎
 │   ├── vexflow.js             # 🎹 VexFlow 乐谱渲染引擎
-│   ├── quicksand.css          # 🔤 Quicksand 儿童友好英文字体本地样式
 │   └── fonts/                 # 🔤 Quicksand 本地 WOFF2 字体文件 (quicksand-600/700.woff2)
 ├── css/                       # 🎨 全局公共样式目录
 │   └── style.css              # 🎨 全局儿童友好设计系统 (3D 浮雕大按键 + 伴学卡片 + 微光进度条 + 全局共享样式)
 ├── js/                        # 🎈 全局公共脚本目录
 │   ├── kid-dialog.js          # 🎈 全局统一儿童友好弹窗、气泡与二次确认模块
 │   └── viewport.js            # 📱 移动端与 iPadOS 视口适配 + SPA 跨页面 postMessage 路由拦截桥
-├── version.json               # 🏷️ 自动化版本号与更新描述文件 (当前 v2.2.6)
+├── version.json               # 🏷️ 自动化版本号与更新描述文件 (当前 v2.3.0)
 ├── manifest.json              # 📱 Web App PWA 配置文件 (定义添加到主屏幕名称、全屏 standalone 模式与猫咪图标)
 ├── icons/                     # 🐱 萌宠猫咪 Apiapia 全套高清图标与 PNG 资源目录
 │   ├── apple-touch-icon.png   # 🍎 iOS 主屏幕高清图标 (180x180，儿童萌宠学霸猫咪 Apiapia 设计)
@@ -179,7 +178,7 @@ study/
 │   ├── english.js             # 英语动词 100 词卡逻辑、语音播放与掌握度统计
 │   └── english.css            # 3D 翻转卡片与透视样式
 ├── wrangler.toml              # 🚀 Cloudflare Worker 与 KV 绑定配置文件
-├── package.json               # 📦 项目元数据与构建脚本 (v2.2.6)
+├── package.json               # 📦 项目元数据与构建脚本 (v2.3.0)
 ├── .assetsignore              # 🛡️ 静态资源部署忽略规则
 └── README.md                  # 📖 项目总说明文档
 ```
@@ -248,6 +247,11 @@ npm run deploy
 ---
 
 ## 📝 版本更新日志 (Changelog)
+
+### v2.3.0 (2026-10-24)
+- 📖 **阅读练习重写**：全新故事《丁丁一家去公园》（42段，只用已学汉字且覆盖全部256个已学字）；
+- ✍️ **汉字模块优化**：多音字按词语发音、优选普通话语音、故事逐句跟读高亮；笔画练习新增“我来写”描红；未到期加练不再升级；云同步改为按字合并防覆盖；
+- 🐛 **修复**：修复全部汉字轮练未优先复习字、夜间模式切换报错。
 
 ### v2.2.6 (2026-09-30)
 - ✍️ **汉字新增9字并重编阅读故事（共208字）**：

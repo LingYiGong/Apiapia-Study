@@ -16,7 +16,7 @@
     <link rel="manifest" href="../../manifest.json" />
 
     <!-- 全局夜间/护眼模式核心管理 (首屏加载杜绝闪烁) -->
-    <script src="../../js/theme.js?v=2.2.3"></script>
+    <script src="../../js/theme.js?v=2.3.0"></script>
 
     <!-- 本地引入 Vant 4 样式、Tailwind CSS 与 Vue 3 -->
     <link rel="stylesheet" href="../../libs/vant.min.css" />
@@ -25,20 +25,18 @@
     <script src="../../libs/vant.min.js"></script>
 
     <!-- 引入内置词库、句子库与假名库数据 -->
-    <script src="vocab_data.js?v=2.0.6"></script>
-    <script src="sentence_data.js?v=2.0.6"></script>
-    <script src="kana_data.js?v=2.0.6"></script>
+    <script src="vocab_data.js?v=2.3.0"></script>
+    <script src="sentence_data.js?v=2.3.0"></script>
+    <script src="kana_data.js?v=2.3.0"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 -->
-    <link rel="stylesheet" href="../../css/style.css?v=2.2.3" />
-    <!-- 日语模块专属手写板样式 -->
-    <link rel="stylesheet" href="style.css?v=2.0.3" />
+    <link rel="stylesheet" href="../../css/style.css?v=2.3.0" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
-    <script src="../../js/kid-dialog.js?v=2.0.3"></script>
+    <script src="../../js/kid-dialog.js?v=2.3.0"></script>
 
     <!-- 移动端与 iPad 视口自适应模块 -->
-    <script src="../../js/viewport.js?v=2.0.3"></script>
+    <script src="../../js/viewport.js?v=2.3.0"></script>
 </head>
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" v-cloak class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
@@ -238,14 +236,14 @@
                            autocomplete="off"
                            spellcheck="false"
                            @change="saveSyncConfig"
-                           class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-mono font-bold outline-none focus:border-indigo-500 focus:bg-white transition-colors" />
+                           class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-mono font-bold outline-none focus:border-indigo-500 focus:bg-white transition-colors card-subtle" />
                     <p class="text-xs text-slate-400 font-medium leading-relaxed">
                         💡 <b>多端同步原理</b>：在手机、平板与电脑中输入相同的密钥，学习进度即可通过 Cloudflare 边缘数据库自动打通！
                     </p>
                 </div>
 
                 <!-- Auto Sync Toggle -->
-                <div class="p-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50 flex items-center justify-between">
+                <div class="p-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50 flex items-center justify-between card-subtle">
                     <div>
                         <div class="text-xs sm:text-sm font-black text-slate-800">自动实时同步</div>
                         <div class="text-xs text-slate-400 font-medium mt-0.5">打开页面自动拉取，练习打卡后自动推送保存</div>
@@ -367,7 +365,7 @@
                     </div>
 
                     <!-- 听音展示卡片 (大圆角卡片，参考 @hanzi) -->
-                    <div class="flex-1 min-h-0 bg-white rounded-3xl shadow-sm border-2 border-slate-100 p-5 sm:p-7 md:p-9 flex flex-col items-center justify-center mb-3 relative overflow-y-auto">
+                    <div class="flex-1 min-h-0 bg-white rounded-3xl shadow-sm border-2 border-slate-100 p-5 sm:p-7 md:p-9 flex flex-col items-center justify-center mb-3 relative overflow-y-auto card-panel">
                         
                         <transition name="slide-up" mode="out-in">
                             <div :key="(currentPracticeWord?.id || '') + practiceState" class="w-full h-full flex flex-col items-center justify-center my-auto">
@@ -516,7 +514,7 @@
                     
                     <div class="space-y-4">
                         <!-- 顶层信息卡 (大圆角儿童风格卡片) -->
-                        <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border-2 border-slate-100 space-y-3">
+                        <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border-2 border-slate-100 space-y-3 card-panel">
                             <div class="flex items-center justify-between">
                                 <h2 class="text-base sm:text-lg font-black text-slate-800 flex items-center space-x-2">
                                     <span>💬</span>
@@ -571,11 +569,11 @@
 
                         <!-- 统计概览卡 -->
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm text-center">
+                            <div class="bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm text-center card-panel">
                                 <div class="text-xs sm:text-sm text-slate-400 font-bold">待复习句子</div>
                                 <div class="text-3xl font-black text-rose-600 mt-1">{{ sentenceDueCount }}</div>
                             </div>
-                            <div class="bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm text-center">
+                            <div class="bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm text-center card-panel">
                                 <div class="text-xs sm:text-sm text-slate-400 font-bold">已掌握句子 (Lv≥3)</div>
                                 <div class="text-3xl font-black text-emerald-600 mt-1">{{ sentenceMasteredCount }}</div>
                             </div>
@@ -629,7 +627,7 @@
                     </div>
 
                     <!-- 句子卡片容器 (大圆角卡片) -->
-                    <div class="flex-1 min-h-0 bg-white rounded-3xl shadow-sm border-2 border-slate-100 p-5 sm:p-7 md:p-9 flex flex-col items-center justify-center mb-3 relative overflow-y-auto">
+                    <div class="flex-1 min-h-0 bg-white rounded-3xl shadow-sm border-2 border-slate-100 p-5 sm:p-7 md:p-9 flex flex-col items-center justify-center mb-3 relative overflow-y-auto card-panel">
                         
                         <transition name="slide-up" mode="out-in">
                             <div :key="(currentPracticeSentence?.id || '') + sentencePracticeState" class="w-full h-full flex flex-col items-center justify-center my-auto">
@@ -743,7 +741,7 @@
                 <div v-if="kanaPracticeState === 'idle'" :class="kanaCurrentSubTab === 'chart' ? 'flex-1 min-h-0 flex flex-col space-y-3' : 'flex-1 min-h-0 overflow-y-auto space-y-4 pb-8'">
                     
                     <!-- Sub-tabs 切换栏: 🎯 听写设置 | 📕 假名错题本 | 📋 五十音图速查 (大圆角卡片) -->
-                    <div class="bg-white p-1.5 rounded-2xl border-2 border-slate-100 shadow-sm grid grid-cols-3 gap-1.5 flex-shrink-0">
+                    <div class="bg-white p-1.5 rounded-2xl border-2 border-slate-100 shadow-sm grid grid-cols-3 gap-1.5 flex-shrink-0 card-panel">
                         <button type="button" @click="kanaCurrentSubTab = 'setup'"
                                 class="py-2.5 text-xs sm:text-sm font-black rounded-xl transition-all flex items-center justify-center space-x-1"
                                 :class="kanaCurrentSubTab === 'setup' ? 'kid-btn-primary text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100 font-bold'">
@@ -771,7 +769,7 @@
                     <div v-if="kanaCurrentSubTab === 'setup'" class="space-y-4">
                         
                         <!-- 模式选择：区别平假名与片假名 -->
-                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3">
+                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3 card-panel">
                             <div class="flex items-center space-x-2">
                                 <span class="text-xl">🎌</span>
                                 <h3 class="text-base font-black text-slate-800">假名听写模式（平假名 vs 片假名）</h3>
@@ -831,7 +829,7 @@
                         </div>
 
                         <!-- 范围选择卡片 -->
-                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3">
+                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3 card-panel">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-2">
                                     <span class="text-xl">📚</span>
@@ -872,7 +870,7 @@
                             </div>
 
                             <!-- 自选行折叠区 (仅当 custom 时展示) -->
-                            <div v-if="kanaRangeScope === 'custom'" class="p-3.5 bg-slate-50 rounded-2xl border-2 border-slate-200 space-y-2">
+                            <div v-if="kanaRangeScope === 'custom'" class="p-3.5 bg-slate-50 rounded-2xl border-2 border-slate-200 space-y-2 card-subtle">
                                 <div class="text-xs font-black text-slate-600 flex justify-between">
                                     <span>点击选择本次练习的行：</span>
                                     <span class="text-indigo-600">已选 {{ kanaSelectedRows.length }}/10 行</span>
@@ -889,7 +887,7 @@
                         </div>
 
                         <!-- 题数选择卡片 -->
-                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-2.5">
+                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-2.5 card-panel">
                             <div class="flex items-center justify-between">
                                 <h3 class="text-base font-black text-slate-800">每轮听写题数</h3>
                                 <span class="text-xs font-mono font-black text-indigo-600 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-full">{{ kanaQuestionCount === 0 ? '全部题目' : kanaQuestionCount + ' 题' }}</span>
@@ -924,7 +922,7 @@
 
                     <!-- TAB 2: 假名错题本 -->
                     <div v-if="kanaCurrentSubTab === 'wrong'" class="space-y-4">
-                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3.5">
+                        <div class="bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-5 shadow-sm space-y-3.5 card-panel">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-2">
                                     <span class="text-2xl">📕</span>
@@ -941,7 +939,7 @@
                             <!-- 错字列表 -->
                             <div v-if="kanaWrongList.length > 0" class="flex flex-wrap gap-2.5 pt-1 max-h-72 overflow-y-auto">
                                 <div v-for="w in kanaWrongList" :key="w.key"
-                                     class="p-3 bg-slate-50 border-2 border-slate-200 rounded-2xl flex items-center space-x-2.5 shadow-2xs">
+                                     class="p-3 bg-slate-50 border-2 border-slate-200 rounded-2xl flex items-center space-x-2.5 shadow-2xs card-subtle">
                                     <div class="text-center">
                                         <div class="text-2xl font-black text-slate-900 kana-font leading-none">
                                             {{ w.expectedChar }}
@@ -986,7 +984,7 @@
 
                     <!-- TAB 3: 五十音图速查表 -->
                     <div v-if="kanaCurrentSubTab === 'chart'" class="flex-1 min-h-0 flex flex-col">
-                        <div class="flex-1 min-h-0 flex flex-col bg-white rounded-3xl border-2 border-slate-100 p-3 sm:p-5 shadow-sm space-y-2.5">
+                        <div class="flex-1 min-h-0 flex flex-col bg-white rounded-3xl border-2 border-slate-100 p-3 sm:p-5 shadow-sm space-y-2.5 card-panel">
                             <div class="flex items-center justify-between flex-shrink-0">
                                 <div class="flex items-center space-x-2">
                                     <span class="text-xl">📋</span>
@@ -1031,7 +1029,7 @@
                                     </div>
                                     <div v-else
                                          @click="playKanaAudio(k.hiragana)"
-                                         class="p-1 sm:p-2 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition-all cursor-pointer text-center active:scale-95 relative group shadow-2xs flex flex-col justify-between items-center min-h-[64px] sm:min-h-[72px]">
+                                         class="p-1 sm:p-2 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition-all cursor-pointer text-center active:scale-95 relative group shadow-2xs flex flex-col justify-between items-center min-h-[64px] sm:min-h-[72px] card-subtle">
                                         <div class="flex items-center justify-center space-x-1 leading-tight mt-0.5">
                                             <span class="text-lg sm:text-xl font-black text-indigo-700 kana-font">{{ k.hiragana }}</span>
                                             <span class="text-slate-300 text-xs">/</span>
@@ -1053,7 +1051,7 @@
                 <div v-show="kanaPracticeState === 'writing'" class="h-full flex flex-col space-y-3 pb-4">
                     
                     <!-- 顶栏信息与退出按钮 -->
-                    <div class="bg-white p-3.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between flex-shrink-0">
+                    <div class="bg-white p-3.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between flex-shrink-0 card-panel">
                         <div class="text-sm font-black text-slate-800 flex items-center space-x-1.5 flex-wrap gap-y-1">
                             <span class="text-indigo-600">假名听写</span>
                             <span>：第</span>
@@ -1092,7 +1090,7 @@
                     </div>
 
                     <!-- 听音与提示区 -->
-                    <div class="bg-white p-4 sm:p-5 rounded-3xl border-2 border-slate-100 shadow-sm text-center flex-shrink-0">
+                    <div class="bg-white p-4 sm:p-5 rounded-3xl border-2 border-slate-100 shadow-sm text-center flex-shrink-0 card-panel">
                         <div class="flex items-center justify-center space-x-6">
                             <div class="text-left">
                                 <span class="text-xs text-slate-400 font-bold block">
@@ -1128,7 +1126,7 @@
                     </div>
 
                     <!-- 手写田字格区域 (HTML5 Canvas + 米字格辅助线，与 @hanzi 完全一致) -->
-                    <div class="bg-white p-3 sm:p-4 rounded-3xl border-2 border-slate-100 shadow-sm flex flex-col items-center space-y-3 flex-1 min-h-0 justify-center">
+                    <div class="bg-white p-3 sm:p-4 rounded-3xl border-2 border-slate-100 shadow-sm flex flex-col items-center space-y-3 flex-1 min-h-0 justify-center card-panel">
                         <div class="text-xs sm:text-sm font-black text-slate-700 flex items-center space-x-1">
                             <span>✏️ 在田字格里写一写</span>
                             <span :class="currentKanaItem && currentKanaItem.targetType === 'katakana' ? 'text-amber-600 font-black' : 'text-indigo-600 font-black'">
@@ -1170,7 +1168,7 @@
                 <div v-show="kanaPracticeState === 'checking'" class="h-full flex flex-col space-y-3.5 pb-4 overflow-y-auto">
                     
                     <!-- 顶栏状态 -->
-                    <div class="bg-white p-3.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between flex-shrink-0">
+                    <div class="bg-white p-3.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between flex-shrink-0 card-panel">
                         <div class="text-sm font-black text-slate-800 flex items-center space-x-1.5 flex-wrap gap-y-1">
                             <span class="text-indigo-600">答案核对</span>
                             <span>：第</span>
@@ -1208,14 +1206,14 @@
                     </div>
 
                     <!-- 左右对比区：你手写的 vs 标准假名 -->
-                    <div class="bg-white p-4 sm:p-5 rounded-3xl border-2 border-slate-100 shadow-sm space-y-3.5 flex-shrink-0">
+                    <div class="bg-white p-4 sm:p-5 rounded-3xl border-2 border-slate-100 shadow-sm space-y-3.5 flex-shrink-0 card-panel">
                         <p class="text-xs sm:text-sm text-slate-600 text-center font-black">请核对字形与笔画，判定后进入下一题：</p>
                         
                         <div class="grid grid-cols-2 gap-3.5 pt-1">
                             <!-- 左卡片：你写的 -->
-                            <div class="p-3 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center flex flex-col items-center justify-between">
+                            <div class="p-3 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center flex flex-col items-center justify-between card-subtle">
                                 <strong class="block text-xs sm:text-sm text-slate-600 mb-1.5 font-black">你手写的</strong>
-                                <div class="w-full aspect-square bg-white rounded-2xl flex items-center justify-center border-2 border-slate-200 overflow-hidden">
+                                <div class="w-full aspect-square bg-white rounded-2xl flex items-center justify-center border-2 border-slate-200 overflow-hidden card-square">
                                     <img v-if="kanaCapturedWriting" :src="kanaCapturedWriting" class="w-full h-full object-contain" alt="手写预览" />
                                     <span v-else class="text-xs text-slate-400 font-medium">（未手写）</span>
                                 </div>
@@ -1223,11 +1221,11 @@
                             </div>
 
                             <!-- 右卡片：标准假名 -->
-                            <div class="p-3 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center flex flex-col items-center justify-between">
+                            <div class="p-3 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center flex flex-col items-center justify-between card-subtle">
                                 <strong class="block text-xs sm:text-sm text-slate-600 mb-1.5 font-black">
                                     正确【{{ currentKanaItem && (currentKanaItem.targetType === 'katakana' || currentKanaItem.conversionDirection === 'hira_to_kata') ? '片假名' : '平假名' }}】
                                 </strong>
-                                <div class="w-full aspect-square bg-white rounded-2xl flex flex-col items-center justify-center border-2 border-slate-200">
+                                <div class="w-full aspect-square bg-white rounded-2xl flex flex-col items-center justify-center border-2 border-slate-200 card-square">
                                     <span class="text-6xl sm:text-7xl font-black kana-font" :class="currentKanaItem && (currentKanaItem.targetType === 'katakana' || currentKanaItem.conversionDirection === 'hira_to_kata') ? 'text-amber-600' : 'text-indigo-600'">
                                         {{ currentKanaExpectedChar }}
                                     </span>
@@ -1295,7 +1293,7 @@
                 <!-- 4. 本轮练习通关结算界面 (kanaPracticeState === 'summary'，参考 @hanzi 结算通关) -->
                 <div v-show="kanaPracticeState === 'summary'" class="h-full flex flex-col justify-between space-y-4 pb-6 overflow-y-auto">
                     
-                    <div class="bg-white rounded-3xl border-2 border-slate-100 p-6 sm:p-7 shadow-sm text-center space-y-4">
+                    <div class="bg-white rounded-3xl border-2 border-slate-100 p-6 sm:p-7 shadow-sm text-center space-y-4 card-panel">
                         <h2 class="text-2xl font-black text-slate-800">🎉 本轮假名听写大通关！</h2>
 
                         <!-- 得分环 (与 @hanzi 完全一致) -->
@@ -1351,7 +1349,7 @@
             <div v-show="currentTab === 'manage'" class="p-3.5 sm:p-5 flex flex-col space-y-4 pb-8">
                 
                 <!-- 导入与操作卡片 (大圆角儿童风格卡片) -->
-                <div class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border-2 border-slate-100 space-y-3.5">
+                <div class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border-2 border-slate-100 space-y-3.5 card-panel">
                     <div class="flex items-center justify-between">
                         <h2 class="text-base sm:text-lg font-black text-slate-800 flex items-center space-x-2">
                             <span>📦</span>
@@ -1410,7 +1408,7 @@
                 <!-- 词汇管理区域 (manageSubTab === 'words') -->
                 <div v-show="manageSubTab === 'words'" class="space-y-4">
                     <!-- 添加/编辑词汇卡片 -->
-                    <div class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border-2 border-slate-100 space-y-3">
+                    <div class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border-2 border-slate-100 space-y-3 card-panel">
                         <div class="flex justify-between items-center cursor-pointer" @click="showAddForm = !showAddForm">
                             <h2 class="text-base font-black text-slate-800 flex items-center space-x-1.5">
                                 <span>{{ editingId ? '✏️ 编辑词汇' : '➕ 添加新词' }}</span>
@@ -1452,7 +1450,7 @@
                     </div>
 
                     <!-- 词汇列表卡片 -->
-                    <div class="bg-white rounded-3xl shadow-sm border-2 border-slate-100 p-4 sm:p-5 flex flex-col">
+                    <div class="bg-white rounded-3xl shadow-sm border-2 border-slate-100 p-4 sm:p-5 flex flex-col card-panel">
                         <!-- 搜索与计数 -->
                         <div class="space-y-2 mb-3">
                             <van-search v-model="searchQuery" placeholder="搜索日文、注音或释义..." shape="round" class="!p-0" />
@@ -1469,7 +1467,7 @@
                             <p class="text-xs sm:text-sm font-bold">未找到匹配词汇</p>
                         </div>
                         <ul v-else class="space-y-2">
-                            <li v-for="word in paginatedWords" :key="word.id" class="p-3 sm:p-3.5 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 transition-all bg-white flex justify-between items-center shadow-2xs">
+                            <li v-for="word in paginatedWords" :key="word.id" class="p-3 sm:p-3.5 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 transition-all bg-white flex justify-between items-center shadow-2xs card-panel">
                                 <div class="flex-1 min-w-0 pr-2">
                                     <div class="flex items-center space-x-2">
                                         <span class="text-base sm:text-lg font-black text-slate-900 truncate kana-font">{{ word.word }}</span>
@@ -1518,7 +1516,7 @@
 
                 <!-- 句子管理区域 (manageSubTab === 'sentences') -->
                 <div v-show="manageSubTab === 'sentences'" class="space-y-4">
-                    <div class="bg-white rounded-3xl shadow-sm border-2 border-slate-100 p-4 sm:p-5 flex flex-col">
+                    <div class="bg-white rounded-3xl shadow-sm border-2 border-slate-100 p-4 sm:p-5 flex flex-col card-panel">
                         <!-- 搜索与计数 -->
                         <div class="space-y-2 mb-3">
                             <van-search v-model="sentenceSearchQuery" placeholder="搜索句子日文、假名、释义或包含单词..." shape="round" class="!p-0" />
@@ -1535,7 +1533,7 @@
                             <p class="text-xs sm:text-sm font-bold">未找到匹配的例句</p>
                         </div>
                         <ul v-else class="space-y-2.5">
-                            <li v-for="sentence in paginatedSentences" :key="sentence.id" class="p-3.5 sm:p-4 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 transition-all bg-white space-y-2 shadow-2xs">
+                            <li v-for="sentence in paginatedSentences" :key="sentence.id" class="p-3.5 sm:p-4 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 transition-all bg-white space-y-2 shadow-2xs card-panel">
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1 pr-2">
                                         <div class="text-sm sm:text-base font-black text-slate-900 leading-snug kana-font">
@@ -1594,16 +1592,16 @@
                     </h3>
                 </div>
                 <div class="grid grid-cols-2 gap-3.5 pt-1">
-                    <div class="p-3 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center">
+                    <div class="p-3 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center card-subtle">
                         <strong class="block text-xs font-black text-slate-600 mb-1.5">你写的</strong>
-                        <div class="w-full aspect-square bg-white rounded-2xl border-2 border-slate-200 flex items-center justify-center overflow-hidden">
-                            <img v-if="selectedKanaResultDetail.writingUrl" :src="selectedKanaResultDetail.writingUrl" class="w-full h-full object-contain" />
+                        <div class="w-full aspect-square bg-white rounded-2xl border-2 border-slate-200 flex items-center justify-center overflow-hidden card-square">
+                            <img v-if="selectedKanaResultDetail.writingUrl" :src="selectedKanaResultDetail.writingUrl" class="w-full h-full object-contain" alt="假名手写预览" />
                             <span v-else class="text-xs text-slate-400 font-bold">（无手写）</span>
                         </div>
                     </div>
-                    <div class="p-3 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center">
+                    <div class="p-3 bg-slate-50 rounded-2xl border-2 border-slate-200 text-center card-subtle">
                         <strong class="block text-xs font-black text-slate-600 mb-1.5">标准形态</strong>
-                        <div class="w-full aspect-square bg-white rounded-2xl border-2 border-slate-200 flex flex-col items-center justify-center">
+                        <div class="w-full aspect-square bg-white rounded-2xl border-2 border-slate-200 flex flex-col items-center justify-center card-square">
                             <span class="text-6xl font-black kana-font text-indigo-700">{{ selectedKanaResultDetail.expectedChar }}</span>
                             <span class="text-xs font-mono font-bold text-slate-400 mt-1">{{ selectedKanaResultDetail.romaji }}</span>
                         </div>
@@ -1687,6 +1685,6 @@
     </div>
 
     <!-- 核心业务逻辑脚本 -->
-    <script src="app.js?v=2.0.6"></script>
+    <script src="app.js?v=2.3.0"></script>
 </body>
 </html>

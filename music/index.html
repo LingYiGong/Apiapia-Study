@@ -16,7 +16,7 @@
     <link rel="manifest" href="../manifest.json" />
 
     <!-- 全局夜间/护眼模式核心管理 (首屏加载杜绝闪烁) -->
-    <script src="../js/theme.js?v=2.2.3"></script>
+    <script src="../js/theme.js?v=2.3.0"></script>
 
     <!-- 本地引入 Vant 4 样式、Tailwind CSS 与 VexFlow 乐谱引擎 -->
     <link rel="stylesheet" href="../libs/vant.min.css" />
@@ -24,16 +24,16 @@
     <script src="../libs/vexflow.js"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 (与首页及其他小能手统一) -->
-    <link rel="stylesheet" href="../css/style.css?v=2.2.3" />
+    <link rel="stylesheet" href="../css/style.css?v=2.3.0" />
 
     <!-- 钢琴模块专属大乐谱与调音动画样式 -->
-    <link rel="stylesheet" href="./music.css?v=2.0.0" />
+    <link rel="stylesheet" href="./music.css?v=2.3.0" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
-    <script src="../js/kid-dialog.js?v=2.0.3"></script>
+    <script src="../js/kid-dialog.js?v=2.3.0"></script>
 
     <!-- 移动端与 iPad 视口自适应模块 -->
-    <script src="../js/viewport.js?v=2.0.3"></script>
+    <script src="../js/viewport.js?v=2.3.0"></script>
 </head>
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
@@ -78,7 +78,7 @@
         <main class="flex-1 min-h-0 overflow-y-auto relative bg-[#f8fafc] p-3.5 sm:p-5 space-y-4">
 
             <!-- 1. 练习设置控制条 (大圆角卡片、大触控下拉项) -->
-            <div class="bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-3.5 sm:p-4">
+            <div class="bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-3.5 sm:p-4 card-panel">
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs sm:text-sm font-bold text-slate-700">
                     <!-- 谱号切换 -->
                     <div class="flex flex-col space-y-1">
@@ -123,7 +123,7 @@
             </div>
 
             <!-- 2. 核心大五线谱卡片 (专为儿童视奏定制超大乐谱) -->
-            <div id="staff-card" class="staff-card-wrap bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 relative flex flex-col items-center justify-center overflow-hidden">
+            <div id="staff-card" class="staff-card-wrap bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-6 relative flex flex-col items-center justify-center overflow-hidden card-panel">
                 <!-- 题目音符大徽章 -->
                 <div class="absolute top-3.5 left-4 sm:left-6 flex items-baseline space-x-2 bg-slate-100/90 border border-slate-200 px-3 sm:px-4 py-1.5 rounded-full shadow-2xs z-10">
                     <span class="text-xs text-slate-500 font-black">目标:</span>
@@ -164,7 +164,7 @@
             </button>
 
             <!-- 4. 实时识别与音准诊断看板 (调音表 + 动态电平) -->
-            <div class="bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 card-panel">
                 <!-- 左列: 实时听到的音符 -->
                 <div class="flex flex-col space-y-2">
                     <div class="flex items-center justify-between text-xs font-black text-slate-400">
@@ -218,6 +218,6 @@
     </div>
 
     <!-- 钢琴视奏逻辑脚本 -->
-    <script src="./music.js?v=2.0.0" defer></script>
+    <script src="./music.js?v=2.3.0" defer></script>
 </body>
 </html>

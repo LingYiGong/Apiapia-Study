@@ -1,7 +1,7 @@
 // Apiapia 学习中心 - PWA Service Worker
-const CACHE_NAME = 'apiapia-pwa-v2.2.6';
+const CACHE_NAME = 'apiapia-pwa-v2.3.0';
 
-// 基础核心缓存资源（已完全本地化，无外部 CDN 依赖）
+// 基础核心缓存资源（仅包含首屏与全站公共依赖，模块专属库按需缓存）
 const CORE_ASSETS = [
     './',
     './index.html',
@@ -15,9 +15,6 @@ const CORE_ASSETS = [
     './libs/vant.min.js',
     './libs/vant.min.css',
     './libs/tailwindcss.js',
-    './libs/hanzi-writer.min.js',
-    './libs/vexflow.js',
-    './libs/quicksand.css',
     './libs/fonts/quicksand-600.woff2',
     './libs/fonts/quicksand-700.woff2',
     './icons/favicon.ico',
@@ -58,31 +55,40 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// 请求阶段：version.json 绝不走缓存；其他资源网络优先，网络异常时回退到缓存
+// 请求阶段：API 与 version.json 走网络；静态资源采用 Stale-While-Revalidate 策略
 self.addEventListener('fetch', (event) => {
     const requestUrl = new URL(event.request.url);
 
-    // 1. 动态检测版本号接口、跨域资源等走网络
-    if (requestUrl.pathname.endsWith('version.json') || event.request.method !== 'GET') {
+    // 1. API 请求、版本检测接口、非 GET 请求均不走缓存
+    if (
+        requestUrl.pathname.startsWith('/api/') ||
+        requestUrl.pathname.endsWith('version.json') ||
+        event.request.method !== 'GET'
+    ) {
         return;
     }
 
-    // 2. 核心网络优先策略（Network First），保障随时能够拉取到最新内容
+    // 2. 静态资源：Stale-While-Revalidate（优先返回缓存，同时后台更新）
+    // 对静态文件忽略 ?v= 版本查询参数，使预缓存清单能够命中带版本号的请求
+    const staticExt = /\.(?:html?|js|css|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|otf)$/i;
+    const cacheKey = staticExt.test(requestUrl.pathname)
+        ? new Request(requestUrl.origin + requestUrl.pathname, { method: 'GET' })
+        : event.request;
+
     event.respondWith(
-        fetch(event.request)
-            .then((networkResponse) => {
-                // 若请求有效且为本站同源资源，更新对应缓存
-                if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-                    const responseToCache = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseToCache);
-                    });
-                }
-                return networkResponse;
-            })
-            .catch(() => {
-                // 网络失败或离线时，尝试从缓存读取
-                return caches.match(event.request);
-            })
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.match(cacheKey).then((cachedResponse) => {
+                const networkFetch = fetch(event.request)
+                    .then((networkResponse) => {
+                        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+                            cache.put(cacheKey, networkResponse.clone());
+                        }
+                        return networkResponse;
+                    })
+                    .catch(() => cachedResponse);
+
+                return cachedResponse || networkFetch;
+            });
+        })
     );
 });

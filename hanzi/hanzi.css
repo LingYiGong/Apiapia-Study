@@ -134,7 +134,7 @@
     justify-content: center;
     cursor: pointer;
     user-select: none;
-    outline: none;
+    /* 键盘焦点由全局 :focus-visible 统一提供，避免键盘用户看不到焦点位置 */
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
 }
@@ -154,16 +154,13 @@
 }
 
 /* 首页模式大卡片点按凹陷手感 */
-#startBtn:active, #recognitionStartBtn:active, #readStartBtn:active, #storyStartBtn:active, #strokeStartBtn:active {
+#startBtn:active, #recognitionStartBtn:active, #storyStartBtn:active, #strokeStartBtn:active {
     transform: scale(0.98) translateY(2px) !important;
     filter: brightness(0.96);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
 }
 
-.choice-option:focus,
-.choice-option:focus-visible {
-    outline: none;
-}
+/* 键盘焦点由全局 style.css 的 :focus-visible 统一提供，此处不再取消 outline */
 
 .choice-option:disabled {
     cursor: default;
@@ -276,7 +273,7 @@
     align-items: center;
     gap: 6px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    transition: border-color 0.2s var(--ease-press), background-color 0.2s var(--ease-press), box-shadow 0.2s var(--ease-press);
     user-select: none;
 }
 
@@ -313,7 +310,7 @@
     cursor: pointer;
     line-height: 1;
     margin-left: 2px;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .wrong-remove-btn:hover {
@@ -550,46 +547,8 @@
 }
 
 /* ================== 汉字模块夜间护眼模式专属深度适配 ================== */
-html.dark .choice-option {
-    background: #1e293b;
-    border-color: #334155;
-    border-bottom-color: #475569;
-    color: #f8fafc;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-}
-
-html.dark .choice-option:hover:not(:disabled) {
-    background: #312e81;
-    border-color: #6366f1;
-    border-bottom-color: #4f46e5;
-}
-
-html.dark .choice-option:active:not(:disabled) {
-    background: #3730a3 !important;
-    border-color: #818cf8 !important;
-}
-
-html.dark .choice-option.wrong-choice {
-    background: #4c0519;
-    border-color: #f43f5e;
-    color: #fecdd3;
-}
-
-html.dark .choice-option.correct-choice {
-    background: #064e3b;
-    border-color: #10b981;
-    color: #a7f3d0;
-}
-
-html.dark .story-paper {
-    background: linear-gradient(135deg, rgba(120, 53, 15, 0.25) 0%, rgba(30, 41, 59, 0.95) 100%);
-    border-color: rgba(245, 158, 11, 0.4);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-}
-
-html.dark .story-text {
-    color: #fde68a;
-}
+/* 说明：choice-option、story-paper、story-text、comparison-box、wrong-item、
+   result-chip、dictation-result 等通用组件的夜间模式已统一在全局 css/style.css 中维护，此处不再重复。 */
 
 html.dark .story-rt {
     color: #a5b4fc;
@@ -614,20 +573,9 @@ html.dark .story-ruby.story-char-speaking .story-rt {
     color: #e0e7ff;
 }
 
-html.dark .comparison-box,
-html.dark .written-preview,
-html.dark .result-standard {
-    background: #131d2e;
-    border-color: #334155;
-    color: #f8fafc;
-}
+/* comparison-box / written-preview / result-standard 的夜间样式已统一在 style.css 维护 */
 
-html.dark .wrong-item {
-    background: #1e293b;
-    border-color: #881337;
-    color: #fecdd3;
-}
-
+/* wrong-item 基础夜间样式已统一在 style.css 维护，仅保留专属 hover 效果 */
 html.dark .wrong-item:hover {
     background: #281422;
     border-color: #f43f5e;
@@ -647,38 +595,9 @@ html.dark .wrong-remove-btn:hover {
     color: #ffffff;
 }
 
-html.dark .result-chip {
-    background: #1e293b;
-    border-color: #475569;
-    color: #f8fafc;
-}
+/* result-chip 夜间样式已统一在 style.css 维护 */
 
-html.dark .result-chip.correct {
-    background: #064e3b;
-    border-color: #059669;
-    color: #6ee7b7;
-}
-
-html.dark .result-chip.wrong {
-    background: #4c0519;
-    border-color: #e11d48;
-    color: #fca5a5;
-}
-
-html.dark .dictation-result {
-    background: #1e293b;
-    border-color: #334155;
-}
-
-html.dark .dictation-result.correct {
-    border-color: #059669;
-    background: rgba(6, 78, 59, 0.25);
-}
-
-html.dark .dictation-result.wrong {
-    border-color: #e11d48;
-    background: rgba(76, 5, 25, 0.25);
-}
+/* dictation-result 夜间样式已统一在 style.css 维护 */
 
 html.dark .result-verdict {
     color: #f8fafc;

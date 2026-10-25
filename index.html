@@ -8,6 +8,7 @@
     <meta name="apple-mobile-web-app-title" content="Apiapia">
     <meta name="theme-color" content="#4f46e5">
     <title>Apiapia 学习中心 · 小朋友趣味自学</title>
+    <meta name="description" content="Apiapia 学习中心 —— 萌宠猫咪伴学，趣味日语假名、汉字笔顺听写、钢琴视奏与英语核心动词闪卡。" />
     <!-- 网站 Favicon 与 iOS / PWA 应用图标 (萌宠猫咪 Apiapia 主题) -->
     <link rel="icon" type="image/x-icon" href="./icons/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
@@ -16,7 +17,7 @@
     <link rel="manifest" href="./manifest.json" />
 
     <!-- 全局夜间/护眼模式核心管理 (首屏加载杜绝闪烁) -->
-    <script src="js/theme.js?v=2.2.4"></script>
+    <script src="js/theme.js?v=2.3.0"></script>
 
     <!-- 本地引入 Vant 4 样式、Tailwind CSS 与 Vue 3 -->
     <link rel="stylesheet" href="./libs/vant.min.css" />
@@ -25,13 +26,13 @@
     <script src="./libs/vant.min.js"></script>
 
     <!-- 全局统一儿童友好样式表 (统一 @hanzi 设计语言) -->
-    <link rel="stylesheet" href="css/style.css?v=2.2.4" />
+    <link rel="stylesheet" href="css/style.css?v=2.3.0" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
-    <script src="js/kid-dialog.js?v=2.0.3"></script>
+    <script src="js/kid-dialog.js?v=2.3.0"></script>
 
     <!-- 移动端与 iPad 视口自适应模块 -->
-    <script src="js/viewport.js?v=2.0.3"></script>
+    <script src="js/viewport.js?v=2.3.0"></script>
 </head>
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" v-cloak class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
@@ -252,21 +253,21 @@
 
                 <!-- iOS Safari 专属指引 -->
                 <div v-if="isIOS" class="space-y-2.5 my-1 text-xs text-slate-700">
-                    <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5">
+                    <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5 card-subtle">
                         <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-xs flex-shrink-0">1</span>
                         <div class="min-w-0">
                             <p class="font-black text-slate-800">点击 Safari 底部（或顶部）的【分享】按钮</p>
                             <p class="text-slate-500 text-[11px] mt-0.5">即方形带有向上箭头图标：<span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-1 py-0.5 rounded border border-indigo-200">⎋ 分享</span></p>
                         </div>
                     </div>
-                    <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5">
+                    <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5 card-subtle">
                         <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-xs flex-shrink-0">2</span>
                         <div class="min-w-0">
                             <p class="font-black text-slate-800">在菜单面板中向下滚动，找到并点击：</p>
                             <p class="text-slate-500 text-[11px] mt-0.5 font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200 inline-block">➕ 添加到主屏幕</p>
                         </div>
                     </div>
-                    <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5">
+                    <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5 card-subtle">
                         <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-xs flex-shrink-0">3</span>
                         <div class="min-w-0">
                             <p class="font-black text-slate-800">点击右上角【添加】</p>
@@ -284,14 +285,14 @@
                         </button>
                     </div>
                     <div v-else class="space-y-2">
-                        <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5">
+                        <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5 card-subtle">
                             <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-xs flex-shrink-0">1</span>
                             <div class="min-w-0">
                                 <p class="font-black text-slate-800">点击浏览器菜单</p>
                                 <p class="text-slate-500 text-[11px] mt-0.5">通常位于右上角或底部的三点 <b>⋮</b> 或三道杠 <b>☰</b></p>
                             </div>
                         </div>
-                        <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5">
+                        <div class="flex items-start space-x-2.5 bg-slate-50 border border-slate-200 rounded-2xl p-2.5 card-subtle">
                             <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-xs flex-shrink-0">2</span>
                             <div class="min-w-0">
                                 <p class="font-black text-slate-800">选择【添加到主屏幕】或【安装应用】</p>
@@ -351,6 +352,6 @@
     </div>
 
     <!-- 业务逻辑脚本 (Vue 3 + Vant 4) -->
-    <script src="app.js?v=2.0.2"></script>
+    <script src="app.js?v=2.3.0"></script>
 </body>
 </html>

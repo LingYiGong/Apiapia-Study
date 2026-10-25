@@ -93,7 +93,6 @@ const els = {
     strokeStartBtn: document.getElementById("strokeStartBtn"),
     resetDataBtn: document.getElementById("resetDataBtn"),
     totalPracticed: document.getElementById("totalPracticed"),
-    totalCorrect: document.getElementById("totalCorrect"),
     wrongCount: document.getElementById("wrongCount"),
     wrongbookSetup: document.getElementById("wrongbookSetup"),
     wrongbookListSetup: document.getElementById("wrongbookListSetup"),
@@ -101,9 +100,6 @@ const els = {
     wrongbookActions: document.getElementById("wrongbookActions"),
     wrongTabCountBadge: document.getElementById("wrongTabCountBadge"),
     clearWrongBookBtn: document.getElementById("clearWrongBookBtn"),
-    emptyStateGoPracticeBtn: document.getElementById("emptyStateGoPracticeBtn"),
-    practiceWrongRecognitionBtn: document.getElementById("practiceWrongRecognitionBtn"),
-    practiceWrongChoiceBtn: document.getElementById("practiceWrongChoiceBtn"),
 
     currentNumber: document.getElementById("currentNumber"),
     totalNumber: document.getElementById("totalNumber"),
@@ -127,7 +123,6 @@ const els = {
     wrongBtn: document.getElementById("wrongBtn"),
     quitBtn: document.getElementById("quitBtn"),
     dictationLevelBadge: document.getElementById("dictationLevelBadge"),
-    dictationEbHint: document.getElementById("dictationEbHint"),
     dictationEbPredictText: document.getElementById("dictationEbPredictText"),
 
     recognitionCurrentNumber: document.getElementById("recognitionCurrentNumber"),
@@ -144,7 +139,6 @@ const els = {
     recognitionCorrectBtn: document.getElementById("recognitionCorrectBtn"),
     quitRecognitionBtn: document.getElementById("quitRecognitionBtn"),
     recognitionLevelBadge: document.getElementById("recognitionLevelBadge"),
-    recognitionEbHint: document.getElementById("recognitionEbHint"),
     recognitionEbPredictText: document.getElementById("recognitionEbPredictText"),
 
     choiceScreen: document.getElementById("choiceScreen"),
