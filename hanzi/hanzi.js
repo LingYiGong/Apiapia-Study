@@ -1547,7 +1547,6 @@ function recordAnswer(isCorrect) {
     });
 
     updateStatsForAnswer(item, isCorrect);
-    if (isCorrect) playSuccessSound();
 
     // 回答错误追加到本轮末尾重练，巩固记忆
     if (!isCorrect) {
