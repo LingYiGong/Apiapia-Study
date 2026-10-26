@@ -617,7 +617,7 @@ const app = createApp({
             // 注册 PWA ServiceWorker
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./sw.js?v=' + BUILD_VERSION).then((reg) => {
+                    navigator.serviceWorker.register('./sw.js?v=' + BUILD_VERSION, { updateViaCache: 'none' }).then((reg) => {
                         console.log('[SW] PWA ServiceWorker registered with scope:', reg.scope);
                     }).catch(err => {
                         console.warn('[SW] Registration failed:', err);
