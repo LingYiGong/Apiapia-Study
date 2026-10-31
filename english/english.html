@@ -208,7 +208,7 @@
         </van-popup>
 
         <!-- 主体滚动内容区 (儿童友好背景与舒适间距) -->
-        <main class="flex-1 min-h-0 overflow-y-auto relative bg-[#f8fafc] dark:bg-[#0f172a] p-3.5 sm:p-5" :class="currentTab === 'toeic' && toeicSubTab === 'reading' ? 'pb-28' : 'pb-6'">
+        <main class="flex-1 min-h-0 overflow-y-auto relative bg-[#f8fafc] dark:bg-[#0f172a] p-3.5 sm:p-5 pb-6">
 
             <!-- ============================================================= -->
             <!-- TAB 1: 📖 托业短文学习 (精读点读 / 单词练习 / 语法微课) -->
@@ -1209,87 +1209,6 @@
             </div>
 
         </main>
-
-        <!-- ============================================================= -->
-        <!-- 常驻悬浮迷你播放栏 (Docked Mini-Player) (仅在托业短文 · 精读点读时呈现) -->
-        <!-- ============================================================= -->
-        <div
-            v-if="currentTab === 'toeic' && toeicSubTab === 'reading'"
-            class="docked-mini-player bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t-2 border-indigo-200 dark:border-slate-700 shadow-xl"
-        >
-            <!-- 播放栏顶缘进度条 -->
-            <div class="w-full bg-indigo-100 dark:bg-slate-700 h-1">
-                <div 
-                    class="bg-gradient-to-r from-indigo-500 to-purple-600 h-full transition-all duration-300"
-                    :style="{ width: (activeSentenceIndex >= 0 ? (((activeSentenceIndex + 1) / (currentArticle.sentences?.length || 1)) * 100) : 0) + '%' }"
-                ></div>
-            </div>
-
-            <!-- 控制按钮区 -->
-            <div class="max-w-2xl mx-auto px-3.5 py-1.5 sm:py-2 flex items-center justify-between gap-2">
-                <!-- 序号与句子预览 -->
-                <div 
-                    @click="scrollToActiveSentence"
-                    class="flex items-center space-x-2 min-w-0 flex-1 cursor-pointer select-none"
-                    title="点击定位到当前句子"
-                >
-                    <span 
-                        class="px-2 py-0.5 rounded-lg text-[10px] font-black shrink-0 transition-colors"
-                        :class="isSpeakingNow ? 'bg-indigo-600 text-white animate-pulse' : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'"
-                    >
-                        {{ activeSentenceIndex >= 0 ? `${activeSentenceIndex + 1}/${currentArticle.sentences?.length || 0}` : '点读' }}
-                    </span>
-                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200 truncate leading-tight">
-                        {{ currentSentenceTextPreview }}
-                    </p>
-                </div>
-
-                <!-- 控制按钮组 -->
-                <div class="flex items-center space-x-1 sm:space-x-1.5 shrink-0">
-                    <button
-                        @click="toggleSpeechRate"
-                        type="button"
-                        class="px-1.5 py-1 rounded-lg text-[10px] font-black border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100"
-                        title="调整语速"
-                    >
-                        {{ speechRate }}x
-                    </button>
-                    <button
-                        @click="togglePlaybackMode"
-                        type="button"
-                        class="w-7 h-7 rounded-lg text-xs font-black border transition-all flex items-center justify-center"
-                        :class="playbackMode === 'continuous' ? 'bg-indigo-50 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700' : 'bg-amber-50 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700'"
-                        :title="playbackMode === 'continuous' ? '整篇连播' : '单句循环'"
-                    >
-                        {{ playbackMode === 'continuous' ? '🔁' : '🔂' }}
-                    </button>
-                    <button
-                        @click="prevSentence"
-                        type="button"
-                        class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center btn-3d font-bold text-xs"
-                        title="上一句"
-                    >
-                        ⏮
-                    </button>
-                    <button
-                        @click="togglePlayPause"
-                        type="button"
-                        class="w-9 h-9 rounded-xl kid-btn-primary flex items-center justify-center text-white shadow-sm font-black text-sm"
-                        :title="isSpeakingNow ? '暂停' : '开始播放'"
-                    >
-                        <span>{{ isSpeakingNow ? '⏸' : '▶' }}</span>
-                    </button>
-                    <button
-                        @click="nextSentence"
-                        type="button"
-                        class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center btn-3d font-bold text-xs"
-                        title="下一句"
-                    >
-                        ⏭
-                    </button>
-                </div>
-            </div>
-        </div>
 
 
         <!-- ============================================================= -->

@@ -132,14 +132,6 @@
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-/* ================== 常驻悬浮迷你播放栏适配 ================== */
-.docked-mini-player {
-    position: fixed;
-    bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
-    left: 0;
-    right: 0;
-    z-index: 25;
-}
 
 /* ================== 夜间护眼模式微调 (Dark Mode Overrides) ================== */
 html.dark .card-front {
@@ -154,10 +146,7 @@ html.dark .card-back {
     color: var(--text) !important;
 }
 
-html.dark .docked-mini-player > div {
-    background-color: rgba(30, 41, 59, 0.95) !important;
-    border-color: #334155 !important;
-}
+
 
 html.dark .btn-3d-white {
     background: #1e293b;
