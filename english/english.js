@@ -109,7 +109,7 @@
 
             // ------------ 托业短文状态 ------------
             const articles = ref(typeof TOEIC_ARTICLES !== 'undefined' ? TOEIC_ARTICLES : []);
-            const wordDict = ref(typeof TOEIC_WORD_DICT !== 'undefined' ? TOEIC_WORD_DICT : {});
+            const wordDict = typeof TOEIC_WORD_DICT !== 'undefined' ? TOEIC_WORD_DICT : {};
             const currentArticleId = ref(1);
             const toeicSubTab = ref('reading'); // 'reading' | 'words' | 'grammar'
             const showChinese = ref(true); // 全篇译文开关
@@ -132,7 +132,6 @@
             // 播放器状态
             const activeSentenceId = ref(null);
             const isSpeakingNow = ref(false);
-            const playbackMode = ref('continuous'); // 'continuous' | 'loop'
 
             const synth = typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null;
             let sharedAudio = null;
@@ -527,7 +526,7 @@
             const completedArticles = ref([]);
 
             // ------------ 核心动词卡状态 ------------
-            const verbList = ref(typeof CORE_VERBS !== 'undefined' ? CORE_VERBS : (typeof words !== 'undefined' ? words : []));
+            const verbList = ref(typeof CORE_VERBS !== 'undefined' ? CORE_VERBS : []);
             const currentVerbIndex = ref(0);
             const verbFlipped = ref(false);
             const verbProgress = ref({}); // { [index]: 'known' | 'unknown' }
@@ -543,19 +542,6 @@
 
             const isCurrentArticleCompleted = computed(() => {
                 return completedArticles.value.includes(currentArticleId.value);
-            });
-
-            const activeSentenceIndex = computed(() => {
-                if (!currentArticle.value || !currentArticle.value.sentences) return -1;
-                return currentArticle.value.sentences.findIndex(s => s.id === activeSentenceId.value);
-            });
-
-            const currentSentenceTextPreview = computed(() => {
-                if (activeSentenceIndex.value >= 0 && currentArticle.value.sentences) {
-                    const s = currentArticle.value.sentences[activeSentenceIndex.value];
-                    return s ? s.en : '';
-                }
-                return '点击播放或点任意句子开始';
             });
 
             // 动词统计
@@ -605,7 +591,7 @@
             // 动词掌握总结文案
             const statsSummaryMessage = computed(() => {
                 const percent = verbsMasteryPercent.value;
-                if (percent === 100) return '太厉害啦！已熟练掌握全部 100 个核心高频生活动词！🎉';
+                if (percent === 100) return `太厉害啦！已熟练掌握全部 ${totalVerbsCount.value} 个核心高频生活动词！🎉`;
                 if (percent >= 60) return `已熟练掌握 ${knownVerbsCount.value} 个动词，再巩固一下 ${unknownVerbsCount.value} 个需复习词汇！💪`;
                 return `当前已掌握 ${knownVerbsCount.value} 个，保持翻牌复习节奏，越练越轻松！🌟`;
             });
@@ -702,24 +688,17 @@
                 voicePlayer.speak(sent.en, () => {
                     if (!isSpeakingNow.value) return;
 
-                    if (playbackMode.value === 'loop') {
+                    // 默认整篇连播：当前句读完后自动接续下一句
+                    const sents = currentArticle.value.sentences || [];
+                    const curIdx = sents.findIndex(s => s.id === sent.id);
+                    if (curIdx < sents.length - 1) {
+                        const nextSent = sents[curIdx + 1];
                         setTimeout(() => {
-                            if (isSpeakingNow.value) playSentenceById(sent.id);
-                        }, 400);
-                    } else if (playbackMode.value === 'continuous') {
-                        const sents = currentArticle.value.sentences || [];
-                        const curIdx = sents.findIndex(s => s.id === sent.id);
-                        if (curIdx < sents.length - 1) {
-                            const nextSent = sents[curIdx + 1];
-                            setTimeout(() => {
-                                if (isSpeakingNow.value) playSentenceById(nextSent.id);
-                            }, 450);
-                        } else {
-                            isSpeakingNow.value = false;
-                            triggerConfetti();
-                        }
+                            if (isSpeakingNow.value) playSentenceById(nextSent.id);
+                        }, 450);
                     } else {
                         isSpeakingNow.value = false;
+                        triggerConfetti();
                     }
                 }, speechRate.value);
             };
@@ -730,50 +709,6 @@
                 } else {
                     playSentenceById(sent.id);
                 }
-            };
-
-            const togglePlayPause = () => {
-                if (isSpeakingNow.value) {
-                    stopPlayback();
-                } else {
-                    const targetId = activeSentenceId.value || currentArticle.value.sentences?.[0]?.id;
-                    if (targetId) playSentenceById(targetId);
-                }
-            };
-
-            const prevSentence = () => {
-                const sents = currentArticle.value.sentences || [];
-                if (sents.length === 0) return;
-                let newIndex = activeSentenceIndex.value <= 0 ? sents.length - 1 : activeSentenceIndex.value - 1;
-                playSentenceById(sents[newIndex].id);
-            };
-
-            const nextSentence = () => {
-                const sents = currentArticle.value.sentences || [];
-                if (sents.length === 0) return;
-                let newIndex = activeSentenceIndex.value >= sents.length - 1 ? 0 : activeSentenceIndex.value + 1;
-                playSentenceById(sents[newIndex].id);
-            };
-
-            const togglePlaybackMode = () => {
-                playbackMode.value = playbackMode.value === 'continuous' ? 'loop' : 'continuous';
-                window.kidToast && window.kidToast(playbackMode.value === 'continuous' ? '已切换为：整篇连播' : '已切换为：单句循环', 'info');
-            };
-
-            const toggleSpeechRate = () => {
-                if (speechRate.value === 1.0) speechRate.value = 0.85;
-                else if (speechRate.value === 0.85) speechRate.value = 0.75;
-                else if (speechRate.value === 0.75) speechRate.value = 1.25;
-                else speechRate.value = 1.0;
-                saveAudioConfig();
-                window.kidToast && window.kidToast(`语速已切换为：${speechRate.value}x`, 'info');
-            };
-
-            const scrollToActiveSentence = () => {
-                const targetId = activeSentenceId.value || currentArticle.value.sentences?.[0]?.id;
-                if (!targetId) return;
-                const el = document.getElementById('sentence-' + targetId);
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             };
 
             // ------------ 单词 Token 化与即时点查 ------------
@@ -812,7 +747,7 @@
 
             const handleWordClick = (tok, contextKey) => {
                 const lower = tok.clean;
-                const dictEntry = wordDict.value[lower] || {};
+                const dictEntry = wordDict[lower] || {};
 
                 // 优先查验当前文章 target words
                 const targetWordItem = currentArticle.value.words?.find(w =>
@@ -1058,7 +993,7 @@
                 }
                 const ok = await window.kidConfirm({
                     title: '清空动词学习记录？',
-                    message: '确定要清空全部 100 个核心动词的掌握记录吗？此操作不可恢复。',
+                    message: `确定要清空全部 ${totalVerbsCount.value} 个核心动词的掌握记录吗？此操作不可恢复。`,
                     icon: '🗑️',
                     type: 'danger',
                     confirmText: '确定清空',
@@ -1128,9 +1063,6 @@
                 if (synth) {
                     if (synth.onvoiceschanged !== undefined) {
                         synth.onvoiceschanged = initVoices;
-                    }
-                    if (synth.addEventListener) {
-                        synth.addEventListener('voiceschanged', initVoices);
                     }
                 }
                 setTimeout(initVoices, 250);
@@ -1206,7 +1138,6 @@
                 testSentenceAudio,
                 currentTab,
                 articles,
-                wordDict,
                 currentArticleId,
                 currentArticle,
                 completedArticles,
@@ -1215,17 +1146,13 @@
                 toeicSubTab,
                 showChinese,
                 activeSentenceId,
-                activeSentenceIndex,
-                currentSentenceTextPreview,
                 isSpeakingNow,
-                playbackMode,
                 speechRate,
                 selectedWordInfo,
                 wordAnswers,
                 grammarAnswers,
                 showWordExampleZh,
                 showQuizZh,
-                verbList,
                 currentVerbIndex,
                 currentVerb,
                 currentVerbStatus,
@@ -1245,12 +1172,6 @@
                 selectArticle,
                 nextArticle,
                 playSingleSentence,
-                togglePlayPause,
-                prevSentence,
-                nextSentence,
-                togglePlaybackMode,
-                toggleSpeechRate,
-                scrollToActiveSentence,
                 tokenizeSentence,
                 handleWordClick,
                 closeWordInfo,

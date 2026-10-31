@@ -41,10 +41,10 @@
     <script src="./words-data.js?v=2.3.0"></script>
 </head>
 <body class="flex flex-col overflow-hidden bg-[#f8fafc] dark:bg-[#0f172a] text-slate-800 dark:text-slate-100">
-    <div id="app" class="flex flex-col mx-auto w-full max-w-2xl bg-[#f8fafc] dark:bg-[#0f172a] shadow-2xl relative border-gray-200 dark:border-slate-800 h-full overflow-hidden" v-cloak>
+    <div id="app" class="flex flex-col mx-auto w-full bg-[#f8fafc] dark:bg-[#0f172a] shadow-2xl relative border-gray-200 dark:border-slate-800 h-full overflow-hidden" v-cloak>
 
         <!-- 顶部导航栏 (统一儿童风格明快渐变色，与 @hanzi 完全一致) -->
-        <header class="app-header bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-3 sm:px-6 pt-3 pb-3 shadow-md z-30 flex-shrink-0">
+        <header class="app-header bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-3 sm:px-6 pb-3 shadow-md z-30 flex-shrink-0">
             <div class="flex items-center justify-between h-9">
                 <div class="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
                     <a href="../index.html" class="h-8 text-xs sm:text-sm px-2.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center space-x-1 sm:space-x-1.5 border border-white/30 transition-all active:scale-95 shadow-sm whitespace-nowrap flex-shrink-0" title="返回 Apiapia 学习中心">
@@ -78,7 +78,7 @@
         </header>
 
         <!-- 发音与语音设置弹窗 (参考 @japanese 统一设计：真人原声在线双通道 + 系统本地 TTS 切换) -->
-        <van-popup v-model:show="showAudioSettings" position="bottom" round closeable :style="{ maxHeight: '88%' }" class="p-5 sm:p-6 !rounded-t-3xl dark:bg-slate-900 dark:text-slate-100">
+        <van-popup v-model:show="showAudioSettings" position="bottom" round closeable :style="{ maxHeight: '88%' }" class="p-5 sm:p-6 !rounded-t-3xl">
             <div class="space-y-4">
                 <div class="border-b dark:border-slate-700 pb-3 pr-8">
                     <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center space-x-2">
@@ -276,7 +276,7 @@
                 <!-- ================= SUB-TAB 1.1: 📖 精读点读 ================= -->
                 <div v-show="toeicSubTab === 'reading'" class="space-y-3.5 animate-pop">
                     <!-- 文章标题卡片 -->
-                    <div class="bg-gradient-to-r from-indigo-50/90 via-sky-50/90 to-purple-50/90 dark:from-slate-800 dark:via-indigo-950/40 dark:to-slate-800 border-2 border-indigo-200 dark:border-indigo-900 rounded-3xl p-4 shadow-xs flex items-start justify-between card-panel">
+                    <div class="bg-gradient-to-r from-indigo-50/90 via-sky-50/90 to-purple-50/90 dark:from-slate-800 dark:via-indigo-950/40 dark:to-slate-800 border-2 border-indigo-200 dark:border-indigo-900 rounded-3xl p-4 shadow-sm flex items-start justify-between card-panel">
                         <div class="min-w-0 pr-2">
                             <div class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-[11px] font-black mb-1.5 border border-indigo-200 dark:border-indigo-800">
                                 <span>📌</span>
@@ -292,7 +292,7 @@
                             <button
                                 @click="showChinese = !showChinese"
                                 type="button"
-                                class="px-2.5 py-1 rounded-full text-xs font-black border transition-all flex items-center space-x-1 shadow-2xs"
+                                class="px-2.5 py-1 rounded-full text-xs font-black border transition-all flex items-center space-x-1 shadow-sm"
                                 :class="showChinese ? 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-700' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600'"
                                 title="显示或隐藏全篇中文翻译"
                             >
@@ -315,7 +315,7 @@
                             class="relative p-4 rounded-3xl border-2 transition-all cursor-pointer select-none card-panel"
                             :class="activeSentenceId === sent.id
                                 ? 'bg-indigo-50/95 dark:bg-indigo-950/40 border-indigo-400 dark:border-indigo-500 ring-4 ring-indigo-200/60 dark:ring-indigo-900/40 shadow-md scale-[1.01]'
-                                : 'bg-white dark:bg-slate-800 border-slate-200/90 dark:border-slate-700 hover:border-indigo-300 shadow-2xs'"
+                                : 'bg-white dark:bg-slate-800 border-slate-200/90 dark:border-slate-700 hover:border-indigo-300 shadow-sm'"
                         >
                             <!-- 顶部序号与动感波形 / 喇叭 -->
                             <div class="flex items-center justify-between mb-2">
@@ -383,8 +383,8 @@
                                     <div class="flex items-baseline space-x-1.5 flex-wrap">
                                         <span class="text-base font-black text-slate-900 dark:text-white">{{ selectedWordInfo.text }}</span>
                                         <span class="text-xs font-mono text-amber-800 dark:text-amber-300 font-bold">{{ selectedWordInfo.phonetic }}</span>
-                                        <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
-                                        <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.2 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
+                                        <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.5 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
+                                        <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.5 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
                                     </div>
                                     <div class="mt-1 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-start space-x-1">
                                         <span class="text-amber-600 dark:text-amber-400 font-black shrink-0">释义：</span>
@@ -395,7 +395,7 @@
                                     <button
                                         @click.stop="speakText(selectedWordInfo.text)"
                                         type="button"
-                                        class="w-8 h-8 rounded-xl bg-amber-400 hover:bg-amber-500 text-amber-950 flex items-center justify-center btn-3d shadow-2xs font-bold"
+                                        class="w-8 h-8 rounded-xl bg-amber-400 hover:bg-amber-500 text-amber-950 flex items-center justify-center btn-3d shadow-sm font-bold"
                                         title="再次发音"
                                     >
                                         🔊
@@ -445,7 +445,7 @@
                         <div
                             v-for="item in currentArticle.words"
                             :key="item.word"
-                            class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-2xs hover:border-pink-300 transition-all card-panel"
+                            class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-sm hover:border-pink-300 transition-all card-panel"
                         >
                             <!-- 单词标题行 -->
                             <div class="flex items-center justify-between">
@@ -456,7 +456,7 @@
                                 <button
                                     @click="speakText(item.word)"
                                     type="button"
-                                    class="w-9 h-9 rounded-2xl bg-pink-100 dark:bg-pink-900/60 text-pink-600 dark:text-pink-300 flex items-center justify-center btn-3d shadow-2xs font-bold text-sm"
+                                    class="w-9 h-9 rounded-2xl bg-pink-100 dark:bg-pink-900/60 text-pink-600 dark:text-pink-300 flex items-center justify-center btn-3d shadow-sm font-bold text-sm"
                                     title="单词发音"
                                 >
                                     🔊
@@ -524,8 +524,8 @@
                                         <div class="flex items-baseline space-x-1.5 flex-wrap">
                                             <span class="text-sm font-black text-slate-900 dark:text-white">{{ selectedWordInfo.text }}</span>
                                             <span class="text-xs font-mono text-amber-800 dark:text-amber-300 font-bold">{{ selectedWordInfo.phonetic }}</span>
-                                            <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
-                                            <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.2 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
+                                            <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.5 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
+                                            <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.5 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
                                         </div>
                                         <div class="mt-1 text-xs font-bold text-slate-700 dark:text-slate-300">
                                             <span class="text-amber-600 dark:text-amber-400 font-black">释义：</span>
@@ -564,7 +564,7 @@
                             <div
                                 v-for="(quiz, qIdx) in currentArticle.wordQuizzes"
                                 :key="quiz.id"
-                                class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-2xs card-panel"
+                                class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-sm card-panel"
                             >
                                 <!-- 题干头 -->
                                 <div class="flex items-center justify-between mb-1.5">
@@ -620,8 +620,8 @@
                                         <div class="flex items-baseline space-x-1.5 flex-wrap">
                                             <span class="text-sm font-black text-slate-900 dark:text-white">{{ selectedWordInfo.text }}</span>
                                             <span class="text-xs font-mono text-amber-800 dark:text-amber-300 font-bold">{{ selectedWordInfo.phonetic }}</span>
-                                            <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
-                                            <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.2 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
+                                            <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.5 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
+                                            <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.5 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
                                         </div>
                                         <div class="mt-1 text-xs font-bold text-slate-700 dark:text-slate-300">
                                             <span class="text-amber-600 dark:text-amber-400 font-black">释义：</span>
@@ -679,7 +679,7 @@
                 <!-- ================= SUB-TAB 1.3: 📐 语法微课 ================= -->
                 <div v-show="toeicSubTab === 'grammar'" class="space-y-4 animate-pop">
                     <!-- 语法考点卡片 -->
-                    <div class="bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-slate-800 dark:to-amber-950/40 border-2 border-amber-300 dark:border-amber-700 rounded-3xl p-4 shadow-2xs card-panel">
+                    <div class="bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-slate-800 dark:to-amber-950/40 border-2 border-amber-300 dark:border-amber-700 rounded-3xl p-4 shadow-sm card-panel">
                         <div class="flex items-center space-x-2 mb-2">
                             <span class="text-2xl">🍋</span>
                             <div class="inline-block px-2.5 py-0.5 rounded-full bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-xs font-black">
@@ -708,7 +708,7 @@
                             <div
                                 v-for="(quiz, qIdx) in currentArticle.grammarQuizzes"
                                 :key="quiz.id"
-                                class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-2xs card-panel"
+                                class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-sm card-panel"
                             >
                                 <div class="flex items-center justify-between mb-1.5">
                                     <span class="text-xs font-black text-amber-600 dark:text-amber-400">Question {{ qIdx + 1 }} · 单项选择</span>
@@ -749,8 +749,8 @@
                                         <div class="flex items-baseline space-x-1.5 flex-wrap">
                                             <span class="text-sm font-black text-slate-900 dark:text-white">{{ selectedWordInfo.text }}</span>
                                             <span class="text-xs font-mono text-amber-800 dark:text-amber-300 font-bold">{{ selectedWordInfo.phonetic }}</span>
-                                            <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
-                                            <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.2 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
+                                            <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.5 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
+                                            <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.5 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
                                         </div>
                                         <div class="mt-1 text-xs font-bold text-slate-700 dark:text-slate-300">
                                             <span class="text-amber-600 dark:text-amber-400 font-black">释义：</span>
@@ -816,7 +816,7 @@
                                 <button
                                     @click="resetCurrentArticleQuizzes"
                                     type="button"
-                                    class="kid-btn-light px-4 py-2.5 rounded-2xl text-xs font-black shadow-2xs"
+                                    class="kid-btn-light px-4 py-2.5 rounded-2xl text-xs font-black shadow-sm"
                                 >
                                     🔄 重新刷题
                                 </button>
@@ -859,7 +859,7 @@
                 <div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 shadow-sm flex items-center justify-between card-panel">
                     <div class="text-xs sm:text-sm font-black text-slate-800 dark:text-white flex items-center space-x-2">
                         <span class="px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200 font-mono font-black text-xs border border-indigo-200 dark:border-indigo-800">
-                            Word #{{ currentVerbIndex + 101 }}
+                            Word #{{ currentVerbIndex + 1 }}
                         </span>
                         <span class="text-slate-500 dark:text-slate-400 font-bold text-xs">3D 翻牌闪卡记忆</span>
                     </div>
@@ -901,7 +901,7 @@
                                 <div class="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-wide">
                                     {{ currentVerb ? currentVerb.chinese : '' }}
                                 </div>
-                                <div class="text-xs font-black text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 px-3.5 py-1.5 rounded-full inline-block shadow-2xs">
+                                <div class="text-xs font-black text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 px-3.5 py-1.5 rounded-full inline-block shadow-sm">
                                     轻按卡片翻转揭晓英文
                                 </div>
                             </div>
@@ -921,7 +921,7 @@
                             </div>
 
                             <div class="my-auto space-y-3">
-                                <div class="text-4xl sm:text-6xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight font-sans">
+                                <div class="text-4xl sm:text-6xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight">
                                     {{ currentVerb ? currentVerb.english : '' }}
                                 </div>
                                 <div class="text-lg sm:text-2xl font-black text-slate-800 dark:text-slate-100">
@@ -1047,10 +1047,10 @@
                             v-for="item in filteredVerbList"
                             :key="item.originalIndex"
                             @click="jumpToVerb(item.originalIndex)"
-                            class="p-3.5 sm:p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all bg-white dark:bg-slate-800 mb-2 shadow-2xs flex items-center justify-between cursor-pointer active:scale-[0.99] card-panel"
+                            class="p-3.5 sm:p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all bg-white dark:bg-slate-800 mb-2 shadow-sm flex items-center justify-between cursor-pointer active:scale-[0.99] card-panel"
                         >
                             <div class="flex items-center space-x-3.5 min-w-0 pr-2">
-                                <span class="text-xs text-slate-400 font-mono font-bold w-9 flex-shrink-0">#{{ item.originalIndex + 101 }}</span>
+                                <span class="text-xs text-slate-400 font-mono font-bold w-9 flex-shrink-0">#{{ item.originalIndex + 1 }}</span>
                                 <div class="min-w-0">
                                     <div class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center space-x-2">
                                         <span>{{ item.english }}</span>
@@ -1124,25 +1124,25 @@
 
                     <!-- 短文与动词双翼指标卡 -->
                     <div class="grid grid-cols-2 gap-3 pt-2 text-left">
-                        <div class="p-3.5 bg-indigo-50/80 dark:bg-indigo-950/40 border-2 border-indigo-200/80 dark:border-indigo-900 rounded-2xl text-center shadow-2xs">
+                        <div class="p-3.5 bg-indigo-50/80 dark:bg-indigo-950/40 border-2 border-indigo-200/80 dark:border-indigo-900 rounded-2xl text-center shadow-sm">
                             <div class="text-xs text-indigo-800 dark:text-indigo-300 font-bold">托业短文通关</div>
                             <div class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
                                 {{ completedArticlesCount }} / {{ articles.length }}
                             </div>
                         </div>
-                        <div class="p-3.5 bg-emerald-50/80 dark:bg-emerald-950/40 border-2 border-emerald-200/80 dark:border-emerald-900 rounded-2xl text-center shadow-2xs">
+                        <div class="p-3.5 bg-emerald-50/80 dark:bg-emerald-950/40 border-2 border-emerald-200/80 dark:border-emerald-900 rounded-2xl text-center shadow-sm">
                             <div class="text-xs text-emerald-800 dark:text-emerald-300 font-bold">已掌握动词</div>
                             <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
                                 {{ knownVerbsCount }} 词
                             </div>
                         </div>
-                        <div class="p-3.5 bg-rose-50/80 dark:bg-rose-950/40 border-2 border-rose-200/80 dark:border-rose-900 rounded-2xl text-center shadow-2xs">
+                        <div class="p-3.5 bg-rose-50/80 dark:bg-rose-950/40 border-2 border-rose-200/80 dark:border-rose-900 rounded-2xl text-center shadow-sm">
                             <div class="text-xs text-rose-800 dark:text-rose-300 font-bold">需复习动词</div>
                             <div class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1">
                                 {{ unknownVerbsCount }} 词
                             </div>
                         </div>
-                        <div class="p-3.5 bg-amber-50/80 dark:bg-amber-950/40 border-2 border-amber-200/80 dark:border-amber-900 rounded-2xl text-center shadow-2xs">
+                        <div class="p-3.5 bg-amber-50/80 dark:bg-amber-950/40 border-2 border-amber-200/80 dark:border-amber-900 rounded-2xl text-center shadow-sm">
                             <div class="text-xs text-amber-800 dark:text-amber-300 font-bold">待记忆动词</div>
                             <div class="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">
                                 {{ verbsRemainingCount }} 词
@@ -1166,7 +1166,7 @@
                             v-for="art in articles"
                             :key="art.id"
                             @click="selectArticle(art.id); switchTab('toeic');"
-                            class="p-2.5 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between active:scale-98"
+                            class="p-2.5 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between active:scale-95"
                             :class="completedArticles.includes(art.id)
                                 ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200'
                                 : 'bg-slate-50 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300'"
@@ -1225,7 +1225,7 @@
                 >
                     <div class="relative flex items-center justify-center">
                         <span class="text-2xl transition-transform" :class="currentTab === 'toeic' ? 'scale-110' : 'opacity-75'">📖</span>
-                        <span v-if="completedArticlesCount > 0" class="absolute -top-1 -right-3 px-1.5 py-0.2 min-w-[16px] h-4 bg-amber-500 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-sm">
+                        <span v-if="completedArticlesCount > 0" class="absolute -top-1 -right-3 px-1.5 py-0.5 min-w-[16px] h-4 bg-amber-500 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-sm">
                             {{ completedArticlesCount }}
                         </span>
                     </div>
@@ -1256,7 +1256,7 @@
                 >
                     <div class="relative flex items-center justify-center">
                         <span class="text-2xl transition-transform" :class="currentTab === 'list' ? 'scale-110' : 'opacity-75'">📋</span>
-                        <span v-if="unknownVerbsCount > 0" class="absolute -top-1 -right-3 px-1.5 py-0.2 min-w-[16px] h-4 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-sm">
+                        <span v-if="unknownVerbsCount > 0" class="absolute -top-1 -right-3 px-1.5 py-0.5 min-w-[16px] h-4 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-sm">
                             {{ unknownVerbsCount }}
                         </span>
                     </div>

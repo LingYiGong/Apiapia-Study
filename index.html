@@ -162,10 +162,10 @@
                     </div>
 
                     <!-- 彩色标签胶囊行 (与参考图精确一致) -->
-                    <div class="mt-1.5 sm:mt-2 flex flex-wrap gap-1 sm:gap-1.5 overflow-hidden max-h-12 sm:max-h-14">
+                    <div class="mt-1.5 sm:mt-2 flex flex-wrap gap-0.5 sm:gap-1.5 overflow-hidden max-h-12 sm:max-h-14">
                         <span v-for="tag in item.tags" :key="tag.text"
                               :style="{ backgroundColor: tag.color + '15', color: tag.color, borderColor: tag.color + '35' }"
-                              class="module-feature-tag px-2 sm:px-2.5 py-0.5 rounded-xl text-[10px] sm:text-xs font-black border leading-tight whitespace-nowrap flex-shrink-0">
+                              class="module-feature-tag px-1.5 sm:px-2.5 py-0.5 rounded-xl text-[10px] sm:text-xs font-black border leading-tight whitespace-nowrap flex-shrink-0">
                             {{ tag.text }}
                         </span>
                     </div>

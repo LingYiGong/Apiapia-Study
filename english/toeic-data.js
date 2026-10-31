@@ -8,25 +8,21 @@ const TOEIC_ARTICLES = [
         "id": 1,
         "en": "A new complimentary coffee machine is now available in the second-floor breakroom.",
         "zh": "二楼茶水间里现在安装了一台免费咖啡机供大家使用。",
-        "targetWord": "complimentary"
       },
       {
         "id": 2,
         "en": "All staff members are welcome to enjoy freshly brewed beverages during working hours.",
         "zh": "欢迎所有员工在工作时间享用新鲜冲泡的饮品。",
-        "targetWord": "beverage"
       },
       {
         "id": 3,
         "en": "Please ensure that the coffee machine is properly cleaned after each use.",
         "zh": "每次使用完毕后，请务必确保咖啡机已清理干净。",
-        "targetWord": "available"
       },
       {
         "id": 4,
         "en": "Should you notice any operational issues, report them to the facilities team immediately.",
         "zh": "若发现任何操作故障，请立即向后勤设施团队汇报。",
-        "targetWord": "available"
       }
     ],
     "words": [
@@ -173,25 +169,21 @@ const TOEIC_ARTICLES = [
         "id": 1,
         "en": "We are pleased to announce that Sarah Jenkins has joined our marketing department as director.",
         "zh": "我们很高兴地宣布，莎拉·詹金斯女士已加入市场部并担任主管。",
-        "targetWord": "announce"
       },
       {
         "id": 2,
         "en": "She has accumulated over ten years of marketing experience in global technology firms.",
         "zh": "她在全球科技公司积累了超过十年的市场营销经验。",
-        "targetWord": "experience"
       },
       {
         "id": 3,
         "en": "Since her arrival, she has already begun restructuring our promotional campaigns.",
         "zh": "自入职以来，她已经着手重组我们的宣传推广活动。",
-        "targetWord": "department"
       },
       {
         "id": 4,
         "en": "A welcome reception has been scheduled for Friday afternoon in the lounge.",
         "zh": "欢迎酒会已定于周五下午在员工休息室举行。",
-        "targetWord": "announce"
       }
     ],
     "words": [
@@ -338,25 +330,21 @@ const TOEIC_ARTICLES = [
         "id": 1,
         "en": "Please be advised that the network printer on the second floor is temporarily out of service.",
         "zh": "请注意，二楼的网络打印机目前已暂停使用。",
-        "targetWord": "temporarily"
       },
       {
         "id": 2,
         "en": "The equipment is currently undergoing emergency maintenance due to a severe paper jam.",
         "zh": "由于出现严重卡纸，该设备目前正在接受紧急维护。",
-        "targetWord": "maintenance"
       },
       {
         "id": 3,
         "en": "A certified technician has been contacted to repair the hardware components today.",
         "zh": "今天已联系专业技术人员前来修理硬件部件。",
-        "targetWord": "repair"
       },
       {
         "id": 4,
         "en": "In the meantime, documents can be printed using the copiers located on the third floor.",
         "zh": "在此期间，大家可以使用位于三楼的复印机打印文件。",
-        "targetWord": "temporarily"
       }
     ],
     "words": [
@@ -503,25 +491,21 @@ const TOEIC_ARTICLES = [
         "id": 1,
         "en": "Due to an unexpected scheduling conflict, our weekly team meeting must be rescheduled.",
         "zh": "由于突发的日程冲突，我们的每周团队例会必须改期。",
-        "targetWord": "reschedule"
       },
       {
         "id": 2,
         "en": "We have decided to postpone the project discussion from 10:00 A.M. to 2:30 P.M. on Thursday.",
         "zh": "我们已决定将项目研讨从周四上午十点推迟到下午两点半。",
-        "targetWord": "postpone"
       },
       {
         "id": 3,
         "en": "The updated agenda for the upcoming quarter will be distributed before noon.",
         "zh": "下一季度更新后的会议议程将在中午前分发给大家。",
-        "targetWord": "agenda"
       },
       {
         "id": 4,
         "en": "All department members are expected to assemble in Conference Room B by 2:25 P.M.",
         "zh": "请所有部门成员在下午 2:25 前准时到 B 会议室集合。",
-        "targetWord": "agenda"
       }
     ],
     "words": [
@@ -668,25 +652,21 @@ const TOEIC_ARTICLES = [
         "id": 1,
         "en": "Thank you for submitting your detailed inquiry regarding our eco-friendly packaging solutions.",
         "zh": "感谢您发来关于我们环保包装解决方案的详细咨询。",
-        "targetWord": "inquiry"
       },
       {
         "id": 2,
         "en": "We have attached our newest product catalog along with volume discount price tiers.",
         "zh": "我们已在附件中附上最新产品目录以及批量采购折扣阶梯方案。",
-        "targetWord": "catalog"
       },
       {
         "id": 3,
         "en": "Special wholesale discounts are applicable to all first-time corporate orders placed this month.",
         "zh": "本月下单的所有首次企业采购订单均可享受特别批发折扣。",
-        "targetWord": "discount"
       },
       {
         "id": 4,
         "en": "We look forward to establishing a mutually rewarding commercial partnership with your firm.",
         "zh": "我们非常期待与贵公司建立互利共赢的商业合作伙伴关系。",
-        "targetWord": "attach"
       }
     ],
     "words": [
@@ -833,25 +813,21 @@ const TOEIC_ARTICLES = [
         "id": 1,
         "en": "Please review the updated corporate policy regarding business travel expense claims.",
         "zh": "请查阅关于商务差旅费用报销的最新公司政策。",
-        "targetWord": "expense"
       },
       {
         "id": 2,
         "en": "Employees must retain every official receipt for lodging, meals, and local transit.",
         "zh": "员工必须保留所有住宿、餐饮和当地市内交通的正规发票。",
-        "targetWord": "receipt"
       },
       {
         "id": 3,
         "en": "If you submit your reimbursement form within five working days, processing will be expedited.",
         "zh": "如果您在五个工作日内提交报销单，审核发放流程将会加快。",
-        "targetWord": "submit"
       },
       {
         "id": 4,
         "en": "The accounting department will reimburse all approved expenses via direct bank transfer.",
         "zh": "财务部将通过银行直接转账报销所有已批准的费用。",
-        "targetWord": "reimburse"
       }
     ],
     "words": [
@@ -998,25 +974,21 @@ const TOEIC_ARTICLES = [
         "id": 1,
         "en": "Apex Solutions will observe the upcoming National Holiday with a scheduled office closure.",
         "zh": "Apex Solutions 公司将在即将到来的法定假日期间休假关门。",
-        "targetWord": "observe"
       },
       {
         "id": 2,
         "en": "Our headquarters will be closed starting on Friday, and normal operations will resume on Tuesday.",
         "zh": "总部大楼将于周五起关闭，所有正常业务将于下周二恢复运作。",
-        "targetWord": "closure"
       },
       {
         "id": 3,
         "en": "Before leaving the office, please confirm that your desktop workstations are powered down.",
         "zh": "离开办公室前，请确认您的台式工作站已切断电源。",
-        "targetWord": "resume"
       },
       {
         "id": 4,
         "en": "For any urgent technical emergency, the on-duty support hotline remains accessible.",
         "zh": "如有突发技术紧急事件，值班技术支持热线保持畅通。",
-        "targetWord": "emergency"
       }
     ],
     "words": [
@@ -1163,25 +1135,21 @@ const TOEIC_ARTICLES = [
         "id": 1,
         "en": "Human Resources is excited to sponsor an interactive workshop on strategic communication.",
         "zh": "人力资源部非常高兴赞助举办一场关于战略沟通的互动工作坊。",
-        "targetWord": "workshop"
       },
       {
         "id": 2,
         "en": "This intensive training program is designed to improve cross-functional collaboration.",
         "zh": "该强化培训项目旨在提升跨职能协作能力。",
-        "targetWord": "improve"
       },
       {
         "id": 3,
         "en": "Participants must register online through the staff portal prior to September fifteenth.",
         "zh": "参会人员必须在 9 月 15 日前通过员工门户网站完成在线报名。",
-        "targetWord": "register"
       },
       {
         "id": 4,
         "en": "Because seating capacity is strictly limited, applications will be processed on a first-come basis.",
         "zh": "由于座位名额严格受限，申请将遵循先到先得的原则受理。",
-        "targetWord": "limited"
       }
     ],
     "words": [
@@ -1328,25 +1296,21 @@ const TOEIC_ARTICLES = [
         "id": 1,
         "en": "Thank you for your recent purchase order for commercial printing supplies.",
         "zh": "感谢您最近采购商用打印耗材的订单。",
-        "targetWord": "purchase"
       },
       {
         "id": 2,
         "en": "A detailed invoice itemizing all stationery products has been dispatched to your email.",
         "zh": "列有所有文具用品明细的详细发票已发送至您的电子邮箱。",
-        "targetWord": "invoice"
       },
       {
         "id": 3,
         "en": "Although demand has surged, our warehouse team will deliver your crates on schedule.",
         "zh": "尽管需求量激增，我们的仓储团队仍将按期运送您的货箱。",
-        "targetWord": "deliver"
       },
       {
         "id": 4,
         "en": "The estimated delivery date for this shipment is Wednesday, October fourteenth.",
         "zh": "本批次货物的预计送达日期为 10 月 14 日星期三。",
-        "targetWord": "estimate"
       }
     ],
     "words": [
@@ -1493,25 +1457,21 @@ const TOEIC_ARTICLES = [
         "id": 1,
         "en": "At Horizon Hotels, we are always eager to receive candid feedback from our valued guests.",
         "zh": "在 Horizon 酒店，我们始终热切渴望倾听尊贵宾客的真实反馈。",
-        "targetWord": "feedback"
       },
       {
         "id": 2,
         "en": "Your opinions are extremely valuable in helping us maintain premier hospitality standards.",
         "zh": "您的宝贵意见对帮助我们保持卓越的酒店服务水准至关重要。",
-        "targetWord": "valuable"
       },
       {
         "id": 3,
         "en": "We would deeply appreciate your completing a brief survey that takes only two minutes.",
         "zh": "如果您能抽出仅仅两分钟完成一份简短问卷，我们将不胜感激。",
-        "targetWord": "appreciate"
       },
       {
         "id": 4,
         "en": "As a token of our gratitude, participants will receive a digital discount coupon for future bookings.",
         "zh": "为表达我们的感激之情，参与者将获赠一张可用于日后预订的电子折扣优惠券。",
-        "targetWord": "coupon"
       }
     ],
     "words": [

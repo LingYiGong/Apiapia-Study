@@ -110,4 +110,3 @@ const CORE_VERBS = [
     { english: "continue", chinese: "继续" },
     { english: "finish", chinese: "完成" }
 ];
-const words = CORE_VERBS;

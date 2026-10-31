@@ -330,8 +330,8 @@ const app = createApp({
                 masteredCount: 0,
                 tags: [
                     { text: '托业短文点读', color: '#6366f1' },
-                    { text: '3D立体翻牌', color: '#f43f5e' },
-                    { text: '真人双语发音', color: '#0284c7' }
+                    { text: '3D翻牌', color: '#f43f5e' },
+                    { text: '双语发音', color: '#0284c7' }
                 ],
                 url: 'english/english.html',
                 btnText: '学英语'

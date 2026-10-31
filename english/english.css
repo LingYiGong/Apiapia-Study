@@ -1,7 +1,7 @@
-/* ==========================================================================
+/* ============================================================
    英语学习小助手 · 模块专属样式表
    English Learning Module Specific Styles (Extends ../style.css)
-   ========================================================================== */
+   ============================================================ */
 
 /* ================== 闪卡 3D 翻牌效果 ================== */
 .card-perspective {
@@ -24,15 +24,6 @@
 
 .card-back {
     transform: rotateY(180deg);
-}
-
-/* ================== 隐藏滚动条 ================== */
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-.no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
 }
 
 /* ================== 动效与微交互 ================== */
@@ -74,83 +65,4 @@
 }
 .btn-3d:active {
     transform: translateY(2px) scale(0.985) !important;
-}
-
-.btn-3d-blue {
-    background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-    color: #ffffff;
-    border-bottom: 3px solid #0369a1;
-    box-shadow: 0 3px 10px rgba(2, 132, 199, 0.25);
-}
-.btn-3d-blue:active {
-    border-bottom-width: 1px;
-    box-shadow: 0 1px 3px rgba(2, 132, 199, 0.2);
-}
-
-.btn-3d-mint {
-    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-    color: #ffffff;
-    border-bottom: 3px solid #059669;
-    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.25);
-}
-.btn-3d-mint:active {
-    border-bottom-width: 1px;
-    box-shadow: 0 1px 3px rgba(16, 185, 129, 0.2);
-}
-
-.btn-3d-peach {
-    background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
-    color: #ffffff;
-    border-bottom: 3px solid #be123c;
-    box-shadow: 0 3px 10px rgba(244, 63, 94, 0.25);
-}
-.btn-3d-peach:active {
-    border-bottom-width: 1px;
-    box-shadow: 0 1px 3px rgba(244, 63, 94, 0.2);
-}
-
-.btn-3d-lemon {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    color: #ffffff;
-    border-bottom: 3px solid #b45309;
-    box-shadow: 0 3px 10px rgba(245, 158, 11, 0.25);
-}
-.btn-3d-lemon:active {
-    border-bottom-width: 1px;
-    box-shadow: 0 1px 3px rgba(245, 158, 11, 0.2);
-}
-
-.btn-3d-white {
-    background: #ffffff;
-    color: #334155;
-    border: 1.5px solid #e2e8f0;
-    border-bottom: 3px solid #cbd5e1;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
-}
-.btn-3d-white:active {
-    border-bottom-width: 1px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-
-/* ================== 夜间护眼模式微调 (Dark Mode Overrides) ================== */
-html.dark .card-front {
-    background-color: var(--card) !important;
-    border-color: var(--border) !important;
-    color: var(--text) !important;
-}
-
-html.dark .card-back {
-    background: linear-gradient(to bottom, rgba(79, 70, 229, 0.2), var(--card)) !important;
-    border-color: #6366f1 !important;
-    color: var(--text) !important;
-}
-
-
-
-html.dark .btn-3d-white {
-    background: #1e293b;
-    color: #f8fafc;
-    border-color: #334155;
-    border-bottom-color: #475569;
 }
