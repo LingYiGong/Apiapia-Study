@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-    <meta name="apple-mobile-web-app-title" content="英语动词"/>
+    <meta name="apple-mobile-web-app-title" content="英语学习"/>
     <meta name="theme-color" content="#4f46e5"/>
-    <title>英语核心动词卡 · 小朋友趣味学英语</title>
+    <title>英语学习乐园 · 托业短文与核心动词</title>
     <!-- 网站 Favicon 与 iOS / PWA 应用图标 -->
     <link rel="icon" type="image/x-icon" href="../icons/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png" />
@@ -18,13 +18,14 @@
     <!-- 全局夜间/护眼模式核心管理 (首屏加载杜绝闪烁) -->
     <script src="../js/theme.js?v=2.3.0"></script>
 
-    <!-- 本地引入 Vant 4 样式与 Tailwind CSS -->
+    <!-- 本地引入 Vant 4 样式、Tailwind CSS 与 Vue 3 -->
     <link rel="stylesheet" href="../libs/vant.min.css" />
     <script src="../libs/tailwindcss.js"></script>
+    <script src="../libs/vue.global.prod.js"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 -->
     <link rel="stylesheet" href="../css/style.css?v=2.3.0" />
-    <!-- 英语模块专属 3D 翻转卡片样式 -->
+    <!-- 英语模块专属 3D 翻转卡片与短文阅读样式 -->
     <link rel="stylesheet" href="./english.css?v=2.3.0" />
 
     <!-- 全局统一儿童友好弹窗与提示系统 -->
@@ -32,12 +33,16 @@
 
     <!-- 移动端与 iPad 视口自适应模块 -->
     <script src="../js/viewport.js?v=2.3.0"></script>
+
+    <!-- 本地托业语料与词库数据源 -->
+    <script src="./toeic-data.js?v=2.3.0"></script>
+    <script src="./words-data.js?v=2.3.0"></script>
 </head>
-<body class="flex flex-col overflow-hidden bg-[#f8fafc]">
-    <div id="app" class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
+<body class="flex flex-col overflow-hidden bg-[#f8fafc] dark:bg-[#0f172a] text-slate-800 dark:text-slate-100">
+    <div id="app" class="flex flex-col mx-auto w-full max-w-2xl bg-[#f8fafc] dark:bg-[#0f172a] shadow-2xl relative border-gray-200 dark:border-slate-800 h-full overflow-hidden" v-cloak>
 
         <!-- 顶部导航栏 (统一儿童风格明快渐变色，与 @hanzi 完全一致) -->
-        <header class="app-header bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-3 sm:px-6 pt-3 pb-3 shadow-md z-10 flex-shrink-0">
+        <header class="app-header bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white px-3 sm:px-6 pt-3 pb-3 shadow-md z-30 flex-shrink-0">
             <div class="flex items-center justify-between h-9">
                 <div class="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
                     <a href="../index.html" class="h-8 text-xs sm:text-sm px-2.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold flex items-center space-x-1 sm:space-x-1.5 border border-white/30 transition-all active:scale-95 shadow-sm whitespace-nowrap flex-shrink-0" title="返回 Apiapia 学习中心">
@@ -54,69 +59,640 @@
                         <span class="theme-icon">🌙</span>
                         <span class="theme-text text-xs hidden sm:inline">夜间</span>
                     </button>
-                    <button onclick="speakWord()" type="button" class="h-8 px-2.5 sm:px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1 whitespace-nowrap flex-shrink-0" title="朗读发音">
-                        <span>🔊 发音</span>
-                    </button>
-                    <div class="h-8 px-2.5 sm:px-3 text-xs sm:text-sm bg-white/20 border border-white/30 rounded-full text-white font-bold flex items-center shadow-sm whitespace-nowrap flex-shrink-0">
-                        <span>⚡ 核心100词</span>
-                    </div>
                 </div>
             </div>
 
             <!-- 顶部统计概览栏 (加大字体与可爱图标，统一风格) -->
-            <div class="flex justify-between items-center h-8 mt-2.5 text-[11px] sm:text-xs opacity-95 border-t border-white/20 pt-2 font-bold leading-none overflow-x-auto no-scrollbar gap-1.5 sm:gap-2">
-                <span class="flex items-center whitespace-nowrap flex-shrink-0">🌟 全部: <b id="headTotal" class="text-white font-black ml-1 text-xs sm:text-sm">100</b> 词</span>
-                <span class="flex items-center whitespace-nowrap flex-shrink-0">🏆 已掌握: <b id="headKnown" class="text-emerald-300 font-black ml-1 text-xs sm:text-sm">0</b></span>
-                <span class="flex items-center whitespace-nowrap flex-shrink-0">📝 需复习: <b id="headUnknown" class="text-rose-200 font-black ml-1 text-xs sm:text-sm">0</b></span>
-                <span class="flex items-center whitespace-nowrap flex-shrink-0">🎈 未学: <b id="headRemaining" class="text-yellow-300 font-black ml-1 text-xs sm:text-sm">0</b></span>
+            <div class="flex justify-around items-center h-8 mt-2.5 text-xs sm:text-sm opacity-95 border-t border-white/20 pt-2 font-bold leading-none overflow-x-auto no-scrollbar gap-2">
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">📖 短文通关: <b class="text-amber-300 font-black ml-1">{{ completedArticlesCount }}/{{ articles.length }}</b> 篇</span>
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">🏆 动词掌握: <b class="text-emerald-300 font-black ml-1">{{ knownVerbsCount }}/{{ totalVerbsCount }}</b></span>
+                <span class="flex items-center whitespace-nowrap flex-shrink-0">📝 需复习: <b class="text-rose-200 font-black ml-1">{{ unknownVerbsCount }}</b></span>
             </div>
         </header>
 
         <!-- 主体滚动内容区 (儿童友好背景与舒适间距) -->
-        <main class="flex-1 min-h-0 overflow-y-auto relative bg-[#f8fafc] p-3.5 sm:p-5">
+        <main class="flex-1 min-h-0 overflow-y-auto relative bg-[#f8fafc] dark:bg-[#0f172a] p-3.5 sm:p-5" :class="currentTab === 'toeic' && toeicSubTab === 'reading' ? 'pb-28' : 'pb-6'">
 
-            <!-- ================= TAB 1: 闪卡记忆视图 ================= -->
-            <div id="tabCardView" class="h-full flex flex-col justify-between space-y-3.5">
+            <!-- ============================================================= -->
+            <!-- TAB 1: 📖 托业短文学习 (精读点读 / 单词练习 / 语法微课) -->
+            <!-- ============================================================= -->
+            <div v-show="currentTab === 'toeic'" class="space-y-3.5 animate-pop">
+
+                <!-- 顶部 10 篇短文横向横滑胶囊选择器 -->
+                <div class="bg-white dark:bg-slate-800/90 p-2 rounded-2xl border-2 border-slate-100 dark:border-slate-700 shadow-sm card-panel">
+                    <div class="flex items-center justify-between px-1 mb-1.5 text-xs text-slate-500 dark:text-slate-400 font-bold">
+                        <span>📚 托业商务短文 ({{ articles.length }} 篇)</span>
+                        <span class="text-amber-500 font-black">已点亮 {{ completedArticlesCount }}/{{ articles.length }} ⭐</span>
+                    </div>
+                    <div class="flex space-x-2 overflow-x-auto no-scrollbar py-1">
+                        <button
+                            v-for="art in articles"
+                            :key="art.id"
+                            @click="selectArticle(art.id)"
+                            type="button"
+                            class="flex-shrink-0 px-3 py-1.5 rounded-2xl text-xs font-black transition-all flex items-center space-x-1.5 border btn-3d"
+                            :class="currentArticleId === art.id 
+                                ? 'kid-btn-primary border-indigo-700 text-white shadow-sm' 
+                                : 'bg-slate-50 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600 hover:bg-slate-100'"
+                        >
+                            <span>{{ art.title.split(' ')[0] }}</span>
+                            <span>{{ art.title.split(' ')[1] }}</span>
+                            <span v-if="completedArticles.includes(art.id)" class="text-amber-300 drop-shadow-sm text-xs font-bold">⭐</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 三大短文功能 Segment 标签页切换器 -->
+                <nav class="grid grid-cols-3 gap-1.5 p-1 bg-indigo-50/80 dark:bg-slate-800/80 border-2 border-indigo-100/70 dark:border-slate-700 rounded-2xl">
+                    <button
+                        @click="switchToeicSubTab('reading')"
+                        type="button"
+                        class="py-2 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center space-x-1"
+                        :class="toeicSubTab === 'reading' 
+                            ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm border border-slate-100 dark:border-slate-600' 
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'"
+                    >
+                        <span>📖 精读点读</span>
+                    </button>
+                    <button
+                        @click="switchToeicSubTab('words')"
+                        type="button"
+                        class="py-2 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center space-x-1"
+                        :class="toeicSubTab === 'words' 
+                            ? 'bg-white dark:bg-slate-700 text-pink-600 dark:text-pink-300 shadow-sm border border-slate-100 dark:border-slate-600' 
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'"
+                    >
+                        <span>🔤 单词练习</span>
+                    </button>
+                    <button
+                        @click="switchToeicSubTab('grammar')"
+                        type="button"
+                        class="py-2 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center space-x-1"
+                        :class="toeicSubTab === 'grammar' 
+                            ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-300 shadow-sm border border-slate-100 dark:border-slate-600' 
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'"
+                    >
+                        <span>📐 语法微课</span>
+                    </button>
+                </nav>
+
+                <!-- ================= SUB-TAB 1.1: 📖 精读点读 ================= -->
+                <div v-show="toeicSubTab === 'reading'" class="space-y-3.5 animate-pop">
+                    <!-- 文章标题卡片 -->
+                    <div class="bg-gradient-to-r from-indigo-50/90 via-sky-50/90 to-purple-50/90 dark:from-slate-800 dark:via-indigo-950/40 dark:to-slate-800 border-2 border-indigo-200 dark:border-indigo-900 rounded-3xl p-4 shadow-xs flex items-start justify-between card-panel">
+                        <div class="min-w-0 pr-2">
+                            <div class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-[11px] font-black mb-1.5 border border-indigo-200 dark:border-indigo-800">
+                                <span>📌</span>
+                                <span>{{ currentArticle.tag }}</span>
+                            </div>
+                            <h2 class="text-base sm:text-lg font-black text-slate-800 dark:text-white tracking-tight">{{ currentArticle.title }}</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium leading-relaxed">
+                                💡 轻点任意句子播放朗读，<b>轻按句中单词</b>可单独发音并查音标与释义
+                            </p>
+                        </div>
+                        <div class="flex flex-col items-end space-y-2 flex-shrink-0">
+                            <!-- 全局译文开关 -->
+                            <button
+                                @click="showChinese = !showChinese"
+                                type="button"
+                                class="px-2.5 py-1 rounded-full text-xs font-black border transition-all flex items-center space-x-1 shadow-2xs"
+                                :class="showChinese ? 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-700' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600'"
+                                title="显示或隐藏全篇中文翻译"
+                            >
+                                <span>{{ showChinese ? '👁️ 译文开' : '🙈 纯英文' }}</span>
+                            </button>
+                            <!-- 通关星星 -->
+                            <div v-if="isCurrentArticleCompleted" class="flex items-center space-x-1 px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 text-[11px] font-black">
+                                <span>⭐ 已通关</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 句子列表卡片 -->
+                    <div class="space-y-3">
+                        <div
+                            v-for="(sent, idx) in currentArticle.sentences"
+                            :key="sent.id"
+                            :id="'sentence-' + sent.id"
+                            @click="playSingleSentence(sent)"
+                            class="relative p-4 rounded-3xl border-2 transition-all cursor-pointer select-none card-panel"
+                            :class="activeSentenceId === sent.id
+                                ? 'bg-indigo-50/95 dark:bg-indigo-950/40 border-indigo-400 dark:border-indigo-500 ring-4 ring-indigo-200/60 dark:ring-indigo-900/40 shadow-md scale-[1.01]'
+                                : 'bg-white dark:bg-slate-800 border-slate-200/90 dark:border-slate-700 hover:border-indigo-300 shadow-2xs'"
+                        >
+                            <!-- 顶部序号与动感波形 / 喇叭 -->
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-2">
+                                    <span 
+                                        class="px-2 py-0.5 rounded-full text-[10px] font-black"
+                                        :class="activeSentenceId === sent.id ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'"
+                                    >
+                                        Sentence {{ idx + 1 }}
+                                    </span>
+
+                                    <!-- 朗读中跳动音频波形 -->
+                                    <div v-if="activeSentenceId === sent.id && isSpeakingNow" class="flex items-end space-x-0.5 h-3">
+                                        <span class="w-1 bg-indigo-500 rounded-full animate-equalizer1"></span>
+                                        <span class="w-1 bg-indigo-500 rounded-full animate-equalizer2"></span>
+                                        <span class="w-1 bg-indigo-500 rounded-full animate-equalizer3"></span>
+                                    </div>
+                                </div>
+
+                                <!-- 整句发音喇叭按钮 -->
+                                <button
+                                    @click.stop="playSingleSentence(sent)"
+                                    type="button"
+                                    class="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95"
+                                    :class="activeSentenceId === sent.id && isSpeakingNow 
+                                        ? 'bg-indigo-600 text-white shadow-sm' 
+                                        : 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-200'"
+                                    title="朗读整句"
+                                >
+                                    <span class="text-sm">🔊</span>
+                                </button>
+                            </div>
+
+                            <!-- 英文原文（分解为单词 Token，支持点击查词与发音） -->
+                            <div class="text-base font-bold leading-relaxed text-slate-800 dark:text-slate-100">
+                                <span
+                                    v-for="(tok, tIdx) in tokenizeSentence(sent.en, currentArticle.words)"
+                                    :key="tIdx"
+                                >
+                                    <span
+                                        v-if="tok.type === 'word'"
+                                        @click.stop="handleWordClick(tok, 'sent_' + sent.id)"
+                                        class="inline-block transition-all cursor-pointer rounded-lg px-0.5 py-0.5"
+                                        :class="[
+                                            tok.isTarget 
+                                                ? 'text-pink-600 dark:text-pink-400 bg-pink-100 dark:bg-pink-950 font-black border-b-2 border-pink-300 dark:border-pink-700 hover:bg-pink-200' 
+                                                : 'hover:bg-amber-100 dark:hover:bg-amber-950/60 hover:text-amber-900 dark:hover:text-amber-200 active:bg-amber-200 text-slate-800 dark:text-slate-200 font-bold',
+                                            selectedWordInfo && selectedWordInfo.clean === tok.clean && selectedWordInfo.contextKey === ('sent_' + sent.id)
+                                                ? 'ring-2 ring-indigo-400 bg-indigo-100 dark:bg-indigo-900/80 text-indigo-900 dark:text-indigo-100 font-black'
+                                                : ''
+                                        ]"
+                                        :title="'点击单独发音并查词：' + tok.text"
+                                    >{{ tok.text }}</span>
+                                    <span v-else class="text-slate-800 dark:text-slate-200 font-bold">{{ tok.text }}</span>
+                                </span>
+                            </div>
+
+                            <!-- 单词点击即时查词与发音浮现卡片 -->
+                            <div 
+                                v-if="selectedWordInfo && selectedWordInfo.contextKey === ('sent_' + sent.id)"
+                                class="mt-2.5 p-3 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-800 dark:to-slate-800 border-2 border-amber-300 dark:border-amber-700 shadow-md animate-pop flex items-center justify-between"
+                                @click.stop
+                            >
+                                <div class="flex-1 pr-2 min-w-0">
+                                    <div class="flex items-baseline space-x-1.5 flex-wrap">
+                                        <span class="text-base font-black text-slate-900 dark:text-white">{{ selectedWordInfo.text }}</span>
+                                        <span class="text-xs font-mono text-amber-800 dark:text-amber-300 font-bold">{{ selectedWordInfo.phonetic }}</span>
+                                        <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
+                                        <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.2 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
+                                    </div>
+                                    <div class="mt-1 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-start space-x-1">
+                                        <span class="text-amber-600 dark:text-amber-400 font-black shrink-0">释义：</span>
+                                        <span class="text-slate-800 dark:text-slate-200">{{ selectedWordInfo.meaning }}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-1.5 shrink-0">
+                                    <button
+                                        @click.stop="speakText(selectedWordInfo.text)"
+                                        type="button"
+                                        class="w-8 h-8 rounded-xl bg-amber-400 hover:bg-amber-500 text-amber-950 flex items-center justify-center btn-3d shadow-2xs font-bold"
+                                        title="再次发音"
+                                    >
+                                        🔊
+                                    </button>
+                                    <button
+                                        @click.stop="closeWordInfo"
+                                        type="button"
+                                        class="w-7 h-7 rounded-xl bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold"
+                                        title="关闭释义"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 中文翻译 -->
+                            <div 
+                                v-if="showChinese" 
+                                class="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700 leading-normal flex items-start space-x-1.5"
+                            >
+                                <span class="text-indigo-500 font-black shrink-0">译</span>
+                                <span>{{ sent.zh }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center py-2">
+                        <p class="text-xs text-slate-400 font-medium">💡 读熟短文后，前往【单词练习】和【语法微课】做小测点亮小星星 ⭐！</p>
+                    </div>
+                </div>
+
+                <!-- ================= SUB-TAB 1.2: 🔤 单词练习 ================= -->
+                <div v-show="toeicSubTab === 'words'" class="space-y-4 animate-pop">
+                    <!-- 模块引言 -->
+                    <div class="bg-pink-50/80 dark:bg-slate-800 border-2 border-pink-200 dark:border-pink-900 rounded-3xl p-3.5 flex items-center space-x-3 card-panel">
+                        <div class="text-2xl">🔤</div>
+                        <div>
+                            <h3 class="text-sm font-black text-pink-900 dark:text-pink-300">核心商务高频词 ({{ currentArticle.words?.length || 0 }} 词)</h3>
+                            <p class="text-xs text-pink-700 dark:text-pink-400 font-medium">
+                                💡 点击例句与题目中任意单词可单独发音查音标释义，支持点读整句与展开翻译
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 单词卡片列表 -->
+                    <div class="space-y-3">
+                        <div
+                            v-for="item in currentArticle.words"
+                            :key="item.word"
+                            class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-2xs hover:border-pink-300 transition-all card-panel"
+                        >
+                            <!-- 单词标题行 -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-baseline space-x-2">
+                                    <span class="text-lg font-black text-slate-900 dark:text-white">{{ item.word }}</span>
+                                    <span class="text-xs text-slate-400 font-mono">{{ item.phonetic }}</span>
+                                </div>
+                                <button
+                                    @click="speakText(item.word)"
+                                    type="button"
+                                    class="w-9 h-9 rounded-2xl bg-pink-100 dark:bg-pink-900/60 text-pink-600 dark:text-pink-300 flex items-center justify-center btn-3d shadow-2xs font-bold text-sm"
+                                    title="单词发音"
+                                >
+                                    🔊
+                                </button>
+                            </div>
+
+                            <!-- 词性与释义 -->
+                            <div class="mt-1.5 flex items-center space-x-2">
+                                <span class="px-2 py-0.5 rounded-lg bg-pink-500 text-white text-[11px] font-black uppercase">{{ item.pos }}</span>
+                                <span class="text-sm font-black text-slate-700 dark:text-slate-200">{{ item.meaning }}</span>
+                            </div>
+
+                            <!-- 原文搭配例句展示 -->
+                            <div class="mt-2.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                <div class="flex items-start justify-between gap-2 mb-1.5">
+                                    <div class="flex items-center space-x-1.5">
+                                        <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300">例句</span>
+                                        <button 
+                                            @click="speakText(item.example)"
+                                            type="button"
+                                            class="text-[10px] text-slate-400 hover:text-pink-600 font-bold flex items-center space-x-0.5"
+                                            title="朗读整句例句"
+                                        >
+                                            <span>🔊 朗读整句</span>
+                                        </button>
+                                    </div>
+                                    <button 
+                                        @click="toggleWordExampleZh(item.word)"
+                                        type="button"
+                                        class="text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all"
+                                        :class="showWordExampleZh[item.word] ? 'bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300 border-pink-300' : 'bg-white dark:bg-slate-600 text-slate-500 dark:text-slate-300 border-slate-200 dark:border-slate-500'"
+                                    >
+                                        {{ showWordExampleZh[item.word] ? '隐藏译文' : '查看译文' }}
+                                    </button>
+                                </div>
+
+                                <!-- 例句单词分解 -->
+                                <p class="font-bold text-slate-700 dark:text-slate-200 italic leading-relaxed text-xs">
+                                    <span
+                                        v-for="(tok, tIdx) in tokenizeSentence(item.example, [item])"
+                                        :key="tIdx"
+                                    >
+                                        <span
+                                            v-if="tok.type === 'word'"
+                                            @click.stop="handleWordClick(tok, 'example_' + item.word)"
+                                            class="inline-block transition-all cursor-pointer rounded-lg px-0.5 py-0.5"
+                                            :class="[
+                                                tok.isTarget ? 'text-pink-600 dark:text-pink-400 bg-pink-100 dark:bg-pink-950 font-extrabold border-b border-pink-300' : 'hover:bg-amber-100 dark:hover:bg-amber-950/60 hover:text-amber-900 text-slate-700 dark:text-slate-200',
+                                                selectedWordInfo && selectedWordInfo.clean === tok.clean && selectedWordInfo.contextKey === ('example_' + item.word)
+                                                    ? 'ring-2 ring-indigo-400 bg-indigo-100 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100 font-black'
+                                                    : ''
+                                            ]"
+                                        >{{ tok.text }}</span>
+                                        <span v-else>{{ tok.text }}</span>
+                                    </span>
+                                </p>
+
+                                <!-- 例句单词点查卡片 -->
+                                <div 
+                                    v-if="selectedWordInfo && selectedWordInfo.contextKey === ('example_' + item.word)"
+                                    class="mt-2.5 p-2.5 rounded-2xl bg-amber-50 dark:bg-slate-800 border-2 border-amber-300 dark:border-amber-700 shadow-md animate-pop flex items-center justify-between"
+                                    @click.stop
+                                >
+                                    <div class="flex-1 pr-2 min-w-0">
+                                        <div class="flex items-baseline space-x-1.5 flex-wrap">
+                                            <span class="text-sm font-black text-slate-900 dark:text-white">{{ selectedWordInfo.text }}</span>
+                                            <span class="text-xs font-mono text-amber-800 dark:text-amber-300 font-bold">{{ selectedWordInfo.phonetic }}</span>
+                                            <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
+                                            <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.2 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
+                                        </div>
+                                        <div class="mt-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+                                            <span class="text-amber-600 dark:text-amber-400 font-black">释义：</span>
+                                            <span>{{ selectedWordInfo.meaning }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-1.5 shrink-0">
+                                        <button @click.stop="speakText(selectedWordInfo.text)" type="button" class="w-7 h-7 rounded-xl bg-amber-400 hover:bg-amber-500 text-amber-950 flex items-center justify-center btn-3d font-bold text-xs">🔊</button>
+                                        <button @click.stop="closeWordInfo" type="button" class="w-6 h-6 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xs">✕</button>
+                                    </div>
+                                </div>
+
+                                <!-- 例句译文 -->
+                                <div 
+                                    v-if="showWordExampleZh[item.word]"
+                                    class="mt-2 pt-2 border-t border-slate-200/70 dark:border-slate-600 text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed animate-pop flex items-start space-x-1"
+                                >
+                                    <span class="text-pink-500 font-black shrink-0">译</span>
+                                    <span>{{ item.exampleZh }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 原句挖空选择题小测 -->
+                    <div class="pt-2">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-black text-slate-800 dark:text-white flex items-center gap-1.5">
+                                <span>🎯</span>
+                                <span>原句挖空练兵场</span>
+                            </h3>
+                            <span class="text-xs text-slate-400 font-bold">共 {{ currentArticle.wordQuizzes?.length || 0 }} 题</span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div
+                                v-for="(quiz, qIdx) in currentArticle.wordQuizzes"
+                                :key="quiz.id"
+                                class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-2xs card-panel"
+                            >
+                                <!-- 题干头 -->
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-black text-pink-600 dark:text-pink-400">Question {{ qIdx + 1 }} · 原句挖空</span>
+                                    <div class="flex items-center space-x-1.5">
+                                        <button
+                                            @click="speakText(quiz.questionEn.replace(/_{2,}/g, 'blank'))"
+                                            type="button"
+                                            class="px-2 py-0.5 rounded-lg text-[10px] font-black border bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-pink-50 flex items-center space-x-1"
+                                        >
+                                            <span>🔊 听题</span>
+                                        </button>
+                                        <button
+                                            @click="toggleQuizZh(quiz.id)"
+                                            type="button"
+                                            class="px-2 py-0.5 rounded-lg text-[10px] font-black border transition-all"
+                                            :class="showQuizZh[quiz.id] ? 'bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300 border-pink-300' : 'bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600'"
+                                        >
+                                            <span>译</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 题干英文 -->
+                                <div class="text-sm font-bold text-slate-800 dark:text-slate-100 leading-relaxed mb-2">
+                                    <span
+                                        v-for="(tok, tIdx) in tokenizeSentence(quiz.questionEn, currentArticle.words)"
+                                        :key="tIdx"
+                                    >
+                                        <span
+                                            v-if="tok.type === 'word'"
+                                            @click.stop="handleWordClick(tok, 'quiz_' + quiz.id)"
+                                            class="inline-block transition-all cursor-pointer rounded-lg px-0.5 py-0.5"
+                                            :class="[
+                                                tok.isTarget ? 'text-pink-600 dark:text-pink-400 bg-pink-100 dark:bg-pink-950 font-extrabold border-b border-pink-300' : 'hover:bg-amber-100 dark:hover:bg-amber-950/60 hover:text-amber-900 text-slate-800 dark:text-slate-200',
+                                                selectedWordInfo && selectedWordInfo.clean === tok.clean && selectedWordInfo.contextKey === ('quiz_' + quiz.id)
+                                                    ? 'ring-2 ring-indigo-400 bg-indigo-100 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100 font-black'
+                                                    : ''
+                                            ]"
+                                        >{{ tok.text }}</span>
+                                        <span v-else-if="tok.type === 'blank'" class="inline-block px-1.5 py-0.5 mx-0.5 rounded-lg bg-pink-100 dark:bg-pink-900 text-pink-600 dark:text-pink-300 font-black border-b-2 border-pink-300 select-none">_____</span>
+                                        <span v-else>{{ tok.text }}</span>
+                                    </span>
+                                </div>
+
+                                <!-- 题干译文 -->
+                                <div 
+                                    v-if="showQuizZh[quiz.id]"
+                                    class="mb-3 p-2.5 rounded-2xl bg-pink-50/70 dark:bg-slate-700/50 border border-pink-200 dark:border-slate-600 text-xs text-pink-900 dark:text-pink-200 font-medium leading-relaxed animate-pop flex items-start space-x-1"
+                                >
+                                    <span class="text-pink-500 font-black shrink-0">译</span>
+                                    <span>{{ quiz.questionZh }}</span>
+                                </div>
+
+                                <!-- 选项网格 -->
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button
+                                        v-for="(opt, optIdx) in quiz.options"
+                                        :key="opt"
+                                        @click="answerWordQuiz(quiz, optIdx)"
+                                        type="button"
+                                        class="btn-3d py-2.5 px-3 rounded-2xl text-xs font-bold text-center border transition-all"
+                                        :class="getOptionClass(wordAnswers[quiz.id], optIdx, quiz.answerIndex)"
+                                    >
+                                        {{ opt }}
+                                    </button>
+                                </div>
+
+                                <!-- 答题解析 -->
+                                <div 
+                                    v-if="wordAnswers[quiz.id] !== undefined" 
+                                    class="mt-3 p-3 rounded-2xl border text-xs leading-relaxed animate-pop"
+                                    :class="wordAnswers[quiz.id] === quiz.answerIndex 
+                                        ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200' 
+                                        : 'bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 animate-shake'"
+                                >
+                                    <div class="flex items-center space-x-1.5 font-black mb-1">
+                                        <span v-if="wordAnswers[quiz.id] === quiz.answerIndex">✨ 一次答对！太棒啦！🎉</span>
+                                        <span v-else>💪 差一点点，点击其他选项再试一次哦！</span>
+                                    </div>
+                                    <p class="text-slate-600 dark:text-slate-300 font-medium">💡 解析：{{ quiz.explanation }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= SUB-TAB 1.3: 📐 语法微课 ================= -->
+                <div v-show="toeicSubTab === 'grammar'" class="space-y-4 animate-pop">
+                    <!-- 语法考点卡片 -->
+                    <div class="bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-slate-800 dark:to-amber-950/40 border-2 border-amber-300 dark:border-amber-700 rounded-3xl p-4 shadow-2xs card-panel">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="text-2xl">🍋</span>
+                            <div class="inline-block px-2.5 py-0.5 rounded-full bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-xs font-black">
+                                托业常考套路速记
+                            </div>
+                        </div>
+                        <h3 class="text-base font-black text-amber-950 dark:text-amber-200 mb-1.5">
+                            {{ currentArticle.grammarTip?.title }}
+                        </h3>
+                        <p class="text-xs font-bold text-amber-900/90 dark:text-amber-300/90 leading-relaxed">
+                            {{ currentArticle.grammarTip?.summary }}
+                        </p>
+                    </div>
+
+                    <!-- Part 5 托业单选真题演练 -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-black text-slate-800 dark:text-white flex items-center gap-1.5">
+                                <span>📐</span>
+                                <span>Part 5 考点实战单选题</span>
+                            </h3>
+                            <span class="text-xs text-slate-400 font-bold">共 {{ currentArticle.grammarQuizzes?.length || 0 }} 题</span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div
+                                v-for="(quiz, qIdx) in currentArticle.grammarQuizzes"
+                                :key="quiz.id"
+                                class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-2xs card-panel"
+                            >
+                                <div class="text-xs font-black text-amber-600 dark:text-amber-400 mb-1">Question {{ qIdx + 1 }} · 单项选择</div>
+                                <p class="text-sm font-bold text-slate-800 dark:text-slate-100 leading-relaxed mb-3">
+                                    {{ quiz.question }}
+                                </p>
+
+                                <!-- 4 个选项 (A, B, C, D) -->
+                                <div class="grid grid-cols-1 gap-2">
+                                    <button
+                                        v-for="(opt, optIdx) in quiz.options"
+                                        :key="opt"
+                                        @click="answerGrammarQuiz(quiz, optIdx)"
+                                        type="button"
+                                        class="btn-3d py-2.5 px-4 rounded-2xl text-xs font-bold text-left border flex items-center space-x-2.5 transition-all"
+                                        :class="getOptionClass(grammarAnswers[quiz.id], optIdx, quiz.answerIndex)"
+                                    >
+                                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0"
+                                            :class="grammarAnswers[quiz.id] === optIdx 
+                                                ? (optIdx === quiz.answerIndex ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white') 
+                                                : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'"
+                                        >
+                                            {{ ['A','B','C','D'][optIdx] }}
+                                        </span>
+                                        <span>{{ opt }}</span>
+                                    </button>
+                                </div>
+
+                                <!-- 答案解析卡片 -->
+                                <div 
+                                    v-if="grammarAnswers[quiz.id] !== undefined" 
+                                    class="mt-3 p-3 rounded-2xl border text-xs leading-relaxed animate-pop"
+                                    :class="grammarAnswers[quiz.id] === quiz.answerIndex 
+                                        ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200' 
+                                        : 'bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 animate-shake'"
+                                >
+                                    <div class="flex items-center space-x-1.5 font-black mb-1">
+                                        <span v-if="grammarAnswers[quiz.id] === quiz.answerIndex">🎉 回答正确！手感火热！</span>
+                                        <span v-else>🧐 选错了哦，别灰心，换一个选项试试！</span>
+                                    </div>
+                                    <p class="text-slate-600 dark:text-slate-300 font-medium">💡 解析：{{ quiz.explanation }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 文章通关与打卡激励大卡片 -->
+                    <div class="p-5 rounded-3xl border-2 text-center transition-all card-panel"
+                        :class="isCurrentArticleCompleted 
+                            ? 'bg-gradient-to-b from-emerald-50 to-green-100 dark:from-slate-800 dark:to-emerald-950/40 border-emerald-300 dark:border-emerald-700' 
+                            : 'bg-amber-50/60 dark:bg-slate-800/80 border-dashed border-amber-200 dark:border-amber-800'"
+                    >
+                        <div v-if="isCurrentArticleCompleted">
+                            <div class="text-4xl animate-bounce mb-1">⭐</div>
+                            <h4 class="text-base font-black text-emerald-900 dark:text-emerald-200">太棒啦！已点亮本课小星星！</h4>
+                            <p class="text-xs text-emerald-700 dark:text-emerald-300 font-medium mt-1">你已经搞定了这篇商务短文的语境词汇与语法考点！</p>
+                            <div class="flex items-center justify-center space-x-2 mt-3.5">
+                                <button
+                                    @click="resetCurrentArticleQuizzes"
+                                    type="button"
+                                    class="kid-btn-light px-4 py-2.5 rounded-2xl text-xs font-black shadow-2xs"
+                                >
+                                    🔄 重新刷题
+                                </button>
+                                <button
+                                    @click="nextArticle"
+                                    type="button"
+                                    class="kid-btn-success px-5 py-2.5 rounded-2xl text-xs font-black shadow-md text-white"
+                                >
+                                    进入下一课 🚀
+                                </button>
+                            </div>
+                        </div>
+
+                        <div v-else>
+                            <div class="text-2xl mb-1">✨</div>
+                            <h4 class="text-sm font-black text-slate-800 dark:text-white">完成单词与语法自测即可打卡</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                                当前做对题目：{{ getArticleQuizProgress(currentArticle) }}
+                            </p>
+                            <button
+                                @click="markArticleAsCompleted(currentArticle.id)"
+                                type="button"
+                                class="kid-btn-warning mt-3.5 px-6 py-2.5 rounded-2xl text-xs font-black text-white shadow-md"
+                            >
+                                ⭐ 一键打卡点亮星星
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ============================================================= -->
+            <!-- TAB 2: 🔤 核心生活动词 3D 翻牌闪卡 (核心 100 词) -->
+            <!-- ============================================================= -->
+            <div v-show="currentTab === 'verbs'" class="h-full flex flex-col justify-between space-y-3.5">
                 
                 <!-- 顶部进度条与当前序号 (大圆角卡片) -->
-                <div class="bg-white p-3.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between card-panel">
-                    <div class="text-xs sm:text-sm font-black text-slate-800 flex items-center space-x-2">
-                        <span id="cardNumberBadge" class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 font-mono font-black text-xs border border-indigo-200">
-                            Word #101
+                <div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 shadow-sm flex items-center justify-between card-panel">
+                    <div class="text-xs sm:text-sm font-black text-slate-800 dark:text-white flex items-center space-x-2">
+                        <span class="px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200 font-mono font-black text-xs border border-indigo-200 dark:border-indigo-800">
+                            Word #{{ currentVerbIndex + 101 }}
                         </span>
-                        <span class="text-slate-500 font-bold text-xs">翻牌闪卡记忆</span>
+                        <span class="text-slate-500 dark:text-slate-400 font-bold text-xs">3D 翻牌闪卡记忆</span>
                     </div>
                     <div class="flex items-center space-x-2.5">
-                        <span id="cardStatusBadge" class="text-xs px-2.5 py-1 rounded-full font-bold bg-slate-100 text-slate-500 border border-slate-200">
-                            未判断
+                        <span 
+                            class="text-xs px-2.5 py-1 rounded-full font-bold border"
+                            :class="currentVerbStatus === 'known' 
+                                ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-700' 
+                                : (currentVerbStatus === 'unknown' ? 'bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-700' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600')"
+                        >
+                            {{ currentVerbStatus === 'known' ? '✓ 已掌握' : (currentVerbStatus === 'unknown' ? '✕ 需复习' : '未判断') }}
                         </span>
-                        <span class="text-xs sm:text-sm text-slate-400 font-mono font-black" id="progressNumber">
-                            1 / 100
+                        <span class="text-xs sm:text-sm text-slate-400 font-mono font-black">
+                            {{ currentVerbIndex + 1 }} / {{ totalVerbsCount }}
                         </span>
                     </div>
                 </div>
 
                 <!-- 进度指示条 -->
-                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                    <div id="cardProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-300" style="width: 1%"></div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                    <div 
+                        class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-300" 
+                        :style="{ width: (((currentVerbIndex + 1) / totalVerbsCount) * 100) + '%' }"
+                    ></div>
                 </div>
 
                 <!-- 核心双面翻转闪卡 (儿童友好大圆角卡片 + 3D 翻牌) -->
-                <div class="flex-1 min-h-0 flex flex-col justify-center py-2 card-perspective cursor-pointer select-none" onclick="toggleFlip()">
-                    <div id="flipCardInner" class="flip-card-inner relative w-full h-[280px] sm:h-[320px]">
+                <div class="flex-1 min-h-0 flex flex-col justify-center py-2 card-perspective cursor-pointer select-none" @click="toggleVerbFlip">
+                    <div class="flip-card-inner relative w-full h-[280px] sm:h-[320px]" :class="{ 'is-flipped': verbFlipped }">
                         
                         <!-- 卡片正面 (中文提示) -->
-                        <div class="card-front absolute inset-0 bg-white rounded-3xl border-2 border-slate-200 shadow-sm hover:shadow-md p-6 sm:p-8 flex flex-col justify-between items-center text-center transition-all">
+                        <div class="card-front absolute inset-0 bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md p-6 sm:p-8 flex flex-col justify-between items-center text-center transition-all card-panel">
                             <div class="w-full flex justify-between items-center text-xs sm:text-sm text-slate-400 font-bold">
                                 <span>💡 点击卡片看英文释义</span>
                                 <span>正面 (中文)</span>
                             </div>
 
                             <div class="my-auto space-y-2.5">
-                                <div id="wordFront" class="text-3xl sm:text-5xl font-black text-slate-900 tracking-wide">
-                                    能，可以
+                                <div class="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-wide">
+                                    {{ currentVerb ? currentVerb.chinese : '' }}
                                 </div>
-                                <div class="text-xs font-black text-indigo-600 bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 rounded-full inline-block shadow-2xs">
+                                <div class="text-xs font-black text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 px-3.5 py-1.5 rounded-full inline-block shadow-2xs">
                                     轻按卡片翻转揭晓英文
                                 </div>
                             </div>
@@ -127,8 +703,8 @@
                         </div>
 
                         <!-- 卡片背面 (英文与朗读) -->
-                        <div class="card-back absolute inset-0 bg-gradient-to-b from-indigo-50/80 via-white to-white rounded-3xl border-2 border-indigo-300 shadow-md p-6 sm:p-8 flex flex-col justify-between items-center text-center transition-all">
-                            <div class="w-full flex justify-between items-center text-xs sm:text-sm text-indigo-600 font-black">
+                        <div class="card-back absolute inset-0 bg-gradient-to-b from-indigo-50/80 via-white to-white dark:from-indigo-950/60 dark:via-slate-800 dark:to-slate-800 rounded-3xl border-2 border-indigo-300 dark:border-indigo-700 shadow-md p-6 sm:p-8 flex flex-col justify-between items-center text-center transition-all card-panel">
+                            <div class="w-full flex justify-between items-center text-xs sm:text-sm text-indigo-600 dark:text-indigo-400 font-black">
                                 <span class="flex items-center space-x-1">
                                     <span>🔊 自动朗读发音</span>
                                 </span>
@@ -136,16 +712,16 @@
                             </div>
 
                             <div class="my-auto space-y-3">
-                                <div id="wordBack" class="text-4xl sm:text-6xl font-black text-indigo-600 tracking-tight font-sans">
-                                    can
+                                <div class="text-4xl sm:text-6xl font-black text-indigo-600 dark:text-indigo-400 tracking-tight font-sans">
+                                    {{ currentVerb ? currentVerb.english : '' }}
                                 </div>
-                                <div id="meaningBack" class="text-lg sm:text-2xl font-black text-slate-800">
-                                    能，可以
+                                <div class="text-lg sm:text-2xl font-black text-slate-800 dark:text-slate-100">
+                                    {{ currentVerb ? currentVerb.chinese : '' }}
                                 </div>
                             </div>
 
                             <div class="w-full flex justify-center">
-                                <button onclick="event.stopPropagation(); speakWord()" class="px-4 py-2 kid-btn-light rounded-2xl text-xs sm:text-sm font-black flex items-center space-x-1.5">
+                                <button @click.stop="currentVerb && speakText(currentVerb.english)" type="button" class="px-4 py-2 kid-btn-light rounded-2xl text-xs sm:text-sm font-black flex items-center space-x-1.5">
                                     <span>🔊 重新播放发音</span>
                                 </button>
                             </div>
@@ -156,27 +732,25 @@
 
                 <!-- 掌握判断与切换控制底栏 (3D 触控大按钮，与 @hanzi 完全一致) -->
                 <div class="space-y-3 pt-1">
-                    <!-- 掌握度决策大按钮 -->
                     <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                        <button onclick="markUnknown()" type="button" class="py-3.5 sm:py-4 kid-btn-danger text-white font-black text-base sm:text-lg rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center space-x-2">
+                        <button @click="markVerbUnknown" type="button" class="py-3.5 sm:py-4 kid-btn-danger text-white font-black text-base sm:text-lg rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center space-x-2">
                             <span>❌</span>
                             <span>没记住 / 不认识</span>
                         </button>
-                        <button onclick="markKnown()" type="button" class="py-3.5 sm:py-4 kid-btn-success text-white font-black text-base sm:text-lg rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center space-x-2">
+                        <button @click="markVerbKnown" type="button" class="py-3.5 sm:py-4 kid-btn-success text-white font-black text-base sm:text-lg rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center space-x-2">
                             <span>✅</span>
                             <span>已掌握 / 认识</span>
                         </button>
                     </div>
 
-                    <!-- 翻页控制按钮 -->
                     <div class="grid grid-cols-3 gap-2.5">
-                        <button onclick="previousWord()" type="button" class="py-3 px-3 kid-btn-light text-slate-700 font-black text-xs sm:text-sm rounded-2xl">
+                        <button @click="prevVerb" type="button" class="py-3 px-3 kid-btn-light text-slate-700 dark:text-slate-200 font-black text-xs sm:text-sm rounded-2xl">
                             ← 上一个
                         </button>
-                        <button onclick="toggleFlip()" type="button" class="py-3 px-3 kid-btn-primary text-white font-black text-xs sm:text-sm rounded-2xl shadow-sm">
+                        <button @click="toggleVerbFlip" type="button" class="py-3 px-3 kid-btn-primary text-white font-black text-xs sm:text-sm rounded-2xl shadow-sm">
                             🔄 翻转卡片
                         </button>
-                        <button onclick="nextWord()" type="button" class="py-3 px-3 kid-btn-light text-slate-700 font-black text-xs sm:text-sm rounded-2xl">
+                        <button @click="nextVerb" type="button" class="py-3 px-3 kid-btn-light text-slate-700 dark:text-slate-200 font-black text-xs sm:text-sm rounded-2xl">
                             下一个 →
                         </button>
                     </div>
@@ -189,93 +763,237 @@
             </div>
 
 
-            <!-- ================= TAB 2: 词库列表视图 ================= -->
-            <div id="tabListView" class="space-y-4 hidden pb-8">
+            <!-- ============================================================= -->
+            <!-- TAB 3: 📋 100 动词词库列表视图 -->
+            <!-- ============================================================= -->
+            <div v-show="currentTab === 'list'" class="space-y-4 pb-8 animate-pop">
                 
-                <!-- 筛选标签胶囊 -->
-                <div class="bg-white p-1.5 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center justify-between space-x-2 card-panel">
-                    <button onclick="showList('all')" id="tabBtnAll" class="flex-1 py-2 text-xs sm:text-sm font-black rounded-xl transition-all text-white kid-btn-primary shadow-sm">
-                        全部 (100)
-                    </button>
-                    <button onclick="showList('known')" id="tabBtnKnown" class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all text-slate-600 hover:text-slate-900 bg-slate-50">
-                        ✓ 认识 (<span id="filterKnownCount">0</span>)
-                    </button>
-                    <button onclick="showList('unknown')" id="tabBtnUnknown" class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all text-slate-600 hover:text-slate-900 bg-slate-50">
-                        ✕ 需复习 (<span id="filterUnknownCount">0</span>)
-                    </button>
+                <!-- 搜索与筛选胶囊 -->
+                <div class="bg-white dark:bg-slate-800 p-2 sm:p-2.5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 shadow-sm space-y-2 card-panel">
+                    <!-- 快速搜索输入框 -->
+                    <div class="relative">
+                        <input
+                            v-model="verbSearch"
+                            type="text"
+                            placeholder="🔍 搜索英文或中文释义..."
+                            class="w-full py-2 pl-3 pr-8 rounded-xl bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                        />
+                        <button
+                            v-if="verbSearch"
+                            @click="verbSearch = ''"
+                            type="button"
+                            class="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 font-black text-xs"
+                        >
+                            ✕
+                        </button>
+                    </div>
+
+                    <!-- 分类筛选胶囊 -->
+                    <div class="flex items-center justify-between space-x-2">
+                        <button
+                            @click="verbFilter = 'all'"
+                            type="button"
+                            class="flex-1 py-2 text-xs sm:text-sm rounded-xl transition-all font-black"
+                            :class="verbFilter === 'all' 
+                                ? 'kid-btn-primary text-white shadow-sm' 
+                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 bg-slate-50 dark:bg-slate-700 font-bold'"
+                        >
+                            全部 ({{ totalVerbsCount }})
+                        </button>
+                        <button
+                            @click="verbFilter = 'known'"
+                            type="button"
+                            class="flex-1 py-2 text-xs sm:text-sm rounded-xl transition-all font-black"
+                            :class="verbFilter === 'known' 
+                                ? 'kid-btn-success text-white shadow-sm' 
+                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 bg-slate-50 dark:bg-slate-700 font-bold'"
+                        >
+                            ✓ 认识 ({{ knownVerbsCount }})
+                        </button>
+                        <button
+                            @click="verbFilter = 'unknown'"
+                            type="button"
+                            class="flex-1 py-2 text-xs sm:text-sm rounded-xl transition-all font-black"
+                            :class="verbFilter === 'unknown' 
+                                ? 'kid-btn-danger text-white shadow-sm' 
+                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 bg-slate-50 dark:bg-slate-700 font-bold'"
+                        >
+                            ✕ 需复习 ({{ unknownVerbsCount }})
+                        </button>
+                    </div>
                 </div>
 
-                <!-- 词库卡片列表 (大圆角卡片) -->
-                <div class="bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-4 sm:p-5 card-panel">
-                    <div class="pb-3 mb-3 border-b-2 border-slate-100 flex items-center justify-between">
-                        <h2 id="listTitle" class="text-sm sm:text-base font-black text-slate-800">全部核心动词 (100)</h2>
-                        <span class="text-xs text-slate-400 font-medium">轻点单词可直接切入卡片学习</span>
+                <!-- 词库卡片列表 -->
+                <div class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-100 dark:border-slate-700 shadow-sm p-4 sm:p-5 card-panel">
+                    <div class="pb-3 mb-3 border-b-2 border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                        <h2 class="text-sm sm:text-base font-black text-slate-800 dark:text-white">
+                            {{ verbFilter === 'all' ? '全部核心生活动词' : (verbFilter === 'known' ? '已熟练掌握的动词' : '需要复习的动词') }}
+                            <span class="text-xs text-indigo-500 font-bold ml-1">({{ filteredVerbList.length }})</span>
+                        </h2>
+                        <span class="text-xs text-slate-400 font-medium">轻点单词进入翻牌复习</span>
                     </div>
-                    <div id="wordList" class="space-y-2 max-h-[calc(100vh-290px)] overflow-y-auto">
-                        <!-- 动态渲染词汇列表 -->
+
+                    <div class="space-y-2 max-h-[calc(100vh-320px)] overflow-y-auto">
+                        <div
+                            v-for="item in filteredVerbList"
+                            :key="item.originalIndex"
+                            @click="jumpToVerb(item.originalIndex)"
+                            class="p-3.5 sm:p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all bg-white dark:bg-slate-800 mb-2 shadow-2xs flex items-center justify-between cursor-pointer active:scale-[0.99] card-panel"
+                        >
+                            <div class="flex items-center space-x-3.5 min-w-0 pr-2">
+                                <span class="text-xs text-slate-400 font-mono font-bold w-9 flex-shrink-0">#{{ item.originalIndex + 101 }}</span>
+                                <div class="min-w-0">
+                                    <div class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center space-x-2">
+                                        <span>{{ item.english }}</span>
+                                        <button
+                                            @click.stop="speakText(item.english)"
+                                            type="button"
+                                            class="w-7 h-7 rounded-full bg-indigo-50 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-300 flex items-center justify-center font-bold active:scale-95 transition-all text-xs"
+                                            title="朗读"
+                                        >
+                                            🔊
+                                        </button>
+                                    </div>
+                                    <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">{{ item.chinese }}</div>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0 flex items-center space-x-2">
+                                <span 
+                                    v-if="verbProgress[item.originalIndex] === 'known'"
+                                    class="text-xs px-2.5 py-0.5 rounded-full font-black bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                                >
+                                    ✓ 认识
+                                </span>
+                                <span 
+                                    v-else-if="verbProgress[item.originalIndex] === 'unknown'"
+                                    class="text-xs px-2.5 py-0.5 rounded-full font-black bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800"
+                                >
+                                    ✕ 需复习
+                                </span>
+                                <span 
+                                    v-else
+                                    class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-slate-100 dark:bg-slate-700 text-slate-400 border border-slate-200 dark:border-slate-600"
+                                >
+                                    未学
+                                </span>
+                                <span class="text-slate-300 dark:text-slate-600 font-bold text-base">➔</span>
+                            </div>
+                        </div>
+
+                        <div v-if="filteredVerbList.length === 0" class="p-10 text-center text-slate-400 text-xs sm:text-sm space-y-2">
+                            <div class="text-3xl mb-1">📭</div>
+                            <div class="font-bold">此分类或搜索条件下暂时没有单词</div>
+                        </div>
                     </div>
                 </div>
 
             </div>
 
 
-            <!-- ================= TAB 3: 学习统计与管理视图 ================= -->
-            <div id="tabStatsView" class="space-y-4 hidden pb-8">
+            <!-- ============================================================= -->
+            <!-- TAB 4: 📊 学习统计与看板视图 (短文通关 + 核心动词) -->
+            <!-- ============================================================= -->
+            <div v-show="currentTab === 'stats'" class="space-y-4 pb-8 animate-pop">
                 
                 <!-- 掌握度进度圆环卡片 (与 @hanzi 完全统一) -->
-                <div class="bg-white rounded-3xl border-2 border-slate-100 p-6 shadow-sm text-center space-y-4 card-panel">
-                    <h3 class="text-base font-black text-slate-800 flex items-center justify-center space-x-2">
+                <div class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-100 dark:border-slate-700 p-6 shadow-sm text-center space-y-4 card-panel">
+                    <h3 class="text-base font-black text-slate-800 dark:text-white flex items-center justify-center space-x-2">
                         <span>📊</span>
-                        <span>学习进度看板</span>
+                        <span>综合学习进度看板</span>
                     </h3>
 
                     <div id="scoreRing" class="score-ring">
                         <div class="score-ring-content">
-                            <strong id="scoreText">0%</strong>
-                            <span>掌握率</span>
+                            <strong>{{ verbsMasteryPercent }}%</strong>
+                            <span>动词掌握率</span>
                         </div>
                     </div>
 
-                    <p id="statsSummaryMessage" class="text-sm sm:text-base font-bold text-slate-700 leading-relaxed max-w-xs mx-auto">
-                        核心高频生活动词掌握情况
+                    <p class="text-sm sm:text-base font-bold text-slate-700 dark:text-slate-300 leading-relaxed max-w-xs mx-auto">
+                        {{ statsSummaryMessage }}
                     </p>
 
-                    <!-- 4 大指标格 (大圆角立体卡片) -->
+                    <!-- 短文与动词双翼指标卡 -->
                     <div class="grid grid-cols-2 gap-3 pt-2 text-left">
-                        <div class="p-3.5 bg-indigo-50/80 border-2 border-indigo-200/80 rounded-2xl text-center shadow-2xs">
-                            <div class="text-xs text-indigo-800 font-bold">总词汇数</div>
-                            <div id="statTotalBox" class="text-2xl font-black text-indigo-600 mt-1">100</div>
+                        <div class="p-3.5 bg-indigo-50/80 dark:bg-indigo-950/40 border-2 border-indigo-200/80 dark:border-indigo-900 rounded-2xl text-center shadow-2xs">
+                            <div class="text-xs text-indigo-800 dark:text-indigo-300 font-bold">托业短文通关</div>
+                            <div class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
+                                {{ completedArticlesCount }} / {{ articles.length }}
+                            </div>
                         </div>
-                        <div class="p-3.5 bg-emerald-50/80 border-2 border-emerald-200/80 rounded-2xl text-center shadow-2xs">
-                            <div class="text-xs text-emerald-800 font-bold">已掌握 (认识)</div>
-                            <div id="statKnownBox" class="text-2xl font-black text-emerald-600 mt-1">0</div>
+                        <div class="p-3.5 bg-emerald-50/80 dark:bg-emerald-950/40 border-2 border-emerald-200/80 dark:border-emerald-900 rounded-2xl text-center shadow-2xs">
+                            <div class="text-xs text-emerald-800 dark:text-emerald-300 font-bold">已掌握动词</div>
+                            <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
+                                {{ knownVerbsCount }} 词
+                            </div>
                         </div>
-                        <div class="p-3.5 bg-rose-50/80 border-2 border-rose-200/80 rounded-2xl text-center shadow-2xs">
-                            <div class="text-xs text-rose-800 font-bold">需复习 (不认识)</div>
-                            <div id="statUnknownBox" class="text-2xl font-black text-rose-600 mt-1">0</div>
+                        <div class="p-3.5 bg-rose-50/80 dark:bg-rose-950/40 border-2 border-rose-200/80 dark:border-rose-900 rounded-2xl text-center shadow-2xs">
+                            <div class="text-xs text-rose-800 dark:text-rose-300 font-bold">需复习动词</div>
+                            <div class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1">
+                                {{ unknownVerbsCount }} 词
+                            </div>
                         </div>
-                        <div class="p-3.5 bg-amber-50/80 border-2 border-amber-200/80 rounded-2xl text-center shadow-2xs">
-                            <div class="text-xs text-amber-800 font-bold">待记忆 (未学)</div>
-                            <div id="statRemainingBox" class="text-2xl font-black text-amber-600 mt-1">0</div>
+                        <div class="p-3.5 bg-amber-50/80 dark:bg-amber-950/40 border-2 border-amber-200/80 dark:border-amber-900 rounded-2xl text-center shadow-2xs">
+                            <div class="text-xs text-amber-800 dark:text-amber-300 font-bold">待记忆动词</div>
+                            <div class="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">
+                                {{ verbsRemainingCount }} 词
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10 篇托业短文打卡星级一览 -->
+                <div class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-100 dark:border-slate-700 p-4 sm:p-5 shadow-sm space-y-3 card-panel">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-700">
+                        <h4 class="text-sm font-black text-slate-800 dark:text-white flex items-center space-x-1.5">
+                            <span>⭐</span>
+                            <span>托业短文打卡进度 ({{ completedArticlesCount }}/{{ articles.length }})</span>
+                        </h4>
+                        <span class="text-xs text-slate-400">轻点可直接进入该课</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div
+                            v-for="art in articles"
+                            :key="art.id"
+                            @click="selectArticle(art.id); switchTab('toeic');"
+                            class="p-2.5 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between active:scale-98"
+                            :class="completedArticles.includes(art.id)
+                                ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200'
+                                : 'bg-slate-50 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300'"
+                        >
+                            <div class="flex items-center space-x-2 min-w-0 pr-1">
+                                <span class="text-base flex-shrink-0">{{ art.title.split(' ')[0] }}</span>
+                                <span class="text-xs font-bold truncate">{{ art.title.split(' ')[1] }}</span>
+                            </div>
+                            <span class="text-base flex-shrink-0">
+                                {{ completedArticles.includes(art.id) ? '⭐' : '⚪' }}
+                            </span>
                         </div>
                     </div>
                 </div>
 
                 <!-- 学习建议卡片 -->
-                <div class="p-4 sm:p-5 bg-white border-2 border-slate-100 rounded-3xl flex items-start space-x-3.5 text-xs sm:text-sm text-slate-600 shadow-sm font-medium card-panel">
+                <div class="p-4 sm:p-5 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-3xl flex items-start space-x-3.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 shadow-sm font-medium card-panel">
                     <span class="text-2xl flex-shrink-0">💡</span>
                     <div class="space-y-1">
-                        <div class="font-black text-slate-800 text-xs sm:text-sm">动词闪卡记忆法</div>
-                        <p class="text-slate-500 text-xs leading-relaxed">
-                            建议先看中文释义，在大脑中尝试拼读和回想英文；再轻触卡片翻面核对发音。标记“不认识”的单词将在列表页专门归类复习。
+                        <div class="font-black text-slate-800 dark:text-white text-xs sm:text-sm">短文点读与动词翻牌双翼学习法</div>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
+                            建议每日先完成 1 篇托业短文精读与微课小测点亮小星星；再通过 3D 翻牌巩固核心生活高频动词。双轨并行，语境与单词齐头并进！
                         </p>
                     </div>
                 </div>
 
-                <!-- 清空学习记录操作 -->
-                <div class="pt-2 text-center">
-                    <button onclick="clearProgress()" type="button" class="py-2.5 px-4 kid-btn-light rounded-xl text-xs font-bold text-rose-500 hover:text-rose-600">
-                        🗑️ 清空本模块全部学习记录
+                <!-- 清空学习记录操作区 -->
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
+                    <button @click="clearToeicProgress" type="button" class="py-2.5 px-4 kid-btn-light rounded-xl text-xs font-bold text-amber-600 hover:text-amber-700">
+                        ⭐ 清空托业短文打卡记录
+                    </button>
+                    <button @click="clearVerbProgress" type="button" class="py-2.5 px-4 kid-btn-light rounded-xl text-xs font-bold text-rose-500 hover:text-rose-600">
+                        🗑️ 清空核心动词学习记录
+                    </button>
+                    <button @click="clearAllProgress" type="button" class="py-2.5 px-4 kid-btn-light rounded-xl text-xs font-bold text-slate-400 hover:text-rose-600">
+                        ⚠️ 重置全部数据
                     </button>
                 </div>
 
@@ -283,47 +1001,160 @@
 
         </main>
 
-        <!-- 底部大图标圆润导航栏 (3-columns，统一 @hanzi 导航栏设计) -->
-        <nav id="englishBottomNav" class="app-bottom-nav flex-shrink-0 bg-white/95 backdrop-blur-md border-t-2 border-slate-100 z-20 select-none shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
-            <div class="grid grid-cols-3 h-16 items-center">
-                <!-- 词卡记忆 -->
-                <button id="navTabCard" type="button" onclick="switchTab('card')"
-                        class="flex flex-col items-center justify-center py-1 text-indigo-600 font-black transition-all active:scale-95 touch-manipulation relative">
-                    <div class="relative flex items-center justify-center">
-                        <span class="text-2xl scale-110">🔤</span>
-                    </div>
-                    <span class="text-xs mt-0.5 tracking-tight font-black">词卡记忆</span>
-                    <span class="nav-indicator w-6 h-1 bg-indigo-600 rounded-full mt-0.5"></span>
-                </button>
+        <!-- ============================================================= -->
+        <!-- 常驻悬浮迷你播放栏 (Docked Mini-Player) (仅在托业短文 · 精读点读时呈现) -->
+        <!-- ============================================================= -->
+        <div
+            v-if="currentTab === 'toeic' && toeicSubTab === 'reading'"
+            class="docked-mini-player bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t-2 border-indigo-200 dark:border-slate-700 shadow-xl"
+        >
+            <!-- 播放栏顶缘进度条 -->
+            <div class="w-full bg-indigo-100 dark:bg-slate-700 h-1">
+                <div 
+                    class="bg-gradient-to-r from-indigo-500 to-purple-600 h-full transition-all duration-300"
+                    :style="{ width: (activeSentenceIndex >= 0 ? (((activeSentenceIndex + 1) / (currentArticle.sentences?.length || 1)) * 100) : 0) + '%' }"
+                ></div>
+            </div>
 
-                <!-- 词库列表 -->
-                <button id="navTabList" type="button" onclick="switchTab('list')"
-                        class="flex flex-col items-center justify-center py-1 text-slate-400 hover:text-slate-600 font-bold transition-all active:scale-95 touch-manipulation relative">
+            <!-- 控制按钮区 -->
+            <div class="max-w-2xl mx-auto px-3.5 py-1.5 sm:py-2 flex items-center justify-between gap-2">
+                <!-- 序号与句子预览 -->
+                <div 
+                    @click="scrollToActiveSentence"
+                    class="flex items-center space-x-2 min-w-0 flex-1 cursor-pointer select-none"
+                    title="点击定位到当前句子"
+                >
+                    <span 
+                        class="px-2 py-0.5 rounded-lg text-[10px] font-black shrink-0 transition-colors"
+                        :class="isSpeakingNow ? 'bg-indigo-600 text-white animate-pulse' : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'"
+                    >
+                        {{ activeSentenceIndex >= 0 ? `${activeSentenceIndex + 1}/${currentArticle.sentences?.length || 0}` : '点读' }}
+                    </span>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200 truncate leading-tight">
+                        {{ currentSentenceTextPreview }}
+                    </p>
+                </div>
+
+                <!-- 控制按钮组 -->
+                <div class="flex items-center space-x-1 sm:space-x-1.5 shrink-0">
+                    <button
+                        @click="toggleSpeechRate"
+                        type="button"
+                        class="px-1.5 py-1 rounded-lg text-[10px] font-black border bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100"
+                        title="调整语速"
+                    >
+                        {{ speechRate }}x
+                    </button>
+                    <button
+                        @click="togglePlaybackMode"
+                        type="button"
+                        class="w-7 h-7 rounded-lg text-xs font-black border transition-all flex items-center justify-center"
+                        :class="playbackMode === 'continuous' ? 'bg-indigo-50 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700' : 'bg-amber-50 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700'"
+                        :title="playbackMode === 'continuous' ? '整篇连播' : '单句循环'"
+                    >
+                        {{ playbackMode === 'continuous' ? '🔁' : '🔂' }}
+                    </button>
+                    <button
+                        @click="prevSentence"
+                        type="button"
+                        class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center btn-3d font-bold text-xs"
+                        title="上一句"
+                    >
+                        ⏮
+                    </button>
+                    <button
+                        @click="togglePlayPause"
+                        type="button"
+                        class="w-9 h-9 rounded-xl kid-btn-primary flex items-center justify-center text-white shadow-sm font-black text-sm"
+                        :title="isSpeakingNow ? '暂停' : '开始播放'"
+                    >
+                        <span>{{ isSpeakingNow ? '⏸' : '▶' }}</span>
+                    </button>
+                    <button
+                        @click="nextSentence"
+                        type="button"
+                        class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center btn-3d font-bold text-xs"
+                        title="下一句"
+                    >
+                        ⏭
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ============================================================= -->
+        <!-- 底部大图标圆润导航栏 (4-columns，统一 @hanzi 与 @japanese 导航栏设计) -->
+        <!-- ============================================================= -->
+        <nav class="app-bottom-nav flex-shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t-2 border-slate-100 dark:border-slate-800 z-30 select-none shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
+            <div class="grid grid-cols-4 h-16 items-center">
+                <!-- 托业短文 -->
+                <button
+                    type="button"
+                    @click="switchTab('toeic')"
+                    class="flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative"
+                    :class="currentTab === 'toeic' ? 'text-indigo-600 dark:text-indigo-400 font-black' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold'"
+                >
                     <div class="relative flex items-center justify-center">
-                        <span class="text-2xl opacity-75">📋</span>
-                        <span id="navUnknownBadge" class="hidden absolute -top-1 -right-3 px-1.5 py-0.2 min-w-[16px] h-4 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-sm">
-                            0
+                        <span class="text-2xl transition-transform" :class="currentTab === 'toeic' ? 'scale-110' : 'opacity-75'">📖</span>
+                        <span v-if="completedArticlesCount > 0" class="absolute -top-1 -right-3 px-1.5 py-0.2 min-w-[16px] h-4 bg-amber-500 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-sm">
+                            {{ completedArticlesCount }}
                         </span>
                     </div>
-                    <span class="text-xs mt-0.5 tracking-tight font-black">词库列表</span>
-                    <span class="nav-indicator w-6 h-1 bg-transparent rounded-full mt-0.5"></span>
+                    <span class="text-xs mt-0.5 tracking-tight font-black">托业短文</span>
+                    <span class="w-6 h-1 rounded-full mt-0.5 transition-all" :class="currentTab === 'toeic' ? 'bg-indigo-600 dark:bg-indigo-400' : 'bg-transparent'"></span>
                 </button>
 
-                <!-- 进度统计 -->
-                <button id="navTabStats" type="button" onclick="switchTab('stats')"
-                        class="flex flex-col items-center justify-center py-1 text-slate-400 hover:text-slate-600 font-bold transition-all active:scale-95 touch-manipulation relative">
+                <!-- 核心动词 -->
+                <button
+                    type="button"
+                    @click="switchTab('verbs')"
+                    class="flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative"
+                    :class="currentTab === 'verbs' ? 'text-indigo-600 dark:text-indigo-400 font-black' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold'"
+                >
                     <div class="relative flex items-center justify-center">
-                        <span class="text-2xl opacity-75">📊</span>
+                        <span class="text-2xl transition-transform" :class="currentTab === 'verbs' ? 'scale-110' : 'opacity-75'">🔤</span>
                     </div>
-                    <span class="text-xs mt-0.5 tracking-tight font-black">进度统计</span>
-                    <span class="nav-indicator w-6 h-1 bg-transparent rounded-full mt-0.5"></span>
+                    <span class="text-xs mt-0.5 tracking-tight font-black">核心动词</span>
+                    <span class="w-6 h-1 rounded-full mt-0.5 transition-all" :class="currentTab === 'verbs' ? 'bg-indigo-600 dark:bg-indigo-400' : 'bg-transparent'"></span>
+                </button>
+
+                <!-- 动词词库 -->
+                <button
+                    type="button"
+                    @click="switchTab('list')"
+                    class="flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative"
+                    :class="currentTab === 'list' ? 'text-indigo-600 dark:text-indigo-400 font-black' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold'"
+                >
+                    <div class="relative flex items-center justify-center">
+                        <span class="text-2xl transition-transform" :class="currentTab === 'list' ? 'scale-110' : 'opacity-75'">📋</span>
+                        <span v-if="unknownVerbsCount > 0" class="absolute -top-1 -right-3 px-1.5 py-0.2 min-w-[16px] h-4 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-sm">
+                            {{ unknownVerbsCount }}
+                        </span>
+                    </div>
+                    <span class="text-xs mt-0.5 tracking-tight font-black">动词词库</span>
+                    <span class="w-6 h-1 rounded-full mt-0.5 transition-all" :class="currentTab === 'list' ? 'bg-indigo-600 dark:bg-indigo-400' : 'bg-transparent'"></span>
+                </button>
+
+                <!-- 进度看板 -->
+                <button
+                    type="button"
+                    @click="switchTab('stats')"
+                    class="flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative"
+                    :class="currentTab === 'stats' ? 'text-indigo-600 dark:text-indigo-400 font-black' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold'"
+                >
+                    <div class="relative flex items-center justify-center">
+                        <span class="text-2xl transition-transform" :class="currentTab === 'stats' ? 'scale-110' : 'opacity-75'">📊</span>
+                    </div>
+                    <span class="text-xs mt-0.5 tracking-tight font-black">进度看板</span>
+                    <span class="w-6 h-1 rounded-full mt-0.5 transition-all" :class="currentTab === 'stats' ? 'bg-indigo-600 dark:bg-indigo-400' : 'bg-transparent'"></span>
                 </button>
             </div>
         </nav>
 
     </div>
 
-    <!-- 逻辑脚本引入 -->
+    <!-- 核心逻辑脚本引入 -->
     <script src="./english.js?v=2.3.0" defer></script>
 </body>
 </html>

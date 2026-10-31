@@ -318,23 +318,23 @@ const app = createApp({
             },
             {
                 id: 'english',
-                title: '英语核心动词卡',
-                subtitle: '100 高频动词 · 3D 双面翻牌 · 掌握度',
+                title: '英语学习乐园',
+                subtitle: '托业短文精读 · 核心100动词 · 3D闪卡',
                 icon: '🔤',
-                iconBg: 'bg-rose-50 text-rose-600 border border-rose-100',
-                barClass: 'bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500',
-                cardBorder: 'border-rose-300 hover:border-rose-500',
-                btnClass: 'kid-btn-danger',
-                userProgressText: '100 核心动词 · 3D 闪卡',
+                iconBg: 'bg-indigo-50 text-indigo-600 border border-indigo-100',
+                barClass: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500',
+                cardBorder: 'border-indigo-300 hover:border-indigo-500',
+                btnClass: 'kid-btn-primary',
+                userProgressText: '托业商务短文 · 核心动词 3D 闪卡',
                 dueCount: 0,
                 masteredCount: 0,
                 tags: [
+                    { text: '托业短文点读', color: '#6366f1' },
                     { text: '3D立体翻牌', color: '#f43f5e' },
-                    { text: '真人双语发音', color: '#0284c7' },
-                    { text: '掌握度看板', color: '#10b981' }
+                    { text: '真人双语发音', color: '#0284c7' }
                 ],
                 url: 'english/english.html',
-                btnText: '英语词卡'
+                btnText: '学英语'
             }
         ]);
 
@@ -387,23 +387,35 @@ const app = createApp({
                 console.warn('读取汉字进度异常', e);
             }
 
-            // 3. 英语模块进度
+            // 3. 英语模块进度 (托业短文 + 核心动词)
             try {
                 const enRaw = localStorage.getItem('englishWordProgress');
+                const toeicRaw = localStorage.getItem('toeic_completed_articles');
                 const enMod = modules.value.find(m => m.id === 'english');
                 if (enMod) {
+                    let known = 0;
+                    let unknown = 0;
+                    let toeicCount = 0;
                     if (enRaw) {
                         const progress = JSON.parse(enRaw);
                         const vals = Object.values(progress);
-                        const known = vals.filter(v => v === 'known').length;
-                        const unknown = vals.filter(v => v === 'unknown').length;
+                        known = vals.filter(v => v === 'known').length;
+                        unknown = vals.filter(v => v === 'unknown').length;
                         enMod.masteredCount = known;
                         enMod.dueCount = unknown;
-                        if (vals.length > 0) {
-                            enMod.userProgressText = `已掌握 ${known} 词 · 需复习 ${unknown} 词`;
-                        } else {
-                            enMod.userProgressText = '尚未开始学习，点击开启翻牌卡片';
-                        }
+                    }
+                    if (toeicRaw) {
+                        const tList = JSON.parse(toeicRaw);
+                        if (Array.isArray(tList)) toeicCount = tList.length;
+                    }
+                    if (toeicCount > 0 || known > 0 || unknown > 0) {
+                        const parts = [];
+                        if (toeicCount > 0) parts.push(`短文通关 ${toeicCount}/10 篇`);
+                        if (known > 0) parts.push(`动词掌握 ${known} 词`);
+                        if (unknown > 0) parts.push(`需复习 ${unknown} 词`);
+                        enMod.userProgressText = parts.join(' · ');
+                    } else {
+                        enMod.userProgressText = '尚未开始学习，点击进入短文精读与翻牌';
                     }
                 }
             } catch (e) {
