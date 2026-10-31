@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <meta name="referrer" content="no-referrer"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
     <meta name="apple-mobile-web-app-title" content="英语学习"/>
@@ -22,6 +23,7 @@
     <link rel="stylesheet" href="../libs/vant.min.css" />
     <script src="../libs/tailwindcss.js"></script>
     <script src="../libs/vue.global.prod.js"></script>
+    <script src="../libs/vant.min.js"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 -->
     <link rel="stylesheet" href="../css/style.css?v=2.3.0" />
@@ -59,6 +61,11 @@
                         <span class="theme-icon">🌙</span>
                         <span class="theme-text text-xs hidden sm:inline">夜间</span>
                     </button>
+                    <button type="button" @click="showAudioSettings = true"
+                            class="h-8 px-2.5 sm:px-3 text-xs sm:text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full font-bold active:scale-95 shadow-sm flex items-center space-x-1 whitespace-nowrap flex-shrink-0"
+                            title="发音设置">
+                        <span>🔊 发音</span>
+                    </button>
                 </div>
             </div>
 
@@ -69,6 +76,136 @@
                 <span class="flex items-center whitespace-nowrap flex-shrink-0">📝 需复习: <b class="text-rose-200 font-black ml-1">{{ unknownVerbsCount }}</b></span>
             </div>
         </header>
+
+        <!-- 发音与语音设置弹窗 (参考 @japanese 统一设计：真人原声在线双通道 + 系统本地 TTS 切换) -->
+        <van-popup v-model:show="showAudioSettings" position="bottom" round closeable :style="{ maxHeight: '88%' }" class="p-5 sm:p-6 !rounded-t-3xl dark:bg-slate-900 dark:text-slate-100">
+            <div class="space-y-4">
+                <div class="border-b dark:border-slate-700 pb-3 pr-8">
+                    <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center space-x-2">
+                        <span>🔊</span>
+                        <span>英语发音与语音设置</span>
+                    </h3>
+                </div>
+
+                <!-- iPad / iOS Special Tip Banner -->
+                <div v-if="isIOS" class="p-3.5 bg-amber-50 dark:bg-amber-950/50 border-2 border-amber-200/80 dark:border-amber-800 rounded-2xl text-xs space-y-1.5 text-amber-900 dark:text-amber-200 font-medium">
+                    <div class="font-black flex items-center space-x-1 text-amber-950 dark:text-amber-100">
+                        <span>🍎 iPad / iPhone 专属真人发音指南：</span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs leading-relaxed">
+                        1. <strong>无声排查</strong>：推荐使用默认的【<strong>🌐 真人原声发音</strong>】（走媒体音频通道，即使开启侧边静音开关也能正常发声）。若使用系统本地 TTS，请检查控制中心「<strong>静音模式（铃铛图标）</strong>」是否关闭并调大媒体音量。<br/>
+                        2. <strong>高品质真人音质推荐</strong>：若选择【系统本地 TTS】，可在 iPad/iPhone【设置 ➔ 辅助功能 ➔ 朗读内容 ➔ 声音 ➔ 英语】中免费下载 <strong>Siri</strong> 或 <strong>Samantha (增强版)</strong>。
+                    </p>
+                </div>
+
+                <!-- Engine Selection -->
+                <div class="space-y-2">
+                    <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-200">发音音源引擎</label>
+                    <van-radio-group v-model="audioEngine" @change="saveAudioConfig" class="space-y-2.5">
+                        <div class="p-3.5 rounded-2xl border-2 transition-all cursor-pointer"
+                             :class="audioEngine === 'online' ? 'border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/50 shadow-sm' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300'"
+                             @click="audioEngine = 'online'; saveAudioConfig()">
+                            <van-radio name="online">
+                                <div>
+                                    <div class="text-xs sm:text-sm font-black text-slate-800 dark:text-white flex items-center space-x-1.5">
+                                        <span>🌐 真人原声发音</span>
+                                        <span class="text-[10px] bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200 font-bold px-2 py-0.5 rounded-full">默认推荐・纯正语流</span>
+                                    </div>
+                                    <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">单词采用有道词典真人发音，长句采用 Google / 百度神经网络自然语流；已启用后台智能预加载与高速缓存池，iOS 免静音拦截、即点即播。</p>
+                                </div>
+                            </van-radio>
+                        </div>
+
+                        <div class="p-3.5 rounded-2xl border-2 transition-all cursor-pointer"
+                             :class="audioEngine === 'tts' ? 'border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/50 shadow-sm' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300'"
+                             @click="audioEngine = 'tts'; saveAudioConfig()">
+                            <van-radio name="tts">
+                                <div class="flex-1">
+                                    <div class="text-xs sm:text-sm font-black text-slate-800 dark:text-white flex items-center space-x-1.5">
+                                        <span>🍎 系统本地 TTS 原生发音</span>
+                                        <span class="text-[10px] bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold px-2 py-0.5 rounded-full">完全离线备用</span>
+                                    </div>
+                                    <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">调用设备本地系统原生引擎（iPad/iPhone 调用 Apple Siri / Samantha，电脑调用微软 Natural / Google 语音）。无需联网，完全离线运行。</p>
+                                </div>
+                            </van-radio>
+
+                            <div v-if="audioEngine === 'tts'" class="mt-2.5 pt-2.5 border-t border-slate-200 dark:border-slate-700" @click.stop>
+                                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">当前匹配英语语音包：</label>
+                                <select v-if="availableVoices.length > 0" v-model="enVoiceName" @change="saveAudioConfig" class="w-full text-xs sm:text-sm border-2 border-slate-200 dark:border-slate-700 rounded-xl p-2 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold outline-none">
+                                    <option v-for="v in availableVoices" :key="v.name" :value="v.name">
+                                        {{ v.name }} ({{ v.lang }}){{ /siri/i.test(v.name) ? ' · Apple Siri 真人' : (/samantha/i.test(v.name) ? ' · Apple Samantha' : (/natural|aria|jenny|guy/i.test(v.name) ? ' · 微软神经语音' : '')) }}
+                                    </option>
+                                </select>
+                                <div v-else class="text-xs text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/50 p-2.5 rounded-xl border border-amber-200 dark:border-amber-800 leading-relaxed mt-1 font-medium">
+                                    {{ isIOS ? '💡 iPad/iPhone 提示：轻点下方试听按钮，系统即可激活 Apple 原生英语声音。' : '💡 未在系统检测到英语 TTS 语音包时，系统将自动无缝降级为在线通道播放。' }}
+                                </div>
+                            </div>
+                        </div>
+                    </van-radio-group>
+                </div>
+
+                <!-- Accent Selection -->
+                <div class="space-y-2">
+                    <label class="block text-xs sm:text-sm font-black text-slate-700 dark:text-slate-200">发音口音偏好</label>
+                    <van-radio-group v-model="audioAccent" @change="saveAudioConfig" direction="horizontal" class="grid grid-cols-2 gap-2.5">
+                        <div class="flex items-center p-3 rounded-2xl border-2 text-xs sm:text-sm cursor-pointer transition-all"
+                             :class="audioAccent === 'us' ? 'border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-200 font-black' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:border-slate-300'"
+                             @click="audioAccent = 'us'; saveAudioConfig()">
+                            <van-radio name="us">🇺🇸 美式发音 (推荐)</van-radio>
+                        </div>
+                        <div class="flex items-center p-3 rounded-2xl border-2 text-xs sm:text-sm cursor-pointer transition-all"
+                             :class="audioAccent === 'uk' ? 'border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-200 font-black' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:border-slate-300'"
+                             @click="audioAccent = 'uk'; saveAudioConfig()">
+                            <van-radio name="uk">🇬🇧 英式发音</van-radio>
+                        </div>
+                    </van-radio-group>
+                </div>
+
+                <!-- Speed Control -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs sm:text-sm font-black text-slate-700 dark:text-slate-200">朗读语速</label>
+                        <span class="text-xs font-black text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 px-2.5 py-1 rounded-full font-mono">
+                            {{ Number(speechRate).toFixed(2) }}x
+                        </span>
+                    </div>
+                    <div class="space-y-3 py-2 px-1">
+                        <van-slider
+                            v-model="speechRate"
+                            :min="0.75"
+                            :max="1.25"
+                            :step="0.05"
+                            active-color="#4f46e5"
+                            @change="saveAudioConfig" />
+                        <div class="flex justify-between text-xs text-slate-400 font-bold px-0.5 select-none pt-1">
+                            <span @click="speechRate = 0.75; saveAudioConfig()" class="cursor-pointer hover:text-indigo-600">0.75x 慢</span>
+                            <span @click="speechRate = 0.85; saveAudioConfig()" class="cursor-pointer hover:text-indigo-600">0.85x 适中</span>
+                            <span @click="speechRate = 1.0; saveAudioConfig()" class="cursor-pointer hover:text-indigo-600">1.0x 标准</span>
+                            <span @click="speechRate = 1.25; saveAudioConfig()" class="cursor-pointer hover:text-indigo-600">1.25x 快</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Audio Buttons -->
+                <div class="pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2.5">
+                    <button type="button" @click="testAudio('complimentary')"
+                            class="py-3 kid-btn-light text-slate-800 dark:text-slate-100 text-xs sm:text-sm font-black rounded-2xl flex items-center justify-center space-x-1">
+                        <span>🔊 试听单词</span>
+                    </button>
+                    <button type="button" @click="testSentenceAudio('A new complimentary coffee machine is now available in the second-floor breakroom.')"
+                            class="py-3 kid-btn-light text-slate-800 dark:text-slate-100 text-xs sm:text-sm font-black rounded-2xl flex items-center justify-center space-x-1">
+                        <span>🔊 试听句子</span>
+                    </button>
+                </div>
+
+                <div class="pt-2">
+                    <button type="button" @click="showAudioSettings = false"
+                            class="w-full py-4 kid-btn-primary text-white font-black text-base rounded-2xl shadow-lg">
+                        完成设置并关闭
+                    </button>
+                </div>
+            </div>
+        </van-popup>
 
         <!-- 主体滚动内容区 (儿童友好背景与舒适间距) -->
         <main class="flex-1 min-h-0 overflow-y-auto relative bg-[#f8fafc] dark:bg-[#0f172a] p-3.5 sm:p-5" :class="currentTab === 'toeic' && toeicSubTab === 'reading' ? 'pb-28' : 'pb-6'">
@@ -473,6 +610,30 @@
                                     </span>
                                 </div>
 
+                                <!-- 题干单词点查卡片 -->
+                                <div
+                                    v-if="selectedWordInfo && selectedWordInfo.contextKey === ('quiz_' + quiz.id)"
+                                    class="mb-3 p-2.5 rounded-2xl bg-amber-50 dark:bg-slate-800 border-2 border-amber-300 dark:border-amber-700 shadow-md animate-pop flex items-center justify-between"
+                                    @click.stop
+                                >
+                                    <div class="flex-1 pr-2 min-w-0">
+                                        <div class="flex items-baseline space-x-1.5 flex-wrap">
+                                            <span class="text-sm font-black text-slate-900 dark:text-white">{{ selectedWordInfo.text }}</span>
+                                            <span class="text-xs font-mono text-amber-800 dark:text-amber-300 font-bold">{{ selectedWordInfo.phonetic }}</span>
+                                            <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
+                                            <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.2 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
+                                        </div>
+                                        <div class="mt-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+                                            <span class="text-amber-600 dark:text-amber-400 font-black">释义：</span>
+                                            <span>{{ selectedWordInfo.meaning }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-1.5 shrink-0">
+                                        <button @click.stop="speakText(selectedWordInfo.text)" type="button" class="w-7 h-7 rounded-xl bg-amber-400 hover:bg-amber-500 text-amber-950 flex items-center justify-center btn-3d font-bold text-xs">🔊</button>
+                                        <button @click.stop="closeWordInfo" type="button" class="w-6 h-6 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xs">✕</button>
+                                    </div>
+                                </div>
+
                                 <!-- 题干译文 -->
                                 <div 
                                     v-if="showQuizZh[quiz.id]"
@@ -549,10 +710,58 @@
                                 :key="quiz.id"
                                 class="bg-white dark:bg-slate-800 rounded-3xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-2xs card-panel"
                             >
-                                <div class="text-xs font-black text-amber-600 dark:text-amber-400 mb-1">Question {{ qIdx + 1 }} · 单项选择</div>
-                                <p class="text-sm font-bold text-slate-800 dark:text-slate-100 leading-relaxed mb-3">
-                                    {{ quiz.question }}
-                                </p>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-black text-amber-600 dark:text-amber-400">Question {{ qIdx + 1 }} · 单项选择</span>
+                                    <button
+                                        @click="speakText(quiz.question.replace(/_{2,}/g, 'blank'))"
+                                        type="button"
+                                        class="px-2 py-0.5 rounded-lg text-[10px] font-black border bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-amber-50 flex items-center space-x-1"
+                                    >
+                                        <span>🔊 听题</span>
+                                    </button>
+                                </div>
+                                <div class="text-sm font-bold text-slate-800 dark:text-slate-100 leading-relaxed mb-3">
+                                    <span
+                                        v-for="(tok, tIdx) in tokenizeSentence(quiz.question, currentArticle.words)"
+                                        :key="tIdx"
+                                    >
+                                        <span
+                                            v-if="tok.type === 'word'"
+                                            @click.stop="handleWordClick(tok, 'gquiz_' + quiz.id)"
+                                            class="inline-block transition-all cursor-pointer rounded-lg px-0.5 py-0.5"
+                                            :class="[
+                                                tok.isTarget ? 'text-pink-600 dark:text-pink-400 bg-pink-100 dark:bg-pink-950 font-extrabold border-b border-pink-300' : 'hover:bg-amber-100 dark:hover:bg-amber-950/60 hover:text-amber-900 text-slate-800 dark:text-slate-200',
+                                                selectedWordInfo && selectedWordInfo.clean === tok.clean && selectedWordInfo.contextKey === ('gquiz_' + quiz.id)
+                                                    ? 'ring-2 ring-indigo-400 bg-indigo-100 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100 font-black'
+                                                    : ''
+                                            ]"
+                                        >{{ tok.text }}</span>
+                                        <span v-else-if="tok.type === 'blank'" class="inline-block px-1.5 py-0.5 mx-0.5 rounded-lg bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 font-black border-b-2 border-amber-300 select-none">_____</span>
+                                        <span v-else>{{ tok.text }}</span>
+                                    </span>
+                                </div>
+                                <div
+                                    v-if="selectedWordInfo && selectedWordInfo.contextKey === ('gquiz_' + quiz.id)"
+                                    class="mb-3 p-2.5 rounded-2xl bg-amber-50 dark:bg-slate-800 border-2 border-amber-300 dark:border-amber-700 shadow-md animate-pop flex items-center justify-between"
+                                    @click.stop
+                                >
+                                    <div class="flex-1 pr-2 min-w-0">
+                                        <div class="flex items-baseline space-x-1.5 flex-wrap">
+                                            <span class="text-sm font-black text-slate-900 dark:text-white">{{ selectedWordInfo.text }}</span>
+                                            <span class="text-xs font-mono text-amber-800 dark:text-amber-300 font-bold">{{ selectedWordInfo.phonetic }}</span>
+                                            <span v-if="selectedWordInfo.pos" class="px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-100 text-[10px] font-black uppercase">{{ selectedWordInfo.pos }}</span>
+                                            <span v-if="selectedWordInfo.isTarget" class="px-1.5 py-0.2 rounded bg-pink-500 text-white text-[10px] font-black">⭐ 核心词</span>
+                                        </div>
+                                        <div class="mt-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+                                            <span class="text-amber-600 dark:text-amber-400 font-black">释义：</span>
+                                            <span>{{ selectedWordInfo.meaning }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-1.5 shrink-0">
+                                        <button @click.stop="speakText(selectedWordInfo.text)" type="button" class="w-7 h-7 rounded-xl bg-amber-400 hover:bg-amber-500 text-amber-950 flex items-center justify-center btn-3d font-bold text-xs">🔊</button>
+                                        <button @click.stop="closeWordInfo" type="button" class="w-6 h-6 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xs">✕</button>
+                                    </div>
+                                </div>
 
                                 <!-- 4 个选项 (A, B, C, D) -->
                                 <div class="grid grid-cols-1 gap-2">

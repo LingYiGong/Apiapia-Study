@@ -7,67 +7,13 @@
     const { createApp, ref, computed, onMounted, nextTick, watch } = Vue;
 
     // =========================================================================
-    // 1. Web Speech API 语音播放管理器封装
+    // 1. 语音辅助判断（区分单词与句子，精准匹配真人音源通道）
     // =========================================================================
-    const voicePlayer = {
-        isSpeaking: false,
-        preferredVoice: null,
-        currentRate: 1.0,
+    const SILENT_WAV = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 
-        init() {
-            const updateVoices = () => {
-                if (!('speechSynthesis' in window)) return;
-                const voices = window.speechSynthesis.getVoices();
-                this.preferredVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Samantha') || v.name.includes('Natural') || v.name.includes('Google')))
-                    || voices.find(v => v.lang === 'en-US')
-                    || null;
-            };
-
-            if ('speechSynthesis' in window) {
-                updateVoices();
-                if (window.speechSynthesis.onvoiceschanged !== undefined) {
-                    window.speechSynthesis.onvoiceschanged = updateVoices;
-                }
-            }
-        },
-
-        speak(text, onEndCallback, rate = 1.0) {
-            if (!('speechSynthesis' in window)) {
-                if (onEndCallback) onEndCallback();
-                return;
-            }
-
-            window.speechSynthesis.cancel();
-            if (!text) {
-                if (onEndCallback) onEndCallback();
-                return;
-            }
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            utterance.rate = rate || this.currentRate || 1.0;
-            if (this.preferredVoice) utterance.voice = this.preferredVoice;
-
-            utterance.onend = () => {
-                this.isSpeaking = false;
-                if (onEndCallback) onEndCallback();
-            };
-
-            utterance.onerror = () => {
-                this.isSpeaking = false;
-                if (onEndCallback) onEndCallback();
-            };
-
-            this.isSpeaking = true;
-            window.speechSynthesis.speak(utterance);
-        },
-
-        stop() {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-            }
-            this.isSpeaking = false;
-        }
+    const isSentenceText = (text) => {
+        const clean = (text || '').trim();
+        return /\s/.test(clean) && (clean.split(/\s+/).length > 2 || clean.length > 25 || /[.?!;,]/.test(clean));
     };
 
     // =========================================================================
@@ -168,11 +114,405 @@
             const toeicSubTab = ref('reading'); // 'reading' | 'words' | 'grammar'
             const showChinese = ref(true); // 全篇译文开关
 
+            // ------------ 设备检测与发音引擎配置（参考 @japanese 架构） ------------
+            const isIOS = typeof navigator !== 'undefined' && (
+                /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+            );
+
+            const AUDIO_CONFIG_KEY = 'english_study_audio_config_v1';
+            const showAudioSettings = ref(false);
+            // 默认采用【真人原声发音】（有道词典真人美英原声 + Google/百度神经网络自然语流 + 智能预加载缓存池 + 本地 TTS 兜底）
+            const audioEngine = ref('online'); // 'online' | 'tts'
+            const audioAccent = ref('us');     // 'us' (美音) | 'uk' (英音)
+            const speechRate = ref(1.0);       // 0.75 ~ 1.25
+            const enVoiceName = ref('');
+            const availableVoices = ref([]);
+
             // 播放器状态
             const activeSentenceId = ref(null);
             const isSpeakingNow = ref(false);
             const playbackMode = ref('continuous'); // 'continuous' | 'loop'
-            const speechRate = ref(1.0); // 1.0 | 0.85 | 0.75
+
+            const synth = typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null;
+            let sharedAudio = null;
+            let activeUtterance = null;
+            let currentSessionId = 0;
+            let activeTimeoutId = null;
+            let audioUnlocked = false;
+            let ttsUnlocked = false;
+
+            const getSharedAudio = () => {
+                if (!sharedAudio && typeof Audio !== 'undefined') {
+                    sharedAudio = new Audio();
+                    sharedAudio.preload = 'auto';
+                    sharedAudio.setAttribute('playsinline', '');
+                    sharedAudio.setAttribute('webkit-playsinline', '');
+                }
+                return sharedAudio;
+            };
+
+            const initVoices = () => {
+                if (!synth) return;
+                const allVoices = synth.getVoices() || [];
+                const enVoices = allVoices.filter(v => {
+                    const lang = (v.lang || '').toLowerCase().replace('_', '-');
+                    return lang.startsWith('en') ||
+                        /english|英语|samantha|alex|ava|allison|susan|tom|daniel|serena|oliver|karen|moira|tessa|siri|aria|guy|jenny|ryan|sonia/i.test(v.name);
+                });
+                availableVoices.value = enVoices;
+
+                if (enVoices.length > 0) {
+                    if (!enVoiceName.value || !enVoices.some(v => v.name === enVoiceName.value)) {
+                        const preferUK = audioAccent.value === 'uk';
+                        const accentVoices = enVoices.filter(v => {
+                            const lang = (v.lang || '').toLowerCase().replace('_', '-');
+                            return preferUK ? (lang.includes('gb') || lang.includes('uk')) : lang.includes('us');
+                        });
+                        const pool = accentVoices.length > 0 ? accentVoices : enVoices;
+
+                        // 本地真人级音色匹配优先级（参考 @japanese）：
+                        // 1. Apple 原生 Siri 真人语音 (iPad/iOS 极品音质)
+                        // 2. 微软 Edge 自然神经语音 (Aria / Jenny / Guy / Sonia / Ryan / Natural)
+                        // 3. Apple Enhanced / Premium 高清增强语音 (Samantha / Ava / Alex / Daniel)
+                        // 4. Apple 经典语音 (Samantha / Alex / Daniel / Serena)
+                        // 5. Google 英语语音
+                        const siri = pool.find(v => /siri/i.test(v.name)) || enVoices.find(v => /siri/i.test(v.name));
+                        const natural = pool.find(v => /natural|online|aria|jenny|guy|sonia|ryan/i.test(v.name));
+                        const enhanced = pool.find(v => /enhanced|premium|高品質|高品位/i.test(v.name));
+                        const appleClassic = preferUK
+                            ? pool.find(v => /daniel|serena|oliver|kate|martha/i.test(v.name))
+                            : pool.find(v => /samantha|alex|ava|allison|tom/i.test(v.name));
+                        const google = pool.find(v => /google/i.test(v.name));
+                        enVoiceName.value = (siri || natural || enhanced || appleClassic || google || pool[0] || enVoices[0]).name;
+                    }
+                }
+            };
+
+            const getEnglishVoice = () => {
+                if (!synth) return null;
+                const allVoices = synth.getVoices() || [];
+                if (availableVoices.value.length === 0 && allVoices.length > 0) {
+                    initVoices();
+                }
+                const enVoices = allVoices.filter(v => {
+                    const lang = (v.lang || '').toLowerCase().replace('_', '-');
+                    return lang.startsWith('en') ||
+                        /english|英语|samantha|alex|ava|allison|susan|tom|daniel|serena|oliver|karen|moira|tessa|siri|aria|guy|jenny|ryan|sonia/i.test(v.name);
+                });
+                if (enVoiceName.value) {
+                    const found = enVoices.find(v => v.name === enVoiceName.value);
+                    if (found) return found;
+                }
+                const preferUK = audioAccent.value === 'uk';
+                const accentVoices = enVoices.filter(v => {
+                    const lang = (v.lang || '').toLowerCase().replace('_', '-');
+                    return preferUK ? (lang.includes('gb') || lang.includes('uk')) : lang.includes('us');
+                });
+                const pool = accentVoices.length > 0 ? accentVoices : enVoices;
+                const siri = pool.find(v => /siri/i.test(v.name)) || enVoices.find(v => /siri/i.test(v.name));
+                const natural = pool.find(v => /natural|online|aria|jenny|guy|sonia|ryan/i.test(v.name));
+                const enhanced = pool.find(v => /enhanced|premium|高品質|高品位/i.test(v.name));
+                const appleClassic = preferUK
+                    ? pool.find(v => /daniel|serena|oliver|kate|martha/i.test(v.name))
+                    : pool.find(v => /samantha|alex|ava|allison|tom/i.test(v.name));
+                const google = pool.find(v => /google/i.test(v.name));
+                return siri || natural || enhanced || appleClassic || google || pool[0] || enVoices[0] || null;
+            };
+
+            const loadAudioConfig = () => {
+                try {
+                    const raw = localStorage.getItem(AUDIO_CONFIG_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed.audioEngine) audioEngine.value = parsed.audioEngine;
+                        if (parsed.audioAccent) audioAccent.value = parsed.audioAccent;
+                        if (parsed.speechRate !== undefined && parsed.speechRate !== null) {
+                            const r = Number(parsed.speechRate);
+                            if (!isNaN(r) && r >= 0.7 && r <= 1.5) {
+                                speechRate.value = Math.round(r * 100) / 100;
+                            }
+                        }
+                        if (parsed.enVoiceName) enVoiceName.value = parsed.enVoiceName;
+                    }
+                } catch (e) {
+                    console.error('加载英语语音配置失败', e);
+                }
+            };
+
+            const saveAudioConfig = () => {
+                try {
+                    const r = Number(speechRate.value);
+                    if (!isNaN(r) && r >= 0.7 && r <= 1.5) {
+                        speechRate.value = Math.round(r * 100) / 100;
+                    } else {
+                        speechRate.value = 1.0;
+                    }
+                    localStorage.setItem(AUDIO_CONFIG_KEY, JSON.stringify({
+                        audioEngine: audioEngine.value,
+                        audioAccent: audioAccent.value,
+                        speechRate: speechRate.value,
+                        enVoiceName: enVoiceName.value
+                    }));
+                } catch (e) {
+                    console.error('保存英语语音配置失败', e);
+                }
+            };
+
+            // 真人原声发音高速缓存池与预加载系统（参考 @japanese）
+            const onlineAudioCache = new Map(); // cacheKey -> Audio instance
+
+            const buildOnlineUrls = (cleanText) => {
+                const encoded = encodeURIComponent(cleanText);
+                const isUK = audioAccent.value === 'uk';
+                const youdaoUrl = `https://dict.youdao.com/dictvoice?audio=${encoded}&type=${isUK ? 1 : 2}`;
+                const googleUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${isUK ? 'en-gb' : 'en'}&q=${encoded}`;
+                const baiduUrl = `https://fanyi.baidu.com/gettts?lan=${isUK ? 'uk' : 'en'}&text=${encoded}&spd=3&source=web`;
+
+                // 注意：有道 dictvoice 对完整长句会返回 HTTP 500，因此长句优先走 Google 神经网络 + 百度双通道，单词/短语优先走有道真人原声
+                if (isSentenceText(cleanText)) {
+                    return [googleUrl, baiduUrl];
+                }
+                return [youdaoUrl, googleUrl, baiduUrl];
+            };
+
+            const preloadOnlineAudio = (text) => {
+                if (!text || typeof window === 'undefined' || audioEngine.value !== 'online') return;
+                const clean = String(text).replace(/_{2,}/g, ' blank ').replace(/\s+/g, ' ').trim();
+                if (!clean) return;
+                const cacheKey = `${audioAccent.value}:${clean}`;
+                if (onlineAudioCache.has(cacheKey)) return;
+
+                try {
+                    const urls = buildOnlineUrls(clean);
+                    if (urls.length === 0) return;
+                    const audio = new Audio();
+                    audio.preload = 'auto';
+                    audio.src = urls[0];
+                    onlineAudioCache.set(cacheKey, audio);
+                    if (onlineAudioCache.size > 160) {
+                        const firstKey = onlineAudioCache.keys().next().value;
+                        onlineAudioCache.delete(firstKey);
+                    }
+                } catch (e) {}
+            };
+
+            const clearPendingTimer = () => {
+                if (activeTimeoutId) {
+                    clearTimeout(activeTimeoutId);
+                    activeTimeoutId = null;
+                }
+            };
+
+            const speakTTS = (text, rate, sessionId, onFinish) => {
+                if (sessionId !== currentSessionId) return;
+                if (!synth || typeof SpeechSynthesisUtterance === 'undefined') {
+                    onFinish();
+                    return;
+                }
+                try {
+                    if (sharedAudio) {
+                        try { sharedAudio.pause(); } catch (e) {}
+                    }
+                    if (synth.paused) {
+                        synth.resume();
+                    }
+
+                    const utter = new SpeechSynthesisUtterance(text);
+                    utter.lang = audioAccent.value === 'uk' ? 'en-GB' : 'en-US';
+                    utter.rate = Number(rate) || Number(speechRate.value) || 1.0;
+
+                    const selectedVoice = getEnglishVoice();
+                    if (selectedVoice) {
+                        utter.voice = selectedVoice;
+                    }
+
+                    // 挂载全局引用，防止 iOS Safari 垃圾回收提前销毁 utterance 导致无声或 onend 丢失
+                    activeUtterance = utter;
+                    window._englishActiveUtterance = utter;
+
+                    let done = false;
+                    const complete = () => {
+                        if (done) return;
+                        done = true;
+                        clearPendingTimer();
+                        if (activeUtterance === utter) activeUtterance = null;
+                        if (window._englishActiveUtterance === utter) window._englishActiveUtterance = null;
+                        onFinish();
+                    };
+
+                    // 安全兜底超时，防止极端情况下 iOS WebKit 不触发 onend 导致连播卡住
+                    const maxMs = Math.max(4000, Math.min(25000, text.length * 140));
+                    activeTimeoutId = setTimeout(complete, maxMs);
+
+                    utter.onend = complete;
+                    utter.onerror = (err) => {
+                        if (err && err.error && err.error !== 'canceled' && err.error !== 'interrupted') {
+                            console.warn('SpeechSynthesis error:', err.error);
+                        }
+                        complete();
+                    };
+
+                    // iOS Safari 关键修复：绝对不能无条件同步调用 cancel() 后立即 speak()，否则新队列也会被清空
+                    if (synth.speaking) {
+                        synth.cancel();
+                        setTimeout(() => {
+                            if (sessionId === currentSessionId) {
+                                synth.speak(utter);
+                            }
+                        }, 30);
+                    } else {
+                        synth.speak(utter);
+                    }
+                } catch (e) {
+                    console.error('SpeechSynthesis error:', e);
+                    onFinish();
+                }
+            };
+
+            const playOnlineAudio = (cleanText, rate, sessionId, onFinish) => {
+                if (sessionId !== currentSessionId) return;
+                const urls = buildOnlineUrls(cleanText);
+                const audio = getSharedAudio();
+                if (!audio || urls.length === 0) {
+                    speakTTS(cleanText, rate, sessionId, onFinish);
+                    return;
+                }
+
+                // 若本地 TTS 正在朗读，先停止它
+                if (synth && activeUtterance && synth.speaking) {
+                    synth.cancel();
+                }
+
+                const tryChannel = (channelIdx) => {
+                    if (sessionId !== currentSessionId) return;
+                    clearPendingTimer();
+
+                    if (channelIdx >= urls.length) {
+                        speakTTS(cleanText, rate, sessionId, onFinish);
+                        return;
+                    }
+
+                    let settled = false;
+                    let hasStarted = false;
+
+                    const fallbackNext = (forceTTS = false) => {
+                        if (settled || sessionId !== currentSessionId) return;
+                        settled = true;
+                        clearPendingTimer();
+                        audio.onplaying = audio.onended = audio.onerror = audio.onloadedmetadata = null;
+                        if (forceTTS) {
+                            speakTTS(cleanText, rate, sessionId, onFinish);
+                        } else {
+                            tryChannel(channelIdx + 1);
+                        }
+                    };
+
+                    audio.onplaying = audio.onended = audio.onerror = audio.onloadedmetadata = null;
+                    try { audio.pause(); } catch (e) {}
+
+                    audio.src = urls[channelIdx];
+                    audio.defaultPlaybackRate = rate;
+                    audio.playbackRate = rate;
+
+                    audio.onloadedmetadata = () => {
+                        if (sessionId === currentSessionId) {
+                            audio.playbackRate = rate;
+                        }
+                    };
+
+                    audio.onplaying = () => {
+                        hasStarted = true;
+                        audioUnlocked = true;
+                        clearPendingTimer();
+                    };
+
+                    audio.onended = () => {
+                        if (settled) return;
+                        settled = true;
+                        clearPendingTimer();
+                        audio.onplaying = audio.onended = audio.onerror = audio.onloadedmetadata = null;
+                        onFinish();
+                    };
+
+                    audio.onerror = () => {
+                        fallbackNext(false);
+                    };
+
+                    // 超时保护：若当前在线通道超过 1400ms 仍未开始播放，自动无缝切换下一备用音源或本地 TTS
+                    activeTimeoutId = setTimeout(() => {
+                        if (!hasStarted && audio.paused) {
+                            fallbackNext(false);
+                        }
+                    }, 1400);
+
+                    try {
+                        const playPromise = audio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch((err) => {
+                                if (sessionId !== currentSessionId || hasStarted) return;
+                                if (err && err.name === 'AbortError') return;
+                                fallbackNext(err && err.name === 'NotAllowedError');
+                            });
+                        }
+                    } catch (e) {
+                        fallbackNext(false);
+                    }
+                };
+
+                tryChannel(0);
+            };
+
+            const voicePlayer = {
+                isSpeaking: false,
+                speak(text, onEndCallback, rate) {
+                    const clean = String(text || '').replace(/_{2,}/g, ' blank ').replace(/\s+/g, ' ').trim();
+                    this.stop();
+                    if (!clean) {
+                        if (onEndCallback) onEndCallback();
+                        return;
+                    }
+
+                    const sessionId = ++currentSessionId;
+                    const playRate = Number(rate) || Number(speechRate.value) || 1.0;
+                    this.isSpeaking = true;
+
+                    const onFinish = () => {
+                        if (sessionId !== currentSessionId) return;
+                        clearPendingTimer();
+                        this.isSpeaking = false;
+                        if (onEndCallback) onEndCallback();
+                    };
+
+                    if (audioEngine.value === 'online') {
+                        playOnlineAudio(clean, playRate, sessionId, onFinish);
+                    } else {
+                        const voice = getEnglishVoice();
+                        if (!voice && synth && availableVoices.value.length === 0) {
+                            playOnlineAudio(clean, playRate, sessionId, onFinish);
+                        } else {
+                            speakTTS(clean, playRate, sessionId, onFinish);
+                        }
+                    }
+                },
+                stop() {
+                    currentSessionId++;
+                    clearPendingTimer();
+                    if (sharedAudio) {
+                        sharedAudio.onplaying = sharedAudio.onended = sharedAudio.onerror = sharedAudio.onloadedmetadata = null;
+                        try {
+                            sharedAudio.pause();
+                            sharedAudio.currentTime = 0;
+                        } catch (e) {}
+                    }
+                    if (synth && (activeUtterance || synth.speaking)) {
+                        try { synth.cancel(); } catch (e) {}
+                    }
+                    activeUtterance = null;
+                    window._englishActiveUtterance = null;
+                    this.isSpeaking = false;
+                }
+            };
 
             // 单词点击即时查词浮现卡片
             const selectedWordInfo = ref(null);
@@ -331,6 +671,7 @@
                 currentArticleId.value = artId;
                 showWordExampleZh.value = {};
                 showQuizZh.value = {};
+                nextTick(() => preloadArticleAudio());
             };
 
             const nextArticle = () => {
@@ -422,7 +763,9 @@
             const toggleSpeechRate = () => {
                 if (speechRate.value === 1.0) speechRate.value = 0.85;
                 else if (speechRate.value === 0.85) speechRate.value = 0.75;
+                else if (speechRate.value === 0.75) speechRate.value = 1.25;
                 else speechRate.value = 1.0;
+                saveAudioConfig();
                 window.kidToast && window.kidToast(`语速已切换为：${speechRate.value}x`, 'info');
             };
 
@@ -499,7 +842,37 @@
             };
 
             const speakText = (text) => {
-                voicePlayer.speak(text, null, 1.0);
+                if (isSpeakingNow.value) {
+                    isSpeakingNow.value = false;
+                }
+                voicePlayer.speak(text, null, speechRate.value);
+            };
+
+            const testAudio = (wordSample) => {
+                speakText(wordSample || 'complimentary');
+                window.kidToast && window.kidToast('正在播放单词发音...', 'info');
+            };
+
+            const testSentenceAudio = (sentenceSample) => {
+                speakText(sentenceSample || 'A new complimentary coffee machine is now available in the second-floor breakroom.');
+                window.kidToast && window.kidToast('正在播放句子发音...', 'info');
+            };
+
+            const preloadArticleAudio = () => {
+                const art = currentArticle.value;
+                if (!art) return;
+                (art.sentences || []).slice(0, 3).forEach(s => preloadOnlineAudio(s.en));
+                (art.words || []).slice(0, 5).forEach(w => preloadOnlineAudio(w.word));
+            };
+
+            const preloadVerbAudio = () => {
+                if (currentVerb.value) {
+                    preloadOnlineAudio(currentVerb.value.english);
+                }
+                const nextIdx = (currentVerbIndex.value + 1) % (verbList.value.length || 1);
+                if (verbList.value[nextIdx]) {
+                    preloadOnlineAudio(verbList.value[nextIdx].english);
+                }
             };
 
             const toggleWordExampleZh = (word) => {
@@ -610,6 +983,7 @@
                     currentVerbIndex.value = verbList.value.length - 1;
                 }
                 verbFlipped.value = false;
+                preloadVerbAudio();
             };
 
             const nextVerb = () => {
@@ -619,6 +993,7 @@
                     currentVerbIndex.value = 0;
                 }
                 verbFlipped.value = false;
+                preloadVerbAudio();
             };
 
             const markVerbKnown = () => {
@@ -746,12 +1121,73 @@
                 });
             };
 
-            // ------------ 初始化生命周期 ------------
+            // ------------ 初始化生命周期（含 iOS WebKit 手势解锁与语音包多重预热，参考 @japanese） ------------
             onMounted(() => {
-                voicePlayer.init();
+                loadAudioConfig();
+                initVoices();
+                if (synth) {
+                    if (synth.onvoiceschanged !== undefined) {
+                        synth.onvoiceschanged = initVoices;
+                    }
+                    if (synth.addEventListener) {
+                        synth.addEventListener('voiceschanged', initVoices);
+                    }
+                }
+                setTimeout(initVoices, 250);
+                setTimeout(initVoices, 800);
+                setTimeout(initVoices, 1600);
+
+                // iPad / iOS WebKit audio & speech gesture unlocker (参考 @japanese)
+                const unlockAudioAndTTS = () => {
+                    if (synth && !ttsUnlocked) {
+                        try {
+                            if (synth.paused) synth.resume();
+                            if (!synth.speaking && !voicePlayer.isSpeaking) {
+                                const dummy = new SpeechSynthesisUtterance('');
+                                dummy.volume = 0;
+                                synth.speak(dummy);
+                            }
+                            ttsUnlocked = true;
+                        } catch (e) {}
+                        initVoices();
+                    }
+                    if (!audioUnlocked) {
+                        try {
+                            const audio = getSharedAudio();
+                            if (audio && audio.paused && !voicePlayer.isSpeaking) {
+                                audio.src = SILENT_WAV;
+                                const p = audio.play();
+                                if (p !== undefined) {
+                                    p.then(() => {
+                                        if (audio.src === SILENT_WAV) {
+                                            audio.pause();
+                                            audio.currentTime = 0;
+                                        }
+                                        audioUnlocked = true;
+                                    }).catch(() => {});
+                                }
+                            }
+                        } catch (e) {}
+                    }
+                };
+                window.addEventListener('touchstart', unlockAudioAndTTS, { once: true, capture: true, passive: true });
+                window.addEventListener('touchend', unlockAudioAndTTS, { once: true, capture: true, passive: true });
+                window.addEventListener('click', unlockAudioAndTTS, { once: true, capture: true, passive: true });
+
+                // 移动端切后台或锁屏时自动停止播放，防止回到前台后状态错乱
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'hidden' && isSpeakingNow.value) {
+                        stopPlayback();
+                    }
+                });
+
                 loadLocalData();
                 setupKeyboard();
-                nextTick(() => updateScoreRing());
+                nextTick(() => {
+                    updateScoreRing();
+                    preloadArticleAudio();
+                    preloadVerbAudio();
+                });
 
                 window.addEventListener('apiapia-theme-changed', () => {
                     updateScoreRing();
@@ -759,6 +1195,15 @@
             });
 
             return {
+                isIOS,
+                showAudioSettings,
+                audioEngine,
+                audioAccent,
+                enVoiceName,
+                availableVoices,
+                saveAudioConfig,
+                testAudio,
+                testSentenceAudio,
                 currentTab,
                 articles,
                 wordDict,
@@ -831,5 +1276,8 @@
         }
     });
 
+    if (typeof vant !== 'undefined') {
+        app.use(vant);
+    }
     app.mount('#app');
 })();
