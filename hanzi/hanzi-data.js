@@ -2,7 +2,7 @@
 
 const HANZI_DATA = [
     {char: "一", hint: "一个的一", category: "数字数量"},
-    {char: "二", hint: "二个的二", category: "数字数量"},
+    {char: "二", hint: "二十的二", category: "数字数量"},
     {char: "三", hint: "三个的三", category: "数字数量"},
     {char: "四", hint: "四个的四", category: "数字数量"},
     {char: "五", hint: "五个的五", category: "数字数量"},
@@ -16,6 +16,9 @@ const HANZI_DATA = [
     {char: "多", hint: "多少的多", category: "数字数量"},
     {char: "少", hint: "多少的少", category: "数字数量"},
     {char: "只", hint: "一只小鸟的只", category: "数字数量"},
+    {char: "颗", hint: "一颗星星的颗", category: "数字数量"},
+    {char: "条", hint: "一条小鱼的条", category: "数字数量"},
+    {char: "片", hint: "一片树叶的片", category: "数字数量"},
     {char: "分", hint: "一分钱的分", category: "数字数量"},
     {char: "元", hint: "一元钱的元", category: "数字数量"},
     {char: "两", hint: "两个的两", category: "数字数量"},
@@ -43,20 +46,21 @@ const HANZI_DATA = [
     {char: "火", hint: "大火的火", category: "自然天气"},
     {char: "水", hint: "喝水的水", category: "自然天气"},
     {char: "气", hint: "空气的气", category: "自然天气"},
-    {char: "土", hint: "土地的土", category: "自然天气"},
-    {char: "石", hint: "石头的石", category: "自然天气"},
-    {char: "田", hint: "田地的田", category: "自然天气"},
-    {char: "白", hint: "白色的白", category: "自然天气"},
-    {char: "早", hint: "早上的早", category: "自然天气"},
-    {char: "午", hint: "中午的午", category: "自然天气"},
     {char: "光", hint: "阳光的光", category: "自然天气"},
     {char: "星", hint: "星星的星", category: "自然天气"},
     {char: "阳", hint: "阳光的阳", category: "自然天气"},
-    {char: "亮", hint: "月亮的亮", category: "自然天气"},
+    {char: "亮", hint: "明亮的亮", category: "自然天气"},
     {char: "空", hint: "天空的空", category: "自然天气"},
-    {char: "明", hint: "明天的明", category: "自然天气"},
-    {char: "今", hint: "今天的今", category: "自然天气"},
-    {char: "岛", hint: "小岛的岛", category: "自然天气"},
+
+    {char: "土", hint: "土地的土", category: "自然地理"},
+    {char: "石", hint: "石头的石", category: "自然地理"},
+    {char: "田", hint: "田地的田", category: "自然地理"},
+    {char: "岛", hint: "小岛的岛", category: "自然地理"},
+
+    {char: "早", hint: "早上的早", category: "时间"},
+    {char: "午", hint: "中午的午", category: "时间"},
+    {char: "今", hint: "今天的今", category: "时间"},
+    {char: "明", hint: "明天的明", category: "时间"},
 
     {char: "牛", hint: "小牛的牛", category: "动物植物"},
     {char: "马", hint: "白马的马", category: "动物植物"},
@@ -73,6 +77,7 @@ const HANZI_DATA = [
     {char: "禾", hint: "禾苗的禾", category: "动物植物"},
     {char: "竹", hint: "竹子的竹", category: "动物植物"},
     {char: "尾", hint: "尾巴的尾", category: "动物植物"},
+    {char: "巴", hint: "尾巴的巴", category: "动物植物"},
     {char: "苗", hint: "禾苗的苗", category: "动物植物"},
     {char: "叶", hint: "树叶的叶", category: "动物植物"},
     {char: "林", hint: "树林的林", category: "动物植物"},
@@ -94,17 +99,18 @@ const HANZI_DATA = [
     {char: "弟", hint: "弟弟的弟", category: "人物身体"},
     {char: "姐", hint: "姐姐的姐", category: "人物身体"},
     {char: "兄", hint: "兄弟的兄", category: "人物身体"},
-    {char: "子", hint: "孩子的子", category: "人物身体"},
+    {char: "子", hint: "王子的子", category: "人物身体"},
     {char: "儿", hint: "儿女的儿", category: "人物身体"},
-    {char: "发", hint: "头发的发", category: "人物身体"},
+    {char: "发", hint: "理发的发", category: "人物身体"},
     {char: "衣", hint: "衣服的衣", category: "人物身体"},
     {char: "他", hint: "男生的他", category: "人物身体"},
     {char: "她", hint: "女生的她", category: "人物身体"},
     {char: "你", hint: "你们的你", category: "人物身体"},
     {char: "毛", hint: "毛发的毛", category: "人物身体"},
     {char: "朋", hint: "朋友的朋", category: "人物身体"},
-    {char: "友", hint: "朋友的友", category: "人物身体"},
+    {char: "友", hint: "友好的友", category: "人物身体"},
     {char: "王", hint: "大王的王", category: "人物身体"},
+    {char: "丁", hint: "园丁的丁", category: "人物身体"},
     {char: "头", hint: "头发的头", category: "人物身体"},
     {char: "手", hint: "小手的手", category: "人物身体"},
     {char: "口", hint: "开口的口", category: "人物身体"},
@@ -122,7 +128,7 @@ const HANZI_DATA = [
     {char: "嘴", hint: "嘴巴的嘴", category: "人物身体"},
     {char: "眼", hint: "眼睛的眼", category: "人物身体"},
     {char: "睛", hint: "眼睛的睛", category: "人物身体"},
-    {char: "脚", hint: "小脚的脚", category: "人物身体"},
+    {char: "脚", hint: "脚步的脚", category: "人物身体"},
     {char: "腿", hint: "小腿的腿", category: "人物身体"},
     {char: "体", hint: "身体的体", category: "人物身体"},
     {char: "足", hint: "足球的足", category: "人物身体"},
@@ -141,10 +147,8 @@ const HANZI_DATA = [
     {char: "工", hint: "工作的工", category: "物品动作"},
     {char: "力", hint: "力气的力", category: "物品动作"},
     {char: "干", hint: "干活的干", category: "物品动作"},
-    {char: "巴", hint: "尾巴的巴", category: "物品动作"},
     {char: "面", hint: "面包的面", category: "物品动作"},
     {char: "包", hint: "面包的包", category: "物品动作"},
-    {char: "丁", hint: "园丁的丁", category: "物品动作"},
     {char: "厂", hint: "工厂的厂", category: "物品动作"},
     {char: "见", hint: "看见的见", category: "物品动作"},
     {char: "把", hint: "一把伞的把", category: "物品动作"},
@@ -193,7 +197,7 @@ const HANZI_DATA = [
     {char: "不", hint: "不要的不", category: "常用字"},
     {char: "有", hint: "有没有的有", category: "常用字"},
     {char: "了", hint: "好了的了", category: "常用字"},
-    {char: "的", hint: "我的的", category: "常用字"},
+    {char: "的", hint: "我的书", category: "常用字"},
     {char: "比", hint: "比较的比", category: "常用字"},
     {char: "文", hint: "中文的文", category: "常用字"},
     {char: "连", hint: "连起来的连", category: "常用字"},
@@ -212,6 +216,7 @@ const HANZI_DATA = [
     {char: "谢", hint: "谢谢的谢", category: "常用字"},
     {char: "要", hint: "想要的要", category: "常用字"},
     {char: "红", hint: "红色的红", category: "常用字"},
+    {char: "白", hint: "白色的白", category: "常用字"},
     {char: "黑", hint: "黑色的黑", category: "常用字"},
     {char: "色", hint: "颜色的色", category: "常用字"},
     {char: "香", hint: "香味的香", category: "常用字"},
@@ -231,7 +236,7 @@ const HANZI_DATA = [
     {char: "先", hint: "先后的先", category: "常用字"},
     {char: "没", hint: "没有的没", category: "常用字"},
     {char: "认", hint: "认识的认", category: "常用字"},
-    {char: "识", hint: "认识的识", category: "常用字"},
+    {char: "识", hint: "识字的识", category: "常用字"},
 
     {char: "颜", hint: "颜色的颜", category: "常用字"},
     {char: "黄", hint: "黄色的黄", category: "常用字"},
@@ -266,17 +271,28 @@ const HANZI_DATA = [
     {char: "急", hint: "着急的急", category: "心情感受"},
     {char: "害", hint: "害怕的害", category: "心情感受"},
     {char: "怕", hint: "害怕的怕", category: "心情感受"},
-    {char: "惊", hint: "吃惊的惊", category: "心情感受"}
+    {char: "惊", hint: "吃惊的惊", category: "心情感受"},
+    {char: "哈", hint: "哈哈笑的哈", category: "心情感受"},
+
+    {char: "老", hint: "老师的老", category: "校园学习"},
+    {char: "师", hint: "老师的师", category: "校园学习"},
+    {char: "同", hint: "同学的同", category: "校园学习"},
+    {char: "学", hint: "学习的学", category: "校园学习"},
+    {char: "校", hint: "学校的校", category: "校园学习"},
+    {char: "桌", hint: "桌子的桌", category: "校园学习"},
+    {char: "椅", hint: "椅子的椅", category: "校园学习"},
+    {char: "教", hint: "教室的教", category: "校园学习"},
+    {char: "室", hint: "教室的室", category: "校园学习"}
 ];
 
 // 单独朗读时语音引擎容易读错（多音字）或读不自然（轻声字）的字。
 // 朗读这些字时改为先读提示里的词语（如“头发”），用词语语境带出正确读音。
-const POLYPHONE_CHARS = "只发干了的着呀吗么们乐兴几闷膀色尾什";
+const POLYPHONE_CHARS = "只发干了的着呀吗么们乐兴几闷膀色尾什哈教校片";
 
 // 采用当前字词提示中的常用读音。多音字按本练习中的用法标注。
 const PINYIN_MAP = {
     "一": "yī", "二": "èr", "三": "sān", "四": "sì", "五": "wǔ", "六": "liù", "几": "jǐ",
-    "半": "bàn", "多": "duō", "少": "shǎo", "只": "zhī", "分": "fēn", "元": "yuán", "上": "shàng",
+    "半": "bàn", "多": "duō", "少": "shǎo", "只": "zhī", "颗": "kē", "条": "tiáo", "片": "piàn", "分": "fēn", "元": "yuán", "上": "shàng",
     "下": "xià", "中": "zhōng", "里": "lǐ", "在": "zài", "出": "chū", "回": "huí", "去": "qù",
     "来": "lái", "高": "gāo", "平": "píng", "日": "rì", "月": "yuè", "天": "tiān", "云": "yún",
     "雨": "yǔ", "风": "fēng", "电": "diàn", "闪": "shǎn", "火": "huǒ", "水": "shuǐ", "气": "qì",
@@ -306,7 +322,8 @@ const PINYIN_MAP = {
     "脚": "jiǎo", "腿": "tuǐ", "体": "tǐ", "翅": "chì", "膀": "bǎng", "羽": "yǔ", "没": "méi", "认": "rèn", "识": "shí", "颜": "yán", "黄": "huáng", "蓝": "lán", "绿": "lǜ", "粉": "fěn", "青": "qīng", "紫": "zǐ", "彩": "cǎi", "食": "shí", "物": "wù", "尝": "cháng", "闻": "wén", "味": "wèi",
     "鲜": "xiān", "苦": "kǔ", "甜": "tián", "什": "shén", "么": "me", "狮": "shī", "起": "qǐ", "运": "yùn", "动": "dòng", "踢": "tī", "足": "zú",
     "赛": "sài", "快": "kuài", "慢": "màn", "跑": "pǎo", "步": "bù", "唱": "chàng", "歌": "gē", "跳": "tiào", "舞": "wǔ", "吹": "chuī", "号": "hào", "讲": "jiǎng", "故": "gù", "事": "shì",
-    "怎": "zěn", "帮": "bāng", "找": "zhǎo", "欢": "huān", "担": "dān", "闷": "mèn", "急": "jí", "害": "hài", "怕": "pà", "惊": "jīng"
+    "怎": "zěn", "帮": "bāng", "找": "zhǎo", "欢": "huān", "担": "dān", "闷": "mèn", "急": "jí", "害": "hài", "怕": "pà", "惊": "jīng",
+    "哈": "hā", "老": "lǎo", "师": "shī", "同": "tóng", "学": "xué", "校": "xiào", "桌": "zhuō", "椅": "yǐ", "教": "jiào", "室": "shì"
 };
 
 // 严格仅使用全部已学汉字（100%全字覆盖），供小朋友逐句、逐段朗读与认字练习。
@@ -315,7 +332,7 @@ const STORY_SENTENCES = [
     "丁丁早早起来了。他自己穿衣，自己吃面包，又吃了半块甜瓜。",
     "丁丁有一家：爸爸、妈妈、爷爷、奶奶、哥哥、姐姐和小弟弟。丁丁很爱他们。",
     "姐姐文文有长长的头发、黑黑的眉毛和亮亮的眼睛。她一笑，小脸红红的。",
-    "小弟弟是一家的小宝贝，太可爱了。他有圆圆的小肚子、小小的鼻子、小小的嘴巴，口里有两只小白牙。",
+    "小弟弟是一家的小宝贝，太可爱了。他有圆圆的小肚子、小小的鼻子、小小的嘴巴，口里有两颗小白牙。",
     "妈妈问：“今天我们去哪儿呀？”爸爸笑着讲：“去太阳岛公园！那里有花，有鱼，也有很多小动物。”",
     "爷爷买来三串紫果，一串三元五分。奶奶的包里有面包、香米和鲜果。",
     "我们一家坐上车，关好车门。爸爸开车，不快也不慢。妈妈抱着小弟弟，小弟弟一会儿笑，一会儿唱。",
@@ -327,10 +344,10 @@ const STORY_SENTENCES = [
     "竹林里的竹子高高的，竹叶绿绿的。竹林连着森林。风一吹，竹叶也跳起舞来。",
     "一只小鸟立在木头上。它有一身蓝羽毛，有两只小翅膀。它在木头上唱歌，我们心里很欢乐。",
     "竹叶上有一只小虫，正在慢慢走。小鸟看见了小虫，飞呀飞，飞上了高高的天空。",
-    "公园里有一块水面，水中有一小岛。小岛平平的，上面有花也有草。",
-    "水里有很多小鱼：红鱼、黄鱼、黑鱼、白鱼。小鱼在水里动来动去，比一比哪只快。那里鱼多，这里鱼少。",
-    "文文和丁丁看一看：一只、两只、三只、四只、五只、六只、七只、八只、九只、十只！水里有十只小鱼！",
-    "公园里也有一只黄狮子。它是狮子王，头上有长长的毛，身体很有力气。",
+    "公园里有一片水面，水中有小岛。小岛平平的，上面有花也有草。",
+    "水里有很多小鱼：红鱼、黄鱼、黑鱼、白鱼。小鱼在水里动来动去，比一比哪条快。那里鱼多，这里鱼少。",
+    "文文和丁丁看一看：一条、两条、三条、四条、五条、六条、七条、八条、九条、十条！水里有十条小鱼！",
+    "公园里也有一头黄狮子。它是狮子王，头上有长长的毛，身体很有力气。",
     "狮子王一开口，小弟弟害怕了，快快抱着妈妈的腿。妈妈笑着讲：“不怕不怕，狮子在门里，不会出来。”",
     "中午，我们坐在草上吃食物。奶奶打开包，里面有面包、紫果和香瓜。",
     "姐姐手里有一把小刀，把香瓜分两半。我们尝一尝，香瓜的味很甜，很鲜！",
@@ -352,7 +369,9 @@ const STORY_SENTENCES = [
     "画书里有王子。王子身穿白衣，手里有长弓，身上有白玉，坐在白马上，很有力气！",
     "文文问：“这是什么？”丁丁看一看：“这是‘王’，狮子王的王！我认识它！”",
     "天上的月亮出来了，月光明亮，星星一闪一闪。爷爷讲：“小心火，小心电，冰块不要多吃。”",
-    "一家坐在一起，奶奶讲起了故事：小白兔帮小弟弟找红球，你帮我，我帮你。今天太快乐了！明天我们去哪儿呀？"
+    "一家坐在一起，奶奶讲起了故事：小白兔帮小弟弟找红球，你帮我，我帮你。今天太快乐了！明天我们去哪儿呀？",
+    "这天早上，丁丁和文文上学了。学校里，我们在教室里看书、画画，也唱歌。我们坐在桌椅上，一起学，一起笑，心里很快乐。",
+    "教室里，同学们坐好了。老师讲：“同学们好！”我们哈哈笑，一起讲：“老师好！”"
 ];
 
 // 国家标准现代汉语常用字表（3500字），用于生成规范且难度适中的日常常用汉字干扰项
