@@ -1363,12 +1363,49 @@ function isPolyphone(char) {
     return typeof POLYPHONE_CHARS === "string" && POLYPHONE_CHARS.includes(char);
 }
 
-// 从“头发的发”这类提示中取出词语“头发”
+// 部分多音字在“XX的X”末尾会被语音引擎切分并读成另一读音（如“理发的发”末尾“的发”常读作 fā）。
+// 仅在构造 TTS 朗读文本时用单音同音字替换末尾单字，界面展示的 item.hint 保持原样。
+const SPEECH_HINT_TAIL_MAP = {
+    "发": "珐",
+    "干": "淦",
+    "兴": "杏",
+    "什": "神",
+    "都": "兜",
+    "只": "之",
+    "几": "己",
+    "闷": "焖",
+    "膀": "绑",
+    "教": "叫",
+    "校": "笑",
+    "片": "骗",
+    "担": "丹",
+    "长": "常",
+    "角": "脚",
+    "哪": "“哪”"
+};
+
+// 从“头发的发”这类提示中取出词语“头发”；若不是“……的X”格式（如“我的书”），则退回完整提示语境
 function getHintWord(item) {
     if (!item || !item.hint) return "";
     const suffix = `的${item.char}`;
-    const word = item.hint.endsWith(suffix) ? item.hint.slice(0, -suffix.length) : "";
-    return word.includes(item.char) ? word : "";
+    if (item.hint.endsWith(suffix)) {
+        const word = item.hint.slice(0, -suffix.length);
+        if (word.includes(item.char)) return word;
+    }
+    return item.hint.includes(item.char) ? item.hint : "";
+}
+
+function getSpeechHintText(item) {
+    if (!item || !item.hint) return "";
+    const suffix = `的${item.char}`;
+    if (item.hint.endsWith(suffix)) {
+        const mappedTail = SPEECH_HINT_TAIL_MAP[item.char];
+        if (mappedTail) {
+            return `${item.hint.slice(0, -item.char.length)}${mappedTail}`;
+        }
+        return item.hint;
+    }
+    return isPolyphone(item.char) ? `${item.hint}，我的${item.char}` : item.hint;
 }
 
 function findItem(char) {
@@ -1391,7 +1428,7 @@ function getItemSpeechText(item, mode = state.speechMode) {
     const lead = word || item.char;
     if (mode === "char") return lead;
     if (mode === "twice") return `${lead}。${lead}。`;
-    return `${lead}。${item.hint}。`;
+    return `${lead}。${getSpeechHintText(item)}。`;
 }
 
 function speakCurrent() {
