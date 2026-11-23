@@ -1359,8 +1359,8 @@ function speakText(text, {rate, onstart, onend, interrupt = true} = {}) {
     return utterance;
 }
 
-// 部分多音字在“XX的X”末尾会被语音引擎切分并读成另一读音（如“理发的发”末尾“的发”常读作 fā）。
-// 仅在构造 TTS 朗读文本时用单音同音字替换末尾单字，界面展示的 item.hint 保持原样。
+// 部分多音字单读或在“XX的X”末尾会被语音引擎切分并读成另一读音（如“理发的发”末尾“的发”常读作 fā）。
+// 仅在构造 TTS 朗读文本时用单音同音字替换，界面展示的汉字与 item.hint 保持原样。
 const SPEECH_HINT_TAIL_MAP = {
     "发": "珐",
     "干": "淦",
@@ -1380,7 +1380,14 @@ const SPEECH_HINT_TAIL_MAP = {
     "哪": "“哪”",
     "觉": "叫",
     "累": "泪",
-    "间": "尖"
+    "间": "尖",
+    "乐": "勒",
+    "空": "崆",
+    "中": "钟",
+    "分": "芬",
+    "号": "浩",
+    "和": "河",
+    "没": "煤"
 };
 
 function getSpeechHintText(item) {
@@ -1399,16 +1406,17 @@ function findItem(char) {
     return HANZI_DATA.find(item => item.char === char) || null;
 }
 
-// 单字发音
+// 单字发音：多音字用同音单音字保证 TTS 读出正确读音
 function getCharSpeechText(char) {
-    return char;
+    return SPEECH_HINT_TAIL_MAP[char] || char;
 }
 
 // 按“朗读方式”设置生成题目读音
 function getItemSpeechText(item, mode = state.speechMode) {
-    if (mode === "char") return item.char;
-    if (mode === "twice") return `${item.char}。${item.char}。`;
-    return `${item.char}。${getSpeechHintText(item)}。`;
+    const lead = getCharSpeechText(item.char);
+    if (mode === "char") return lead;
+    if (mode === "twice") return `${lead}。${lead}。`;
+    return `${lead}。${getSpeechHintText(item)}。`;
 }
 
 function speakCurrent() {
