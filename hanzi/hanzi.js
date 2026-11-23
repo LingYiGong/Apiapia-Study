@@ -1359,10 +1359,6 @@ function speakText(text, {rate, onstart, onend, interrupt = true} = {}) {
     return utterance;
 }
 
-function isPolyphone(char) {
-    return typeof POLYPHONE_CHARS === "string" && POLYPHONE_CHARS.includes(char);
-}
-
 // 部分多音字在“XX的X”末尾会被语音引擎切分并读成另一读音（如“理发的发”末尾“的发”常读作 fā）。
 // 仅在构造 TTS 朗读文本时用单音同音字替换末尾单字，界面展示的 item.hint 保持原样。
 const SPEECH_HINT_TAIL_MAP = {
@@ -1381,19 +1377,11 @@ const SPEECH_HINT_TAIL_MAP = {
     "担": "丹",
     "长": "常",
     "角": "脚",
-    "哪": "“哪”"
+    "哪": "“哪”",
+    "觉": "叫",
+    "累": "泪",
+    "间": "尖"
 };
-
-// 从“头发的发”这类提示中取出词语“头发”；若不是“……的X”格式（如“我的书”），则退回完整提示语境
-function getHintWord(item) {
-    if (!item || !item.hint) return "";
-    const suffix = `的${item.char}`;
-    if (item.hint.endsWith(suffix)) {
-        const word = item.hint.slice(0, -suffix.length);
-        if (word.includes(item.char)) return word;
-    }
-    return item.hint.includes(item.char) ? item.hint : "";
-}
 
 function getSpeechHintText(item) {
     if (!item || !item.hint) return "";
@@ -1403,32 +1391,24 @@ function getSpeechHintText(item) {
         if (mappedTail) {
             return `${item.hint.slice(0, -item.char.length)}${mappedTail}`;
         }
-        return item.hint;
     }
-    return isPolyphone(item.char) ? `${item.hint}，我的${item.char}` : item.hint;
+    return item.hint;
 }
 
 function findItem(char) {
     return HANZI_DATA.find(item => item.char === char) || null;
 }
 
-// 单字发音：多音字/轻声字改读词语，避免语音引擎读错
+// 单字发音
 function getCharSpeechText(char) {
-    const item = findItem(char);
-    if (item && isPolyphone(char)) {
-        const word = getHintWord(item);
-        if (word) return word;
-    }
     return char;
 }
 
 // 按“朗读方式”设置生成题目读音
 function getItemSpeechText(item, mode = state.speechMode) {
-    const word = isPolyphone(item.char) ? getHintWord(item) : "";
-    const lead = word || item.char;
-    if (mode === "char") return lead;
-    if (mode === "twice") return `${lead}。${lead}。`;
-    return `${lead}。${getSpeechHintText(item)}。`;
+    if (mode === "char") return item.char;
+    if (mode === "twice") return `${item.char}。${item.char}。`;
+    return `${item.char}。${getSpeechHintText(item)}。`;
 }
 
 function speakCurrent() {
