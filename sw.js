@@ -1,5 +1,5 @@
 // Apiapia 学习中心 - PWA Service Worker
-const CACHE_NAME = 'apiapia-pwa-v2.3.0-r2';
+const CACHE_NAME = 'apiapia-pwa-v2.3.1-r1';
 
 // 基础核心缓存资源（仅包含首屏与全站公共依赖，模块专属库按需缓存）
 // 注意：不要预缓存 './index.html'。Cloudflare 静态资源会把 /index.html 重定向到 /，

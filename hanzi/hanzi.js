@@ -1,13 +1,14 @@
 "use strict";
 
 const STORAGE_KEY = "hanziDictationStatsV1";
-const STROKE_PROGRESS_KEY = "hanziStrokeProgressV1";
-const STROKE_ORDER_KEY = "hanziStrokeOrderV1";
 const SPEECH_SETTINGS_KEY = "hanziSpeechSettingsV1";
 const SYNC_KEY_STORAGE = "hanziSyncKeyV1";
 const AUTO_SYNC_STORAGE = "hanziAutoSyncV1";
 const LAST_SYNC_TIME_KEY = "hanziLastSyncTimeV1";
 const STORY_PROGRESS_KEY = "hanziStoryProgressV2";
+const WRITE_MODE_KEY = "hanziDictationWriteModeV1";
+const OUTLINE_MODE_KEY = "hanziIpadOutlineV1";
+const RECENT_NEW_COUNT = 25;
 
 let debounceSyncTimer = null;
 
@@ -16,11 +17,18 @@ const state = {
     isWrongPractice: false,
     session: [],
     currentIndex: 0,
-    writings: [],
     answers: [],
-    recognitionSession: [],
-    recognitionIndex: 0,
-    recognitionAnswers: [],
+    dictationWriteMode: "ipad", // "ipad" | "paper"
+    ipadShowOutline: false,
+    ipadStrokeWriter: null,
+    ipadStrokeRenderToken: 0,
+    ipadCurrentStrokeNum: 0,
+    ipadCurrentMistakes: 0,
+    ipadClickedHint: false,
+    ipadGaveUp: false,
+    ipadQuizCompleted: false,
+    answerStrokeWriter: null,
+    answerStrokeRenderToken: 0,
     choiceSession: [],
     choiceIndex: 0,
     choiceAnswers: [],
@@ -28,36 +36,37 @@ const state = {
     choiceLocked: false,
     speechRate: 0.78,
     speechMode: "hint",
-    strokes: [],
-    activeStroke: null,
-    currentWriting: "",
-    answerStrokeWriter: null,
-    answerStrokeRenderToken: 0,
     currentStory: "",
     storyIndex: 0,
+    storyFilter: "all", // "all" | "wrong" | "new"
+    storyFilteredIndices: [],
+    storyFilteredPos: 0,
+    storyDetailChar: "",
     showStoryPinyin: false,
     storySpeakingCharIndex: -1,
     storyCharHighlightTimer: null,
     storyReadToken: 0,
     currentUtterance: null,
-    strokeSession: [],
-    strokeIndex: 0,
-    strokeWriter: null,
-    strokeRenderToken: 0,
-    strokeMode: "watch",
-    strokeStartToken: 0,
+    speechToken: 0,
+    speakDelayTimer: null,
+    speechWatchdogTimer: null,
+    sharedTTSAudio: null,
+    audioUnlocked: false,
+    ttsUnlocked: false,
+    wallFilter: "all", // "all" | "new" | "wrong" | "learning" | "mastered"
+    wallSelectedChar: "",
     reviewLocked: false,
     reviewUnlockTimer: null,
-    questionUnlockTimer: null,
-    recognitionLocked: false,
-    recognitionUnlockTimer: null
+    questionUnlockTimer: null
 };
 
 const els = {
     setupScreen: document.getElementById("setupScreen"),
     dictationScreen: document.getElementById("dictationScreen"),
-    recognitionScreen: document.getElementById("recognitionScreen"),
+    choiceScreen: document.getElementById("choiceScreen"),
+    storyScreen: document.getElementById("storyScreen"),
     summaryScreen: document.getElementById("summaryScreen"),
+
     categorySelect: document.getElementById("categorySelect"),
     countSelect: document.getElementById("countSelect"),
     speechMode: document.getElementById("speechMode"),
@@ -87,10 +96,8 @@ const els = {
     dueCount: document.getElementById("dueCount"),
     masteredCount: document.getElementById("masteredCount"),
     startBtn: document.getElementById("startBtn"),
-    recognitionStartBtn: document.getElementById("recognitionStartBtn"),
     choiceStartBtn: document.getElementById("choiceStartBtn"),
     storyStartBtn: document.getElementById("storyStartBtn"),
-    strokeStartBtn: document.getElementById("strokeStartBtn"),
     resetDataBtn: document.getElementById("resetDataBtn"),
     totalPracticed: document.getElementById("totalPracticed"),
     wrongCount: document.getElementById("wrongCount"),
@@ -101,47 +108,52 @@ const els = {
     wrongTabCountBadge: document.getElementById("wrongTabCountBadge"),
     clearWrongBookBtn: document.getElementById("clearWrongBookBtn"),
 
+    // 听写与笔顺界面
     currentNumber: document.getElementById("currentNumber"),
     totalNumber: document.getElementById("totalNumber"),
     dictationStageLabel: document.getElementById("dictationStageLabel"),
     progressBar: document.getElementById("progressBar"),
+    dictationLevelBadge: document.getElementById("dictationLevelBadge"),
+    quitBtn: document.getElementById("quitBtn"),
+    dictationModeIpadBtn: document.getElementById("dictationModeIpadBtn"),
+    dictationModePaperBtn: document.getElementById("dictationModePaperBtn"),
     questionPinyin: document.getElementById("questionPinyin"),
+    questionMaskedHint: document.getElementById("questionMaskedHint"),
     speakBtn: document.getElementById("speakBtn"),
-    writingArea: document.getElementById("writingArea"),
-    writingBoard: document.getElementById("writingBoard"),
-    writingCanvas: document.getElementById("writingCanvas"),
-    undoStrokeBtn: document.getElementById("undoStrokeBtn"),
-    clearWritingBtn: document.getElementById("clearWritingBtn"),
+
+    // iPad 笔画手写模式
+    ipadWritingPanel: document.getElementById("ipadWritingPanel"),
+    ipadOutlineHideBtn: document.getElementById("ipadOutlineHideBtn"),
+    ipadOutlineShowBtn: document.getElementById("ipadOutlineShowBtn"),
+    ipadHintStrokeBtn: document.getElementById("ipadHintStrokeBtn"),
+    ipadResetStrokeBtn: document.getElementById("ipadResetStrokeBtn"),
+    dictationStrokeGrid: document.getElementById("dictationStrokeGrid"),
+    dictationStrokeWriter: document.getElementById("dictationStrokeWriter"),
+    dictationStrokeStatus: document.getElementById("dictationStrokeStatus"),
+    dictationStrokeFeedback: document.getElementById("dictationStrokeFeedback"),
+    ipadPreCompleteBar: document.getElementById("ipadPreCompleteBar"),
+    ipadGiveUpBtn: document.getElementById("ipadGiveUpBtn"),
+    ipadAssistActionBar: document.getElementById("ipadAssistActionBar"),
+    ipadRetryQuizBtn: document.getElementById("ipadRetryQuizBtn"),
+    ipadAssistWrongNextBtn: document.getElementById("ipadAssistWrongNextBtn"),
+    ipadCompleteBar: document.getElementById("ipadCompleteBar"),
+    ipadCompleteInfo: document.getElementById("ipadCompleteInfo"),
+    ipadMarkWrongBtn: document.getElementById("ipadMarkWrongBtn"),
+    ipadNextBtn: document.getElementById("ipadNextBtn"),
+
+    // 纸上写 · 看答案模式
+    paperWritingPanel: document.getElementById("paperWritingPanel"),
+    paperPromptBox: document.getElementById("paperPromptBox"),
     showAnswerBtn: document.getElementById("showAnswerBtn"),
     answerPanel: document.getElementById("answerPanel"),
     answerHint: document.getElementById("answerHint"),
-    currentWritingPreview: document.getElementById("currentWritingPreview"),
     answerStrokeWriter: document.getElementById("answerStrokeWriter"),
     answerStrokeStatus: document.getElementById("answerStrokeStatus"),
     replayAnswerStrokeBtn: document.getElementById("replayAnswerStrokeBtn"),
     correctBtn: document.getElementById("correctBtn"),
     wrongBtn: document.getElementById("wrongBtn"),
-    quitBtn: document.getElementById("quitBtn"),
-    dictationLevelBadge: document.getElementById("dictationLevelBadge"),
-    dictationEbPredictText: document.getElementById("dictationEbPredictText"),
 
-    recognitionCurrentNumber: document.getElementById("recognitionCurrentNumber"),
-    recognitionTotalNumber: document.getElementById("recognitionTotalNumber"),
-    recognitionProgressBar: document.getElementById("recognitionProgressBar"),
-    recognitionCharBtn: document.getElementById("recognitionCharBtn"),
-    recognitionChar: document.getElementById("recognitionChar"),
-    recognitionTapTip: document.getElementById("recognitionTapTip"),
-    recognitionReveal: document.getElementById("recognitionReveal"),
-    recognitionPinyin: document.getElementById("recognitionPinyin"),
-    recognitionHint: document.getElementById("recognitionHint"),
-    recognitionReplayBtn: document.getElementById("recognitionReplayBtn"),
-    recognitionWrongBtn: document.getElementById("recognitionWrongBtn"),
-    recognitionCorrectBtn: document.getElementById("recognitionCorrectBtn"),
-    quitRecognitionBtn: document.getElementById("quitRecognitionBtn"),
-    recognitionLevelBadge: document.getElementById("recognitionLevelBadge"),
-    recognitionEbPredictText: document.getElementById("recognitionEbPredictText"),
-
-    choiceScreen: document.getElementById("choiceScreen"),
+    // 听音选字
     choiceCurrentNumber: document.getElementById("choiceCurrentNumber"),
     choiceTotalNumber: document.getElementById("choiceTotalNumber"),
     choiceProgressBar: document.getElementById("choiceProgressBar"),
@@ -151,33 +163,46 @@ const els = {
     choiceLevelBadge: document.getElementById("choiceLevelBadge"),
     quitChoiceBtn: document.getElementById("quitChoiceBtn"),
 
-    storyScreen: document.getElementById("storyScreen"),
+    // 故事阅读巩固
     storyCurrentNumber: document.getElementById("storyCurrentNumber"),
     storyTotalNumber: document.getElementById("storyTotalNumber"),
+    storyFilterBadge: document.getElementById("storyFilterBadge"),
+    storyFilterAllBtn: document.getElementById("storyFilterAllBtn"),
+    storyFilterWrongBtn: document.getElementById("storyFilterWrongBtn"),
+    storyFilterNewBtn: document.getElementById("storyFilterNewBtn"),
+    storyJumpSelect: document.getElementById("storyJumpSelect"),
     storyText: document.getElementById("storyText"),
-    storyPinyin: document.getElementById("storyPinyin"),
+    storyDetailPlaceholder: document.getElementById("storyDetailPlaceholder"),
+    storyDetailContent: document.getElementById("storyDetailContent"),
+    storyDetailChar: document.getElementById("storyDetailChar"),
+    storyDetailPinyin: document.getElementById("storyDetailPinyin"),
+    storyDetailHint: document.getElementById("storyDetailHint"),
+    storyDetailSpeakBtn: document.getElementById("storyDetailSpeakBtn"),
+    storyDetailWrongToggleBtn: document.getElementById("storyDetailWrongToggleBtn"),
     storyPinyinBtn: document.getElementById("storyPinyinBtn"),
     storySpeakBtn: document.getElementById("storySpeakBtn"),
     storyPrevBtn: document.getElementById("storyPrevBtn"),
     storyNextBtn: document.getElementById("storyNextBtn"),
     quitStoryBtn: document.getElementById("quitStoryBtn"),
 
-    strokeScreen: document.getElementById("strokeScreen"),
-    strokeCurrentNumber: document.getElementById("strokeCurrentNumber"),
-    strokeTotalNumber: document.getElementById("strokeTotalNumber"),
-    strokeProgressBar: document.getElementById("strokeProgressBar"),
-    strokePinyin: document.getElementById("strokePinyin"),
-    strokeHint: document.getElementById("strokeHint"),
-    strokeGrid: document.getElementById("strokeGrid"),
-    strokeWriter: document.getElementById("strokeWriter"),
-    strokeStatus: document.getElementById("strokeStatus"),
-    strokeWatchBtn: document.getElementById("strokeWatchBtn"),
-    strokeQuizBtn: document.getElementById("strokeQuizBtn"),
-    strokeFeedback: document.getElementById("strokeFeedback"),
-    previousStrokeBtn: document.getElementById("previousStrokeBtn"),
-    nextStrokeBtn: document.getElementById("nextStrokeBtn"),
-    quitStrokeBtn: document.getElementById("quitStrokeBtn"),
+    // 已学汉字累计墙
+    wallTotalCount: document.getElementById("wallTotalCount"),
+    wallFilterAll: document.getElementById("wallFilterAll"),
+    wallFilterNew: document.getElementById("wallFilterNew"),
+    wallFilterWrong: document.getElementById("wallFilterWrong"),
+    wallFilterLearning: document.getElementById("wallFilterLearning"),
+    wallFilterMastered: document.getElementById("wallFilterMastered"),
+    wallCharInspector: document.getElementById("wallCharInspector"),
+    wallInspectorChar: document.getElementById("wallInspectorChar"),
+    wallInspectorPinyin: document.getElementById("wallInspectorPinyin"),
+    wallInspectorHint: document.getElementById("wallInspectorHint"),
+    wallInspectorMeta: document.getElementById("wallInspectorMeta"),
+    wallInspectorSpeakBtn: document.getElementById("wallInspectorSpeakBtn"),
+    wallInspectorWrongBtn: document.getElementById("wallInspectorWrongBtn"),
+    wallInspectorCloseBtn: document.getElementById("wallInspectorCloseBtn"),
+    hanziWallGrid: document.getElementById("hanziWallGrid"),
 
+    // 结算页面
     scoreRing: document.getElementById("scoreRing"),
     scoreText: document.getElementById("scoreText"),
     summaryMessage: document.getElementById("summaryMessage"),
@@ -188,6 +213,23 @@ const els = {
 };
 
 const DAY = 24 * 60 * 60 * 1000;
+
+function getHanziIndexMap() {
+    const map = new Map();
+    if (typeof HANZI_DATA !== "undefined" && Array.isArray(HANZI_DATA)) {
+        HANZI_DATA.forEach((item, idx) => map.set(item.char, idx));
+    }
+    return map;
+}
+
+const HANZI_INDEX_MAP = getHanziIndexMap();
+
+function isRecentAddition(char) {
+    if (typeof HANZI_DATA === "undefined" || !Array.isArray(HANZI_DATA)) return false;
+    const idx = HANZI_INDEX_MAP.get(char);
+    if (idx === undefined) return false;
+    return idx >= Math.max(0, HANZI_DATA.length - RECENT_NEW_COUNT);
+}
 
 function calculateNextReview(level) {
     let daysToAdd = 0;
@@ -219,18 +261,8 @@ function isDueForReview(charStats) {
     return (Number(charStats.nextReviewDate) || 0) <= Date.now();
 }
 
-// 生成“答对/答错后会怎样”的提示文字
-function getReviewPredictText(charStats, correctVerb, wrongVerb) {
-    const level = Number(charStats.level) || 0;
-    const correctPart = isDueForReview(charStats)
-        ? `✅ ${correctVerb}升至 Lv.${level + 1}（${getNextReviewDays(level + 1)}复习）`
-        : `✅ ${correctVerb}保持 Lv.${level}（还没到复习时间，算加练）`;
-    return `${correctPart} · ❌ ${wrongVerb}重置为 Lv.0 并本轮追加重练`;
-}
-
 function formatDateDisplay(ts) {
-    if (!ts) return "今日待复习";
-    if (ts <= Date.now()) return "今日待复习";
+    if (!ts || ts <= Date.now()) return "今日待复习";
     const d = new Date(Number(ts));
     const diffDays = Math.ceil((ts - Date.now()) / DAY);
     return `${diffDays}天后 (${d.getMonth() + 1}/${d.getDate()})`;
@@ -243,16 +275,17 @@ function updateLevelBadge(badgeEl, char) {
     const level = cs.level || 0;
     const isMastered = level >= 3;
     const isDue = (cs.nextReviewDate || 0) <= Date.now();
+    const isBrandNew = (cs.practiced || 0) === 0;
 
-    badgeEl.textContent = `Lv.${level}${isMastered ? " 🌟" : ""}`;
+    badgeEl.textContent = isBrandNew ? `新字 · Lv.${level}` : `Lv.${level}${isMastered ? " 🌟" : ""}`;
     badgeEl.className = `level-badge ${isMastered ? "level-mastered" : (isDue ? "level-due" : "")}`;
-    badgeEl.title = `艾宾浩斯等级 Lv.${level}${isMastered ? " (已掌握)" : ""}，下次复习: ${formatDateDisplay(cs.nextReviewDate)}`;
+    badgeEl.title = `记忆等级 Lv.${level}${isMastered ? " (已掌握)" : ""}，下次复习: ${formatDateDisplay(cs.nextReviewDate)}`;
 }
 
 function getDefaultStats() {
     const characters = {};
     const now = Date.now();
-    // 所有汉字均已学习过，初始全部设为 Lv.1 且进入今日待复习队列
+    // 线下已学字库，初始全部设为 Lv.1 且进入今日待复习队列，新加入字 practiced=0
     if (typeof HANZI_DATA !== "undefined" && Array.isArray(HANZI_DATA)) {
         HANZI_DATA.forEach(item => {
             characters[item.char] = {
@@ -288,7 +321,7 @@ function ensureAllCharactersLearned(stats, persist = true) {
                     wrong: 0,
                     streak: 0,
                     lastPracticed: null,
-                    level: 1, // 已学习过，初始从 Lv.1 开始
+                    level: 1,
                     nextReviewDate: now
                 };
                 changed = true;
@@ -391,6 +424,26 @@ function saveSpeechSettings() {
     }
 }
 
+function loadDictationPreferences() {
+    try {
+        const savedMode = localStorage.getItem(WRITE_MODE_KEY);
+        if (savedMode === "ipad" || savedMode === "paper") {
+            state.dictationWriteMode = savedMode;
+        }
+        const savedOutline = localStorage.getItem(OUTLINE_MODE_KEY);
+        if (savedOutline === "true" || savedOutline === "false") {
+            state.ipadShowOutline = savedOutline === "true";
+        }
+    } catch (_) {}
+}
+
+function saveDictationPreferences() {
+    try {
+        localStorage.setItem(WRITE_MODE_KEY, state.dictationWriteMode);
+        localStorage.setItem(OUTLINE_MODE_KEY, String(state.ipadShowOutline));
+    } catch (_) {}
+}
+
 function openSettingsModal() {
     if (!els.settingsModal) return;
     els.settingsModal.classList.remove("hidden");
@@ -405,7 +458,7 @@ function closeSettingsModal() {
     if (els.openSettingsBtn) {
         els.openSettingsBtn.setAttribute("aria-expanded", "false");
     }
-    window.speechSynthesis?.cancel?.();
+    stopAllSpeech();
 }
 
 function openSyncModal() {
@@ -511,18 +564,12 @@ async function pushToCloud(silent = false) {
 
     setSyncStatus("syncing", "正在推送...");
     try {
-        let strokeProg = "";
-        try {
-            strokeProg = localStorage.getItem(STROKE_PROGRESS_KEY) || "";
-        } catch (_) {}
-
         let speechSettings = {};
         try {
             const raw = localStorage.getItem(SPEECH_SETTINGS_KEY);
             if (raw) speechSettings = JSON.parse(raw);
         } catch (_) {}
 
-        // 推送前先与云端合并，避免另一台设备上较新的进度被旧数据覆盖
         let stats = loadStats();
         try {
             const cloudRes = await fetch("/api/hanzi/sync", {headers: {"X-Sync-Key": key}});
@@ -542,7 +589,7 @@ async function pushToCloud(silent = false) {
             headers: {"Content-Type": "application/json", "X-Sync-Key": key},
             body: JSON.stringify({
                 stats,
-                strokeProgress: strokeProg,
+                strokeProgress: "",
                 speechSettings: speechSettings,
                 syncKey: key
             })
@@ -598,8 +645,6 @@ function getRecordTime(record) {
     return Number(record.updatedAt) || Date.parse(record.lastPracticed || "") || 0;
 }
 
-// 按字合并本地与云端记录：每个字取最近一次更新的那份，避免多设备之间互相覆盖丢失进度。
-// resetAt 之前的记录视为已被“清空全部记录”删除。
 function mergeStats(local, cloud) {
     const resetAt = Math.max(Number(local.resetAt) || 0, Number(cloud.resetAt) || 0);
     const localChars = local.characters || {};
@@ -677,11 +722,7 @@ async function pullFromCloud(silent = false) {
             if (cloudData.stats && typeof cloudData.stats === "object") {
                 const merged = mergeStats(loadStats(), cloudData.stats);
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-                // 本地有比云端更新的记录时，把合并结果推回云端
                 if (!statsEqual(merged, cloudData.stats)) triggerAutoSync();
-            }
-            if (cloudData.strokeProgress) {
-                localStorage.setItem(STROKE_PROGRESS_KEY, cloudData.strokeProgress);
             }
             if (cloudData.speechSettings && typeof cloudData.speechSettings === "object") {
                 localStorage.setItem(SPEECH_SETTINGS_KEY, JSON.stringify(cloudData.speechSettings));
@@ -696,7 +737,7 @@ async function pullFromCloud(silent = false) {
 
             if (!silent) {
                 const total = cloudData.stats?.totalPracticed || 0;
-                const wrong = Object.values(cloudData.stats?.characters || {}).filter(c => c.wrong > 0).length;
+                const wrong = Object.values(cloudData.stats?.characters || {}).filter(c => c.inWrongBook || c.wrong > 0).length;
                 if (window.kidToast) {
                     window.kidToast(`☁️ 已拉取云端数据（练习 ${total} 次，错字本 ${wrong} 个）`, "success");
                 } else {
@@ -763,7 +804,7 @@ function alertSpeechNotSupported() {
 }
 
 function previewSpeech() {
-    if (!("speechSynthesis" in window)) {
+    if (!("speechSynthesis" in window) && typeof Audio === "undefined") {
         alertSpeechNotSupported();
         return;
     }
@@ -805,13 +846,11 @@ function updateStatsForAnswer(item, isCorrect) {
         stats.totalCorrect += 1;
         charStats.correct += 1;
         charStats.streak += 1;
-        // 只有到了复习时间再答对才升级；提前加练答对不改变排期，避免一天内连刷升到高等级后很久不复习
         if (isDueForReview(charStats)) {
             newLevel = oldLevel + 1;
             charStats.level = newLevel;
             charStats.nextReviewDate = calculateNextReview(newLevel);
         }
-        // 关键修复：如果在错字本专项练习中攻克，或连续答对 streak>=2 或升级至 Lv.2+，自动移出错字本！
         if (state.isWrongPractice || charStats.streak >= 2 || newLevel >= 2) {
             charStats.inWrongBook = false;
         }
@@ -820,13 +859,30 @@ function updateStatsForAnswer(item, isCorrect) {
         charStats.streak = 0;
         newLevel = 0;
         charStats.level = 0;
-        charStats.nextReviewDate = Date.now(); // 设为今日待复习
+        charStats.nextReviewDate = Date.now();
         charStats.inWrongBook = true;
     }
 
     stats.characters[item.char] = charStats;
     saveStats(stats);
     return { oldLevel, newLevel, nextReviewDate: charStats.nextReviewDate };
+}
+
+function setCharWrongBookState(char, inWrong) {
+    if (!char) return false;
+    const stats = loadStats();
+    const cs = getCharStats(stats, char);
+    cs.inWrongBook = Boolean(inWrong);
+    if (inWrong) {
+        cs.level = 0;
+        cs.streak = 0;
+        cs.nextReviewDate = Date.now();
+    }
+    cs.updatedAt = Date.now();
+    stats.characters[char] = cs;
+    saveStats(stats);
+    refreshHomeStats();
+    return cs.inWrongBook;
 }
 
 function getWrongCharacters(stats = loadStats()) {
@@ -845,19 +901,20 @@ function getWrongCharacters(stats = loadStats()) {
         .sort((a, b) => b.wrongScore - a.wrongScore);
 }
 
+function getNewAndWeakCharacters(stats = loadStats()) {
+    return HANZI_DATA.filter(item => {
+        const cs = getCharStats(stats, item.char);
+        return (cs.practiced || 0) === 0 || cs.inWrongBook || (cs.practiced || 0) < 2 || isRecentAddition(item.char);
+    });
+}
+
 function speakSingleCharacter(char) {
     if (!char) return;
     speakText(getCharSpeechText(char));
 }
 
 function removeFromWrongBook(char) {
-    const stats = loadStats();
-    const charStats = getCharStats(stats, char);
-    charStats.inWrongBook = false;
-    charStats.updatedAt = Date.now();
-    stats.characters[char] = charStats;
-    saveStats(stats);
-    refreshHomeStats();
+    setCharWrongBookState(char, false);
     if (window.kidToast) {
         window.kidToast(`已将“${char}”移出错字本 👍`, "success");
     }
@@ -936,38 +993,37 @@ function refreshHomeStats() {
     if (els.wrongCount) els.wrongCount.textContent = wrongChars.length;
     if (els.totalPracticed) els.totalPracticed.textContent = stats.totalPracticed;
 
-    const statDue = document.getElementById("statDue");
-    const statMastered = document.getElementById("statMastered");
-    const statWrong = document.getElementById("statWrong");
-    const statTotal = document.getElementById("statTotal");
-    if (statDue) statDue.textContent = dueChars.length;
-    if (statMastered) statMastered.textContent = masteredChars.length;
-    if (statWrong) statWrong.textContent = wrongChars.length;
-    if (statTotal) statTotal.textContent = stats.totalPracticed;
-
     const navDueBadge = document.getElementById("navDueBadge");
     const navWrongBadge = document.getElementById("navWrongBadge");
     if (navDueBadge) {
-        navDueBadge.textContent = dueChars.length > 99 ? '99+' : dueChars.length;
+        navDueBadge.textContent = dueChars.length > 99 ? "99+" : dueChars.length;
         navDueBadge.classList.toggle("hidden", dueChars.length === 0);
     }
     if (navWrongBadge) {
-        navWrongBadge.textContent = wrongChars.length > 99 ? '99+' : wrongChars.length;
+        navWrongBadge.textContent = wrongChars.length > 99 ? "99+" : wrongChars.length;
         navWrongBadge.classList.toggle("hidden", wrongChars.length === 0);
     }
 
-    // 艾宾浩斯复习横幅状态提示
     if (els.ebbinghausBanner) {
+        const unpracticedCount = HANZI_DATA.filter(item => (getCharStats(stats, item.char).practiced || 0) === 0).length;
         if (dueChars.length > 0) {
-            if (els.ebBannerTitle) els.ebBannerTitle.textContent = `⏰ 今日艾宾浩斯待复习：${dueChars.length} 个汉字`;
-            if (els.ebBannerDesc) els.ebBannerDesc.textContent = `遗忘曲线提醒：今日有 ${dueChars.length} 个汉字到达最佳复习点，及时复习可大幅提升长期记忆！`;
+            if (els.ebBannerTitle) {
+                els.ebBannerTitle.textContent = unpracticedCount > 0
+                    ? `🌱 有 ${unpracticedCount} 个新加字 + ${dueChars.length} 个待复习`
+                    : `⏰ 今日待复习：${dueChars.length} 个汉字`;
+            }
+            if (els.ebBannerDesc) {
+                els.ebBannerDesc.textContent = unpracticedCount > 0
+                    ? `优先出新加字与错字，再复习到期汉字，巩固效率最高！`
+                    : `每天练一练待复习的字和错字，记得越来越牢！`;
+            }
             if (els.quickDueBtn) {
                 els.quickDueBtn.classList.remove("hidden");
                 els.quickDueBtn.textContent = `⚡ 立即复习 (${dueChars.length})`;
             }
         } else {
-            if (els.ebBannerTitle) els.ebBannerTitle.textContent = `🎉 今日复习已全部完成！`;
-            if (els.ebBannerDesc) els.ebBannerDesc.textContent = `所有 ${HANZI_DATA.length} 个汉字均在艾宾浩斯记忆保护期内，保持良好记忆节奏！`;
+            if (els.ebBannerTitle) els.ebBannerTitle.textContent = `🎉 今日巩固已全部完成！`;
+            if (els.ebBannerDesc) els.ebBannerDesc.textContent = `全部 ${HANZI_DATA.length} 个已学汉字均已巩固到位，棒棒哒！`;
             if (els.quickDueBtn) {
                 els.quickDueBtn.classList.add("hidden");
             }
@@ -1027,33 +1083,34 @@ function refreshHomeStats() {
     }
 
     buildCategoryOptions();
+    renderHanziWall(stats);
 }
 
 function buildCategoryOptions() {
     const stats = loadStats();
     const dueChars = getDueCharacters(stats);
+    const newWeakChars = getNewAndWeakCharacters(stats);
     const wrongChars = getWrongCharacters(stats);
-    const categories = [...new Set(HANZI_DATA.map(item => item.category))];
 
     const prevValue = els.categorySelect ? els.categorySelect.value : "";
 
     const options = [
         {
             value: "due",
-            label: `🌟 今日待复习（${dueChars.length}个）${dueChars.length > 0 ? " [艾宾浩斯推荐]" : " [已完成]"}`
+            label: `⏰ 今日待复习（${dueChars.length}个）${dueChars.length > 0 ? " [新字优先]" : " [已完成]"}`
         },
         {
-            value: "all",
-            label: `🌐 全部汉字轮练（${HANZI_DATA.length}个）`
+            value: "new_weak",
+            label: `🌱 最新加入与薄弱字（${newWeakChars.length}个）[重点巩固]`
         },
         {
             value: "wrong",
             label: `📕 错字本专项（${wrongChars.length}个）`
         },
-        ...categories.map(category => ({
-            value: category,
-            label: `📂 ${category}（${HANZI_DATA.filter(item => item.category === category).length}个）`
-        }))
+        {
+            value: "all",
+            label: `🌐 全部已学汉字（${HANZI_DATA.length}个）`
+        }
     ];
 
     if (!els.categorySelect) return;
@@ -1069,6 +1126,8 @@ function buildCategoryOptions() {
         els.categorySelect.value = prevValue;
     } else if (dueChars.length > 0) {
         els.categorySelect.value = "due";
+    } else if (newWeakChars.length > 0) {
+        els.categorySelect.value = "new_weak";
     } else {
         els.categorySelect.value = "all";
     }
@@ -1096,10 +1155,13 @@ function createSession() {
         pool = getDueCharacters(stats);
         if (pool.length === 0) {
             if (window.kidToast) {
-                window.kidToast("🎉 今日艾宾浩斯待复习汉字已全部完成！已切换至全部汉字练习", "success");
-            } else {
-                alert("🎉 今日艾宾浩斯待复习汉字已全部完成！已为您切换至全部汉字练习。");
+                window.kidToast("🎉 今日待复习汉字已全部完成！已为您切换至全部已学汉字巩固", "success");
             }
+            pool = [...HANZI_DATA];
+        }
+    } else if (selectedCategory === "new_weak") {
+        pool = getNewAndWeakCharacters(stats);
+        if (pool.length === 0) {
             pool = [...HANZI_DATA];
         }
     } else if (selectedCategory === "wrong") {
@@ -1107,38 +1169,59 @@ function createSession() {
         if (pool.length === 0) {
             if (window.kidToast) {
                 window.kidToast("错字本还是空的，太棒了！已为您切换至今日待复习 👏", "success");
-            } else {
-                alert("错字本还是空的，太棒了！已为您切换至今日待复习。");
             }
             pool = getDueCharacters(stats);
             if (pool.length === 0) pool = [...HANZI_DATA];
         }
-    } else if (selectedCategory === "all") {
-        pool = HANZI_DATA;
     } else {
-        pool = HANZI_DATA.filter(item => item.category === selectedCategory);
+        pool = HANZI_DATA;
     }
 
     const count = Math.min(requestedCount, pool.length);
-
-    // 先挑到期的字（等级低、逾期久的优先），不足再补未到期的字；选出后打乱出题顺序
     return shuffle(prioritizeForReview(pool, stats).slice(0, count));
 }
 
+// 优先级：1. 从未练过的新字(越晚加入越靠前) 2. 错字本/Lv.0 3. 今日到期(低级优先) 4. 练习次数少的近期字
 function prioritizeForReview(items, stats) {
     const now = Date.now();
+    const getPriorityTier = (item, cs) => {
+        if ((cs.practiced || 0) === 0) return 0;
+        if (cs.inWrongBook || (cs.level || 0) === 0) return 1;
+        if ((cs.nextReviewDate || 0) <= now) return 2;
+        if (isRecentAddition(item.char) && (cs.practiced || 0) < 3) return 3;
+        return 4;
+    };
+
     return shuffle(items)
-        .map(item => ({item, cs: getCharStats(stats, item.char)}))
+        .map(item => ({
+            item,
+            cs: getCharStats(stats, item.char),
+            idx: HANZI_INDEX_MAP.get(item.char) ?? 0
+        }))
         .sort((a, b) => {
-            const aDue = (a.cs.nextReviewDate || 0) <= now;
-            const bDue = (b.cs.nextReviewDate || 0) <= now;
-            if (aDue !== bDue) return aDue ? -1 : 1;
-            if (!aDue) return 0;
+            const tierA = getPriorityTier(a.item, a.cs);
+            const tierB = getPriorityTier(b.item, b.cs);
+            if (tierA !== tierB) return tierA - tierB;
+
+            // 同样是新加入未练的字，后加入的优先出现
+            if (tierA === 0) return b.idx - a.idx;
+
             const levelDiff = (a.cs.level || 0) - (b.cs.level || 0);
             if (levelDiff !== 0) return levelDiff;
+
+            const practicedDiff = (a.cs.practiced || 0) - (b.cs.practiced || 0);
+            if (practicedDiff !== 0) return practicedDiff;
+
             return (a.cs.nextReviewDate || 0) - (b.cs.nextReviewDate || 0);
         })
         .map(entry => entry.item);
+}
+
+// 挖空词组提示：将 "天空的天" 变成 "天空的【 ？ 】"，避免泄露天机同时明确同音字词意
+function getMaskedHint(item) {
+    if (!item || !item.hint) return "";
+    if (!item.char || !item.hint.includes(item.char)) return item.hint;
+    return item.hint.split(item.char).join("【 ？ 】");
 }
 
 function startSession(customItems = null) {
@@ -1157,18 +1240,89 @@ function startSession(customItems = null) {
     }
     state.reviewLocked = false;
 
+    loadDictationPreferences();
     state.mode = "dictation";
     state.session = shuffle(items);
     state.currentIndex = 0;
-    state.writings = [];
     state.answers = [];
     state.speechRate = Number(els.speechRate.value);
     state.speechMode = els.speechMode.value;
 
+    updateDictationWriteModeUI();
+    updateIpadOutlineButtonsUI();
     showScreen("dictation");
     renderQuestion();
 
     setTimeout(() => speakCurrent(), 350);
+}
+
+function updateDictationWriteModeUI() {
+    const isIpad = state.dictationWriteMode === "ipad";
+    els.dictationModeIpadBtn?.classList.toggle("active", isIpad);
+    els.dictationModePaperBtn?.classList.toggle("active", !isIpad);
+    els.dictationModeIpadBtn?.setAttribute("aria-pressed", String(isIpad));
+    els.dictationModePaperBtn?.setAttribute("aria-pressed", String(!isIpad));
+}
+
+function updateIpadOutlineButtonsUI() {
+    const show = Boolean(state.ipadShowOutline);
+    els.ipadOutlineHideBtn?.classList.toggle("active", !show);
+    els.ipadOutlineShowBtn?.classList.toggle("active", show);
+    els.ipadOutlineHideBtn?.setAttribute("aria-pressed", String(!show));
+    els.ipadOutlineShowBtn?.setAttribute("aria-pressed", String(show));
+}
+
+function setDictationWriteMode(mode) {
+    if (mode !== "ipad" && mode !== "paper") return;
+    if (state.dictationWriteMode === mode) return;
+    state.dictationWriteMode = mode;
+    saveDictationPreferences();
+    updateDictationWriteModeUI();
+    renderQuestion();
+}
+
+function setIpadOutlineMode(showOutline) {
+    state.ipadShowOutline = Boolean(showOutline);
+    saveDictationPreferences();
+    updateIpadOutlineButtonsUI();
+
+    const writer = state.ipadStrokeWriter;
+    if (!writer) return;
+    if (state.ipadShowOutline) {
+        writer.showOutline?.();
+    } else {
+        writer.hideOutline?.();
+    }
+}
+
+function clearIpadStrokeWriter() {
+    state.ipadStrokeRenderToken += 1;
+    state.ipadStrokeWriter?.cancelQuiz?.();
+    state.ipadStrokeWriter?.pauseAnimation?.();
+    state.ipadStrokeWriter = null;
+    if (els.dictationStrokeWriter) els.dictationStrokeWriter.replaceChildren();
+    if (els.dictationStrokeStatus) {
+        els.dictationStrokeStatus.textContent = "正在准备田字格……";
+        els.dictationStrokeStatus.classList.remove("hidden");
+    }
+}
+
+function clearAnswerStroke() {
+    state.answerStrokeRenderToken += 1;
+    state.answerStrokeWriter?.pauseAnimation?.();
+    state.answerStrokeWriter = null;
+    if (els.answerStrokeWriter) els.answerStrokeWriter.replaceChildren();
+    if (els.replayAnswerStrokeBtn) els.replayAnswerStrokeBtn.disabled = true;
+    if (els.answerStrokeStatus) {
+        els.answerStrokeStatus.textContent = "正在准备笔画演示……";
+        els.answerStrokeStatus.classList.remove("hidden");
+    }
+}
+
+function setDictationStrokeFeedback(text, type = "") {
+    if (!els.dictationStrokeFeedback) return;
+    els.dictationStrokeFeedback.textContent = text;
+    els.dictationStrokeFeedback.className = `stroke-feedback ${type}`;
 }
 
 function renderQuestion() {
@@ -1181,127 +1335,350 @@ function renderQuestion() {
     }
     state.reviewLocked = false;
 
+    clearIpadStrokeWriter();
     clearAnswerStroke();
-    els.speakBtn.closest(".listen-area").classList.remove("hidden");
-    els.currentNumber.textContent = state.currentIndex + 1;
-    els.totalNumber.textContent = state.session.length;
-    els.dictationStageLabel.textContent = "听写";
-    els.progressBar.style.width =
-        `${((state.currentIndex + 1) / state.session.length) * 100}%`;
-    els.questionPinyin.textContent = PINYIN_MAP[item.char] || "";
+
+    els.speakBtn?.closest(".listen-area")?.classList.remove("hidden");
+    if (els.currentNumber) els.currentNumber.textContent = state.currentIndex + 1;
+    if (els.totalNumber) els.totalNumber.textContent = state.session.length;
+    if (els.dictationStageLabel) els.dictationStageLabel.textContent = "听写";
+    if (els.progressBar) {
+        els.progressBar.style.width = `${((state.currentIndex + 1) / state.session.length) * 100}%`;
+    }
+    if (els.questionPinyin) els.questionPinyin.textContent = PINYIN_MAP[item.char] || "";
+    if (els.questionMaskedHint) els.questionMaskedHint.textContent = getMaskedHint(item);
 
     updateLevelBadge(els.dictationLevelBadge, item.char);
 
-    els.answerPanel.classList.add("hidden");
-    els.showAnswerBtn.classList.remove("hidden");
-    els.showAnswerBtn.textContent = "✨ 写好了，核对本题";
-    // 防误触：新题目切出时短暂禁用核对按钮350ms，防止上一题连击误触
-    els.showAnswerBtn.disabled = true;
-    if (state.questionUnlockTimer) {
-        clearTimeout(state.questionUnlockTimer);
+    if (state.dictationWriteMode === "ipad") {
+        renderIpadWritingQuestion(item);
+    } else {
+        renderPaperWritingQuestion(item);
     }
-    state.questionUnlockTimer = setTimeout(() => {
-        els.showAnswerBtn.disabled = false;
-        state.questionUnlockTimer = null;
-    }, 350);
-
-    els.writingArea.classList.remove("hidden");
-    els.answerHint.textContent = "";
-    els.currentWritingPreview.removeAttribute("src");
-    els.currentWritingPreview.classList.add("hidden");
-    resetWriting();
 }
 
-function resizeWritingCanvas() {
-    const rect = els.writingBoard.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
+function renderIpadWritingQuestion(item) {
+    els.ipadWritingPanel?.classList.remove("hidden");
+    els.paperWritingPanel?.classList.add("hidden");
 
-    const ratio = Math.min(window.devicePixelRatio || 1, 3);
-    els.writingCanvas.width = Math.round(rect.width * ratio);
-    els.writingCanvas.height = Math.round(rect.height * ratio);
-    const context = els.writingCanvas.getContext("2d");
-    context.setTransform(ratio, 0, 0, ratio, 0, 0);
-    redrawWriting();
+    els.ipadPreCompleteBar?.classList.remove("hidden");
+    els.ipadAssistActionBar?.classList.add("hidden");
+    els.ipadCompleteBar?.classList.add("hidden");
+
+    state.ipadCurrentStrokeNum = 0;
+    state.ipadCurrentMistakes = 0;
+    state.ipadClickedHint = false;
+    state.ipadGaveUp = false;
+    state.ipadQuizCompleted = false;
+
+    updateIpadOutlineButtonsUI();
+    startDictationIpadQuiz(item);
 }
 
-function redrawWriting() {
-    const context = els.writingCanvas.getContext("2d");
-    const rect = els.writingCanvas.getBoundingClientRect();
-    context.clearRect(0, 0, rect.width, rect.height);
+function startDictationIpadQuiz(item) {
+    clearIpadStrokeWriter();
+    state.ipadCurrentStrokeNum = 0;
+    state.ipadCurrentMistakes = 0;
+    state.ipadQuizCompleted = false;
+    state.ipadGaveUp = false;
+
+    els.ipadPreCompleteBar?.classList.remove("hidden");
+    els.ipadAssistActionBar?.classList.add("hidden");
+    els.ipadCompleteBar?.classList.add("hidden");
+
+    setDictationStrokeFeedback(
+        state.ipadShowOutline
+            ? "✏️ 描红模式：跟着灰色字底，一笔一划写出来"
+            : "🔒 默写模式：听读音，在空白田字格里写出这个字"
+    );
+
+    if (typeof HanziWriter === "undefined") {
+        if (els.dictationStrokeStatus) {
+            els.dictationStrokeStatus.textContent = "笔画组件加载失败，请切换为“纸上写”模式或刷新页面。";
+        }
+        return;
+    }
+
+    const renderToken = ++state.ipadStrokeRenderToken;
+    const gridRect = els.dictationStrokeGrid?.getBoundingClientRect();
+    const size = Math.max(220, Math.round(gridRect?.width || 300));
     const isDark = document.documentElement.classList.contains("dark");
-    context.strokeStyle = isDark ? "#f8fafc" : "#1e293b";
-    context.lineCap = "round";
-    context.lineJoin = "round";
 
-    state.strokes.forEach(stroke => {
-        if (stroke.length === 0) return;
-        context.beginPath();
-        context.moveTo(stroke[0].x, stroke[0].y);
-        stroke.slice(1).forEach(point => context.lineTo(point.x, point.y));
-        if (stroke.length === 1) context.lineTo(stroke[0].x + 0.1, stroke[0].y + 0.1);
-        context.lineWidth = stroke[0].width;
-        context.stroke();
+    state.ipadStrokeWriter = HanziWriter.create(els.dictationStrokeWriter, item.char, {
+        width: size,
+        height: size,
+        padding: Math.round(size * 0.09),
+        showOutline: state.ipadShowOutline,
+        showCharacter: false,
+        strokeColor: isDark ? "#60a5fa" : "#20242c",
+        outlineColor: isDark ? "#475569" : "#d7dbe3",
+        drawingColor: isDark ? "#f8fafc" : "#1e293b",
+        drawingWidth: Math.max(14, Math.round(size / 18)),
+        highlightColor: "#f59e0b",
+        strokeAnimationSpeed: 0.7,
+        delayBetweenStrokes: 550,
+        delayBetweenLoops: 1800,
+        onLoadCharDataSuccess: () => {
+            if (renderToken !== state.ipadStrokeRenderToken) return;
+            els.dictationStrokeStatus?.classList.add("hidden");
+            beginHanziQuizSession(item, renderToken);
+        },
+        onLoadCharDataError: () => {
+            if (renderToken !== state.ipadStrokeRenderToken) return;
+            if (els.dictationStrokeStatus) {
+                els.dictationStrokeStatus.textContent = `暂时无法加载“${item.char}”的笔画数据，可切换上方“纸上写”模式继续。`;
+            }
+        }
     });
 }
 
-function getWritingPoint(event) {
-    const rect = els.writingCanvas.getBoundingClientRect();
-    const pressure = event.pressure > 0 ? event.pressure : 0.5;
-    return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-        width: 6 + pressure * 6
-    };
+function beginHanziQuizSession(item, renderToken) {
+    const writer = state.ipadStrokeWriter;
+    if (!writer) return;
+    writer.quiz({
+        leniency: 1.35,
+        showHintAfterMisses: 2,
+        highlightOnComplete: true,
+        onCorrectStroke: data => {
+            if (renderToken !== state.ipadStrokeRenderToken) return;
+            state.ipadCurrentStrokeNum = data.strokeNum + 1;
+            const strokeTotal = data.strokeNum + 1 + data.strokesRemaining;
+            setDictationStrokeFeedback(`✅ 第 ${data.strokeNum + 1} / ${strokeTotal} 笔写对啦 👍`, "good");
+        },
+        onMistake: data => {
+            if (renderToken !== state.ipadStrokeRenderToken) return;
+            state.ipadCurrentMistakes += 1;
+            const tip = data.mistakesOnStroke >= 2
+                ? "💡 看看闪烁的提示笔画，照着写～"
+                : "笔顺或位置不对哦，再试一次～";
+            setDictationStrokeFeedback(tip, "oops");
+        },
+        onComplete: data => {
+            if (renderToken !== state.ipadStrokeRenderToken) return;
+            state.ipadQuizCompleted = true;
+            state.ipadCurrentMistakes = data.totalMistakes;
+
+            const stats = loadStats();
+            const cs = getCharStats(stats, item.char);
+            const pinyin = PINYIN_MAP[item.char] || "";
+
+            els.ipadPreCompleteBar?.classList.add("hidden");
+            els.ipadAssistActionBar?.classList.add("hidden");
+            els.ipadCompleteBar?.classList.remove("hidden");
+
+            if (els.ipadCompleteInfo) {
+                const mistakeCount = data.totalMistakes || 0;
+                let note = "";
+                if (!state.ipadShowOutline && !state.ipadClickedHint && mistakeCount === 0) {
+                    note = `🌟 盲写全对，一笔都没错！`;
+                } else if (mistakeCount <= 2) {
+                    note = `👍 写完啦！${mistakeCount > 0 ? `（小提示 ${mistakeCount} 次）` : ""}`;
+                } else {
+                    note = `💪 终于写出来啦（错了 ${mistakeCount} 次，建议点“记错重练”巩固）`;
+                }
+                els.ipadCompleteInfo.textContent = `${item.char} [${pinyin}] · ${item.hint} — ${note}`;
+            }
+
+            setDictationStrokeFeedback(`🎉 “${item.char}”写好啦！`, "done");
+            playSuccessSound();
+            lockVerdictButtons(450);
+
+            setTimeout(() => {
+                if (renderToken === state.ipadStrokeRenderToken && !els.dictationScreen.classList.contains("hidden")) {
+                    speakText(getCharSpeechText(item.char), {rate: state.speechRate});
+                }
+            }, 350);
+        }
+    });
 }
 
-function beginStroke(event) {
-    if (!els.answerPanel.classList.contains("hidden")) return;
-    event.preventDefault();
-    els.writingCanvas.setPointerCapture(event.pointerId);
-    state.activeStroke = [getWritingPoint(event)];
-    state.strokes.push(state.activeStroke);
-    redrawWriting();
+function hintIpadStroke() {
+    const writer = state.ipadStrokeWriter;
+    if (!writer || state.ipadQuizCompleted || state.ipadGaveUp) return;
+    state.ipadClickedHint = true;
+    writer.highlightStroke?.(state.ipadCurrentStrokeNum);
+    setDictationStrokeFeedback("💡 看看田字格里闪烁的这一笔，照着写～", "oops");
 }
 
-function continueStroke(event) {
-    if (!state.activeStroke) return;
-    event.preventDefault();
-    const events = event.getCoalescedEvents?.() || [event];
-    events.forEach(pointEvent => state.activeStroke.push(getWritingPoint(pointEvent)));
-    redrawWriting();
+function giveUpAndShowStroke() {
+    const writer = state.ipadStrokeWriter;
+    const item = state.session[state.currentIndex];
+    if (!item) return;
+
+    state.ipadGaveUp = true;
+    state.ipadClickedHint = true;
+
+    els.ipadPreCompleteBar?.classList.add("hidden");
+    els.ipadCompleteBar?.classList.add("hidden");
+    els.ipadAssistActionBar?.classList.remove("hidden");
+
+    if (writer) {
+        writer.cancelQuiz?.();
+        writer.showOutline?.();
+        writer.loopCharacterAnimation?.();
+    }
+    setDictationStrokeFeedback(`👀 仔细看“${item.char}”的正确笔顺，看完可以自己重写一遍`, "oops");
+    speakCurrent();
 }
 
-function endStroke(event) {
-    if (!state.activeStroke) return;
-    event.preventDefault();
-    state.activeStroke = null;
+function retryIpadQuiz() {
+    const item = state.session[state.currentIndex];
+    if (!item) return;
+    startDictationIpadQuiz(item);
 }
 
-function resetWriting() {
-    state.strokes = [];
-    state.activeStroke = null;
-    state.currentWriting = "";
-    requestAnimationFrame(resizeWritingCanvas);
+function renderPaperWritingQuestion(item) {
+    els.ipadWritingPanel?.classList.add("hidden");
+    els.paperWritingPanel?.classList.remove("hidden");
+
+    els.paperPromptBox?.classList.remove("hidden");
+    els.answerPanel?.classList.add("hidden");
+    if (els.showAnswerBtn) {
+        els.showAnswerBtn.disabled = true;
+        if (state.questionUnlockTimer) {
+            clearTimeout(state.questionUnlockTimer);
+        }
+        state.questionUnlockTimer = setTimeout(() => {
+            if (els.showAnswerBtn) els.showAnswerBtn.disabled = false;
+            state.questionUnlockTimer = null;
+        }, 350);
+    }
+    if (els.answerHint) els.answerHint.textContent = "";
 }
 
-function undoStroke() {
-    if (!els.answerPanel.classList.contains("hidden")) return;
-    state.strokes.pop();
-    redrawWriting();
+function submitPaperWriting() {
+    if (els.showAnswerBtn?.disabled) return;
+    if (els.showAnswerBtn) els.showAnswerBtn.disabled = true;
+    renderReview();
 }
 
-function captureWriting() {
-    state.currentWriting = state.strokes.length > 0
-        ? els.writingCanvas.toDataURL("image/png")
-        : "";
-    return state.currentWriting;
+function renderAnswerStroke(char) {
+    clearAnswerStroke();
+
+    if (typeof HanziWriter === "undefined") {
+        if (els.answerStrokeStatus) {
+            els.answerStrokeStatus.textContent = "笔画组件加载失败，请检查网络后刷新页面。";
+        }
+        return;
+    }
+
+    const renderToken = ++state.answerStrokeRenderToken;
+    const rect = els.answerStrokeWriter?.getBoundingClientRect();
+    const size = Math.max(180, Math.round(rect?.width || 210));
+
+    const isDark = document.documentElement.classList.contains("dark");
+    state.answerStrokeWriter = HanziWriter.create(els.answerStrokeWriter, char, {
+        width: size,
+        height: size,
+        padding: Math.round(size * 0.08),
+        showOutline: true,
+        showCharacter: false,
+        strokeColor: isDark ? "#60a5fa" : "#1e293b",
+        outlineColor: isDark ? "#475569" : "#d7dbe3",
+        strokeAnimationSpeed: 0.75,
+        delayBetweenStrokes: 420,
+        delayBetweenLoops: 1800,
+        onLoadCharDataSuccess: () => {
+            if (renderToken !== state.answerStrokeRenderToken) return;
+            els.answerStrokeStatus?.classList.add("hidden");
+            if (els.replayAnswerStrokeBtn) els.replayAnswerStrokeBtn.disabled = false;
+            state.answerStrokeWriter.loopCharacterAnimation();
+        },
+        onLoadCharDataError: () => {
+            if (renderToken !== state.answerStrokeRenderToken) return;
+            if (els.answerStrokeStatus) {
+                els.answerStrokeStatus.textContent = `暂时无法加载“${char}”的笔画数据。`;
+            }
+        }
+    });
 }
+
+function replayAnswerStroke() {
+    if (!state.answerStrokeWriter) return;
+    state.answerStrokeWriter.cancelQuiz?.();
+    state.answerStrokeWriter.loopCharacterAnimation();
+}
+
+function renderReview() {
+    stopAllSpeech();
+    const item = state.session[state.currentIndex];
+    if (!item) return;
+    if (els.dictationStageLabel) els.dictationStageLabel.textContent = "核对";
+    if (els.currentNumber) els.currentNumber.textContent = state.currentIndex + 1;
+    if (els.totalNumber) els.totalNumber.textContent = state.session.length;
+    if (els.progressBar) {
+        els.progressBar.style.width = `${((state.currentIndex + 1) / state.session.length) * 100}%`;
+    }
+    const pinyin = PINYIN_MAP[item.char] || "";
+    if (els.answerHint) els.answerHint.textContent = `${item.char} [${pinyin}] · ${item.hint}`;
+
+    els.paperPromptBox?.classList.add("hidden");
+    els.answerPanel?.classList.remove("hidden");
+
+    lockVerdictButtons(600);
+    renderAnswerStroke(item.char);
+}
+
+function lockVerdictButtons(duration = 600) {
+    if (state.reviewUnlockTimer) {
+        clearTimeout(state.reviewUnlockTimer);
+        state.reviewUnlockTimer = null;
+    }
+    state.reviewLocked = true;
+    [els.wrongBtn, els.correctBtn, els.ipadMarkWrongBtn, els.ipadNextBtn, els.ipadAssistWrongNextBtn].forEach(btn => {
+        if (btn) btn.disabled = true;
+    });
+
+    state.reviewUnlockTimer = setTimeout(() => {
+        state.reviewLocked = false;
+        [els.wrongBtn, els.correctBtn, els.ipadMarkWrongBtn, els.ipadNextBtn, els.ipadAssistWrongNextBtn].forEach(btn => {
+            if (btn) btn.disabled = false;
+        });
+        state.reviewUnlockTimer = null;
+    }, duration);
+}
+
+function recordAnswer(isCorrect) {
+    if (state.reviewLocked) return;
+    state.reviewLocked = true;
+    if (state.reviewUnlockTimer) {
+        clearTimeout(state.reviewUnlockTimer);
+        state.reviewUnlockTimer = null;
+    }
+    [els.wrongBtn, els.correctBtn, els.ipadMarkWrongBtn, els.ipadNextBtn, els.ipadAssistWrongNextBtn].forEach(btn => {
+        if (btn) btn.disabled = true;
+    });
+
+    const item = state.session[state.currentIndex];
+    if (!item) return;
+
+    state.answers.push({
+        item,
+        isCorrect,
+        mode: state.dictationWriteMode
+    });
+
+    updateStatsForAnswer(item, isCorrect);
+
+    if (!isCorrect) {
+        state.session.push(item);
+    }
+
+    if (state.currentIndex < state.session.length - 1) {
+        state.currentIndex += 1;
+        renderQuestion();
+        setTimeout(() => speakCurrent(), 260);
+    } else {
+        finishSession();
+    }
+}
+
+const SILENT_WAV = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
 
 let cachedChineseVoice;
 
-// 优先选择自然、清晰的普通话女声；排除粤语(zh-HK)，避免小朋友听到非普通话读音
 function getChineseVoice() {
-    if (cachedChineseVoice !== undefined) return cachedChineseVoice;
+    if (cachedChineseVoice) return cachedChineseVoice;
     const voices = window.speechSynthesis?.getVoices?.() || [];
     if (voices.length === 0) return null;
 
@@ -1314,10 +1691,11 @@ function getChineseVoice() {
         else if (/^zh-(TW|Hant)/i.test(lang)) score = 40;
         else if (/^zh/i.test(lang)) score = 60;
         else return -1;
-        if (/Natural|Online|Neural/i.test(name)) score += 30;
-        if (/Xiaoxiao|Xiaoyi|晓晓|晓伊/i.test(name)) score += 20;
-        if (/Google/i.test(name)) score += 15;
-        if (/Tingting|Ting-Ting|婷婷|Lili|Meijia/i.test(name)) score += 10;
+        if (voice.localService === true) score += 40;
+        if (/Siri/i.test(name)) score += 35;
+        if (/Xiaoxiao|Xiaoyi|晓晓|晓伊|Natural|Neural/i.test(name)) score += 25;
+        if (/Tingting|Ting-Ting|婷婷|Huihui|Yaoyao|Kangkang|慧慧|瑶瑶|康康|Lili|Meijia/i.test(name)) score += 20;
+        if (/Google/i.test(name) && !voice.localService) score -= 50;
         return score;
     };
 
@@ -1333,10 +1711,199 @@ function getSpeechRate() {
     return Number(els.speechRate?.value) || state.speechRate || 0.78;
 }
 
-// 统一朗读入口：所有模式都通过这里发音，保证语音、语速一致
+function getSharedTTSAudio() {
+    if (!state.sharedTTSAudio && typeof Audio !== "undefined") {
+        const audio = new Audio();
+        audio.preload = "auto";
+        audio.setAttribute("playsinline", "");
+        audio.setAttribute("webkit-playsinline", "");
+        state.sharedTTSAudio = audio;
+    }
+    return state.sharedTTSAudio;
+}
+
+function clearSpeechTimers() {
+    if (state.speakDelayTimer) {
+        clearTimeout(state.speakDelayTimer);
+        state.speakDelayTimer = null;
+    }
+    if (state.speechWatchdogTimer) {
+        clearTimeout(state.speechWatchdogTimer);
+        state.speechWatchdogTimer = null;
+    }
+}
+
+function stopAllSpeech() {
+    state.speechToken += 1;
+    clearSpeechTimers();
+    if (state.sharedTTSAudio) {
+        try {
+            state.sharedTTSAudio.pause();
+            state.sharedTTSAudio.currentTime = 0;
+        } catch (_) {}
+    }
+    try {
+        window.speechSynthesis?.cancel?.();
+    } catch (_) {}
+    state.currentUtterance = null;
+    if (typeof window !== "undefined") {
+        window._hanziActiveUtterance = null;
+    }
+}
+
+function unlockAudioAndTTS() {
+    const synth = typeof window !== "undefined" ? window.speechSynthesis : null;
+    if (synth && !state.ttsUnlocked) {
+        try {
+            if (synth.paused) synth.resume();
+            if (!synth.speaking && !synth.pending && state.speechToken === 0 && typeof SpeechSynthesisUtterance !== "undefined") {
+                const dummy = new SpeechSynthesisUtterance("");
+                dummy.volume = 0;
+                synth.speak(dummy);
+            }
+            state.ttsUnlocked = true;
+        } catch (_) {}
+        getChineseVoice();
+    }
+    if (!state.audioUnlocked) {
+        try {
+            const audio = getSharedTTSAudio();
+            if (audio && audio.paused && state.speechToken === 0) {
+                audio.src = SILENT_WAV;
+                const p = audio.play();
+                if (p && typeof p.then === "function") {
+                    p.then(() => {
+                        if (audio.src === SILENT_WAV) {
+                            audio.pause();
+                            audio.currentTime = 0;
+                        }
+                        state.audioUnlocked = true;
+                    }).catch(() => {});
+                }
+            }
+        } catch (_) {}
+    }
+}
+
+function playOnlineChineseTTS(text, {rate, onstart, onend, token} = {}) {
+    if (!text || token !== state.speechToken) return;
+    const audio = getSharedTTSAudio();
+    if (!audio) {
+        if (token === state.speechToken) onend?.();
+        return;
+    }
+
+    const encoded = encodeURIComponent(text);
+    const urls = [
+        `https://dict.youdao.com/dictvoice?audio=${encoded}&le=zh`,
+        `https://fanyi.baidu.com/gettts?lan=zh&text=${encoded}&spd=4&source=web`
+    ];
+    let urlIdx = 0;
+    let started = false;
+    let finished = false;
+    let stallTimer = null;
+
+    const cleanup = () => {
+        if (stallTimer) {
+            clearTimeout(stallTimer);
+            stallTimer = null;
+        }
+        audio.onplaying = null;
+        audio.onended = null;
+        audio.onerror = null;
+    };
+
+    const finish = () => {
+        if (finished) return;
+        finished = true;
+        cleanup();
+        if (token === state.speechToken) onend?.();
+    };
+
+    const tryNext = () => {
+        if (finished || token !== state.speechToken) {
+            cleanup();
+            return;
+        }
+        if (urlIdx >= urls.length) {
+            finish();
+            return;
+        }
+        const src = urls[urlIdx++];
+        if (stallTimer) clearTimeout(stallTimer);
+        stallTimer = setTimeout(() => {
+            if (!started && !finished && token === state.speechToken) {
+                tryNext();
+            }
+        }, 1800);
+
+        audio.onplaying = () => {
+            if (token !== state.speechToken) {
+                try { audio.pause(); } catch (_) {}
+                cleanup();
+                return;
+            }
+            if (!started) {
+                started = true;
+                if (stallTimer) {
+                    clearTimeout(stallTimer);
+                    stallTimer = null;
+                }
+                onstart?.();
+            }
+        };
+        audio.onended = finish;
+        audio.onerror = () => {
+            if (token !== state.speechToken) {
+                cleanup();
+                return;
+            }
+            tryNext();
+        };
+
+        try {
+            audio.pause();
+            audio.src = src;
+            audio.playbackRate = Math.max(0.65, Math.min(1.5, Number(rate) || getSpeechRate()));
+            audio.currentTime = 0;
+            const p = audio.play();
+            if (p && typeof p.catch === "function") {
+                p.catch(err => {
+                    if (err && err.name === "AbortError") return;
+                    tryNext();
+                });
+            }
+        } catch (_) {
+            tryNext();
+        }
+    };
+
+    tryNext();
+}
+
 function speakText(text, {rate, onstart, onend, interrupt = true} = {}) {
-    if (!text || !("speechSynthesis" in window)) return null;
-    if (interrupt) window.speechSynthesis.cancel();
+    if (!text) return null;
+
+    const token = ++state.speechToken;
+    clearSpeechTimers();
+    state.ttsUnlocked = true;
+
+    if (state.sharedTTSAudio) {
+        try {
+            state.sharedTTSAudio.pause();
+            state.sharedTTSAudio.currentTime = 0;
+        } catch (_) {}
+    }
+
+    const synth = typeof window !== "undefined" && "speechSynthesis" in window ? window.speechSynthesis : null;
+    if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
+        playOnlineChineseTTS(text, {rate, onstart, onend, token});
+        return null;
+    }
+
+    if (synth.paused) {
+        try { synth.resume(); } catch (_) {}
+    }
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "zh-CN";
@@ -1345,22 +1912,88 @@ function speakText(text, {rate, onstart, onend, interrupt = true} = {}) {
     utterance.volume = 1;
     const voice = getChineseVoice();
     if (voice) utterance.voice = voice;
-    if (onstart) utterance.onstart = onstart;
-    utterance.onend = () => onend?.();
-    utterance.onerror = event => {
-        if (event.error !== "interrupted" && event.error !== "canceled") {
-            console.warn("语音播放失败：", event.error);
+
+    let started = false;
+    let settled = false;
+
+    utterance.onstart = () => {
+        if (token !== state.speechToken) return;
+        started = true;
+        if (state.speechWatchdogTimer) {
+            clearTimeout(state.speechWatchdogTimer);
+            state.speechWatchdogTimer = null;
+        }
+        onstart?.();
+    };
+
+    utterance.onend = () => {
+        if (token !== state.speechToken || settled) return;
+        settled = true;
+        if (state.speechWatchdogTimer) {
+            clearTimeout(state.speechWatchdogTimer);
+            state.speechWatchdogTimer = null;
+        }
+        if (state.currentUtterance === utterance) state.currentUtterance = null;
+        if (typeof window !== "undefined" && window._hanziActiveUtterance === utterance) {
+            window._hanziActiveUtterance = null;
         }
         onend?.();
     };
-    // 保留引用，避免部分浏览器在播放中途回收对象导致 onend 不触发
+
+    utterance.onerror = event => {
+        if (token !== state.speechToken || settled) return;
+        const errCode = event?.error;
+        if (errCode === "canceled" || errCode === "interrupted") return;
+        settled = true;
+        if (state.speechWatchdogTimer) {
+            clearTimeout(state.speechWatchdogTimer);
+            state.speechWatchdogTimer = null;
+        }
+        console.warn("本地语音播放失败，切换在线语音：", errCode);
+        playOnlineChineseTTS(text, {rate, onstart, onend, token});
+    };
+
     state.currentUtterance = utterance;
-    window.speechSynthesis.speak(utterance);
+    if (typeof window !== "undefined") {
+        window._hanziActiveUtterance = utterance;
+    }
+
+    const doSpeak = () => {
+        if (token !== state.speechToken) return;
+        state.speechWatchdogTimer = setTimeout(() => {
+            state.speechWatchdogTimer = null;
+            if (!started && !settled && token === state.speechToken) {
+                settled = true;
+                try { synth.cancel(); } catch (_) {}
+                playOnlineChineseTTS(text, {rate, onstart, onend, token});
+            }
+        }, 900);
+
+        try {
+            synth.speak(utterance);
+        } catch (err) {
+            if (!settled && token === state.speechToken) {
+                settled = true;
+                clearSpeechTimers();
+                console.warn("语音调用异常，切换在线语音：", err);
+                playOnlineChineseTTS(text, {rate, onstart, onend, token});
+            }
+        }
+    };
+
+    if (interrupt && (synth.speaking || synth.pending)) {
+        try { synth.cancel(); } catch (_) {}
+        state.speakDelayTimer = setTimeout(() => {
+            state.speakDelayTimer = null;
+            doSpeak();
+        }, 35);
+    } else {
+        doSpeak();
+    }
+
     return utterance;
 }
 
-// 部分多音字单读或在“XX的X”末尾会被语音引擎切分并读成另一读音（如“理发的发”末尾“的发”常读作 fā）。
-// 仅在构造 TTS 朗读文本时用单音同音字替换，界面展示的汉字与 item.hint 保持原样。
 const SPEECH_HINT_TAIL_MAP = {
     "发": "珐",
     "干": "淦",
@@ -1406,12 +2039,10 @@ function findItem(char) {
     return HANZI_DATA.find(item => item.char === char) || null;
 }
 
-// 单字发音：多音字用同音单音字保证 TTS 读出正确读音
 function getCharSpeechText(char) {
     return SPEECH_HINT_TAIL_MAP[char] || char;
 }
 
-// 按“朗读方式”设置生成题目读音
 function getItemSpeechText(item, mode = state.speechMode) {
     const lead = getCharSpeechText(item.char);
     if (mode === "char") return lead;
@@ -1421,429 +2052,49 @@ function getItemSpeechText(item, mode = state.speechMode) {
 
 function speakCurrent() {
     const item = state.session[state.currentIndex];
-
     if (!item) return;
-    if (!("speechSynthesis" in window)) {
+    if (!("speechSynthesis" in window) && typeof Audio === "undefined") {
         alertSpeechNotSupported();
         return;
     }
     speakText(getItemSpeechText(item), {rate: state.speechRate});
 }
 
-function lockVerdictButtons(duration = 650) {
-    if (state.reviewUnlockTimer) {
-        clearTimeout(state.reviewUnlockTimer);
-        state.reviewUnlockTimer = null;
-    }
-    state.reviewLocked = true;
-    if (els.wrongBtn) els.wrongBtn.disabled = true;
-    if (els.correctBtn) els.correctBtn.disabled = true;
-
-    state.reviewUnlockTimer = setTimeout(() => {
-        state.reviewLocked = false;
-        if (els.wrongBtn) els.wrongBtn.disabled = false;
-        if (els.correctBtn) els.correctBtn.disabled = false;
-        state.reviewUnlockTimer = null;
-    }, duration);
-}
-
-function submitWriting() {
-    if (els.showAnswerBtn.disabled) return;
-    els.showAnswerBtn.disabled = true;
-    const writing = captureWriting();
-    state.writings[state.currentIndex] = writing;
-    renderReview();
-}
-
-function clearAnswerStroke() {
-    state.answerStrokeRenderToken += 1;
-    state.answerStrokeWriter?.pauseAnimation?.();
-    state.answerStrokeWriter = null;
-    els.answerStrokeWriter.replaceChildren();
-    els.replayAnswerStrokeBtn.disabled = true;
-    els.answerStrokeStatus.textContent = "正在准备笔画演示……";
-    els.answerStrokeStatus.classList.remove("hidden");
-}
-
-function renderAnswerStroke(char) {
-    clearAnswerStroke();
-
-    if (typeof HanziWriter === "undefined") {
-        els.answerStrokeStatus.textContent = "笔画组件加载失败，请检查网络后刷新页面。";
-        return;
-    }
-
-    const renderToken = ++state.answerStrokeRenderToken;
-    const size = Math.round(els.answerStrokeWriter.getBoundingClientRect().width);
-
-    const isDark = document.documentElement.classList.contains("dark");
-    state.answerStrokeWriter = HanziWriter.create(els.answerStrokeWriter, char, {
-        width: size,
-        height: size,
-        padding: Math.round(size * 0.08),
-        showOutline: true,
-        showCharacter: false,
-        strokeColor: isDark ? "#60a5fa" : "#1e293b",
-        outlineColor: isDark ? "#475569" : "#d7dbe3",
-        strokeAnimationSpeed: 0.8,
-        delayBetweenStrokes: 400,
-        delayBetweenLoops: 2000,
-        onLoadCharDataSuccess: () => {
-            if (renderToken !== state.answerStrokeRenderToken) return;
-            els.answerStrokeStatus.classList.add("hidden");
-            els.replayAnswerStrokeBtn.disabled = false;
-            state.answerStrokeWriter.loopCharacterAnimation();
-        },
-        onLoadCharDataError: () => {
-            if (renderToken !== state.answerStrokeRenderToken) return;
-            els.answerStrokeStatus.textContent = `暂时无法加载“${char}”的笔画数据。`;
-        }
-    });
-}
-
-function replayAnswerStroke() {
-    if (!state.answerStrokeWriter) return;
-    state.answerStrokeWriter.cancelQuiz?.();
-    state.answerStrokeWriter.loopCharacterAnimation();
-}
-
-function renderReview() {
-    window.speechSynthesis?.cancel?.();
-    const item = state.session[state.currentIndex];
-    const writing = state.writings[state.currentIndex];
-    els.dictationStageLabel.textContent = "判断";
-    els.currentNumber.textContent = state.currentIndex + 1;
-    els.totalNumber.textContent = state.session.length;
-    els.progressBar.style.width =
-        `${((state.currentIndex + 1) / state.session.length) * 100}%`;
-    els.questionPinyin.textContent = PINYIN_MAP[item.char] || "";
-    if (writing) {
-        els.currentWritingPreview.src = writing;
-        els.currentWritingPreview.alt = `手写的“${item.char}”`;
-        els.currentWritingPreview.classList.remove("hidden");
-    } else {
-        els.currentWritingPreview.removeAttribute("src");
-        els.currentWritingPreview.alt = "本题没有手写内容";
-        els.currentWritingPreview.classList.add("hidden");
-    }
-    const pinyin = PINYIN_MAP[item.char] || "";
-    els.answerHint.textContent = `${pinyin} · ${item.hint}`;
-
-    // 艾宾浩斯排期预测提示
-    const stats = loadStats();
-    const cs = getCharStats(stats, item.char);
-    if (els.dictationEbPredictText) {
-        els.dictationEbPredictText.textContent = getReviewPredictText(cs, "写对了将", "记错了");
-    }
-
-    els.answerPanel.classList.remove("hidden");
-    els.showAnswerBtn.classList.add("hidden");
-    els.writingArea.classList.add("hidden");
-    els.speakBtn.closest(".listen-area").classList.add("hidden");
-
-    // 防误触/防双击：展示核对答案面板时锁定对错按钮650ms，防止连击误点直接跳下一题
-    lockVerdictButtons(650);
-
-    renderAnswerStroke(item.char);
-}
-
-function recordAnswer(isCorrect) {
-    if (state.reviewLocked) return;
-    state.reviewLocked = true;
-    if (state.reviewUnlockTimer) {
-        clearTimeout(state.reviewUnlockTimer);
-        state.reviewUnlockTimer = null;
-    }
-    if (els.wrongBtn) els.wrongBtn.disabled = true;
-    if (els.correctBtn) els.correctBtn.disabled = true;
-
-    const item = state.session[state.currentIndex];
-
-    state.answers.push({
-        item,
-        isCorrect,
-        writing: state.writings[state.currentIndex]
-    });
-
-    updateStatsForAnswer(item, isCorrect);
-
-    // 回答错误追加到本轮末尾重练，巩固记忆
-    if (!isCorrect) {
-        state.session.push(item);
-    }
-
-    if (state.currentIndex < state.session.length - 1) {
-        state.currentIndex += 1;
-        renderQuestion();
-        setTimeout(() => speakCurrent(), 260);
-    } else {
-        finishSession();
-    }
-}
-
-
-function lockRecognitionButtons(duration = 500) {
-    if (state.recognitionUnlockTimer) {
-        clearTimeout(state.recognitionUnlockTimer);
-        state.recognitionUnlockTimer = null;
-    }
-    state.recognitionLocked = true;
-    if (els.recognitionWrongBtn) els.recognitionWrongBtn.disabled = true;
-    if (els.recognitionCorrectBtn) els.recognitionCorrectBtn.disabled = true;
-
-    state.recognitionUnlockTimer = setTimeout(() => {
-        state.recognitionLocked = false;
-        if (els.recognitionWrongBtn) els.recognitionWrongBtn.disabled = false;
-        if (els.recognitionCorrectBtn) els.recognitionCorrectBtn.disabled = false;
-        state.recognitionUnlockTimer = null;
-    }, duration);
-}
-
-function startRecognition(customItems = null) {
-    const items = customItems || createSession();
-    if (!items || items.length === 0) return;
-
-    state.isWrongPractice = Boolean(customItems) || (els.categorySelect && els.categorySelect.value === "wrong");
-
-    if (state.recognitionUnlockTimer) {
-        clearTimeout(state.recognitionUnlockTimer);
-        state.recognitionUnlockTimer = null;
-    }
-    state.recognitionLocked = false;
-
-    state.mode = "recognition";
-    state.recognitionSession = shuffle(items);
-    state.recognitionIndex = 0;
-    state.recognitionAnswers = [];
-    state.speechRate = Number(els.speechRate.value);
-    state.speechMode = els.speechMode.value;
-
-    showScreen("recognition");
-    renderRecognitionQuestion();
-}
-
-function renderRecognitionQuestion() {
-    const item = state.recognitionSession[state.recognitionIndex];
-    if (!item) return;
-
-    if (state.recognitionUnlockTimer) {
-        clearTimeout(state.recognitionUnlockTimer);
-        state.recognitionUnlockTimer = null;
-    }
-    state.recognitionLocked = false;
-
-    els.recognitionCurrentNumber.textContent = state.recognitionIndex + 1;
-    els.recognitionTotalNumber.textContent = state.recognitionSession.length;
-    els.recognitionProgressBar.style.width =
-        `${((state.recognitionIndex + 1) / state.recognitionSession.length) * 100}%`;
-
-    els.recognitionChar.textContent = item.char;
-    els.recognitionTapTip.textContent = "读完了？点我听听对不对 🔊";
-    els.recognitionPinyin.textContent = "";
-    els.recognitionHint.textContent = "";
-
-    updateLevelBadge(els.recognitionLevelBadge, item.char);
-
-    const stats = loadStats();
-    const cs = getCharStats(stats, item.char);
-    if (els.recognitionEbPredictText) {
-        els.recognitionEbPredictText.textContent = getReviewPredictText(cs, "读对了将", "没读出");
-    }
-
-    els.recognitionReveal.classList.add("hidden");
-}
-
-function speakRecognitionCurrent() {
-    const item = state.recognitionSession[state.recognitionIndex];
-
-    if (!item) return;
-    if (!("speechSynthesis" in window)) {
-        alertSpeechNotSupported();
-        return;
-    }
-
-    speakText(getItemSpeechText(item), {rate: state.speechRate});
-
-    els.recognitionPinyin.textContent = PINYIN_MAP[item.char] || "";
-    els.recognitionHint.textContent = item.hint;
-    els.recognitionTapTip.textContent = "🔊 再点可以重听";
-    els.recognitionReveal.classList.remove("hidden");
-    // 防误触：展开判定选项时锁定判定按钮500ms
-    lockRecognitionButtons(500);
-}
-
-function recordRecognitionAnswer(isCorrect) {
-    if (state.recognitionLocked) return;
-    state.recognitionLocked = true;
-    if (state.recognitionUnlockTimer) {
-        clearTimeout(state.recognitionUnlockTimer);
-        state.recognitionUnlockTimer = null;
-    }
-    if (els.recognitionWrongBtn) els.recognitionWrongBtn.disabled = true;
-    if (els.recognitionCorrectBtn) els.recognitionCorrectBtn.disabled = true;
-
-    const item = state.recognitionSession[state.recognitionIndex];
-
-    state.recognitionAnswers.push({
-        item,
-        isCorrect
-    });
-
-    updateStatsForAnswer(item, isCorrect);
-    if (isCorrect) playSuccessSound();
-
-    if (!isCorrect) {
-        state.recognitionSession.push(item);
-    }
-
-    if (state.recognitionIndex < state.recognitionSession.length - 1) {
-        state.recognitionIndex += 1;
-        renderRecognitionQuestion();
-    } else {
-        finishRecognition();
-    }
-}
-
-function finishRecognition() {
-    window.speechSynthesis?.cancel?.();
-    if (state.recognitionUnlockTimer) {
-        clearTimeout(state.recognitionUnlockTimer);
-        state.recognitionUnlockTimer = null;
-    }
-    state.recognitionLocked = false;
-
-    const correctCount =
-        state.recognitionAnswers.filter(answer => answer.isCorrect).length;
-    const total = state.recognitionAnswers.length;
-    const percentage =
-        total === 0 ? 0 : Math.round((correctCount / total) * 100);
-    const unfamiliarAnswers =
-        state.recognitionAnswers.filter(answer => !answer.isCorrect);
-
-    els.scoreText.textContent = `${percentage}%`;
-    els.scoreRing.style.background =
-        `conic-gradient(var(--primary) ${percentage}%, var(--ring-empty, #e7ebf3) ${percentage}%)`;
-
-    let message;
-    if (percentage === 100) {
-        message = `太棒了！这 ${total} 个字都会读！`;
-    } else if (percentage >= 80) {
-        message = `认读得很好！会读 ${correctCount} 个，再练一下不熟悉的字。`;
-    } else if (percentage >= 60) {
-        message = `已经会读 ${correctCount} 个。点击下面的按钮，可以再练不会的字。`;
-    } else {
-        message = `今天认识了更多汉字。多看几遍、多听几遍，很快就会读了。`;
-    }
-
-    els.summaryMessage.textContent = message;
-    els.resultList.innerHTML = "";
-    els.resultList.classList.remove("dictation-results");
-
-    const stats = loadStats();
-    state.recognitionAnswers.forEach(answer => {
-        const chip = document.createElement("span");
-        chip.className = `result-chip ${answer.isCorrect ? "correct" : "wrong"}`;
-        const cs = getCharStats(stats, answer.item.char);
-        chip.textContent = `${answer.item.char} (Lv.${cs.level})`;
-        chip.title = `${answer.isCorrect ? "会读" : "还不会读"} · 当前 Lv.${cs.level}，下次复习: ${formatDateDisplay(cs.nextReviewDate)}`;
-        els.resultList.appendChild(chip);
-    });
-
-    const uniqueUnfamiliar = getUniqueItems(unfamiliarAnswers.map(a => a.item));
-    els.practiceWrongBtn.disabled = uniqueUnfamiliar.length === 0;
-    els.practiceWrongBtn.textContent =
-        uniqueUnfamiliar.length === 0
-            ? "本轮全部会读"
-            : `再练不会的字（${uniqueUnfamiliar.length}个）`;
-
-    if (els.continueDueBtn) {
-        const dueCount = getDueCharacters(stats).length;
-        if (dueCount > 0) {
-            els.continueDueBtn.classList.remove("hidden");
-            els.continueDueBtn.textContent = `⚡ 继续复习今日待复习汉字（还剩 ${dueCount} 个）`;
-        } else {
-            els.continueDueBtn.classList.add("hidden");
-        }
-    }
-
-    showScreen("summary");
-    refreshHomeStats();
-
-    if (percentage === 100 && total > 0) {
-        setTimeout(() => {
-            window.showApiapiaPerfectReward && window.showApiapiaPerfectReward({
-                moduleName: "汉字快速认读",
-                detail: `本轮 ${total} 个汉字全部都会读！`
-            });
-        }, 350);
-    }
-}
-
-// COMMON_HANZI 前段是 2500 个一级常用字，“蔼”起是 1000 个次常用字（如“糠”“蔗”），
-// 对小朋友来说过于生僻，干扰项只从一级常用字里挑
-function getDistractorPool() {
-    if (typeof COMMON_HANZI !== "string" || COMMON_HANZI.length === 0) return "";
-    const secondaryStart = COMMON_HANZI.indexOf("蔼");
-    return secondaryStart > 0 ? COMMON_HANZI.slice(0, secondaryStart) : COMMON_HANZI;
-}
-
-// 获取常用汉字集合中的随机汉字（从3500常用字中挑选，排除已学汉字和指定排除字符）
-function getRandomCommonHanzi(excludeSet) {
-    const pool = getDistractorPool();
-
-    if (pool.length > 0) {
-        let attempts = 0;
-        while (attempts < 200) {
-            attempts++;
-            const idx = Math.floor(Math.random() * pool.length);
-            const char = pool[idx];
-            if (!excludeSet.has(char)) {
-                return char;
-            }
-        }
-    }
-
-    // 备用兜底策略（若字库未能正常加载，在标准 CJK 统一表意字区安全选取）
-    const MIN_CODE = 0x4e00;
-    const MAX_CODE = 0x9fa5;
-    while (true) {
-        const code = Math.floor(Math.random() * (MAX_CODE - MIN_CODE + 1)) + MIN_CODE;
-        const char = String.fromCharCode(code);
-        if (!excludeSet.has(char)) {
-            return char;
-        }
-    }
-}
-
+// 听音选字干扰项：全部从孩子已学字库 HANZI_DATA 中抽取（优先错字本及近期新字），真正检验辨字能力
 function getChoiceOptions(item) {
-    const excludeSet = new Set();
-    // 排除目标汉字
-    if (item && item.char) {
-        excludeSet.add(item.char);
+    const targetPinyin = PINYIN_MAP[item.char] || "";
+    const stats = loadStats();
+
+    let candidates = HANZI_DATA.filter(c =>
+        c.char !== item.char && (!targetPinyin || PINYIN_MAP[c.char] !== targetPinyin)
+    );
+    if (candidates.length < 4) {
+        candidates = HANZI_DATA.filter(c => c.char !== item.char);
     }
 
-    // 排除所有已学过的汉字 (HANZI_DATA 与历史学习记录中存在的所有字)
-    if (typeof HANZI_DATA !== "undefined" && Array.isArray(HANZI_DATA)) {
-        HANZI_DATA.forEach(candidate => {
-            if (candidate && candidate.char) excludeSet.add(candidate.char);
-        });
+    const focusPool = shuffle(
+        candidates.filter(c => {
+            const cs = getCharStats(stats, c.char);
+            return cs.inWrongBook || isRecentAddition(c.char) || (cs.practiced || 0) < 2;
+        })
+    );
+    const otherPool = shuffle(
+        candidates.filter(c => !focusPool.some(r => r.char === c.char))
+    );
+
+    const distractors = [];
+    for (const c of focusPool) {
+        if (distractors.length >= 2) break;
+        distractors.push(c);
     }
-    try {
-        const stats = loadStats();
-        if (stats && stats.characters) {
-            Object.keys(stats.characters).forEach(c => excludeSet.add(c));
+    for (const c of [...otherPool, ...focusPool]) {
+        if (distractors.length >= 4) break;
+        if (!distractors.some(d => d.char === c.char)) {
+            distractors.push(c);
         }
-    } catch (_) {}
-
-    // 1 个正确目标字 + 4 个从常用汉字库中随机抽取的未学干扰汉字 (共 5 个选项，难度适中且符合儿童认知)
-    const options = [item];
-    while (options.length < 5) {
-        const distractorChar = getRandomCommonHanzi(excludeSet);
-        excludeSet.add(distractorChar);
-        options.push({ char: distractorChar });
     }
 
-    return shuffle(options);
+    return shuffle([item, ...distractors]);
 }
 
 function startChoice(customItems = null) {
@@ -1900,7 +2151,6 @@ function renderChoiceQuestion() {
 function speakChoiceCurrent() {
     const item = state.choiceSession[state.choiceIndex];
     if (!item) return;
-    // 选字题必须带提示词，才能区分同音字（如“青”和“清”）
     speakText(getItemSpeechText(item, "hint"), {rate: state.speechRate});
 }
 
@@ -1916,7 +2166,6 @@ function getAudioContext() {
     return sharedAudioContext;
 }
 
-// 答对时的“叮咚”上行音，给小朋友即时的正向鼓励
 function playSuccessSound() {
     try {
         const context = getAudioContext();
@@ -1947,7 +2196,6 @@ function playErrorSound() {
         const oscillator = context.createOscillator();
         const gain = context.createGain();
         const startAt = context.currentTime + 0.01;
-        // 柔和的低音“嘟嘟”，提示选错但不吓到小朋友
         oscillator.type = "sine";
         oscillator.frequency.setValueAtTime(330, startAt);
         oscillator.frequency.setValueAtTime(247, startAt + 0.14);
@@ -1968,7 +2216,6 @@ function speakOptionCharacter(option, button) {
 
     const char = option.char;
     const item = state.choiceSession[state.choiceIndex];
-    // 点到本题目标字时按设置带提示词朗读，其他干扰字只读字音
     const text = item && char === item.char && item.hint
         ? getItemSpeechText(item)
         : getCharSpeechText(char);
@@ -1986,7 +2233,6 @@ function speakOptionCharacter(option, button) {
 
 function chooseCharacter(option, button) {
     if (state.choiceLocked) {
-        // 选择正确后，再次点击选项中的汉字（包括其他干扰字或目标字），播放对应汉字的读音
         speakOptionCharacter(option, button);
         return;
     }
@@ -2001,7 +2247,6 @@ function chooseCharacter(option, button) {
         button.setAttribute("aria-label", `选择汉字${option.char}，回答错误`);
         button.disabled = true;
         playErrorSound();
-        // 选错后自动再播一次正确读音，引导小朋友重新辨认
         const choiceIndex = state.choiceIndex;
         setTimeout(() => {
             if (state.choiceIndex === choiceIndex && !state.choiceLocked) speakChoiceCurrent();
@@ -2011,7 +2256,6 @@ function chooseCharacter(option, button) {
 
     state.choiceLocked = true;
     button.classList.add("correct-choice");
-    // 选对后，重新启用所有选项按钮，使点击其他任意汉字都能听到读音
     els.choiceOptions?.querySelectorAll("button").forEach(node => {
         node.disabled = false;
         node.setAttribute("title", "点击听汉字读音");
@@ -2026,7 +2270,6 @@ function chooseCharacter(option, button) {
     state.choiceAnswers.push({item, isCorrect: isFirstTryCorrect});
     updateStatsForAnswer(item, isFirstTryCorrect);
 
-    // 选对后先响“叮咚”，再读一遍这个字，让字形和读音在脑中连起来
     playSuccessSound();
     const choiceIndex = state.choiceIndex;
     setTimeout(() => {
@@ -2047,7 +2290,7 @@ function nextChoiceQuestion() {
 }
 
 function finishChoice() {
-    window.speechSynthesis?.cancel?.();
+    stopAllSpeech();
     const correctCount = state.choiceAnswers.filter(answer => answer.isCorrect).length;
     const total = state.choiceAnswers.length;
     const percentage = total ? Math.round(correctCount / total * 100) : 0;
@@ -2067,6 +2310,7 @@ function finishChoice() {
         const cs = getCharStats(stats, answer.item.char);
         chip.textContent = `${answer.item.char} (Lv.${cs.level})`;
         chip.title = `${answer.isCorrect ? "一次选对" : "再次尝试后选对"} · 当前 Lv.${cs.level}，下次复习: ${formatDateDisplay(cs.nextReviewDate)}`;
+        chip.addEventListener("click", () => speakSingleCharacter(answer.item.char));
         els.resultList.appendChild(chip);
     });
     const uniqueWrong = getUniqueItems(wrongAnswers.map(a => a.item));
@@ -2099,7 +2343,8 @@ function finishChoice() {
 }
 
 function finishSession() {
-    window.speechSynthesis?.cancel?.();
+    stopAllSpeech();
+    clearIpadStrokeWriter();
     clearAnswerStroke();
     if (state.reviewUnlockTimer) {
         clearTimeout(state.reviewUnlockTimer);
@@ -2123,61 +2368,56 @@ function finishSession() {
 
     let message;
     if (percentage === 100) {
-        message = `太棒了！今天 ${total} 个字全部写对了！`;
+        message = `太棒了！今天 ${total} 个字全部过关！`;
     } else if (percentage >= 80) {
-        message = `表现很好！写对了 ${correctCount} 个，再复习一下错字就更棒了。`;
+        message = `表现很好！写对了 ${correctCount} 个，再巩固一下错字就更棒了。`;
     } else if (percentage >= 60) {
-        message = `已经写对了 ${correctCount} 个。慢慢来，错字多练几次就会记住。`;
+        message = `已经掌握 ${correctCount} 个。慢慢来，错字多写几次就会记住。`;
     } else {
-        message = `今天完成了 ${total} 个字的练习。先把错字再听一遍，不着急。`;
+        message = `今天完成了 ${total} 个字的听写练习。点下面错字可再听读音，不着急。`;
     }
 
     els.summaryMessage.textContent = message;
     els.resultList.innerHTML = "";
-
     els.resultList.classList.add("dictation-results");
 
     const stats = loadStats();
     state.answers.forEach(answer => {
         const card = document.createElement("div");
-        card.className = `dictation-result ${answer.isCorrect ? "correct" : "wrong"}`;
+        card.className = `dictation-result ${answer.isCorrect ? "correct" : "wrong"} cursor-pointer`;
+        card.title = "点击再听一次读音 🔊";
+        card.addEventListener("click", () => speakSingleCharacter(answer.item.char));
 
-        const comparison = document.createElement("div");
-        comparison.className = "comparison";
+        const topRow = document.createElement("div");
+        topRow.className = "flex items-center justify-between gap-3 mb-2";
 
-        const writtenBox = document.createElement("div");
-        writtenBox.className = "comparison-box";
-        const writtenLabel = document.createElement("strong");
-        writtenLabel.textContent = "孩子写的";
-        writtenBox.appendChild(writtenLabel);
-        if (answer.writing) {
-            const image = document.createElement("img");
-            image.className = "written-preview";
-            image.src = answer.writing;
-            image.alt = `手写的“${answer.item.char}”`;
-            writtenBox.appendChild(image);
-        } else {
-            const empty = document.createElement("div");
-            empty.className = "result-standard bg-slate-50/50";
-            writtenBox.appendChild(empty);
-        }
+        const leftInfo = document.createElement("div");
+        leftInfo.className = "flex items-center space-x-3 min-w-0";
 
-        const standardBox = document.createElement("div");
-        standardBox.className = "comparison-box";
-        const standardLabel = document.createElement("strong");
-        standardLabel.textContent = "正确答案";
-        const standard = document.createElement("div");
-        standard.className = "result-standard";
-        standard.textContent = answer.item.char;
-        standardBox.append(standardLabel, standard);
+        const charBox = document.createElement("div");
+        charBox.className = "w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-4xl font-black text-slate-900 hanzi-font flex-shrink-0 card-subtle";
+        charBox.textContent = answer.item.char;
 
-        comparison.append(writtenBox, standardBox);
+        const textMeta = document.createElement("div");
+        textMeta.className = "text-left min-w-0";
+        const pinyin = PINYIN_MAP[answer.item.char] || "";
+        textMeta.innerHTML = `<div class="text-base font-black text-indigo-600">${pinyin}</div><div class="text-xs font-bold text-slate-500 truncate">${answer.item.hint}</div>`;
+
+        leftInfo.append(charBox, textMeta);
+
+        const speakTag = document.createElement("span");
+        speakTag.className = "text-xs px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600 font-bold flex-shrink-0";
+        speakTag.textContent = "🔊 听音";
+
+        topRow.append(leftInfo, speakTag);
+
         const verdict = document.createElement("div");
         verdict.className = "result-verdict";
         const cs = getCharStats(stats, answer.item.char);
         const reviewText = cs.nextReviewDate ? formatDateDisplay(cs.nextReviewDate) : "待定";
-        verdict.innerHTML = `<span>${answer.isCorrect ? "✅ 写对了" : "❌ 写错了"}</span> <span class="level-badge ${cs.level >= 3 ? "level-mastered" : (cs.nextReviewDate <= Date.now() ? "level-due" : "")}" style="margin-left: 8px;">Lv.${cs.level}</span><span class="verdict-review-time" style="font-size: 0.82rem; margin-left: 6px;">下次: ${reviewText}</span>`;
-        card.append(comparison, verdict);
+        verdict.innerHTML = `<span>${answer.isCorrect ? "✅ 写对过关" : "❌ 需重练巩固"}</span> <div><span class="level-badge ${cs.level >= 3 ? "level-mastered" : (cs.nextReviewDate <= Date.now() ? "level-due" : "")}">Lv.${cs.level}</span><span class="verdict-review-time" style="font-size: 0.8rem; margin-left: 6px;">下次: ${reviewText}</span></div>`;
+
+        card.append(topRow, verdict);
         els.resultList.appendChild(card);
     });
 
@@ -2204,23 +2444,24 @@ function finishSession() {
     if (percentage === 100 && total > 0) {
         setTimeout(() => {
             window.showApiapiaPerfectReward && window.showApiapiaPerfectReward({
-                moduleName: "汉字听写默写",
-                detail: `本轮 ${total} 个字全部默写正确！`
+                moduleName: "汉字听写与笔顺",
+                detail: `本轮 ${total} 个字全部过关！`
             });
         }, 350);
     }
 }
 
 function showScreen(name) {
+    if (name !== "story" && typeof stopStoryReading === "function") {
+        stopStoryReading();
+    }
     if (typeof clearStoryCharHighlights === "function") {
         clearStoryCharHighlights();
     }
     els.setupScreen?.classList.toggle("hidden", name !== "setup");
     els.dictationScreen?.classList.toggle("hidden", name !== "dictation");
-    els.recognitionScreen?.classList.toggle("hidden", name !== "recognition");
     els.choiceScreen?.classList.toggle("hidden", name !== "choice");
     els.storyScreen?.classList.toggle("hidden", name !== "story");
-    els.strokeScreen?.classList.toggle("hidden", name !== "stroke");
     els.summaryScreen?.classList.toggle("hidden", name !== "summary");
 
     const bottomNav = document.getElementById("hanziBottomNav");
@@ -2233,257 +2474,7 @@ function showScreen(name) {
     window.scrollTo({top: 0, behavior: "smooth"});
 }
 
-function getCachedStrokeOrder() {
-    try {
-        const cache = JSON.parse(localStorage.getItem(STROKE_ORDER_KEY));
-        const sourceChars = HANZI_DATA.map(item => item.char);
-        if (
-            cache?.source === sourceChars.join("") &&
-            Array.isArray(cache.characters) &&
-            cache.characters.length === sourceChars.length
-        ) {
-            const itemByChar = new Map(HANZI_DATA.map(item => [item.char, item]));
-            return cache.characters.map(char => itemByChar.get(char)).filter(Boolean);
-        }
-    } catch (error) {
-        console.warn("读取笔画顺序缓存失败：", error);
-    }
-    return null;
-}
-
-async function createStrokeSession() {
-    const cachedItems = getCachedStrokeOrder();
-    if (cachedItems) return cachedItems;
-
-    const itemsWithCounts = await Promise.all(HANZI_DATA.map(async (item, sourceIndex) => {
-        try {
-            const characterData = await HanziWriter.loadCharacterData(item.char);
-            return {item, sourceIndex, strokeCount: characterData.strokes.length};
-        } catch (error) {
-            console.warn(`无法读取“${item.char}”的笔画数：`, error);
-            return {item, sourceIndex, strokeCount: Number.MAX_SAFE_INTEGER};
-        }
-    }));
-
-    itemsWithCounts.sort((a, b) =>
-        a.strokeCount - b.strokeCount || a.sourceIndex - b.sourceIndex
-    );
-    const items = itemsWithCounts.map(entry => entry.item);
-
-    const allCountsLoaded = itemsWithCounts.every(
-        entry => entry.strokeCount !== Number.MAX_SAFE_INTEGER
-    );
-    if (allCountsLoaded) {
-        try {
-            localStorage.setItem(STROKE_ORDER_KEY, JSON.stringify({
-                source: HANZI_DATA.map(item => item.char).join(""),
-                characters: items.map(item => item.char)
-            }));
-        } catch (error) {
-            console.warn("保存笔画顺序缓存失败：", error);
-        }
-    }
-
-    return items;
-}
-
-async function startStrokePractice() {
-    const startToken = ++state.strokeStartToken;
-    showScreen("stroke");
-    els.strokeCurrentNumber.textContent = "…";
-    els.strokeTotalNumber.textContent = HANZI_DATA.length;
-    els.strokeProgressBar.style.width = "0%";
-    els.strokePinyin.textContent = "";
-    els.strokeHint.textContent = "";
-    els.strokeWriter.replaceChildren();
-    els.strokeStatus.textContent = "正在按笔画数从少到多排序……";
-    els.strokeStatus.classList.remove("hidden");
-    els.previousStrokeBtn.disabled = true;
-    els.nextStrokeBtn.disabled = true;
-
-    if (typeof HanziWriter === "undefined") {
-        els.strokeStatus.textContent = "笔画组件加载失败，请检查网络后刷新页面。";
-        return;
-    }
-
-    const items = await createStrokeSession();
-    if (startToken !== state.strokeStartToken) return;
-
-    state.strokeSession = items;
-    let savedChar = "";
-    try {
-        savedChar = localStorage.getItem(STROKE_PROGRESS_KEY) || "";
-    } catch (error) {
-        console.warn("读取笔画学习进度失败：", error);
-    }
-    const savedIndex = items.findIndex(item => item.char === savedChar);
-    state.strokeIndex = savedIndex >= 0 ? savedIndex : 0;
-    renderStrokeCharacter();
-}
-
-function setStrokeMode(mode) {
-    if (state.strokeMode === mode) return;
-    state.strokeMode = mode;
-    renderStrokeCharacter({silent: true});
-}
-
-function updateStrokeModeButtons() {
-    const isQuiz = state.strokeMode === "quiz";
-    els.strokeWatchBtn?.classList.toggle("active", !isQuiz);
-    els.strokeQuizBtn?.classList.toggle("active", isQuiz);
-    els.strokeWatchBtn?.setAttribute("aria-pressed", String(!isQuiz));
-    els.strokeQuizBtn?.setAttribute("aria-pressed", String(isQuiz));
-}
-
-function setStrokeFeedback(text, type = "") {
-    if (!els.strokeFeedback) return;
-    els.strokeFeedback.textContent = text;
-    els.strokeFeedback.className = `stroke-feedback ${type}`;
-}
-
-// “我来写”：小朋友用手指在田字格里按笔顺描写，写错两次后自动提示下一笔
-function startStrokeQuiz(item, renderToken) {
-    const writer = state.strokeWriter;
-    if (!writer) return;
-    let strokeTotal = 0;
-    setStrokeFeedback("跟着灰色的字，一笔一笔写出来吧！", "");
-    writer.quiz({
-        leniency: 1.3,
-        showHintAfterMisses: 2,
-        highlightOnComplete: true,
-        onCorrectStroke: data => {
-            if (renderToken !== state.strokeRenderToken) return;
-            strokeTotal = data.strokeNum + 1 + data.strokesRemaining;
-            setStrokeFeedback(`写对了！第 ${data.strokeNum + 1} / ${strokeTotal} 笔 👍`, "good");
-        },
-        onMistake: data => {
-            if (renderToken !== state.strokeRenderToken) return;
-            const tip = data.mistakesOnStroke >= 2 ? "看看闪烁的提示，照着写～" : "笔顺不对哦，再试一次～";
-            setStrokeFeedback(tip, "oops");
-        },
-        onComplete: data => {
-            if (renderToken !== state.strokeRenderToken) return;
-            const perfect = data.totalMistakes === 0;
-            setStrokeFeedback(
-                perfect ? `太棒了！“${item.char}”一笔都没写错！🌟` : `写完啦！“${item.char}”写好了 🎉`,
-                "done"
-            );
-            playSuccessSound();
-            setTimeout(() => {
-                if (renderToken === state.strokeRenderToken) speakStrokeCharacter(item.char);
-            }, 500);
-        }
-    });
-}
-
-function renderStrokeCharacter({silent = false} = {}) {
-    const item = state.strokeSession[state.strokeIndex];
-    if (!item) return;
-
-    const renderToken = ++state.strokeRenderToken;
-    const isQuiz = state.strokeMode === "quiz";
-    updateStrokeModeButtons();
-    els.strokeGrid.classList.toggle("quiz-mode", isQuiz);
-    setStrokeFeedback(isQuiz ? "" : "仔细看笔顺，跟着动画用手指在空中写一写。");
-    state.strokeWriter?.cancelQuiz?.();
-    state.strokeWriter?.pauseAnimation?.();
-    state.strokeWriter = null;
-    els.strokeWriter.replaceChildren();
-    els.strokeStatus.textContent = "正在准备笔画动画……";
-    els.strokeStatus.classList.remove("hidden");
-
-    els.strokeCurrentNumber.textContent = state.strokeIndex + 1;
-    els.strokeTotalNumber.textContent = state.strokeSession.length;
-    els.strokeProgressBar.style.width =
-        `${((state.strokeIndex + 1) / state.strokeSession.length) * 100}%`;
-    els.strokePinyin.textContent = PINYIN_MAP[item.char] || "";
-    els.strokeHint.textContent = `${item.char} · ${item.hint}`;
-    els.previousStrokeBtn.disabled = state.strokeIndex === 0;
-    els.nextStrokeBtn.disabled = false;
-    els.nextStrokeBtn.textContent = state.strokeIndex === state.strokeSession.length - 1
-        ? "回到第一字 ↺"
-        : "下一字 →";
-    if (!silent) speakStrokeCharacter(item.char);
-
-    if (typeof HanziWriter === "undefined") {
-        els.strokeStatus.textContent = "笔画组件加载失败，请检查网络后刷新页面。";
-        return;
-    }
-
-    const size = Math.round(els.strokeGrid.getBoundingClientRect().width);
-    const isDark = document.documentElement.classList.contains("dark");
-    state.strokeWriter = HanziWriter.create(els.strokeWriter, item.char, {
-        width: size,
-        height: size,
-        padding: Math.round(size * 0.09),
-        showOutline: true,
-        showCharacter: false,
-        strokeColor: isDark ? "#60a5fa" : "#20242c",
-        outlineColor: isDark ? "#475569" : "#d7dbe3",
-        drawingColor: isDark ? "#f8fafc" : "#1e293b",
-        drawingWidth: Math.max(14, Math.round(size / 18)),
-        highlightColor: "#f59e0b",
-        strokeAnimationSpeed: 0.65,
-        delayBetweenStrokes: 650,
-        delayBetweenLoops: 1800,
-        onLoadCharDataSuccess: () => {
-            if (renderToken !== state.strokeRenderToken) return;
-            els.strokeStatus.classList.add("hidden");
-            if (isQuiz) {
-                startStrokeQuiz(item, renderToken);
-            } else {
-                state.strokeWriter.loopCharacterAnimation();
-            }
-        },
-        onLoadCharDataError: () => {
-            if (renderToken !== state.strokeRenderToken) return;
-            els.strokeStatus.textContent = `暂时无法加载“${item.char}”的笔画数据。`;
-        }
-    });
-    try {
-        localStorage.setItem(STROKE_PROGRESS_KEY, item.char);
-    } catch (error) {
-        console.warn("保存笔画学习进度失败：", error);
-    }
-}
-
-function speakStrokeCharacter(char) {
-    if (!char) return;
-    const item = findItem(char);
-    speakText(item ? getItemSpeechText(item, "hint") : char);
-}
-
-function showPreviousStrokeCharacter() {
-    if (state.strokeIndex === 0) return;
-    state.strokeIndex -= 1;
-    renderStrokeCharacter();
-}
-
-function showNextStrokeCharacter() {
-    state.strokeIndex = state.strokeIndex === state.strokeSession.length - 1
-        ? 0
-        : state.strokeIndex + 1;
-    renderStrokeCharacter();
-}
-
-async function quitStrokePractice() {
-    if (window.kidConfirmExitPractice) {
-        const confirmed = await window.kidConfirmExitPractice({
-            title: "退出笔顺临摹？",
-            message: "确定要退出本轮笔顺临摹练习吗？",
-            confirmText: "确定退出",
-            cancelText: "继续练习"
-        });
-        if (!confirmed) return;
-    }
-    state.strokeStartToken += 1;
-    state.strokeRenderToken += 1;
-    state.strokeWriter?.cancelQuiz?.();
-    state.strokeWriter?.pauseAnimation?.();
-    state.strokeWriter = null;
-    window.speechSynthesis?.cancel?.();
-    showScreen("setup");
-}
+/* ================== 故事阅读巩固（支持筛段、跳段、点字加入错字本） ================== */
 
 function clearStoryCharHighlights() {
     if (state.storyCharHighlightTimer) {
@@ -2491,7 +2482,6 @@ function clearStoryCharHighlights() {
         state.storyCharHighlightTimer = null;
     }
     state.storySpeakingCharIndex = -1;
-    stopStoryReading();
     if (els.storyText) {
         els.storyText.querySelectorAll(".story-ruby.story-char-speaking, .story-char.story-char-speaking").forEach(el => {
             el.classList.remove("story-char-speaking");
@@ -2500,11 +2490,12 @@ function clearStoryCharHighlights() {
 }
 
 function speakStoryCharacter(char, index) {
-    if (!char || !("speechSynthesis" in window)) return;
+    if (!char) return;
     const isHanzi = /[\u4e00-\u9fa5]/.test(char) || Boolean(PINYIN_MAP[char]);
     if (!isHanzi) return;
 
-    window.speechSynthesis.cancel();
+    showStoryCharDetail(char);
+    stopStoryReading();
     clearStoryCharHighlights();
 
     if (typeof index === "number" && index >= 0) {
@@ -2515,16 +2506,135 @@ function speakStoryCharacter(char, index) {
 
     state.storyCharHighlightTimer = setTimeout(() => {
         clearStoryCharHighlights();
-    }, 1500);
+    }, 1800);
 
     speakText(getCharSpeechText(char), {
-        interrupt: false,
+        interrupt: true,
         onend: clearStoryCharHighlights
     });
 }
 
-// 把一段故事按标点切成短句，逐句朗读并高亮，方便小朋友指读；
-// 同时避免部分浏览器朗读长文本超过约15秒被截断
+function showStoryCharDetail(char) {
+    if (!char) return;
+    state.storyDetailChar = char;
+    const item = findItem(char);
+    const pinyin = PINYIN_MAP[char] || "";
+    const stats = loadStats();
+    const cs = getCharStats(stats, char);
+
+    els.storyDetailPlaceholder?.classList.add("hidden");
+    els.storyDetailContent?.classList.remove("hidden");
+
+    if (els.storyDetailChar) els.storyDetailChar.textContent = char;
+    if (els.storyDetailPinyin) els.storyDetailPinyin.textContent = pinyin;
+    if (els.storyDetailHint) els.storyDetailHint.textContent = item ? item.hint : "故事常用字";
+    updateStoryDetailWrongBtn(cs.inWrongBook);
+}
+
+function updateStoryDetailWrongBtn(inWrongBook) {
+    const btn = els.storyDetailWrongToggleBtn;
+    if (!btn) return;
+    if (inWrongBook) {
+        btn.textContent = "✅ 已在错字本";
+        btn.className = "px-2.5 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-black border border-emerald-200";
+    } else {
+        btn.textContent = "📕 加入错字本";
+        btn.className = "px-2.5 py-1.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-black border border-rose-200";
+    }
+}
+
+function toggleStoryDetailWrongBook() {
+    const char = state.storyDetailChar;
+    if (!char) return;
+    const stats = loadStats();
+    const cs = getCharStats(stats, char);
+    const nextState = !cs.inWrongBook;
+    setCharWrongBookState(char, nextState);
+    updateStoryDetailWrongBtn(nextState);
+
+    els.storyText?.querySelectorAll(`.story-ruby[data-char="${char}"]`).forEach(el => {
+        el.classList.toggle("story-ruby-wrong", nextState);
+    });
+
+    if (window.kidToast) {
+        window.kidToast(
+            nextState ? `已将“${char}”加入错字本 📕` : `已将“${char}”移出错字本 👍`,
+            nextState ? "info" : "success"
+        );
+    }
+}
+
+function getStoryParagraphIndicesForFilter(filter) {
+    if (typeof STORY_SENTENCES === "undefined" || !Array.isArray(STORY_SENTENCES)) return [];
+    const allIndices = STORY_SENTENCES.map((_, idx) => idx);
+    if (filter === "all") return allIndices;
+
+    const stats = loadStats();
+    if (filter === "wrong") {
+        const wrongSet = new Set(getWrongCharacters(stats).map(w => w.char));
+        if (wrongSet.size === 0) return [];
+        return allIndices.filter(idx => Array.from(STORY_SENTENCES[idx]).some(c => wrongSet.has(c)));
+    }
+    if (filter === "new") {
+        const newSet = new Set(
+            HANZI_DATA.filter(item => {
+                const cs = getCharStats(stats, item.char);
+                return (cs.practiced || 0) === 0 || isRecentAddition(item.char);
+            }).map(item => item.char)
+        );
+        if (newSet.size === 0) return [];
+        return allIndices.filter(idx => Array.from(STORY_SENTENCES[idx]).some(c => newSet.has(c)));
+    }
+    return allIndices;
+}
+
+function updateStoryFilterButtonsUI() {
+    els.storyFilterAllBtn?.classList.toggle("active", state.storyFilter === "all");
+    els.storyFilterWrongBtn?.classList.toggle("active", state.storyFilter === "wrong");
+    els.storyFilterNewBtn?.classList.toggle("active", state.storyFilter === "new");
+}
+
+function populateStoryJumpSelect() {
+    if (!els.storyJumpSelect) return;
+    els.storyJumpSelect.innerHTML = "";
+    state.storyFilteredIndices.forEach((actualIdx, pos) => {
+        const opt = document.createElement("option");
+        opt.value = String(pos);
+        const raw = STORY_SENTENCES[actualIdx] || "";
+        const preview = raw.slice(0, 12) + (raw.length > 12 ? "…" : "");
+        opt.textContent = `第 ${actualIdx + 1} 段 · ${preview}`;
+        els.storyJumpSelect.appendChild(opt);
+    });
+    els.storyJumpSelect.value = String(state.storyFilteredPos);
+}
+
+function setStoryFilter(filter, preferredActualIndex = null) {
+    let indices = getStoryParagraphIndicesForFilter(filter);
+    let actualFilter = filter;
+
+    if (indices.length === 0 && filter !== "all") {
+        if (window.kidToast) {
+            window.kidToast(
+                filter === "wrong" ? "错字本目前为空，已为您显示全部段落 🎉" : "暂无匹配的新字段落，已为您显示全部段落 🎉",
+                "info"
+            );
+        }
+        actualFilter = "all";
+        indices = getStoryParagraphIndicesForFilter("all");
+    }
+
+    state.storyFilter = actualFilter;
+    state.storyFilteredIndices = indices;
+    updateStoryFilterButtonsUI();
+
+    let pos = 0;
+    if (preferredActualIndex !== null) {
+        const foundPos = indices.indexOf(preferredActualIndex);
+        if (foundPos >= 0) pos = foundPos;
+    }
+    renderStoryParagraphByPos(pos);
+}
+
 function splitStoryIntoChunks(text) {
     const chunks = [];
     const chars = Array.from(text);
@@ -2532,7 +2642,6 @@ function splitStoryIntoChunks(text) {
     chars.forEach((char, idx) => {
         if (/[，。！？；：、,.!?;]/.test(char) || idx === chars.length - 1) {
             let end = idx + 1;
-            // 把紧跟的右引号并入本句
             while (end < chars.length && /[”’」』）)]/.test(chars[end])) end += 1;
             const piece = chars.slice(start, end).join("");
             if (/[一-龥]/.test(piece)) chunks.push({text: piece, start, end});
@@ -2553,20 +2662,34 @@ function highlightStoryRange(start, end) {
     });
 }
 
-function renderStoryParagraph(index) {
+function renderStoryParagraphByPos(pos) {
     if (typeof STORY_SENTENCES === "undefined" || !Array.isArray(STORY_SENTENCES) || STORY_SENTENCES.length === 0) {
         return;
     }
-    if (index < 0) index = 0;
-    if (index >= STORY_SENTENCES.length) index = STORY_SENTENCES.length - 1;
-    state.storyIndex = index;
-    try {
-        localStorage.setItem(STORY_PROGRESS_KEY, String(index));
-    } catch (_) {}
+    if (!state.storyFilteredIndices || state.storyFilteredIndices.length === 0) {
+        state.storyFilteredIndices = STORY_SENTENCES.map((_, i) => i);
+    }
+    if (pos < 0) pos = 0;
+    if (pos >= state.storyFilteredIndices.length) pos = state.storyFilteredIndices.length - 1;
 
-    window.speechSynthesis?.cancel?.();
+    state.storyFilteredPos = pos;
+    const index = state.storyFilteredIndices[pos];
+    state.storyIndex = index;
+
+    if (state.storyFilter === "all") {
+        try {
+            localStorage.setItem(STORY_PROGRESS_KEY, String(index));
+        } catch (_) {}
+    }
+
+    stopAllSpeech();
+    stopStoryReading();
     clearStoryCharHighlights();
     state.currentStory = STORY_SENTENCES[index];
+
+    const stats = loadStats();
+    const wrongCharSet = new Set(getWrongCharacters(stats).map(w => w.char));
+
     if (els.storyText) {
         els.storyText.innerHTML = "";
         els.storyText.classList.toggle("show-pinyin", Boolean(state.showStoryPinyin));
@@ -2578,6 +2701,9 @@ function renderStoryParagraph(index) {
             if (isHanzi) {
                 const ruby = document.createElement("ruby");
                 ruby.className = "story-ruby";
+                if (wrongCharSet.has(char)) {
+                    ruby.classList.add("story-ruby-wrong");
+                }
                 ruby.dataset.index = String(idx);
                 ruby.dataset.char = char;
                 ruby.setAttribute("role", "button");
@@ -2594,7 +2720,7 @@ function renderStoryParagraph(index) {
                 rt.textContent = pinyin;
                 ruby.appendChild(rt);
 
-                ruby.title = pinyin ? `${char} [${pinyin}] 点击发音` : `${char} 点击发音`;
+                ruby.title = pinyin ? `${char} [${pinyin}] 点击查看词组并听发音` : `${char} 点击发音`;
                 els.storyText.appendChild(ruby);
             } else {
                 const punct = document.createElement("span");
@@ -2603,7 +2729,6 @@ function renderStoryParagraph(index) {
                 els.storyText.appendChild(punct);
             }
 
-            // 在相邻字符之间插入零宽换行断点 <wbr>，彻底解决 iOS Safari 下连续 ruby 元素被当作不可分割长词导致无法换行溢出的问题
             if (idx < chars.length - 1) {
                 const nextChar = chars[idx + 1];
                 if (!NO_BREAK_AFTER.has(char) && !NO_BREAK_BEFORE.has(nextChar)) {
@@ -2613,41 +2738,47 @@ function renderStoryParagraph(index) {
         });
     }
 
-    if (els.storyPinyin) {
-        els.storyPinyin.innerHTML = "";
-        els.storyPinyin.classList.add("hidden");
-    }
-
     if (els.storyPinyinBtn) {
         els.storyPinyinBtn.textContent = state.showStoryPinyin ? "隐藏拼音" : "显示拼音";
     }
 
-    if (els.storyCurrentNumber) els.storyCurrentNumber.textContent = index + 1;
-    if (els.storyTotalNumber) els.storyTotalNumber.textContent = STORY_SENTENCES.length;
+    if (els.storyCurrentNumber) els.storyCurrentNumber.textContent = pos + 1;
+    if (els.storyTotalNumber) els.storyTotalNumber.textContent = state.storyFilteredIndices.length;
+
+    if (els.storyFilterBadge) {
+        if (state.storyFilter === "all") {
+            els.storyFilterBadge.classList.add("hidden");
+        } else {
+            els.storyFilterBadge.classList.remove("hidden");
+            els.storyFilterBadge.textContent = `原第 ${index + 1} 段`;
+        }
+    }
+
+    populateStoryJumpSelect();
 
     if (els.storyPrevBtn) {
-        const isFirst = (index === 0);
+        const isFirst = (pos === 0);
         els.storyPrevBtn.disabled = isFirst;
         els.storyPrevBtn.classList.toggle("opacity-50", isFirst);
         els.storyPrevBtn.classList.toggle("cursor-not-allowed", isFirst);
     }
     if (els.storyNextBtn) {
-        const isLast = (index === STORY_SENTENCES.length - 1);
-        els.storyNextBtn.textContent = isLast ? "🎉 重新开始" : "下一段 →";
+        const isLast = (pos === state.storyFilteredIndices.length - 1);
+        els.storyNextBtn.textContent = isLast ? "🎉 回到第一段" : "下一段 →";
     }
 }
 
 function nextStoryParagraph() {
-    if (state.storyIndex >= STORY_SENTENCES.length - 1) {
-        renderStoryParagraph(0);
+    if (state.storyFilteredPos >= state.storyFilteredIndices.length - 1) {
+        renderStoryParagraphByPos(0);
     } else {
-        renderStoryParagraph(state.storyIndex + 1);
+        renderStoryParagraphByPos(state.storyFilteredPos + 1);
     }
 }
 
 function prevStoryParagraph() {
-    if (state.storyIndex > 0) {
-        renderStoryParagraph(state.storyIndex - 1);
+    if (state.storyFilteredPos > 0) {
+        renderStoryParagraphByPos(state.storyFilteredPos - 1);
     }
 }
 
@@ -2659,7 +2790,7 @@ function startStory() {
     if (isNaN(savedIndex) || savedIndex < 0 || (typeof STORY_SENTENCES !== "undefined" && savedIndex >= STORY_SENTENCES.length)) {
         savedIndex = 0;
     }
-    renderStoryParagraph(savedIndex);
+    setStoryFilter("all", savedIndex);
     showScreen("story");
 }
 
@@ -2672,12 +2803,12 @@ function toggleStoryPinyin() {
 }
 
 function speakStory() {
-    if (!("speechSynthesis" in window)) {
+    if (!("speechSynthesis" in window) && typeof Audio === "undefined") {
         alertSpeechNotSupported();
         return;
     }
 
-    window.speechSynthesis.cancel();
+    stopStoryReading();
     clearStoryCharHighlights();
 
     const chunks = splitStoryIntoChunks(state.currentStory);
@@ -2691,7 +2822,7 @@ function speakStory() {
         const chunk = chunks[index];
         highlightStoryRange(chunk.start, chunk.end);
         speakText(chunk.text, {
-            interrupt: false,
+            interrupt: index === 0,
             onend: () => speakChunk(index + 1)
         });
     };
@@ -2703,6 +2834,110 @@ function stopStoryReading() {
     highlightStoryRange();
 }
 
+/* ================== 已学汉字累计墙 ================== */
+
+function getWallStatus(cs) {
+    if (cs.inWrongBook) return "wrong";
+    if ((cs.practiced || 0) === 0) return "new";
+    if ((cs.level || 0) >= 3) return "mastered";
+    return "learning";
+}
+
+function setWallFilter(filter) {
+    state.wallFilter = filter;
+    const mapping = [
+        [els.wallFilterAll, "all"],
+        [els.wallFilterNew, "new"],
+        [els.wallFilterWrong, "wrong"],
+        [els.wallFilterLearning, "learning"],
+        [els.wallFilterMastered, "mastered"]
+    ];
+    mapping.forEach(([btn, key]) => btn?.classList.toggle("active", key === filter));
+    renderHanziWall(loadStats());
+}
+
+function inspectWallChar(char, {speak = false} = {}) {
+    state.wallSelectedChar = char;
+    const item = findItem(char);
+    if (!item || !els.wallCharInspector) return;
+
+    const stats = loadStats();
+    const cs = getCharStats(stats, char);
+    const pinyin = PINYIN_MAP[char] || "";
+    const rate = cs.practiced > 0 ? Math.round((cs.correct / cs.practiced) * 100) : 0;
+
+    if (els.wallInspectorChar) els.wallInspectorChar.textContent = char;
+    if (els.wallInspectorPinyin) els.wallInspectorPinyin.textContent = pinyin;
+    if (els.wallInspectorHint) els.wallInspectorHint.textContent = item.hint;
+    if (els.wallInspectorMeta) {
+        els.wallInspectorMeta.textContent = cs.practiced > 0
+            ? `Lv.${cs.level || 0} · 练习 ${cs.practiced} 次 · 正确率 ${rate}% · ${formatDateDisplay(cs.nextReviewDate)}`
+            : `新加入待练习 · Lv.${cs.level || 1}`;
+    }
+
+    if (els.wallInspectorWrongBtn) {
+        if (cs.inWrongBook) {
+            els.wallInspectorWrongBtn.textContent = "✅ 移出错字";
+            els.wallInspectorWrongBtn.className = "px-2.5 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-black border border-emerald-200";
+        } else {
+            els.wallInspectorWrongBtn.textContent = "📕 加入错字";
+            els.wallInspectorWrongBtn.className = "px-2.5 py-1.5 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-black border border-rose-200";
+        }
+    }
+
+    els.wallCharInspector.classList.remove("hidden");
+    els.hanziWallGrid?.querySelectorAll(".hanzi-wall-cell").forEach(cell => {
+        cell.classList.toggle("selected", cell.dataset.char === char);
+    });
+
+    if (speak) speakSingleCharacter(char);
+}
+
+function renderHanziWall(stats = loadStats()) {
+    if (!els.hanziWallGrid || typeof HANZI_DATA === "undefined") return;
+    if (els.wallTotalCount) els.wallTotalCount.textContent = HANZI_DATA.length;
+
+    const filteredItems = HANZI_DATA.filter(item => {
+        if (state.wallFilter === "all") return true;
+        return getWallStatus(getCharStats(stats, item.char)) === state.wallFilter;
+    });
+
+    els.hanziWallGrid.innerHTML = "";
+    if (filteredItems.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "col-span-full py-6 text-center text-xs sm:text-sm text-slate-400 font-bold";
+        empty.textContent = "当前筛选下暂无汉字 🎉";
+        els.hanziWallGrid.appendChild(empty);
+        return;
+    }
+
+    filteredItems.forEach(item => {
+        const cs = getCharStats(stats, item.char);
+        const status = getWallStatus(cs);
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.dataset.char = item.char;
+        cell.className = `hanzi-wall-cell status-${status}${state.wallSelectedChar === item.char ? " selected" : ""}`;
+        cell.textContent = item.char;
+        cell.title = `${item.char} [${PINYIN_MAP[item.char] || ""}] · ${item.hint} (Lv.${cs.level || 0})`;
+
+        if (status === "new" || status === "wrong" || status === "mastered") {
+            const dot = document.createElement("span");
+            dot.className = "wall-dot";
+            cell.appendChild(dot);
+        }
+
+        cell.addEventListener("click", () => inspectWallChar(item.char, {speak: true}));
+        els.hanziWallGrid.appendChild(cell);
+    });
+
+    if (state.wallSelectedChar && !els.wallCharInspector?.classList.contains("hidden")) {
+        inspectWallChar(state.wallSelectedChar, {speak: false});
+    }
+}
+
+/* ================== 退出与重置 ================== */
+
 async function quitSession() {
     if (window.kidConfirmExitPractice) {
         const confirmed = await window.kidConfirmExitPractice({
@@ -2713,11 +2948,11 @@ async function quitSession() {
         });
         if (!confirmed) return;
     } else {
-        const confirmed = confirm("确定要退出本轮听写吗？已经判定过的题目会保留记录。");
-        if (!confirmed) return;
+        if (!confirm("确定要退出本轮听写吗？已经判定过的题目会保留记录。")) return;
     }
 
-    window.speechSynthesis?.cancel?.();
+    stopAllSpeech();
+    clearIpadStrokeWriter();
     clearAnswerStroke();
     if (state.reviewUnlockTimer) {
         clearTimeout(state.reviewUnlockTimer);
@@ -2728,31 +2963,6 @@ async function quitSession() {
         state.questionUnlockTimer = null;
     }
     state.reviewLocked = false;
-    showScreen("setup");
-    refreshHomeStats();
-}
-
-
-async function quitRecognition() {
-    if (window.kidConfirmExitPractice) {
-        const confirmed = await window.kidConfirmExitPractice({
-            title: "退出认读练习？",
-            message: "确定要退出本轮认读练习吗？",
-            confirmText: "确定退出",
-            cancelText: "继续练习"
-        });
-        if (!confirmed) return;
-    } else {
-        const confirmed = confirm("确定要退出本轮认读练习吗？");
-        if (!confirmed) return;
-    }
-
-    window.speechSynthesis?.cancel?.();
-    if (state.recognitionUnlockTimer) {
-        clearTimeout(state.recognitionUnlockTimer);
-        state.recognitionUnlockTimer = null;
-    }
-    state.recognitionLocked = false;
     showScreen("setup");
     refreshHomeStats();
 }
@@ -2769,7 +2979,7 @@ async function quitChoice() {
     } else {
         if (!confirm("确定要退出本轮选字游戏吗？")) return;
     }
-    window.speechSynthesis?.cancel?.();
+    stopAllSpeech();
     showScreen("setup");
     refreshHomeStats();
 }
@@ -2786,17 +2996,13 @@ async function resetAllData() {
             cancelText: "取消"
         });
     } else {
-        confirmed = confirm(
-            "确定要清空全部学习记录吗？错字本和累计成绩都会被删除，此操作不能恢复。"
-        );
+        confirmed = confirm("确定要清空全部学习记录吗？错字本和累计成绩都会被删除，此操作不能恢复。");
     }
 
     if (!confirmed) return;
 
-    // 记录清空时间，云端同步合并时会丢弃这之前的旧记录
     const freshStats = getDefaultStats();
     freshStats.resetAt = Date.now();
-    localStorage.removeItem(STROKE_PROGRESS_KEY);
     saveStats(freshStats);
     refreshHomeStats();
     if (window.kidToast) {
@@ -2806,48 +3012,57 @@ async function resetAllData() {
     }
 }
 
-els.startBtn.addEventListener("click", () => startSession());
-els.recognitionStartBtn.addEventListener("click", () => startRecognition());
-els.choiceStartBtn.addEventListener("click", () => startChoice());
-els.storyStartBtn.addEventListener("click", startStory);
-els.strokeStartBtn.addEventListener("click", startStrokePractice);
+/* ================== 事件绑定 ================== */
 
-els.speakBtn.addEventListener("click", speakCurrent);
-els.writingCanvas.addEventListener("pointerdown", beginStroke);
-els.writingCanvas.addEventListener("pointermove", continueStroke);
-els.writingCanvas.addEventListener("pointerup", endStroke);
-els.writingCanvas.addEventListener("pointercancel", endStroke);
-els.undoStrokeBtn.addEventListener("click", undoStroke);
-els.clearWritingBtn.addEventListener("click", resetWriting);
-window.addEventListener("resize", resizeWritingCanvas);
-els.showAnswerBtn.addEventListener("click", submitWriting);
-els.replayAnswerStrokeBtn.addEventListener("click", replayAnswerStroke);
-els.correctBtn.addEventListener("click", () => recordAnswer(true));
-els.wrongBtn.addEventListener("click", () => recordAnswer(false));
-els.quitBtn.addEventListener("click", quitSession);
+els.startBtn?.addEventListener("click", () => startSession());
+els.choiceStartBtn?.addEventListener("click", () => startChoice());
+els.storyStartBtn?.addEventListener("click", startStory);
 
-els.recognitionCharBtn.addEventListener("click", speakRecognitionCurrent);
-els.recognitionReplayBtn.addEventListener("click", speakRecognitionCurrent);
-els.recognitionCorrectBtn.addEventListener(
-    "click",
-    () => recordRecognitionAnswer(true)
-);
-els.recognitionWrongBtn.addEventListener(
-    "click",
-    () => recordRecognitionAnswer(false)
-);
-els.quitRecognitionBtn.addEventListener("click", quitRecognition);
-els.choiceSpeakBtn.addEventListener("click", speakChoiceCurrent);
-els.choiceFeedback.addEventListener("click", nextChoiceQuestion);
-els.quitChoiceBtn.addEventListener("click", quitChoice);
-els.storyPinyinBtn.addEventListener("click", toggleStoryPinyin);
-els.storySpeakBtn.addEventListener("click", speakStory);
+els.dictationModeIpadBtn?.addEventListener("click", () => setDictationWriteMode("ipad"));
+els.dictationModePaperBtn?.addEventListener("click", () => setDictationWriteMode("paper"));
+els.ipadOutlineHideBtn?.addEventListener("click", () => setIpadOutlineMode(false));
+els.ipadOutlineShowBtn?.addEventListener("click", () => setIpadOutlineMode(true));
+els.ipadHintStrokeBtn?.addEventListener("click", hintIpadStroke);
+els.ipadResetStrokeBtn?.addEventListener("click", retryIpadQuiz);
+els.ipadGiveUpBtn?.addEventListener("click", giveUpAndShowStroke);
+els.ipadRetryQuizBtn?.addEventListener("click", retryIpadQuiz);
+els.ipadAssistWrongNextBtn?.addEventListener("click", () => recordAnswer(false));
+els.ipadMarkWrongBtn?.addEventListener("click", () => recordAnswer(false));
+els.ipadNextBtn?.addEventListener("click", () => recordAnswer(true));
+
+els.speakBtn?.addEventListener("click", speakCurrent);
+els.showAnswerBtn?.addEventListener("click", submitPaperWriting);
+els.replayAnswerStrokeBtn?.addEventListener("click", replayAnswerStroke);
+els.correctBtn?.addEventListener("click", () => recordAnswer(true));
+els.wrongBtn?.addEventListener("click", () => recordAnswer(false));
+els.quitBtn?.addEventListener("click", quitSession);
+
+els.choiceSpeakBtn?.addEventListener("click", speakChoiceCurrent);
+els.choiceFeedback?.addEventListener("click", nextChoiceQuestion);
+els.quitChoiceBtn?.addEventListener("click", quitChoice);
+
+els.storyFilterAllBtn?.addEventListener("click", () => setStoryFilter("all", state.storyIndex));
+els.storyFilterWrongBtn?.addEventListener("click", () => setStoryFilter("wrong", state.storyIndex));
+els.storyFilterNewBtn?.addEventListener("click", () => setStoryFilter("new", state.storyIndex));
+els.storyJumpSelect?.addEventListener("change", event => {
+    const pos = parseInt(event.target.value, 10);
+    if (!isNaN(pos)) renderStoryParagraphByPos(pos);
+});
+els.storyDetailSpeakBtn?.addEventListener("click", () => {
+    if (state.storyDetailChar) speakSingleCharacter(state.storyDetailChar);
+});
+els.storyDetailWrongToggleBtn?.addEventListener("click", toggleStoryDetailWrongBook);
+
+els.storyPinyinBtn?.addEventListener("click", toggleStoryPinyin);
+els.storySpeakBtn?.addEventListener("click", speakStory);
 els.storyPrevBtn?.addEventListener("click", prevStoryParagraph);
 els.storyNextBtn?.addEventListener("click", nextStoryParagraph);
-els.quitStoryBtn.addEventListener("click", () => {
-    window.speechSynthesis?.cancel?.();
+els.quitStoryBtn?.addEventListener("click", () => {
+    stopAllSpeech();
+    stopStoryReading();
     clearStoryCharHighlights();
     showScreen("setup");
+    refreshHomeStats();
 });
 
 els.storyText?.addEventListener("click", event => {
@@ -2869,30 +3084,41 @@ els.storyText?.addEventListener("keydown", event => {
         }
     }
 });
-els.previousStrokeBtn.addEventListener("click", showPreviousStrokeCharacter);
-els.strokeWatchBtn?.addEventListener("click", () => setStrokeMode("watch"));
-els.strokeQuizBtn?.addEventListener("click", () => setStrokeMode("quiz"));
-els.nextStrokeBtn.addEventListener("click", showNextStrokeCharacter);
-els.quitStrokeBtn.addEventListener("click", quitStrokePractice);
 
-els.backHomeBtn.addEventListener("click", () => {
-    window.speechSynthesis?.cancel?.();
+els.wallFilterAll?.addEventListener("click", () => setWallFilter("all"));
+els.wallFilterNew?.addEventListener("click", () => setWallFilter("new"));
+els.wallFilterWrong?.addEventListener("click", () => setWallFilter("wrong"));
+els.wallFilterLearning?.addEventListener("click", () => setWallFilter("learning"));
+els.wallFilterMastered?.addEventListener("click", () => setWallFilter("mastered"));
+els.wallInspectorSpeakBtn?.addEventListener("click", () => {
+    if (state.wallSelectedChar) speakSingleCharacter(state.wallSelectedChar);
+});
+els.wallInspectorWrongBtn?.addEventListener("click", () => {
+    if (!state.wallSelectedChar) return;
+    const stats = loadStats();
+    const cs = getCharStats(stats, state.wallSelectedChar);
+    const nextState = !cs.inWrongBook;
+    setCharWrongBookState(state.wallSelectedChar, nextState);
+    if (window.kidToast) {
+        window.kidToast(
+            nextState ? `已将“${state.wallSelectedChar}”加入错字本 📕` : `已将“${state.wallSelectedChar}”移出错字本 👍`,
+            nextState ? "info" : "success"
+        );
+    }
+});
+els.wallInspectorCloseBtn?.addEventListener("click", () => {
+    state.wallSelectedChar = "";
+    els.wallCharInspector?.classList.add("hidden");
+    els.hanziWallGrid?.querySelectorAll(".hanzi-wall-cell.selected").forEach(cell => cell.classList.remove("selected"));
+});
+
+els.backHomeBtn?.addEventListener("click", () => {
+    stopAllSpeech();
     showScreen("setup");
     refreshHomeStats();
 });
 
-els.practiceWrongBtn.addEventListener("click", () => {
-    if (state.mode === "recognition") {
-        const unfamiliarItems = getUniqueItems(state.recognitionAnswers
-            .filter(answer => !answer.isCorrect)
-            .map(answer => answer.item));
-
-        if (unfamiliarItems.length > 0) {
-            startRecognition(unfamiliarItems);
-        }
-        return;
-    }
-
+els.practiceWrongBtn?.addEventListener("click", () => {
     if (state.mode === "choice") {
         const wrongItems = getUniqueItems(state.choiceAnswers
             .filter(answer => !answer.isCorrect)
@@ -2904,10 +3130,7 @@ els.practiceWrongBtn.addEventListener("click", () => {
     const wrongItems = getUniqueItems(state.answers
         .filter(answer => !answer.isCorrect)
         .map(answer => answer.item));
-
-    if (wrongItems.length > 0) {
-        startSession(wrongItems);
-    }
+    if (wrongItems.length > 0) startSession(wrongItems);
 });
 
 if (els.quickDueBtn) {
@@ -2924,9 +3147,7 @@ if (els.continueDueBtn) {
         if (els.categorySelect) {
             els.categorySelect.value = "due";
         }
-        if (state.mode === "recognition") {
-            startRecognition();
-        } else if (state.mode === "choice") {
+        if (state.mode === "choice") {
             startChoice();
         } else {
             startSession();
@@ -2934,54 +3155,24 @@ if (els.continueDueBtn) {
     });
 }
 
-els.resetDataBtn.addEventListener("click", resetAllData);
+els.resetDataBtn?.addEventListener("click", resetAllData);
 
-if (els.openSettingsBtn) {
-    els.openSettingsBtn.addEventListener("click", openSettingsModal);
-}
-if (els.closeSettingsBtn) {
-    els.closeSettingsBtn.addEventListener("click", closeSettingsModal);
-}
-if (els.confirmSettingsBtn) {
-    els.confirmSettingsBtn.addEventListener("click", closeSettingsModal);
-}
-if (els.modalBackdrop) {
-    els.modalBackdrop.addEventListener("click", closeSettingsModal);
-}
-if (els.speechMode) {
-    els.speechMode.addEventListener("change", saveSpeechSettings);
-}
-if (els.speechRate) {
-    els.speechRate.addEventListener("change", saveSpeechSettings);
-}
-if (els.testSpeechBtn) {
-    els.testSpeechBtn.addEventListener("click", previewSpeech);
-}
+els.openSettingsBtn?.addEventListener("click", openSettingsModal);
+els.closeSettingsBtn?.addEventListener("click", closeSettingsModal);
+els.confirmSettingsBtn?.addEventListener("click", closeSettingsModal);
+els.modalBackdrop?.addEventListener("click", closeSettingsModal);
+els.speechMode?.addEventListener("change", saveSpeechSettings);
+els.speechRate?.addEventListener("change", saveSpeechSettings);
+els.testSpeechBtn?.addEventListener("click", previewSpeech);
 
-if (els.openSyncBtn) {
-    els.openSyncBtn.addEventListener("click", openSyncModal);
-}
-if (els.closeSyncBtn) {
-    els.closeSyncBtn.addEventListener("click", closeSyncModal);
-}
-if (els.confirmSyncBtn) {
-    els.confirmSyncBtn.addEventListener("click", closeSyncModal);
-}
-if (els.syncModalBackdrop) {
-    els.syncModalBackdrop.addEventListener("click", closeSyncModal);
-}
-if (els.pushSyncBtn) {
-    els.pushSyncBtn.addEventListener("click", () => pushToCloud(false));
-}
-if (els.pullSyncBtn) {
-    els.pullSyncBtn.addEventListener("click", () => pullFromCloud(false));
-}
-if (els.syncKeyInput) {
-    els.syncKeyInput.addEventListener("change", saveSyncConfigFromUI);
-}
-if (els.autoSyncCheckbox) {
-    els.autoSyncCheckbox.addEventListener("change", saveSyncConfigFromUI);
-}
+els.openSyncBtn?.addEventListener("click", openSyncModal);
+els.closeSyncBtn?.addEventListener("click", closeSyncModal);
+els.confirmSyncBtn?.addEventListener("click", closeSyncModal);
+els.syncModalBackdrop?.addEventListener("click", closeSyncModal);
+els.pushSyncBtn?.addEventListener("click", () => pushToCloud(false));
+els.pullSyncBtn?.addEventListener("click", () => pullFromCloud(false));
+els.syncKeyInput?.addEventListener("change", saveSyncConfigFromUI);
+els.autoSyncCheckbox?.addEventListener("change", saveSyncConfigFromUI);
 
 function initSync() {
     loadSyncConfigToUI();
@@ -3005,52 +3196,37 @@ document.addEventListener("keydown", event => {
         }
     }
 
-    const dictationActive =
-        !els.dictationScreen.classList.contains("hidden");
-    const recognitionActive =
-        !els.recognitionScreen.classList.contains("hidden");
+    const dictationActive = !els.dictationScreen.classList.contains("hidden");
     const choiceActive = !els.choiceScreen.classList.contains("hidden");
     const storyActive = !els.storyScreen.classList.contains("hidden");
-    const strokeActive = !els.strokeScreen.classList.contains("hidden");
 
-    if (!dictationActive && !recognitionActive && !choiceActive && !storyActive && !strokeActive) return;
+    if (!dictationActive && !choiceActive && !storyActive) return;
 
-    if (event.code === "Space" && !strokeActive) {
+    if (event.code === "Space") {
         event.preventDefault();
-
-        if (dictationActive) {
-            speakCurrent();
-        } else if (recognitionActive) {
-            speakRecognitionCurrent();
-        } else if (choiceActive) {
-            speakChoiceCurrent();
-        } else if (storyActive) {
-            speakStory();
-        }
+        if (dictationActive) speakCurrent();
+        else if (choiceActive) speakChoiceCurrent();
+        else if (storyActive) speakStory();
     }
 
     if (dictationActive) {
-        if (
-            event.key === "Enter" &&
-            !els.showAnswerBtn.classList.contains("hidden") &&
-            !els.showAnswerBtn.disabled
-        ) {
-            submitWriting();
+        if (state.dictationWriteMode === "paper") {
+            if (event.key === "Enter" && !els.paperPromptBox.classList.contains("hidden") && !els.showAnswerBtn.disabled) {
+                submitPaperWriting();
+            }
+            if (!els.answerPanel.classList.contains("hidden") && !state.reviewLocked) {
+                if (event.key === "ArrowLeft") recordAnswer(false);
+                if (event.key === "ArrowRight") recordAnswer(true);
+            }
+        } else {
+            if (event.key === "Enter" && state.ipadQuizCompleted && !state.reviewLocked) {
+                recordAnswer(true);
+            }
+            if (!els.ipadCompleteBar.classList.contains("hidden") && !state.reviewLocked) {
+                if (event.key === "ArrowLeft") recordAnswer(false);
+                if (event.key === "ArrowRight") recordAnswer(true);
+            }
         }
-
-        if (!els.answerPanel.classList.contains("hidden") && !state.reviewLocked) {
-            if (event.key === "ArrowLeft") recordAnswer(false);
-            if (event.key === "ArrowRight") recordAnswer(true);
-        }
-    }
-
-    if (
-        recognitionActive &&
-        !els.recognitionReveal.classList.contains("hidden") &&
-        !state.recognitionLocked
-    ) {
-        if (event.key === "ArrowLeft") recordRecognitionAnswer(false);
-        if (event.key === "ArrowRight") recordRecognitionAnswer(true);
     }
 
     if (choiceActive) {
@@ -3065,11 +3241,6 @@ document.addEventListener("keydown", event => {
         }
     }
 
-    if (strokeActive) {
-        if (event.key === "ArrowLeft") showPreviousStrokeCharacter();
-        if (event.key === "ArrowRight") showNextStrokeCharacter();
-    }
-
     if (storyActive) {
         if (event.key === "ArrowLeft") prevStoryParagraph();
         if (event.key === "ArrowRight") nextStoryParagraph();
@@ -3078,12 +3249,24 @@ document.addEventListener("keydown", event => {
 
 if ("speechSynthesis" in window) {
     window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => {
+    const refreshVoices = () => {
         cachedChineseVoice = undefined;
         getChineseVoice();
     };
+    window.speechSynthesis.onvoiceschanged = refreshVoices;
+    window.speechSynthesis.addEventListener?.("voiceschanged", refreshVoices);
+    setTimeout(refreshVoices, 250);
+    setTimeout(refreshVoices, 800);
+    setTimeout(refreshVoices, 1600);
 }
 
+if (typeof window !== "undefined") {
+    window.addEventListener("touchstart", unlockAudioAndTTS, {once: true, capture: true, passive: true});
+    window.addEventListener("touchend", unlockAudioAndTTS, {once: true, capture: true, passive: true});
+    window.addEventListener("click", unlockAudioAndTTS, {once: true, capture: true, passive: true});
+}
+
+loadDictationPreferences();
 buildCategoryOptions();
 refreshHomeStats();
 loadSpeechSettings();
@@ -3105,11 +3288,11 @@ function switchHomeTab(tabName) {
 
     const updateBtn = (btn, isActive) => {
         if (!btn) return;
-        btn.className = `flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative ${isActive ? 'text-indigo-600 font-black' : 'text-slate-400 hover:text-slate-600 font-bold'}`;
-        const icon = btn.querySelector('.text-xl, .text-2xl');
-        if (icon) icon.className = `text-xl sm:text-2xl transition-transform ${isActive ? 'scale-110' : 'opacity-75'}`;
-        const indicator = btn.querySelector('.nav-indicator');
-        if (indicator) indicator.className = `nav-indicator w-6 h-1 rounded-full mt-0.5 ${isActive ? 'bg-indigo-600' : 'bg-transparent'}`;
+        btn.className = `flex flex-col items-center justify-center py-1 transition-all active:scale-95 touch-manipulation relative ${isActive ? "text-indigo-600 font-black" : "text-slate-400 hover:text-slate-600 font-bold"}`;
+        const icon = btn.querySelector(".text-xl, .text-2xl");
+        if (icon) icon.className = `text-xl sm:text-2xl transition-transform ${isActive ? "scale-110" : "opacity-75"}`;
+        const indicator = btn.querySelector(".nav-indicator");
+        if (indicator) indicator.className = `nav-indicator w-6 h-1 rounded-full mt-0.5 ${isActive ? "bg-indigo-600" : "bg-transparent"}`;
     };
 
     updateBtn(navTabPractice, tabName === "practice");
@@ -3135,20 +3318,6 @@ document.getElementById("practiceWrongFromTabBtn")?.addEventListener("click", ()
     startSession(wrongChars);
 });
 
-document.getElementById("practiceWrongRecognitionBtn")?.addEventListener("click", () => {
-    const stats = loadStats();
-    const wrongChars = getWrongCharacters(stats);
-    if (wrongChars.length === 0) {
-        if (window.kidToast) {
-            window.kidToast("错字本目前为空，太棒啦！🎉", "success");
-        } else {
-            alert("错字本目前为空，太棒啦！");
-        }
-        return;
-    }
-    startRecognition(wrongChars);
-});
-
 document.getElementById("practiceWrongChoiceBtn")?.addEventListener("click", () => {
     const stats = loadStats();
     const wrongChars = getWrongCharacters(stats);
@@ -3171,22 +3340,14 @@ document.getElementById("emptyStateGoPracticeBtn")?.addEventListener("click", ()
     switchHomeTab("practice");
 });
 
-// 监听全局夜间护眼模式切换，即时刷新手写画笔与笔画演示色彩
-window.addEventListener('apiapia-theme-changed', () => {
-    if (typeof redrawWriting === "function" && els.writingCanvas) {
-        redrawWriting();
-    }
-    if (state.strokeWriter && !els.strokeScreen.classList.contains("hidden")) {
-        renderStrokeCharacter({silent: true});
-    }
-    // 答题面板展示时，即时刷新标准笔顺动画色彩与手写答卷对比图
-    if (els.answerPanel && !els.answerPanel.classList.contains("hidden") && state.session && state.session[state.currentIndex]) {
-        if (typeof renderAnswerStroke === "function") {
-            renderAnswerStroke(state.session[state.currentIndex].char);
+window.addEventListener("apiapia-theme-changed", () => {
+    if (!els.dictationScreen.classList.contains("hidden") && state.session && state.session[state.currentIndex]) {
+        const currentItem = state.session[state.currentIndex];
+        if (state.dictationWriteMode === "ipad" && !state.ipadQuizCompleted) {
+            startDictationIpadQuiz(currentItem);
         }
-        if (state.strokes.length > 0 && els.currentWritingPreview && !els.currentWritingPreview.classList.contains("hidden")) {
-            captureWriting();
-            els.currentWritingPreview.src = state.currentWriting;
+        if (state.dictationWriteMode === "paper" && els.answerPanel && !els.answerPanel.classList.contains("hidden")) {
+            renderAnswerStroke(currentItem.char);
         }
     }
 });

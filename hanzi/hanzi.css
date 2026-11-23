@@ -4,34 +4,6 @@
    ============================================================ */
 
 
-/* ================== 小学生标准田字格手写板 ================== */
-.writing-board {
-    position: relative;
-    width: min(340px, 84vw);
-    aspect-ratio: 1;
-    margin: 0 auto;
-    overflow: hidden;
-    border: 3px solid #ef4444;
-    border-radius: 20px;
-    background-color: #ffffff;
-    background-image:
-        /* 中间横十字虚线 */
-        linear-gradient(to right, transparent calc(50% - 1.5px), #fca5a5 50%, transparent calc(50% + 1.5px)),
-        linear-gradient(to bottom, transparent calc(50% - 1.5px), #fca5a5 50%, transparent calc(50% + 1.5px)),
-        /* 对角米字格线 */
-        linear-gradient(45deg, transparent calc(50% - 1px), #fee2e2 50%, transparent calc(50% + 1px)),
-        linear-gradient(-45deg, transparent calc(50% - 1px), #fee2e2 50%, transparent calc(50% + 1px));
-    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
-}
-
-#writingCanvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    touch-action: none;
-    cursor: crosshair;
-}
-
 /* ================== 笔顺演示田字格 ================== */
 .answer-stroke-grid {
     position: relative;
@@ -154,7 +126,7 @@
 }
 
 /* 首页模式大卡片点按凹陷手感 */
-#startBtn:active, #recognitionStartBtn:active, #storyStartBtn:active, #strokeStartBtn:active {
+#startBtn:active, #choiceStartBtn:active, #storyStartBtn:active {
     transform: scale(0.98) translateY(2px) !important;
     filter: brightness(0.96);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
@@ -251,7 +223,7 @@
     background-color: #94a3b8;
 }
 
-/* 选字/认读模式下的字块流式排版：居中换行，保持均匀整齐的间距 */
+/* 选字模式下的字块流式排版：居中换行，保持均匀整齐的间距 */
 .result-list:not(.dictation-results) {
     display: flex;
     flex-wrap: wrap;
@@ -361,57 +333,6 @@
 .dictation-result.wrong {
     border-color: #fda4af;
     background: #fffbfb;
-}
-
-.comparison {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 10px;
-}
-
-.comparison-box {
-    background: #f8fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 10px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.comparison-box strong {
-    display: block;
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-}
-
-.written-preview {
-    width: 80px;
-    height: 80px;
-    object-fit: contain;
-    border-radius: 12px;
-    background: #ffffff;
-    border: 1.5px solid #e2e8f0;
-}
-
-.result-standard {
-    width: 80px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: "KaiTi", "STKaiti", "楷体", serif;
-    font-size: 52px;
-    font-weight: 900;
-    color: #1e293b;
-    border-radius: 12px;
-    background: #ffffff;
-    border: 1.5px solid #e2e8f0;
 }
 
 .result-verdict {
@@ -611,9 +532,7 @@ html.dark .verdict-review-time {
 /* ================== 防误触/防双击核对按钮锁定动效与状态 ================== */
 #showAnswerBtn,
 #wrongBtn,
-#correctBtn,
-#recognitionWrongBtn,
-#recognitionCorrectBtn {
+#correctBtn {
     transition: opacity 0.25s cubic-bezier(0.2, 0, 0, 1),
                 filter 0.25s cubic-bezier(0.2, 0, 0, 1),
                 transform 0.08s ease,
@@ -622,48 +541,13 @@ html.dark .verdict-review-time {
 
 #showAnswerBtn:disabled,
 #wrongBtn:disabled,
-#correctBtn:disabled,
-#recognitionWrongBtn:disabled,
-#recognitionCorrectBtn:disabled {
+#correctBtn:disabled {
     opacity: 0.55 !important;
     cursor: not-allowed !important;
     pointer-events: none !important;
     transform: none !important;
     box-shadow: none !important;
     filter: grayscale(0.25);
-}
-
-/* ================== 笔画练习：看笔顺 / 我来写 切换 ================== */
-.stroke-mode-switch {
-    display: inline-flex;
-    gap: 4px;
-    padding: 4px;
-    border-radius: 999px;
-    background: #f1f5f9;
-    border: 2px solid #e2e8f0;
-}
-
-.stroke-mode-btn {
-    min-width: 108px;
-    padding: 8px 16px;
-    border-radius: 999px;
-    font-size: 15px;
-    font-weight: 900;
-    color: #64748b;
-    background: transparent;
-    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.stroke-mode-btn:active {
-    transform: scale(0.96);
-}
-
-.stroke-mode-btn.active {
-    background: #ffffff;
-    color: #e11d48;
-    box-shadow: 0 2px 8px rgba(225, 29, 72, 0.18);
 }
 
 /* 描写时禁止页面滚动/缩放，手指只用来写字 */
@@ -703,20 +587,6 @@ html.dark .verdict-review-time {
     color: #92400e;
 }
 
-html.dark .stroke-mode-switch {
-    background: #0f172a;
-    border-color: #334155;
-}
-
-html.dark .stroke-mode-btn {
-    color: #94a3b8;
-}
-
-html.dark .stroke-mode-btn.active {
-    background: #1e293b;
-    color: #fda4af;
-}
-
 html.dark .stroke-feedback {
     color: #94a3b8;
 }
@@ -736,4 +606,275 @@ html.dark .stroke-feedback.done {
 html.dark .story-ruby.story-reading .story-char {
     background-color: rgba(250, 204, 21, 0.22);
     color: #fef08a;
+}
+
+/* ================== 听写与笔顺双模式 ================== */
+.dictation-write-mode-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 5px;
+    border-radius: 18px;
+    background: #eef2ff;
+    border: 2px solid #e0e7ff;
+}
+
+.dictation-write-mode-btn {
+    padding: 9px 10px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 900;
+    color: #64748b;
+    background: transparent;
+    transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.dictation-write-mode-btn:active {
+    transform: scale(0.97);
+}
+
+.dictation-write-mode-btn.active {
+    background: #ffffff;
+    color: #4f46e5;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.18);
+}
+
+.ipad-tool-btn {
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+}
+
+.ipad-tool-btn:active {
+    transform: scale(0.95);
+}
+
+.ipad-tool-btn.active {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+}
+
+.paper-answer-stroke-wrap {
+    width: min(230px, 64vw);
+    margin: 0 auto;
+}
+
+/* ================== 故事错字标记与点字助学条 ================== */
+.story-ruby.story-ruby-wrong .story-char {
+    border-bottom: 2.5px dashed #f43f5e;
+    background-color: rgba(254, 226, 226, 0.45);
+}
+
+.story-filter-pill {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+}
+
+.story-filter-pill.active {
+    background: #10b981;
+    border-color: #10b981;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+}
+
+.story-detail-bar {
+    border: 2px solid #e0e7ff;
+    background: #f8faff;
+    border-radius: 18px;
+    padding: 10px 12px;
+}
+
+/* ================== 已学汉字累计墙 ================== */
+.wall-filter-pill {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #64748b;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+}
+
+.wall-filter-pill.active {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+}
+
+.hanzi-wall-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+    gap: 7px;
+    max-height: 340px;
+    overflow-y: auto;
+    padding: 2px;
+}
+
+.hanzi-wall-cell {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    background: #f8fafc;
+    color: #334155;
+    font-family: "KaiTi", "STKaiti", "楷体", serif;
+    font-size: 22px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+.hanzi-wall-cell:active {
+    transform: scale(0.92);
+}
+
+.hanzi-wall-cell.selected {
+    box-shadow: 0 0 0 2.5px #4f46e5;
+    border-color: #4f46e5 !important;
+}
+
+.hanzi-wall-cell.status-mastered {
+    background: #ecfdf5;
+    border-color: #6ee7b7;
+    color: #065f46;
+}
+
+.hanzi-wall-cell.status-learning {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1e40af;
+}
+
+.hanzi-wall-cell.status-new {
+    background: #fefce8;
+    border-color: #fde047;
+    color: #854d0e;
+}
+
+.hanzi-wall-cell.status-wrong {
+    background: #fff1f2;
+    border-color: #fda4af;
+    color: #be123c;
+}
+
+.hanzi-wall-cell .wall-dot {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.hanzi-wall-cell.status-new .wall-dot {
+    background: #eab308;
+}
+
+.hanzi-wall-cell.status-wrong .wall-dot {
+    background: #f43f5e;
+}
+
+.hanzi-wall-cell.status-mastered .wall-dot {
+    background: #10b981;
+}
+
+/* 夜间模式适配 */
+html.dark .dictation-write-mode-switch {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+html.dark .dictation-write-mode-btn {
+    color: #94a3b8;
+}
+
+html.dark .dictation-write-mode-btn.active {
+    background: #1e293b;
+    color: #a5b4fc;
+}
+
+html.dark .ipad-tool-btn,
+html.dark .story-filter-pill,
+html.dark .wall-filter-pill {
+    background: #1e293b;
+    border-color: #334155;
+    color: #cbd5e1;
+}
+
+html.dark .ipad-tool-btn.active,
+html.dark .wall-filter-pill.active {
+    background: #4f46e5;
+    border-color: #6366f1;
+    color: #ffffff;
+}
+
+html.dark .story-filter-pill.active {
+    background: #059669;
+    border-color: #10b981;
+    color: #ffffff;
+}
+
+html.dark .story-ruby.story-ruby-wrong .story-char {
+    background-color: rgba(244, 63, 94, 0.25);
+    border-bottom-color: #fb7185;
+}
+
+html.dark .story-detail-bar {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+html.dark .hanzi-wall-cell {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+html.dark .hanzi-wall-cell.status-mastered {
+    background: rgba(6, 78, 59, 0.45);
+    border-color: #059669;
+    color: #6ee7b7;
+}
+
+html.dark .hanzi-wall-cell.status-learning {
+    background: rgba(30, 58, 138, 0.4);
+    border-color: #3b82f6;
+    color: #93c5fd;
+}
+
+html.dark .hanzi-wall-cell.status-new {
+    background: rgba(113, 63, 18, 0.45);
+    border-color: #ca8a04;
+    color: #fde047;
+}
+
+html.dark .hanzi-wall-cell.status-wrong {
+    background: rgba(76, 5, 25, 0.5);
+    border-color: #e11d48;
+    color: #fda4af;
 }

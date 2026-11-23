@@ -279,19 +279,19 @@ const app = createApp({
             {
                 id: 'hanzi',
                 title: '汉字听写与笔顺',
-                subtitle: '170 启蒙字 · 规范笔顺动画 · 选字',
+                subtitle: '已学字库 · iPad笔画纠错 · 故事巩固',
                 icon: '✍️',
                 iconBg: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
                 barClass: 'bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500',
                 cardBorder: 'border-emerald-300 hover:border-emerald-500',
                 btnClass: 'kid-btn-success',
-                userProgressText: '170 常用启蒙生字 · 规范笔顺',
+                userProgressText: 'iPad笔画手写 · 故事阅读 · 错字巩固',
                 dueCount: 0,
                 masteredCount: 0,
                 tags: [
-                    { text: '标准田字格', color: '#10b981' },
-                    { text: '慢动作笔顺', color: '#f59e0b' },
-                    { text: '5选1选字', color: '#6366f1' }
+                    { text: 'iPad笔画手写', color: '#10b981' },
+                    { text: '纸上听写核对', color: '#f59e0b' },
+                    { text: '故事阅读巩固', color: '#6366f1' }
                 ],
                 url: 'hanzi/hanzi.html',
                 btnText: '汉字学习'
@@ -372,14 +372,19 @@ const app = createApp({
                 const hzMod = modules.value.find(m => m.id === 'hanzi');
                 if (hzMod) {
                     if (hzRaw) {
-                        const stats = JSON.parse(hzRaw);
-                        const chars = Object.keys(stats);
+                        const parsed = JSON.parse(hzRaw);
+                        const charMap = (parsed && parsed.characters && typeof parsed.characters === 'object') ? parsed.characters : {};
+                        const chars = Object.keys(charMap);
                         if (chars.length > 0) {
-                            const mastered = chars.filter(c => stats[c].correct > 0 && (stats[c].wrong || 0) === 0).length;
+                            const now = Date.now();
+                            const practicedChars = chars.filter(c => (charMap[c].practiced || 0) > 0).length;
+                            const mastered = chars.filter(c => (charMap[c].level || 0) >= 3).length;
+                            const due = chars.filter(c => (charMap[c].nextReviewDate || 0) <= now).length;
+                            hzMod.dueCount = due;
                             hzMod.masteredCount = mastered;
-                            hzMod.userProgressText = `已练 ${chars.length} / 170 字 · 满分掌握 ${mastered} 字`;
+                            hzMod.userProgressText = `已练 ${practicedChars}/${chars.length} 字 · 已掌握 ${mastered} 字`;
                         } else {
-                            hzMod.userProgressText = '尚未开始打卡，点击开启笔顺练习';
+                            hzMod.userProgressText = '尚未开始打卡，点击开启汉字练习';
                         }
                     }
                 }
