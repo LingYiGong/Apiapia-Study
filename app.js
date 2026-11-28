@@ -1,23 +1,6 @@
 // Vue 3 + Vant 4 业务逻辑
 const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
 
-// 当前客户端内置基线版本号
-const BUILD_VERSION = '2.3.0';
-
-// Semver 版本比较辅助函数 (remote > current 返回 true)
-function isNewerVersion(remote, current) {
-    if (!remote || !current) return false;
-    const rParts = remote.split('.').map(num => parseInt(num, 10) || 0);
-    const cParts = current.split('.').map(num => parseInt(num, 10) || 0);
-    for (let i = 0; i < Math.max(rParts.length, cParts.length); i++) {
-        const r = rParts[i] || 0;
-        const c = cParts[i] || 0;
-        if (r > c) return true;
-        if (r < c) return false;
-    }
-    return false;
-}
-
 const app = createApp({
     setup() {
         // 夜间护眼模式响应式状态与方法
@@ -37,109 +20,6 @@ const app = createApp({
             }
         };
         window.addEventListener('apiapia-theme-changed', onThemeChanged);
-
-        // 当前版本与自动更新状态 (优先取本地已确认的最新版本，缺省采用 BUILD_VERSION)
-        const storedVersion = localStorage.getItem('study_hub_version');
-        // 若内置版本高于本地缓存版本，自动进位
-        const initialVersion = isNewerVersion(BUILD_VERSION, storedVersion) ? BUILD_VERSION : (storedVersion || BUILD_VERSION);
-        localStorage.setItem('study_hub_version', initialVersion);
-
-        const appVersion = ref(initialVersion);
-        const hasUpdate = ref(false);
-        const latestVersion = ref('');
-        const isChecking = ref(false);
-
-        const checkForUpdates = async (isManual = false) => {
-            if (isChecking.value) return;
-            isChecking.value = true;
-            try {
-                const res = await fetch(`version.json?_t=${Date.now()}`, {
-                    cache: 'no-store',
-                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
-                });
-                if (!res.ok) throw new Error('网络请求异常');
-                const data = await res.json();
-                const serverVersion = (data && data.version) ? data.version.trim() : '';
-
-                if (serverVersion && isNewerVersion(serverVersion, appVersion.value)) {
-                    latestVersion.value = serverVersion;
-                    hasUpdate.value = true;
-                    if (isManual) {
-                        if (window.kidToast) {
-                            window.kidToast(`🎉 发现新版本 v${serverVersion}！请点击上方更新`, 'warning');
-                        } else if (window.vant && window.vant.showNotify) {
-                            window.vant.showNotify({ type: 'warning', message: `🎉 发现新版本 v${serverVersion}！请点击上方更新` });
-                        }
-                    }
-                } else {
-                    hasUpdate.value = false;
-                    // 同步记录为当前版本
-                    if (serverVersion && !isNewerVersion(appVersion.value, serverVersion)) {
-                        appVersion.value = serverVersion;
-                        localStorage.setItem('study_hub_version', serverVersion);
-                    }
-                    if (isManual) {
-                        if (window.kidToast) {
-                            window.kidToast(`已经是最新版本啦 ✨ (v${appVersion.value}) 跟着猫咪 Apiapia 一起闯关吧！`, 'success');
-                        } else if (window.vant && window.vant.showToast) {
-                            window.vant.showToast({ message: `已经是最新版本啦 ✨ (v${appVersion.value}) 跟着猫咪 Apiapia 一起闯关吧！`, icon: 'passed' });
-                        }
-                    }
-                }
-            } catch (e) {
-                console.warn('检查更新失败:', e);
-                if (isManual) {
-                    if (window.kidToast) {
-                        window.kidToast('检查更新失败，请稍候再试', 'error');
-                    } else if (window.vant && window.vant.showToast) {
-                        window.vant.showToast({ message: '检查更新失败，请稍候再试', icon: 'cross' });
-                    }
-                }
-            } finally {
-                isChecking.value = false;
-            }
-        };
-
-        const manualCheckUpdate = () => {
-            checkForUpdates(true);
-        };
-
-        const applyUpdate = async () => {
-            const targetVer = latestVersion.value || appVersion.value;
-            try {
-                // 1. 本地立即记录最新版本，确保页面重载后直观显示新版本号
-                if (targetVer) {
-                    localStorage.setItem('study_hub_version', targetVer);
-                    appVersion.value = targetVer;
-                }
-                hasUpdate.value = false;
-
-                // 2. 清理 CacheStorage（若有 ServiceWorker 或浏览器文件强缓存）
-                if (window.caches) {
-                    const cacheKeys = await window.caches.keys();
-                    await Promise.all(cacheKeys.map(k => window.caches.delete(k)));
-                }
-            } catch (e) {
-                console.warn('清理更新缓存异常:', e);
-            }
-
-            // 3. 强制携带最新版本与时间戳重载，彻底击穿 Safari / PWA 磁盘缓存
-            const url = new URL(window.location.href);
-            url.searchParams.set('_v', targetVer || Date.now().toString());
-            url.searchParams.set('_t', Date.now().toString());
-            window.location.replace(url.toString());
-        };
-
-        const dismissUpdate = () => {
-            hasUpdate.value = false;
-        };
-
-        // 监听应用回到前台（如 iPad 从后台切换回来）自动静默检查
-        const onVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                checkForUpdates(false);
-            }
-        };
 
         // ==========================================
         // 手机桌面安装与 PWA 引导支持
@@ -623,18 +503,15 @@ const app = createApp({
         };
 
         onMounted(() => {
-            checkForUpdates(false);
             refreshModuleProgress();
-            document.addEventListener('visibilitychange', onVisibilityChange);
             window.addEventListener('pageshow', () => {
-                checkForUpdates(false);
                 refreshModuleProgress();
             });
 
             // 注册 PWA ServiceWorker
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./sw.js?v=' + BUILD_VERSION, { updateViaCache: 'none' }).then((reg) => {
+                    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
                         console.log('[SW] PWA ServiceWorker registered with scope:', reg.scope);
                     }).catch(err => {
                         console.warn('[SW] Registration failed:', err);
@@ -663,7 +540,6 @@ const app = createApp({
         onUnmounted(() => {
             if (progressTimer) clearInterval(progressTimer);
             window.removeEventListener('apiapia-theme-changed', onThemeChanged);
-            document.removeEventListener('visibilitychange', onVisibilityChange);
             window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
             window.removeEventListener('appinstalled', onAppInstalled);
             window.removeEventListener('hashchange', syncRouteFromHash);
@@ -674,13 +550,6 @@ const app = createApp({
         return {
             isDark,
             toggleTheme,
-            appVersion,
-            hasUpdate,
-            latestVersion,
-            isChecking,
-            manualCheckUpdate,
-            applyUpdate,
-            dismissUpdate,
             lastVisitedModule,
             currentDateText,
             modules,

@@ -1,5 +1,5 @@
 // Apiapia 学习中心 - PWA Service Worker
-const CACHE_NAME = 'apiapia-pwa-v2.3.1-r1';
+const CACHE_NAME = 'apiapia-pwa-cache';
 
 // 基础核心缓存资源（仅包含首屏与全站公共依赖，模块专属库按需缓存）
 // 注意：不要预缓存 './index.html'。Cloudflare 静态资源会把 /index.html 重定向到 /，
@@ -80,11 +80,10 @@ self.addEventListener('fetch', (event) => {
 
     const requestUrl = new URL(request.url);
 
-    // API、版本检测接口与跨域资源（TTS 等）直接交给浏览器
+    // API 与跨域资源（TTS 等）直接交给浏览器
     if (
         requestUrl.origin !== self.location.origin ||
-        requestUrl.pathname.startsWith('/api/') ||
-        requestUrl.pathname.endsWith('version.json')
+        requestUrl.pathname.startsWith('/api/')
     ) {
         return;
     }
@@ -124,7 +123,7 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // 忽略 ?v= 版本查询参数，使带版本号的请求能够命中预缓存
+    // 忽略查询参数，避免同一静态资源重复缓存
     const cacheKey = requestUrl.origin + requestUrl.pathname;
 
     event.respondWith((async () => {

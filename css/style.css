@@ -913,14 +913,6 @@ html.dark select option {
 }
 
 /* 7.1 特殊按钮与标签护眼对比适配 */
-html.dark .update-banner-btn {
-    background-color: #ffffff !important;
-    color: #ea580c !important;
-}
-html.dark .update-banner-btn:hover {
-    background-color: #fff7ed !important;
-}
-
 html.dark .module-feature-tag {
     filter: brightness(1.25) saturate(1.1);
 }

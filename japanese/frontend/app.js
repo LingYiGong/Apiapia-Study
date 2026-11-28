@@ -289,7 +289,11 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
 
                     // Auto-load built-in vocabulary if localStorage is empty
                     if (window.BUILTIN_VOCAB_ALL && Array.isArray(window.BUILTIN_VOCAB_ALL) && window.BUILTIN_VOCAB_ALL.length > 0) {
-                        words.value = JSON.parse(JSON.stringify(window.BUILTIN_VOCAB_ALL));
+                        words.value = window.BUILTIN_VOCAB_ALL.map(item => ({
+                            ...item,
+                            level: item.level || 0,
+                            next_review_date: item.next_review_date || 0
+                        }));
                         saveData();
                         showToast(`已自动载入内置词库（共 ${words.value.length} 词）`);
                     } else {
@@ -705,7 +709,9 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                 });
 
                 const learnedLongWords = computed(() => {
-                    return Array.from(learnedWordSet.value).filter(lw => lw.length >= 2);
+                    return Array.from(learnedWordSet.value).filter(lw =>
+                        (/[\u4e00-\u9faf]/.test(lw) && lw.length >= 2) || lw.length >= 3
+                    );
                 });
 
                 const isWordLearned = (wordStr) => {
@@ -2255,13 +2261,19 @@ const currentWordSentenceIndex = ref(0);
 
                     const mode = forcedMode || kanaTypeMode.value;
                     const sessionItems = selected.map(k => {
-                        let tType = mode;
+                        let tType;
                         let convDir = null;
-                        if (mode === 'mixed') {
-                            tType = Math.random() > 0.5 ? 'hiragana' : 'katakana';
-                        } else if (mode === 'conversion') {
-                            tType = 'conversion';
-                            convDir = Math.random() > 0.5 ? 'hira_to_kata' : 'kata_to_hira';
+                        if (customItems && k.targetType) {
+                            tType = k.targetType;
+                            convDir = k.conversionDirection || null;
+                        } else {
+                            tType = mode;
+                            if (mode === 'mixed') {
+                                tType = Math.random() > 0.5 ? 'hiragana' : 'katakana';
+                            } else if (mode === 'conversion') {
+                                tType = 'conversion';
+                                convDir = Math.random() > 0.5 ? 'hira_to_kata' : 'kata_to_hira';
+                            }
                         }
                         
                         const expected = (tType === 'katakana' || convDir === 'hira_to_kata') ? k.katakana : k.hiragana;
@@ -2322,12 +2334,15 @@ const currentWordSentenceIndex = ref(0);
 
                     kanaAnswers.value.push(record);
 
+                    const wrongKey = item.targetType === 'conversion'
+                        ? `${item.id}__${item.targetType}__${item.conversionDirection || ''}`
+                        : `${item.id}__${item.targetType}`;
+
                     if (!isCorrect) {
                         // 参考 @hanzi 机制：答错的题目自动追加到本轮队列末尾重练，加深记忆！
                         kanaSession.value.push({ ...item });
 
                         // 记入错题本
-                        const wrongKey = `${item.id}__${item.targetType}`;
                         const existIndex = kanaWrongList.value.findIndex(w => w.key === wrongKey);
                         if (existIndex >= 0) {
                             kanaWrongList.value[existIndex].errorCount += 1;
@@ -2355,9 +2370,9 @@ const currentWordSentenceIndex = ref(0);
                         }
                         saveKanaWrongList();
                     } else {
-                        // 回答正确，扣减错题本中的错误计数
-                        const wrongKey = `${item.id}__${item.targetType}`;
-                        const existIndex = kanaWrongList.value.findIndex(w => w.key === wrongKey);
+                        // 回答正确，扣减错题本中的错误计数（兼容旧版不含方向的 key）
+                        const legacyKey = `${item.id}__${item.targetType}`;
+                        const existIndex = kanaWrongList.value.findIndex(w => w.key === wrongKey || w.key === legacyKey);
                         if (existIndex >= 0) {
                             kanaWrongList.value[existIndex].errorCount -= 1;
                             if (kanaWrongList.value[existIndex].errorCount <= 0) {
