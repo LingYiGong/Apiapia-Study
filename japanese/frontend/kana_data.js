@@ -81,7 +81,7 @@ window.KANA_DATA = [
     // ざ行
     { id: 'k_za', hiragana: 'ざ', katakana: 'ザ', romaji: 'za', group: 'dakuon', groupName: '浊音・半浊音', row: 'za', rowName: 'ざ行', example: '雑誌 (ざっし)', exampleKata: 'デザイン (设计)', strokesHira: 5, strokesKata: 5 },
     { id: 'k_ji_z', hiragana: 'じ', katakana: 'ジ', romaji: 'ji', group: 'dakuon', groupName: '浊音・半浊音', row: 'za', rowName: 'ざ行', example: '時間 (じかん)', exampleKata: 'ジュース (果汁)', strokesHira: 3, strokesKata: 5 },
-    { id: 'k_zu_z', hiragana: 'ず', katakana: 'ず', romaji: 'zu', group: 'dakuon', groupName: '浊音・半浊音', row: 'za', rowName: 'ざ行', example: '地図 (ちず)', exampleKata: 'ズボン (裤子)', strokesHira: 4, strokesKata: 4 },
+    { id: 'k_zu_z', hiragana: 'ず', katakana: 'ズ', romaji: 'zu', group: 'dakuon', groupName: '浊音・半浊音', row: 'za', rowName: 'ざ行', example: '地図 (ちず)', exampleKata: 'ズボン (裤子)', strokesHira: 4, strokesKata: 4 },
     { id: 'k_ze', hiragana: 'ぜ', katakana: 'ゼ', romaji: 'ze', group: 'dakuon', groupName: '浊音・半浊音', row: 'za', rowName: 'ざ行', example: '全部 (ぜんぶ)', exampleKata: 'ゼリー (果冻)', strokesHira: 5, strokesKata: 4 },
     { id: 'k_zo', hiragana: 'ぞ', katakana: 'ゾ', romaji: 'zo', group: 'dakuon', groupName: '浊音・半浊音', row: 'za', rowName: 'ざ行', example: '象 (ぞう)', exampleKata: 'ゾーン (区域)', strokesHira: 3, strokesKata: 4 },
 
@@ -90,12 +90,12 @@ window.KANA_DATA = [
     { id: 'k_ji_d', hiragana: 'ぢ', katakana: 'ヂ', romaji: 'ji', group: 'dakuon', groupName: '浊音・半浊音', row: 'da', rowName: 'だ行', example: '鼻血 (はなぢ)', exampleKata: 'ヂ (同音字/外来语)', strokesHira: 4, strokesKata: 5 },
     { id: 'k_zu_d', hiragana: 'づ', katakana: 'ヅ', romaji: 'zu', group: 'dakuon', groupName: '浊音・半浊音', row: 'da', rowName: 'だ行', example: '続く (つづく)', exampleKata: 'ヅ (同音字/外来语)', strokesHira: 3, strokesKata: 5 },
     { id: 'k_de', hiragana: 'で', katakana: 'デ', romaji: 'de', group: 'dakuon', groupName: '浊音・半浊音', row: 'da', rowName: 'だ行', example: '電話 (でんわ)', exampleKata: 'デパート (百货)', strokesHira: 3, strokesKata: 5 },
-    { id: 'k_do', hiragana: 'ど', katakana: 'ド', romaji: 'do', group: 'dakuon', groupName: '浊音・半浊音', row: 'da', rowName: 'だ行', example: '友達 (ともだち)', exampleKata: 'ドア (门)', strokesHira: 4, strokesKata: 4 },
+    { id: 'k_do', hiragana: 'ど', katakana: 'ド', romaji: 'do', group: 'dakuon', groupName: '浊音・半浊音', row: 'da', rowName: 'だ行', example: '土曜日 (どようび)', exampleKata: 'ドア (门)', strokesHira: 4, strokesKata: 4 },
 
     // ば行
     { id: 'k_ba', hiragana: 'ば', katakana: 'バ', romaji: 'ba', group: 'dakuon', groupName: '浊音・半浊音', row: 'ba', rowName: 'ば行', example: '場所 (ばしょ)', exampleKata: 'バス (巴士)', strokesHira: 5, strokesKata: 4 },
     { id: 'k_bi', hiragana: 'び', katakana: 'ビ', romaji: 'bi', group: 'dakuon', groupName: '浊音・半浊音', row: 'ba', rowName: 'ば行', example: '病院 (びょういん)', exampleKata: 'ビル (大楼)', strokesHira: 3, strokesKata: 4 },
-    { id: 'k_bu', hiragana: 'ぶ', katakana: 'ブ', romaji: 'bu', group: 'dakuon', groupName: '浊音・半浊音', row: 'ba', rowName: 'ば行', example: '文化 (ぶんか)', exampleKata: 'ベッド (床)', strokesHira: 6, strokesKata: 3 },
+    { id: 'k_bu', hiragana: 'ぶ', katakana: 'ブ', romaji: 'bu', group: 'dakuon', groupName: '浊音・半浊音', row: 'ba', rowName: 'ば行', example: '文化 (ぶんか)', exampleKata: 'ブーツ (靴子)', strokesHira: 6, strokesKata: 3 },
     { id: 'k_be', hiragana: 'べ', katakana: 'ベ', romaji: 'be', group: 'dakuon', groupName: '浊音・半浊音', row: 'ba', rowName: 'ば行', example: '勉強 (べんきょう)', exampleKata: 'ベルト (皮带)', strokesHira: 3, strokesKata: 3 },
     { id: 'k_bo', hiragana: 'ぼ', katakana: 'ボ', romaji: 'bo', group: 'dakuon', groupName: '浊音・半浊音', row: 'ba', rowName: 'ば行', example: '貿易 (ぼうえき)', exampleKata: 'ボーイ (男孩/服务生)', strokesHira: 6, strokesKata: 6 },
 
@@ -107,9 +107,9 @@ window.KANA_DATA = [
     { id: 'k_po', hiragana: 'ぽ', katakana: 'ポ', romaji: 'po', group: 'dakuon', groupName: '浊音・半浊音', row: 'pa', rowName: 'ぱ行', example: 'ぽかぽか (暖洋洋)', exampleKata: 'ポスト (邮箱)', strokesHira: 5, strokesKata: 5 },
 
     // ================= 常用拗音 (33字) =================
-    { id: 'k_kya', hiragana: 'きゃ', katakana: 'キャ', romaji: 'kya', group: 'youon', groupName: '拗音', row: 'kya', rowName: 'きゃ行', example: 'きゃく (客)', exampleKata: 'キャンプ (野营)', strokesHira: 6, strokesKata: 5 },
+    { id: 'k_kya', hiragana: 'きゃ', katakana: 'キャ', romaji: 'kya', group: 'youon', groupName: '拗音', row: 'kya', rowName: 'きゃ行', example: 'きゃく (客)', exampleKata: 'キャンプ (野营)', strokesHira: 7, strokesKata: 5 },
     { id: 'k_kyu', hiragana: 'きゅ', katakana: 'キュ', romaji: 'kyu', group: 'youon', groupName: '拗音', row: 'kya', rowName: 'きゃ行', example: 'きゅうり (黄瓜)', exampleKata: 'キューブ (方块)', strokesHira: 6, strokesKata: 5 },
-    { id: 'k_kyo', hiragana: 'きょ', katakana: 'キョ', romaji: 'kyo', group: 'youon', groupName: '拗音', row: 'kya', rowName: 'きゃ行', example: 'きょう (今日)', exampleKata: 'キロ (公斤)', strokesHira: 6, strokesKata: 6 },
+    { id: 'k_kyo', hiragana: 'きょ', katakana: 'キョ', romaji: 'kyo', group: 'youon', groupName: '拗音', row: 'kya', rowName: 'きゃ行', example: 'きょう (今日)', exampleKata: 'キョウト (京都)', strokesHira: 6, strokesKata: 6 },
 
     { id: 'k_sha', hiragana: 'しゃ', katakana: 'シャ', romaji: 'sha', group: 'youon', groupName: '拗音', row: 'sha', rowName: 'しゃ行', example: 'しゃしん (写真)', exampleKata: 'シャワー (淋浴)', strokesHira: 4, strokesKata: 5 },
     { id: 'k_shu', hiragana: 'しゅ', katakana: 'シュ', romaji: 'shu', group: 'youon', groupName: '拗音', row: 'sha', rowName: 'しゃ行', example: 'しゅくだい (宿题)', exampleKata: 'シュークリーム (泡芙)', strokesHira: 3, strokesKata: 5 },
@@ -139,7 +139,7 @@ window.KANA_DATA = [
     { id: 'k_gyu', hiragana: 'ぎゅ', katakana: 'ギュ', romaji: 'gyu', group: 'youon', groupName: '拗音', row: 'gya', rowName: 'ぎゃ行', example: '牛乳 (ぎゅうにゅう)', exampleKata: 'ギュッ (紧紧握住)', strokesHira: 8, strokesKata: 7 },
     { id: 'k_gyo', hiragana: 'ぎょ', katakana: 'ギョ', romaji: 'gyo', group: 'youon', groupName: '拗音', row: 'gya', rowName: 'ぎゃ行', example: '魚 (ぎょ)', exampleKata: 'ギョーザ (饺子)', strokesHira: 8, strokesKata: 8 },
 
-    { id: 'k_ja', hiragana: 'じゃ', katakana: 'ジャ', romaji: 'ja', group: 'youon', groupName: '拗音', row: 'ja', rowName: 'じゃ行', example: 'じゃあ (那么)', exampleKata: 'シャツ/ジャム (果酱)', strokesHira: 6, strokesKata: 7 },
+    { id: 'k_ja', hiragana: 'じゃ', katakana: 'ジャ', romaji: 'ja', group: 'youon', groupName: '拗音', row: 'ja', rowName: 'じゃ行', example: 'じゃあ (那么)', exampleKata: 'ジャム (果酱)', strokesHira: 6, strokesKata: 7 },
     { id: 'k_ju', hiragana: 'じゅ', katakana: 'ジュ', romaji: 'ju', group: 'youon', groupName: '拗音', row: 'ja', rowName: 'じゃ行', example: 'じゅんび (准备)', exampleKata: 'ジュース (果汁)', strokesHira: 5, strokesKata: 7 },
     { id: 'k_jo', hiragana: 'じょ', katakana: 'ジョ', romaji: 'jo', group: 'youon', groupName: '拗音', row: 'ja', rowName: 'じゃ行', example: 'じょせい (女性)', exampleKata: 'ジョギング (慢跑)', strokesHira: 5, strokesKata: 8 },
 

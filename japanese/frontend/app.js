@@ -1241,10 +1241,19 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                         list.forEach(s => {
                             if (!s.japanese || !s.japanese.includes(cleanWord)) return;
                             // 检查汉字前后边界，防止例如复合词截断
-                            const idx = s.japanese.indexOf(cleanWord);
-                            if (idx > 0 && /[\u4e00-\u9faf]/.test(cleanWord)) {
-                                const prev = s.japanese[idx - 1];
-                                if (/[\u4e00-\u9faf]/.test(prev) && cleanWord.length === 1) return;
+                            if (cleanWord.length === 1 && /[\u4e00-\u9faf]/.test(cleanWord)) {
+                                let pos = s.japanese.indexOf(cleanWord);
+                                let validMatch = false;
+                                while (pos !== -1) {
+                                    const prev = pos > 0 ? s.japanese[pos - 1] : '';
+                                    const next = pos + 1 < s.japanese.length ? s.japanese[pos + 1] : '';
+                                    if (!/[\u4e00-\u9faf]/.test(prev) && !/[\u4e00-\u9faf]/.test(next)) {
+                                        validMatch = true;
+                                        break;
+                                    }
+                                    pos = s.japanese.indexOf(cleanWord, pos + 1);
+                                }
+                                if (!validMatch) return;
                             }
                             add(subMatches, s);
                         });
@@ -1327,9 +1336,15 @@ const currentWordSentenceIndex = ref(0);
                 const cleanPronunciation = (str) => {
                     if (!str) return '';
                     return str
+                        .replace(/[\(（][^\)）]*[\)）]/g, '')
                         .replace(/[~～・·…\.\(\)（）\/、，,。！？!?\-_—\s]/g, '')
                         .trim();
                 };
+
+                const HOMOGRAPH_WORDS = new Set([
+                    '方', '角', '何', '日', '月', '後', '人', '分', '中', '空', '家', '間',
+                    '明日', '私', '居る', '開く', '空く', '止める', '辛い', '一日', '風', '音', '上手', '下手'
+                ]);
 
                 const getWordAudioText = (item) => {
                     if (!item) return '';
@@ -1342,22 +1357,15 @@ const currentWordSentenceIndex = ref(0);
                     }
 
                     // 【真人自然语调模式 (默认推荐)】：
-                    // 1. 接尾词/前缀 (如 ～君, ～屋, ～後) -> 自动取假名发音 (如 くん, や, ご)
-                    if (item.word && (item.word.startsWith('～') || item.word.startsWith('~'))) {
-                        return cleanPronunciation(item.kana);
+                    // 1. 接尾词/前缀 (如 ～君, ～屋, お～, ご～) -> 自动取假名发音
+                    if (item.word && (/^[~～]/.test(item.word) || /[~～]$/.test(item.word))) {
+                        return cleanPronunciation(item.kana) || cleanPronunciation(item.word);
                     }
 
                     // 2. 针对单独出现时极易被 TTS 引擎误判声调/音读的多音字，进行精确校正：
-                    if (item.word === '方' && item.kana === 'かた') return 'かた';
-                    if (item.word === '角' && item.kana === 'かど') return 'かど';
-                    if (item.word === '何' && item.kana === 'なに') return 'なに';
-                    if (item.word === '何' && item.kana === 'なん') return 'なん';
-                    if (item.word === '日' && item.kana === 'ひ') return 'ひ';
-                    if (item.word === '日' && item.kana === 'にち') return 'にち';
-                    if (item.word === '月' && item.kana === 'つき') return 'つき';
-                    if (item.word === '月' && item.kana === 'がつ') return 'がつ';
-                    if (item.word === '後' && item.kana === 'あと') return 'あと';
-                    if (item.word === '後' && item.kana === 'うしろ') return 'うしろ';
+                    if (item.word && HOMOGRAPH_WORDS.has(item.word) && item.kana) {
+                        return cleanPronunciation(item.kana);
+                    }
 
                     // 3. 常规词汇：优先使用日文汉字词形，语音引擎（Siri/京子/Nanami）将依据词性自动发出纯正东京腔高低重音
                     return cleanPronunciation(item.word) || cleanPronunciation(item.kana);
@@ -1741,7 +1749,11 @@ const currentWordSentenceIndex = ref(0);
                 const playSentence = (sentenceObj) => {
                     if (!sentenceObj) return;
                     let text = audioTarget.value === 'kana' ? (sentenceObj.kana || sentenceObj.japanese) : sentenceObj.japanese;
-                    text = text.replace(/[~～\-_—]/g, '').trim();
+                    text = text.replace(/[~～\-_—]/g, '');
+                    if (audioTarget.value === 'kana') {
+                        text = text.replace(/\s+/g, '');
+                    }
+                    text = text.trim();
                     if (!text) return;
 
                     if (audioEngine.value === 'online') {

@@ -1009,7 +1009,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_128",
-    "word": "後",
+    "word": "後ろ",
     "kana": "うしろ",
     "meaning": "后面，后方",
     "level": 0,
@@ -1018,7 +1018,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_129",
     "word": "フィルム",
-    "kana": "ふいるむ",
+    "kana": "ふぃるむ",
     "meaning": "胶卷，胶片",
     "level": 0,
     "next_review_date": 1789530199425
@@ -1602,7 +1602,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_202",
     "word": "サラリーマン",
-    "kana": "さらりいまん",
+    "kana": "さらりーまん",
     "meaning": "工薪族，公司职员",
     "level": 0,
     "next_review_date": 1789530199425
@@ -2745,7 +2745,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_345",
-    "word": "パーティ",
+    "word": "パーティー",
     "kana": "ぱーてぃー",
     "meaning": "聚会，宴会，派对",
     "level": 0,
@@ -4482,7 +4482,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_562",
     "word": "ジュース",
-    "kana": "じゅうす",
+    "kana": "じゅーす",
     "meaning": "果汁，饮料",
     "level": 0,
     "next_review_date": 1789530199426
@@ -6522,7 +6522,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_819",
     "word": "象",
-    "kana": "そう",
+    "kana": "ぞう",
     "meaning": "象，大象",
     "level": 0,
     "next_review_date": 1789530199426
@@ -6650,7 +6650,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_835",
     "word": "存知",
-    "kana": "そんじ",
+    "kana": "ぞんじ",
     "meaning": "知道，知晓",
     "level": 0,
     "next_review_date": 1789530199426
@@ -6691,7 +6691,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_840",
     "word": "遠慮なく",
     "kana": "えんりょなく",
-    "meaning": "不客气，客气地",
+    "meaning": "不客气地，毫不客气地",
     "level": 0,
     "next_review_date": 1789530199426
   },
@@ -7195,7 +7195,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_903",
     "word": "渡す",
     "kana": "わたす",
-    "meaning": "递交，交给；渡（河）",
+    "meaning": "递交，交给；把……渡过（河），架（桥）",
     "level": 0,
     "next_review_date": 1789530199426
   },
@@ -8601,7 +8601,7 @@ window.BUILTIN_VOCAB = [
   },
   {
     "id": "w_1079",
-    "word": "每月",
+    "word": "毎月",
     "kana": "まいつき",
     "meaning": "每月，每个月",
     "level": 0,
@@ -10106,7 +10106,7 @@ window.BUILTIN_VOCAB = [
   {
     "id": "w_1309",
     "word": "自由に",
-    "kana": "じゅうに",
+    "kana": "じゆうに",
     "meaning": "自由地，随意地",
     "level": 0,
     "next_review_date": 1789530199427
@@ -17475,7 +17475,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_2235",
     "word": "という理解でよろしいでしょうか",
     "kana": "というりかいでよろしいでしょうか",
-    "meaning": "【语法】您的理解是……，对吗？",
+    "meaning": "【语法】（我理解为）……，这样可以吗？",
     "level": 0,
     "next_review_date": 1795863392942
   },
@@ -17523,7 +17523,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_2241",
     "word": "生成",
     "kana": "せいせい",
-    "meaning": "生成，生成 (Generate)",
+    "meaning": "生成，产生 (Generate)",
     "level": 0,
     "next_review_date": 1795863392942
   },
@@ -22299,7 +22299,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_2838",
     "word": "一方",
     "kana": "いっぽう",
-    "meaning": "【语法】另一方面，",
+    "meaning": "【语法】另一方面",
     "level": 0,
     "next_review_date": 1795863392942
   },
