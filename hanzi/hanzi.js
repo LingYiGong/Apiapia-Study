@@ -68,7 +68,6 @@ const els = {
     summaryScreen: document.getElementById("summaryScreen"),
 
     categorySelect: document.getElementById("categorySelect"),
-    countSelect: document.getElementById("countSelect"),
     speechMode: document.getElementById("speechMode"),
     speechRate: document.getElementById("speechRate"),
     openSettingsBtn: document.getElementById("openSettingsBtn"),
@@ -1146,7 +1145,6 @@ function shuffle(array) {
 
 function createSession() {
     const selectedCategory = els.categorySelect.value;
-    const requestedCount = Number(els.countSelect.value);
     const stats = loadStats();
 
     let pool;
@@ -1177,8 +1175,7 @@ function createSession() {
         pool = HANZI_DATA;
     }
 
-    const count = Math.min(requestedCount, pool.length);
-    return shuffle(prioritizeForReview(pool, stats).slice(0, count));
+    return shuffle(prioritizeForReview(pool, stats)); // 不分轮：练完所选范围的全部字，随时可退出
 }
 
 // 优先级：1. 从未练过的新字(越晚加入越靠前) 2. 错字本/Lv.0 3. 今日到期(低级优先) 4. 练习次数少的近期字
@@ -2316,8 +2313,8 @@ function finishChoice() {
     const uniqueWrong = getUniqueItems(wrongAnswers.map(a => a.item));
     els.practiceWrongBtn.disabled = uniqueWrong.length === 0;
     els.practiceWrongBtn.textContent = uniqueWrong.length
-        ? `再练本轮易错字（${uniqueWrong.length}个）`
-        : "本轮全部一次选对";
+        ? `再练本次易错字（${uniqueWrong.length}个）`
+        : "本次全部一次选对";
 
     if (els.continueDueBtn) {
         const dueCount = getDueCharacters(stats).length;
@@ -2336,7 +2333,7 @@ function finishChoice() {
         setTimeout(() => {
             window.showApiapiaPerfectReward && window.showApiapiaPerfectReward({
                 moduleName: "汉字听音选字",
-                detail: `本轮 ${total} 题全部一次选对！`
+                detail: `本次 ${total} 题全部一次选对！`
             });
         }, 350);
     }
@@ -2425,8 +2422,8 @@ function finishSession() {
     els.practiceWrongBtn.disabled = uniqueWrong.length === 0;
     els.practiceWrongBtn.textContent =
         uniqueWrong.length === 0
-            ? "本轮没有错字"
-            : `再练本轮错字（${uniqueWrong.length}个）`;
+            ? "本次没有错字"
+            : `再练本次错字（${uniqueWrong.length}个）`;
 
     if (els.continueDueBtn) {
         const dueCount = getDueCharacters(stats).length;
@@ -2445,7 +2442,7 @@ function finishSession() {
         setTimeout(() => {
             window.showApiapiaPerfectReward && window.showApiapiaPerfectReward({
                 moduleName: "汉字听写与笔顺",
-                detail: `本轮 ${total} 个字全部过关！`
+                detail: `本次 ${total} 个字全部过关！`
             });
         }, 350);
     }
@@ -2941,14 +2938,14 @@ function renderHanziWall(stats = loadStats()) {
 async function quitSession() {
     if (window.kidConfirmExitPractice) {
         const confirmed = await window.kidConfirmExitPractice({
-            title: "退出本轮听写？",
-            message: "确定要退出本轮听写吗？已经判定过的题目会保留记录。",
+            title: "退出听写？",
+            message: "确定要退出听写吗？已经判定过的题目会保留记录。",
             confirmText: "确定退出",
             cancelText: "继续练习"
         });
         if (!confirmed) return;
     } else {
-        if (!confirm("确定要退出本轮听写吗？已经判定过的题目会保留记录。")) return;
+        if (!confirm("确定要退出听写吗？已经判定过的题目会保留记录。")) return;
     }
 
     stopAllSpeech();
@@ -2971,13 +2968,13 @@ async function quitChoice() {
     if (window.kidConfirmExitPractice) {
         const confirmed = await window.kidConfirmExitPractice({
             title: "退出选字游戏？",
-            message: "确定要退出本轮选字游戏吗？",
+            message: "确定要退出选字游戏吗？",
             confirmText: "确定退出",
             cancelText: "继续练习"
         });
         if (!confirmed) return;
     } else {
-        if (!confirm("确定要退出本轮选字游戏吗？")) return;
+        if (!confirm("确定要退出选字游戏吗？")) return;
     }
     stopAllSpeech();
     showScreen("setup");

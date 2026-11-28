@@ -102,31 +102,21 @@
                         </button>
                     </div>
 
-                    <!-- 练习设置 (范围与字数，大下拉框与大字体) -->
+                    <!-- 练习设置 (练习范围，大下拉框与大字体) -->
                     <div class="bg-white p-4 rounded-3xl border-2 border-slate-100 shadow-sm space-y-3 card-panel">
                         <div class="flex items-center justify-between text-sm font-black text-slate-700">
                             <div class="flex items-center space-x-1.5">
                                 <span class="text-base">📝</span>
                                 <span>练习设置</span>
                             </div>
-                            <span class="text-xs text-slate-400 font-medium">选择学习范围与每轮数量</span>
+                            <span class="text-xs text-slate-400 font-medium">选择学习范围</span>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3 pt-1">
+                        <div class="pt-1">
                             <div class="space-y-1.5">
                                 <label for="categorySelect" class="block text-xs font-bold text-slate-600">练习范围</label>
                                 <div class="relative">
                                     <select id="categorySelect" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold focus:border-indigo-500 focus:bg-white outline-none transition-colors card-subtle">
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="space-y-1.5">
-                                <label for="countSelect" class="block text-xs font-bold text-slate-600">每轮字数</label>
-                                <div class="relative">
-                                    <select id="countSelect" class="w-full text-xs sm:text-sm bg-slate-50 border-2 border-slate-200 rounded-2xl p-3 text-slate-800 font-bold focus:border-indigo-500 focus:bg-white outline-none transition-colors card-subtle">
-                                        <option value="10" selected>10 个字 (轻松快刷)</option>
-                                        <option value="20">20 个字 (标准巩固)</option>
-                                        <option value="30">30 个字 (强化挑战)</option>
                                     </select>
                                 </div>
                             </div>
@@ -327,7 +317,7 @@
                         <span id="choiceLevelBadge" class="level-badge">Lv.1</span>
                     </div>
                     <button id="quitChoiceBtn" class="text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-95 transition-all">
-                        退出本轮
+                        退出练习
                     </button>
                 </div>
 
@@ -370,7 +360,7 @@
                         <span id="dictationLevelBadge" class="level-badge">Lv.1</span>
                     </div>
                     <button id="quitBtn" class="text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold active:scale-95 transition-all">
-                        退出本轮
+                        退出练习
                     </button>
                 </div>
 
@@ -488,7 +478,7 @@
                         <div id="answerHint" class="text-base sm:text-lg text-center text-slate-800 font-black"></div>
 
                         <!-- 两个超大判定按钮：错 / 对 -->
-                        <div class="grid grid-cols-2 gap-3 pt-1">
+                        <div class="pt-1">
                             <button id="wrongBtn" type="button" class="py-4 kid-btn-danger text-white font-black text-sm sm:text-base rounded-2xl shadow-lg">
                                 ❌ 写错/不会 (重练)
                             </button>
@@ -580,10 +570,10 @@
             </section>
 
 
-            <!-- ================= 本轮完成结算界面 ================= -->
+            <!-- ================= 练习完成结算界面 ================= -->
             <section id="summaryScreen" class="summary-screen h-full min-h-0 flex flex-col justify-between space-y-3 sm:space-y-4 hidden pb-2">
                 <div class="summary-card bg-white rounded-3xl border-2 border-slate-100 p-4 sm:p-6 shadow-sm text-center flex flex-col flex-1 min-h-0 space-y-3 card-panel">
-                    <h2 class="text-xl font-black text-slate-800 flex-shrink-0">🎉 本轮练习大通关！</h2>
+                    <h2 class="text-xl font-black text-slate-800 flex-shrink-0">🎉 练习大通关！</h2>
 
                     <div id="scoreRing" class="score-ring flex-shrink-0 my-1 sm:my-2">
                         <div class="score-ring-content">
@@ -602,7 +592,7 @@
                         ⚡ 继续复习今日待复习汉字
                     </button>
                     <button id="practiceWrongBtn" class="w-full py-3.5 sm:py-4 kid-btn-warning text-white font-black text-base rounded-2xl shadow-md">
-                        再练本轮错字
+                        再练本次错字
                     </button>
                     <button id="backHomeBtn" class="w-full py-3 sm:py-3.5 kid-btn-light text-slate-700 font-black text-sm sm:text-base rounded-2xl">
                         返回练习首页
