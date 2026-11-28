@@ -17,84 +17,11 @@
     };
 
     // =========================================================================
-    // 2. 自包含轻量 Canvas 彩带粒子动画（无需外部 CDN）
+    // 2. 轻量 Canvas 彩带粒子动画（复用全局 kid-dialog.js 的 kidConfetti）
     // =========================================================================
     function triggerConfetti(originY = 0.6) {
-        try {
-            const canvas = document.createElement('canvas');
-            canvas.style.position = 'fixed';
-            canvas.style.top = '0';
-            canvas.style.left = '0';
-            canvas.style.width = '100vw';
-            canvas.style.height = '100vh';
-            canvas.style.pointerEvents = 'none';
-            canvas.style.zIndex = '9999';
-            document.body.appendChild(canvas);
-
-            const ctx = canvas.getContext('2d');
-            const width = (canvas.width = window.innerWidth);
-            const height = (canvas.height = window.innerHeight);
-
-            const colors = ['#6366f1', '#10b981', '#f43f5e', '#f59e0b', '#38bdf8', '#fb7185', '#a855f7'];
-            const particles = [];
-            const count = 45;
-
-            for (let i = 0; i < count; i++) {
-                particles.push({
-                    x: width * 0.5 + (Math.random() - 0.5) * 120,
-                    y: height * originY,
-                    vx: (Math.random() - 0.5) * 14,
-                    vy: -Math.random() * 12 - 3,
-                    size: Math.random() * 7 + 4,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    rotation: Math.random() * 360,
-                    rotSpeed: (Math.random() - 0.5) * 10,
-                    opacity: 1
-                });
-            }
-
-            let animId = null;
-            const startTime = Date.now();
-
-            function render() {
-                const elapsed = Date.now() - startTime;
-                ctx.clearRect(0, 0, width, height);
-
-                let activeCount = 0;
-                particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.vy += 0.35;
-                    p.vx *= 0.985;
-                    p.rotation += p.rotSpeed;
-
-                    if (elapsed > 1200) {
-                        p.opacity = Math.max(0, p.opacity - 0.035);
-                    }
-
-                    if (p.opacity > 0 && p.y < height + 40) {
-                        activeCount++;
-                        ctx.save();
-                        ctx.translate(p.x, p.y);
-                        ctx.rotate((p.rotation * Math.PI) / 180);
-                        ctx.globalAlpha = p.opacity;
-                        ctx.fillStyle = p.color;
-                        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
-                        ctx.restore();
-                    }
-                });
-
-                if (activeCount > 0 && elapsed < 2800) {
-                    animId = requestAnimationFrame(render);
-                } else {
-                    if (animId) cancelAnimationFrame(animId);
-                    if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
-                }
-            }
-
-            animId = requestAnimationFrame(render);
-        } catch (e) {
-            // 静默优雅降级
+        if (typeof window.kidConfetti === 'function') {
+            window.kidConfetti({ originY, count: 45, duration: 2800 });
         }
     }
 
@@ -114,11 +41,8 @@
             const toeicSubTab = ref('reading'); // 'reading' | 'words' | 'grammar'
             const showChinese = ref(true); // 全篇译文开关
 
-            // ------------ 设备检测与发音引擎配置（参考 @japanese 架构） ------------
-            const isIOS = typeof navigator !== 'undefined' && (
-                /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-            );
+            // ------------ 设备检测与发音引擎配置 ------------
+            const isIOS = Boolean(window.ApiapiaEnv && window.ApiapiaEnv.isIOS);
 
             const AUDIO_CONFIG_KEY = 'english_study_audio_config_v1';
             const showAudioSettings = ref(false);
@@ -151,64 +75,24 @@
                 return sharedAudio;
             };
 
-            const initVoices = () => {
-                if (!synth) return;
-                const allVoices = synth.getVoices() || [];
-                const enVoices = allVoices.filter(v => {
+            const getFilteredEnglishVoices = () => {
+                if (!synth) return [];
+                return (synth.getVoices() || []).filter(v => {
                     const lang = (v.lang || '').toLowerCase().replace('_', '-');
                     return lang.startsWith('en') ||
                         /english|英语|samantha|alex|ava|allison|susan|tom|daniel|serena|oliver|karen|moira|tessa|siri|aria|guy|jenny|ryan|sonia/i.test(v.name);
                 });
-                availableVoices.value = enVoices;
-
-                if (enVoices.length > 0) {
-                    if (!enVoiceName.value || !enVoices.some(v => v.name === enVoiceName.value)) {
-                        const preferUK = audioAccent.value === 'uk';
-                        const accentVoices = enVoices.filter(v => {
-                            const lang = (v.lang || '').toLowerCase().replace('_', '-');
-                            return preferUK ? (lang.includes('gb') || lang.includes('uk')) : lang.includes('us');
-                        });
-                        const pool = accentVoices.length > 0 ? accentVoices : enVoices;
-
-                        // 本地真人级音色匹配优先级（参考 @japanese）：
-                        // 1. Apple 原生 Siri 真人语音 (iPad/iOS 极品音质)
-                        // 2. 微软 Edge 自然神经语音 (Aria / Jenny / Guy / Sonia / Ryan / Natural)
-                        // 3. Apple Enhanced / Premium 高清增强语音 (Samantha / Ava / Alex / Daniel)
-                        // 4. Apple 经典语音 (Samantha / Alex / Daniel / Serena)
-                        // 5. Google 英语语音
-                        const siri = pool.find(v => /siri/i.test(v.name)) || enVoices.find(v => /siri/i.test(v.name));
-                        const natural = pool.find(v => /natural|online|aria|jenny|guy|sonia|ryan/i.test(v.name));
-                        const enhanced = pool.find(v => /enhanced|premium|高品質|高品位/i.test(v.name));
-                        const appleClassic = preferUK
-                            ? pool.find(v => /daniel|serena|oliver|kate|martha/i.test(v.name))
-                            : pool.find(v => /samantha|alex|ava|allison|tom/i.test(v.name));
-                        const google = pool.find(v => /google/i.test(v.name));
-                        enVoiceName.value = (siri || natural || enhanced || appleClassic || google || pool[0] || enVoices[0]).name;
-                    }
-                }
             };
 
-            const getEnglishVoice = () => {
-                if (!synth) return null;
-                const allVoices = synth.getVoices() || [];
-                if (availableVoices.value.length === 0 && allVoices.length > 0) {
-                    initVoices();
-                }
-                const enVoices = allVoices.filter(v => {
-                    const lang = (v.lang || '').toLowerCase().replace('_', '-');
-                    return lang.startsWith('en') ||
-                        /english|英语|samantha|alex|ava|allison|susan|tom|daniel|serena|oliver|karen|moira|tessa|siri|aria|guy|jenny|ryan|sonia/i.test(v.name);
-                });
-                if (enVoiceName.value) {
-                    const found = enVoices.find(v => v.name === enVoiceName.value);
-                    if (found) return found;
-                }
+            const pickBestEnglishVoice = (enVoices) => {
+                if (!enVoices || enVoices.length === 0) return null;
                 const preferUK = audioAccent.value === 'uk';
                 const accentVoices = enVoices.filter(v => {
                     const lang = (v.lang || '').toLowerCase().replace('_', '-');
                     return preferUK ? (lang.includes('gb') || lang.includes('uk')) : lang.includes('us');
                 });
                 const pool = accentVoices.length > 0 ? accentVoices : enVoices;
+
                 const siri = pool.find(v => /siri/i.test(v.name)) || enVoices.find(v => /siri/i.test(v.name));
                 const natural = pool.find(v => /natural|online|aria|jenny|guy|sonia|ryan/i.test(v.name));
                 const enhanced = pool.find(v => /enhanced|premium|高品質|高品位/i.test(v.name));
@@ -217,6 +101,30 @@
                     : pool.find(v => /samantha|alex|ava|allison|tom/i.test(v.name));
                 const google = pool.find(v => /google/i.test(v.name));
                 return siri || natural || enhanced || appleClassic || google || pool[0] || enVoices[0] || null;
+            };
+
+            const initVoices = () => {
+                if (!synth) return;
+                const enVoices = getFilteredEnglishVoices();
+                availableVoices.value = enVoices;
+
+                if (enVoices.length > 0 && (!enVoiceName.value || !enVoices.some(v => v.name === enVoiceName.value))) {
+                    const best = pickBestEnglishVoice(enVoices);
+                    if (best) enVoiceName.value = best.name;
+                }
+            };
+
+            const getEnglishVoice = () => {
+                if (!synth) return null;
+                const enVoices = getFilteredEnglishVoices();
+                if (availableVoices.value.length === 0 && enVoices.length > 0) {
+                    initVoices();
+                }
+                if (enVoiceName.value) {
+                    const found = enVoices.find(v => v.name === enVoiceName.value);
+                    if (found) return found;
+                }
+                return pickBestEnglishVoice(enVoices);
             };
 
             const loadAudioConfig = () => {
@@ -258,7 +166,7 @@
                 }
             };
 
-            // 真人原声发音高速缓存池与预加载系统（参考 @japanese）
+            // 真人原声发音高速缓存池与预加载系统
             const onlineAudioCache = new Map(); // cacheKey -> Audio instance
 
             const buildOnlineUrls = (cleanText) => {
@@ -961,13 +869,6 @@
 
             // ------------ 清理学习记录 ------------
             const clearToeicProgress = async () => {
-                if (!window.kidConfirm) {
-                    if (confirm('确定要清空全部托业短文通关记录吗？')) {
-                        completedArticles.value = [];
-                        saveToeicProgress();
-                    }
-                    return;
-                }
                 const ok = await window.kidConfirm({
                     title: '清空托业短文打卡？',
                     message: '确定要清空所有已通关短文打卡记录吗？此操作不可恢复。',
@@ -979,18 +880,11 @@
                 if (ok) {
                     completedArticles.value = [];
                     saveToeicProgress();
-                    window.kidToast && window.kidToast('托业短文打卡记录已清空！', 'success');
+                    window.kidToast('托业短文打卡记录已清空！', 'success');
                 }
             };
 
             const clearVerbProgress = async () => {
-                if (!window.kidConfirm) {
-                    if (confirm('确定要清空 100 动词记忆记录吗？')) {
-                        verbProgress.value = {};
-                        saveVerbProgress();
-                    }
-                    return;
-                }
                 const ok = await window.kidConfirm({
                     title: '清空动词学习记录？',
                     message: `确定要清空全部 ${totalVerbsCount.value} 个核心动词的掌握记录吗？此操作不可恢复。`,
@@ -1002,20 +896,11 @@
                 if (ok) {
                     verbProgress.value = {};
                     saveVerbProgress();
-                    window.kidToast && window.kidToast('核心动词学习记录已清空！', 'success');
+                    window.kidToast('核心动词学习记录已清空！', 'success');
                 }
             };
 
             const clearAllProgress = async () => {
-                if (!window.kidConfirm) {
-                    if (confirm('确定要重置英语模块的全部学习数据吗？')) {
-                        completedArticles.value = [];
-                        verbProgress.value = {};
-                        saveToeicProgress();
-                        saveVerbProgress();
-                    }
-                    return;
-                }
                 const ok = await window.kidConfirm({
                     title: '清空全部学习记录？',
                     message: '将清空托业短文打卡与核心动词的全部学习记录，回到初始状态。确定继续吗？',
@@ -1056,7 +941,7 @@
                 });
             };
 
-            // ------------ 初始化生命周期（含 iOS WebKit 手势解锁与语音包多重预热，参考 @japanese） ------------
+            // ------------ 初始化生命周期（含 iOS WebKit 手势解锁与语音包多重预热） ------------
             onMounted(() => {
                 loadAudioConfig();
                 initVoices();
@@ -1069,7 +954,7 @@
                 setTimeout(initVoices, 800);
                 setTimeout(initVoices, 1600);
 
-                // iPad / iOS WebKit audio & speech gesture unlocker (参考 @japanese)
+                // iPad / iOS WebKit audio & speech gesture unlocker
                 const unlockAudioAndTTS = () => {
                     if (synth && !ttsUnlocked) {
                         try {

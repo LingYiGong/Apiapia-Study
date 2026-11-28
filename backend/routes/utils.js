@@ -1,6 +1,9 @@
 /**
- * 共享工具：统一的 JSON 响应、CORS 预检与学习进度云同步处理
+ * 共享工具：统一的 JSON 响应、CORS 预检、参数校验与学习进度云同步处理
  */
+
+const MAX_SYNC_PAYLOAD_BYTES = 2 * 1024 * 1024;
+const SYNC_KEY_PATTERN = /^[\w\u4e00-\u9fa5@.-]{1,64}$/;
 
 export function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -26,7 +29,29 @@ export function corsPreflightResponse() {
 }
 
 export function methodNotAllowedResponse() {
-  return new Response('Method Not Allowed', { status: 405 });
+  return jsonResponse({
+    success: false,
+    error: 'METHOD_NOT_ALLOWED',
+    message: '不支持的请求方法'
+  }, 405);
+}
+
+export function validateSyncKey(rawKey) {
+  if (typeof rawKey !== 'string') {
+    return { valid: false, error: 'MISSING_SYNC_KEY', message: '缺少同步密钥 (key 参数或 X-Sync-Key 请求头)。' };
+  }
+  const key = rawKey.trim();
+  if (!key) {
+    return { valid: false, error: 'MISSING_SYNC_KEY', message: '缺少同步密钥 (key 参数或 X-Sync-Key 请求头)。' };
+  }
+  if (!SYNC_KEY_PATTERN.test(key)) {
+    return {
+      valid: false,
+      error: 'INVALID_SYNC_KEY',
+      message: '同步密钥格式无效（仅支持 1~64 位字母、数字、中文及 _ . @ -）。'
+    };
+  }
+  return { valid: true, key };
 }
 
 /**
@@ -40,26 +65,27 @@ export async function handleSync(request, env, url, options) {
       success: false,
       error: 'KV_NOT_BOUND',
       message: 'Cloudflare KV 命名空间 [STUDY_KV] 尚未在 Worker 设置中绑定。'
-    }, 200);
+    }, 503);
   }
 
   // GET: 读取学习进度
   if (request.method === 'GET') {
-    const syncKey = url.searchParams.get('key') || request.headers.get('X-Sync-Key');
-    if (!syncKey) {
+    const rawKey = url.searchParams.get('key') || request.headers.get('X-Sync-Key');
+    const keyCheck = validateSyncKey(rawKey);
+    if (!keyCheck.valid) {
       return jsonResponse({
         success: false,
-        error: 'MISSING_SYNC_KEY',
-        message: '缺少同步密钥 (key 参数或 X-Sync-Key 请求头)。'
+        error: keyCheck.error,
+        message: keyCheck.message
       }, 400);
     }
 
     try {
-      const raw = await env.STUDY_KV.get(`${options.kvPrefix}${syncKey}`, 'json');
+      const raw = await env.STUDY_KV.get(`${options.kvPrefix}${keyCheck.key}`, 'json');
       return jsonResponse({
         success: true,
         data: raw || null,
-        syncKey
+        syncKey: keyCheck.key
       });
     } catch (err) {
       return jsonResponse({
@@ -72,13 +98,54 @@ export async function handleSync(request, env, url, options) {
   // POST: 保存/更新学习进度
   if (request.method === 'POST') {
     try {
-      const body = await request.json();
-      const syncKey = url.searchParams.get('key') || request.headers.get('X-Sync-Key') || body.syncKey;
-      if (!syncKey) {
+      const contentLengthHeader = request.headers.get('Content-Length');
+      if (contentLengthHeader) {
+        const declaredSize = Number(contentLengthHeader);
+        if (!Number.isNaN(declaredSize) && declaredSize > MAX_SYNC_PAYLOAD_BYTES) {
+          return jsonResponse({
+            success: false,
+            error: 'PAYLOAD_TOO_LARGE',
+            message: '同步数据体积超出 2MB 上限。'
+          }, 413);
+        }
+      }
+
+      const rawText = await request.text();
+      const byteLength = new TextEncoder().encode(rawText).byteLength;
+      if (byteLength > MAX_SYNC_PAYLOAD_BYTES) {
         return jsonResponse({
           success: false,
-          error: 'MISSING_SYNC_KEY',
-          message: '缺少同步密钥 (key 参数、X-Sync-Key 请求头或 body.syncKey)。'
+          error: 'PAYLOAD_TOO_LARGE',
+          message: '同步数据体积超出 2MB 上限。'
+        }, 413);
+      }
+
+      let body;
+      try {
+        body = JSON.parse(rawText);
+      } catch (parseErr) {
+        return jsonResponse({
+          success: false,
+          error: 'INVALID_JSON',
+          message: '请求体不是有效的 JSON 格式。'
+        }, 400);
+      }
+
+      if (!body || typeof body !== 'object' || Array.isArray(body)) {
+        return jsonResponse({
+          success: false,
+          error: 'INVALID_JSON',
+          message: '请求体必须为 JSON 对象。'
+        }, 400);
+      }
+
+      const rawKey = url.searchParams.get('key') || request.headers.get('X-Sync-Key') || body.syncKey;
+      const keyCheck = validateSyncKey(rawKey);
+      if (!keyCheck.valid) {
+        return jsonResponse({
+          success: false,
+          error: keyCheck.error,
+          message: keyCheck.message
         }, 400);
       }
 
@@ -87,12 +154,12 @@ export async function handleSync(request, env, url, options) {
         updatedAt: Date.now()
       };
 
-      await env.STUDY_KV.put(`${options.kvPrefix}${syncKey}`, JSON.stringify(payload));
+      await env.STUDY_KV.put(`${options.kvPrefix}${keyCheck.key}`, JSON.stringify(payload));
 
       return jsonResponse({
         success: true,
         updatedAt: payload.updatedAt,
-        syncKey,
+        syncKey: keyCheck.key,
         ...options.buildSummary(payload)
       });
     } catch (err) {

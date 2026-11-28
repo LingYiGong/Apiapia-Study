@@ -1,6 +1,6 @@
 /* ============================================================
    汉字听写小助手 · 模块专属样式表
-   Hanzi Learning Module Specific Styles (Extends ../style.css)
+   Hanzi Learning Module Specific Styles (Extends ../css/style.css)
    ============================================================ */
 
 
@@ -131,8 +131,6 @@
     filter: brightness(0.96);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
 }
-
-/* 键盘焦点由全局 style.css 的 :focus-visible 统一提供，此处不再取消 outline */
 
 .choice-option:disabled {
     cursor: default;
@@ -468,8 +466,6 @@
 }
 
 /* ================== 汉字模块夜间护眼模式专属深度适配 ================== */
-/* 说明：choice-option、story-paper、story-text、comparison-box、wrong-item、
-   result-chip、dictation-result 等通用组件的夜间模式已统一在全局 css/style.css 中维护，此处不再重复。 */
 
 html.dark .story-rt {
     color: #a5b4fc;
@@ -494,9 +490,6 @@ html.dark .story-ruby.story-char-speaking .story-rt {
     color: #e0e7ff;
 }
 
-/* comparison-box / written-preview / result-standard 的夜间样式已统一在 style.css 维护 */
-
-/* wrong-item 基础夜间样式已统一在 style.css 维护，仅保留专属 hover 效果 */
 html.dark .wrong-item:hover {
     background: #281422;
     border-color: #f43f5e;
@@ -514,19 +507,6 @@ html.dark .wrong-remove-btn {
 html.dark .wrong-remove-btn:hover {
     background: #e11d48;
     color: #ffffff;
-}
-
-/* result-chip 夜间样式已统一在 style.css 维护 */
-
-/* dictation-result 夜间样式已统一在 style.css 维护 */
-
-html.dark .result-verdict {
-    color: #f8fafc;
-    border-top-color: #334155;
-}
-
-html.dark .verdict-review-time {
-    color: #94a3b8;
 }
 
 /* ================== 防误触/防双击核对按钮锁定动效与状态 ================== */

@@ -19,12 +19,12 @@
     <!-- 全局夜间/护眼模式核心管理 (首屏加载杜绝闪烁) -->
     <script src="../js/theme.js"></script>
 
-    <!-- 本地引入 Vant 4 样式与 Tailwind CSS -->
-    <link rel="stylesheet" href="../libs/vant.min.css" />
+    <!-- 本地引入 Tailwind CSS -->
     <script src="../libs/tailwindcss.js"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 -->
     <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/kid-dialog.css" />
     <!-- 汉字模块专属手写板与笔顺样式 -->
     <link rel="stylesheet" href="./hanzi.css" />
 
@@ -33,11 +33,13 @@
 
     <!-- 移动端与 iPad 视口自适应模块 -->
     <script src="../js/viewport.js"></script>
+    <script src="../js/srs.js"></script>
+    <script src="../js/cloud-sync.js"></script>
 </head>
 <body class="flex flex-col overflow-hidden bg-[#f8fafc]">
     <div id="app" class="flex flex-col mx-auto w-full bg-[#f8fafc] shadow-2xl relative border-gray-200 h-full overflow-hidden">
 
-        <!-- 顶部导航栏 (统一儿童风格明快渐变色，与 @hanzi 完全一致) -->
+        <!-- 顶部导航栏 -->
         <header class="app-header bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 text-white px-3 sm:px-6 pt-3 pb-3 shadow-md z-10 flex-shrink-0">
             <div class="flex items-center justify-between h-9">
                 <div class="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
@@ -134,7 +136,7 @@
                         <div id="startBtn" class="bg-white rounded-3xl border-2 border-indigo-100 hover:border-indigo-300 p-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer flex items-center justify-between group relative overflow-hidden">
                             <div class="absolute top-0 left-0 bottom-0 w-2 bg-indigo-500"></div>
                             <div class="flex items-center space-x-3.5 pl-1">
-                                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm border border-indigo-100">
+                                <div class="w-[52px] h-[52px] sm:w-14 sm:h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm border border-indigo-100">
                                     ✍️
                                 </div>
                                 <div>
@@ -152,7 +154,7 @@
                         <div id="choiceStartBtn" class="bg-white rounded-3xl border-2 border-amber-100 hover:border-amber-300 p-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer flex items-center justify-between group relative overflow-hidden">
                             <div class="absolute top-0 left-0 bottom-0 w-2 bg-amber-500"></div>
                             <div class="flex items-center space-x-3.5 pl-1">
-                                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm border border-amber-100">
+                                <div class="w-[52px] h-[52px] sm:w-14 sm:h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm border border-amber-100">
                                     🎧
                                 </div>
                                 <div>
@@ -170,7 +172,7 @@
                         <div id="storyStartBtn" class="bg-white rounded-3xl border-2 border-emerald-100 hover:border-emerald-300 p-4 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer flex items-center justify-between group relative overflow-hidden">
                             <div class="absolute top-0 left-0 bottom-0 w-2 bg-emerald-500"></div>
                             <div class="flex items-center space-x-3.5 pl-1">
-                                <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm border border-emerald-100">
+                                <div class="w-[52px] h-[52px] sm:w-14 sm:h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl flex-shrink-0 shadow-sm border border-emerald-100">
                                     📖
                                 </div>
                                 <div>
@@ -231,7 +233,7 @@
                                 <span>✍️</span>
                                 <span>专项听写错字本 (<span id="wrongTabCountBadge">0</span>)</span>
                             </button>
-                            <button id="practiceWrongChoiceBtn" type="button" class="w-full py-3.5 px-3 kid-btn-amber text-amber-900 text-sm sm:text-base font-black rounded-2xl shadow-sm flex items-center justify-center space-x-2 border border-amber-300">
+                            <button id="practiceWrongChoiceBtn" type="button" class="w-full py-3.5 px-3 kid-btn-warning text-white text-sm sm:text-base font-black rounded-2xl shadow-sm flex items-center justify-center space-x-2 border border-amber-300">
                                 <span>🎧</span>
                                 <span>听音选字强化</span>
                             </button>
@@ -425,7 +427,7 @@
 
                     <!-- 不会写看完动画后的操作按钮 -->
                     <div id="ipadAssistActionBar" class="w-full max-w-[360px] grid grid-cols-2 gap-2.5 hidden">
-                        <button id="ipadRetryQuizBtn" type="button" class="py-3 px-3 kid-btn-amber text-amber-900 text-xs sm:text-sm font-black rounded-2xl border border-amber-300">
+                        <button id="ipadRetryQuizBtn" type="button" class="py-3 px-3 kid-btn-warning text-white text-xs sm:text-sm font-black rounded-2xl border border-amber-300">
                             🔄 看会了，重写一遍
                         </button>
                         <button id="ipadAssistWrongNextBtn" type="button" class="py-3 px-3 kid-btn-danger text-white text-xs sm:text-sm font-black rounded-2xl shadow-md">
@@ -610,7 +612,7 @@
                         class="flex flex-col items-center justify-center py-1 text-indigo-600 font-black transition-all active:scale-95 touch-manipulation relative">
                     <div class="relative flex items-center justify-center">
                         <span class="text-xl sm:text-2xl scale-110">✍️</span>
-                        <span id="navDueBadge" class="hidden absolute -top-1 -right-4 px-1.5 min-w-[18px] h-4.5 bg-amber-500 text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-sm animate-pulse">
+                        <span id="navDueBadge" class="hidden absolute -top-1 -right-4 px-1.5 min-w-[18px] h-[18px] bg-amber-500 text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-sm animate-pulse">
                             0
                         </span>
                     </div>
@@ -623,7 +625,7 @@
                         class="flex flex-col items-center justify-center py-1 text-slate-400 hover:text-slate-600 font-bold transition-all active:scale-95 touch-manipulation relative">
                     <div class="relative flex items-center justify-center">
                         <span class="text-xl sm:text-2xl opacity-75">📕</span>
-                        <span id="navWrongBadge" class="hidden absolute -top-1 -right-4 px-1.5 min-w-[18px] h-4.5 bg-rose-500 text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-sm">
+                        <span id="navWrongBadge" class="hidden absolute -top-1 -right-4 px-1.5 min-w-[18px] h-[18px] bg-rose-500 text-white text-[11px] font-black rounded-full flex items-center justify-center shadow-sm">
                             0
                         </span>
                     </div>

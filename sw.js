@@ -9,9 +9,12 @@ const CORE_ASSETS = [
     './app.js',
     './manifest.json',
     './css/style.css',
+    './css/kid-dialog.css',
     './js/theme.js',
     './js/kid-dialog.js',
     './js/viewport.js',
+    './js/srs.js',
+    './js/cloud-sync.js',
     './libs/vue.global.prod.js',
     './libs/vant.min.js',
     './libs/vant.min.css',
@@ -143,6 +146,6 @@ self.addEventListener('fetch', (event) => {
             return cached;
         }
         const response = await networkFetch;
-        return response || offlineResponse();
+        return response || new Response('', { status: 503, statusText: 'Offline' });
     })());
 });

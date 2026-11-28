@@ -466,18 +466,12 @@ async function startListening() {
     processAudioLoop();
 
   } catch (err) {
-    if (window.kidAlert) {
-      window.kidAlert({
-        title: "麦克风权限提示",
-        message: "无法访问麦克风。请确保当前在 HTTPS 或 localhost 环境下，并在浏览器弹窗中允许麦克风访问。",
-        icon: "🎙️",
-        type: "warning"
-      });
-    } else if (window.kidToast) {
-      window.kidToast("无法访问麦克风，请在浏览器权限提示中点击【允许】", "error");
-    } else {
-      alert("无法访问麦克风。请确保当前在 HTTPS 或 localhost 环境下，并允许麦克风权限。");
-    }
+    window.kidAlert({
+      title: "麦克风权限提示",
+      message: "无法访问麦克风。请确保当前在 HTTPS 或 localhost 环境下，并在浏览器弹窗中允许麦克风访问。",
+      icon: "🎙️",
+      type: "warning"
+    });
   }
 }
 
@@ -750,13 +744,37 @@ dom.btnHeaderSkip.addEventListener("click", () => {
   pickNextNote();
 });
 
+let resizeStaffTimer = null;
 window.addEventListener("resize", () => {
-  renderStaff(false);
+  clearTimeout(resizeStaffTimer);
+  resizeStaffTimer = setTimeout(() => {
+    renderStaff(state.isAdvancing);
+  }, 150);
+});
+
+// SPA 切出或页面隐藏时自动关闭麦克风，避免后台持续收音
+window.addEventListener("message", (event) => {
+  if (window.location && window.location.origin && window.location.origin !== "null" && event.origin !== window.location.origin) {
+    return;
+  }
+  if (event.data && event.data.type === "SPA_MODULE_DEACTIVATED" && isListening) {
+    stopListening();
+  }
+});
+
+window.addEventListener("pagehide", () => {
+  if (isListening) stopListening();
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && isListening) {
+    stopListening();
+  }
 });
 
 // 监听全局夜间护眼模式切换，即时刷新五线谱与谱号色彩
 window.addEventListener("apiapia-theme-changed", () => {
-  renderStaff(false);
+  renderStaff(state.isAdvancing);
 });
 
 try {

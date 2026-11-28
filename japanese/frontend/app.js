@@ -64,16 +64,11 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                 const syncStatus = ref('idle'); // 'idle', 'syncing', 'success', 'error'
                 const syncStatusText = ref('空闲');
                 const lastSyncTime = ref(localStorage.getItem('japanese_study_last_sync_time') || '');
-                let debounceSyncTimer = null;
                 
                 // Audio / Voice Engine Config (v2: 真人级自然语流 & iPad 高清声优优化)
-                const isIOS = typeof navigator !== 'undefined' && (
-                    /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-                );
-                const isMobile = typeof navigator !== 'undefined' && (
-                    isIOS || /Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-                );
+                const envInfo = window.ApiapiaEnv || {};
+                const isIOS = Boolean(envInfo.isIOS);
+                const isMobile = Boolean(envInfo.isMobile);
 
                 const AUDIO_CONFIG_KEY = 'japanese_study_audio_config_v4';
                 const showAudioSettings = ref(false);
@@ -107,50 +102,16 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     }
                 };
 
-                const initVoices = () => {
-                    if (!synth) return;
-                    const allVoices = synth.getVoices() || [];
-                    const jaVoices = allVoices.filter(v => 
+                const getFilteredJapaneseVoices = () => {
+                    if (!synth) return [];
+                    return (synth.getVoices() || []).filter(v =>
                         (v.lang && (v.lang === 'ja-JP' || v.lang === 'ja' || v.lang.toLowerCase().replace('_', '-').startsWith('ja'))) ||
                         /japanese|日本語|kyoko|otoya|siri|hattori|nanami|keita|aoi|daichi|mayu|shiori/i.test(v.name)
                     );
-                    availableVoices.value = jaVoices;
-
-                    if (jaVoices.length > 0) {
-                        if (!jaVoiceName.value || !jaVoices.some(v => v.name === jaVoiceName.value)) {
-                            // 本地真人级音色匹配优先级：
-                            // 1. Apple 原生 Siri 真人语音 (iPad/iOS 极品音质，完全本地离线)
-                            // 2. 微软 Edge 自然神经语音 (Nanami 七海 / Keita 圭太)
-                            // 3. Apple Kyoko 京子 (Enhanced 高清强化版优先)
-                            // 4. Google 日本语自然语音
-                            // 5. Apple Otoya 乙也
-                            const siri = jaVoices.find(v => /siri/i.test(v.name));
-                            const nanami = jaVoices.find(v => /nanami/i.test(v.name));
-                            const keita = jaVoices.find(v => /keita/i.test(v.name));
-                            const natural = jaVoices.find(v => /natural|online/i.test(v.name));
-                            const kyokoEnhanced = jaVoices.find(v => /kyoko|京子/i.test(v.name) && /enhanced|premium|高品質|高品位/i.test(v.name));
-                            const kyoko = jaVoices.find(v => /kyoko|京子/i.test(v.name));
-                            const google = jaVoices.find(v => /google/i.test(v.name));
-                            const otoya = jaVoices.find(v => /otoya|乙也/i.test(v.name));
-                            jaVoiceName.value = (siri || nanami || keita || natural || kyokoEnhanced || kyoko || google || otoya || jaVoices[0]).name;
-                        }
-                    }
                 };
 
-                const getJapaneseVoice = () => {
-                    if (!synth) return null;
-                    const allVoices = synth.getVoices() || [];
-                    if (availableVoices.value.length === 0 && allVoices.length > 0) {
-                        initVoices();
-                    }
-                    const jaVoices = allVoices.filter(v => 
-                        (v.lang && (v.lang === 'ja-JP' || v.lang === 'ja' || v.lang.toLowerCase().replace('_', '-').startsWith('ja'))) ||
-                        /japanese|日本語|kyoko|otoya|siri|hattori|nanami|keita|aoi|daichi|mayu|shiori/i.test(v.name)
-                    );
-                    if (jaVoiceName.value) {
-                        const found = jaVoices.find(v => v.name === jaVoiceName.value);
-                        if (found) return found;
-                    }
+                const pickBestJapaneseVoice = (jaVoices) => {
+                    if (!jaVoices || jaVoices.length === 0) return null;
                     const siri = jaVoices.find(v => /siri/i.test(v.name));
                     const nanami = jaVoices.find(v => /nanami/i.test(v.name));
                     const keita = jaVoices.find(v => /keita/i.test(v.name));
@@ -160,6 +121,30 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     const google = jaVoices.find(v => /google/i.test(v.name));
                     const otoya = jaVoices.find(v => /otoya|乙也/i.test(v.name));
                     return siri || nanami || keita || natural || kyokoEnhanced || kyoko || google || otoya || jaVoices[0] || null;
+                };
+
+                const initVoices = () => {
+                    if (!synth) return;
+                    const jaVoices = getFilteredJapaneseVoices();
+                    availableVoices.value = jaVoices;
+
+                    if (jaVoices.length > 0 && (!jaVoiceName.value || !jaVoices.some(v => v.name === jaVoiceName.value))) {
+                        const best = pickBestJapaneseVoice(jaVoices);
+                        if (best) jaVoiceName.value = best.name;
+                    }
+                };
+
+                const getJapaneseVoice = () => {
+                    if (!synth) return null;
+                    const jaVoices = getFilteredJapaneseVoices();
+                    if (availableVoices.value.length === 0 && jaVoices.length > 0) {
+                        initVoices();
+                    }
+                    if (jaVoiceName.value) {
+                        const found = jaVoices.find(v => v.name === jaVoiceName.value);
+                        if (found) return found;
+                    }
+                    return pickBestJapaneseVoice(jaVoices);
                 };
 
                 const loadAudioConfig = () => {
@@ -180,16 +165,7 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                             }
                             if (parsed.jaVoiceName) jaVoiceName.value = parsed.jaVoiceName;
                         } else {
-                            // 旧版 v1 / v2 / v3 缓存自动升级迁移：默认激活真人原声发音
-                            const oldRaw = localStorage.getItem('japanese_study_audio_config_v3') || localStorage.getItem('japanese_study_audio_config_v2') || localStorage.getItem('japanese_study_audio_config_v1');
-                            if (oldRaw) {
-                                try {
-                                    const oldParsed = JSON.parse(oldRaw);
-                                    if (oldParsed.speechRate) speechRate.value = Number(oldParsed.speechRate) || 1.0;
-                                    if (oldParsed.jaVoiceName) jaVoiceName.value = oldParsed.jaVoiceName;
-                                } catch (e) {}
-                            }
-                            audioEngine.value = 'online'; // 统一默认采用真人原声发音
+                            audioEngine.value = 'online';
                             audioTarget.value = 'word';
                             saveAudioConfig();
                         }
@@ -324,276 +300,104 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     showToast('云同步配置已更新');
                 };
 
-                const triggerAutoSync = () => {
-                    if (!autoSync.value || !syncKey.value.trim()) return;
-                    clearTimeout(debounceSyncTimer);
-                    debounceSyncTimer = setTimeout(() => {
-                        pushToCloud(true);
-                    }, 2500);
-                };
-
-                const pushToCloud = async (silent = false, useKeepalive = false) => {
-                    const key = syncKey.value.trim();
-                    if (!key) {
-                        if (!silent) {
-                            if (window.kidAlert) {
-                                window.kidAlert({
-                                    title: '同步提示',
-                                    message: '请先输入专属同步密钥 (Sync Key)！',
-                                    icon: '💡',
-                                    type: 'warning'
-                                });
-                            } else {
-                                alert('请先输入专属同步密钥 (Sync Key)！');
-                            }
+                const mergeWordsAndSentences = (cloudData) => {
+                    if (!cloudData) return;
+                    if (Array.isArray(cloudData.words) && cloudData.words.length > 0) {
+                        if (words.value && words.value.length > 0) {
+                            const localWordMap = new Map();
+                            words.value.forEach(w => {
+                                if (w.id) localWordMap.set(w.id, w);
+                                localWordMap.set(`${w.word}__${w.kana}`, w);
+                            });
+                            const seenWordRefs = new Set();
+                            const mergedWords = cloudData.words.map(cw => {
+                                const lw = (cw.id && localWordMap.get(cw.id)) || localWordMap.get(`${cw.word}__${cw.kana}`);
+                                if (lw) {
+                                    seenWordRefs.add(lw);
+                                    if ((lw.level || 0) > (cw.level || 0)) {
+                                        return { ...cw, level: lw.level, next_review_date: lw.next_review_date };
+                                    }
+                                }
+                                return cw;
+                            });
+                            words.value.forEach(lw => {
+                                if (!seenWordRefs.has(lw)) mergedWords.push(lw);
+                            });
+                            words.value = mergedWords;
+                        } else {
+                            words.value = cloudData.words;
                         }
-                        return;
+                        try {
+                            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(words.value));
+                        } catch (e) {
+                            console.error('Failed to persist merged words', e);
+                        }
                     }
 
-                    syncStatus.value = 'syncing';
-                    syncStatusText.value = '正在推送...';
+                    if (Array.isArray(cloudData.sentences) && cloudData.sentences.length > 0) {
+                        if (sentences.value && sentences.value.length > 0) {
+                            const localSentenceMap = new Map();
+                            sentences.value.forEach(s => {
+                                if (s.id) localSentenceMap.set(s.id, s);
+                                if (s.japanese) localSentenceMap.set(s.japanese, s);
+                            });
+                            const seenSentenceRefs = new Set();
+                            const mergedSentences = cloudData.sentences.map(cs => {
+                                const ls = (cs.id && localSentenceMap.get(cs.id)) || (cs.japanese && localSentenceMap.get(cs.japanese));
+                                if (ls) {
+                                    seenSentenceRefs.add(ls);
+                                    if ((ls.level || 0) > (cs.level || 0)) {
+                                        return { ...cs, level: ls.level, next_review_date: ls.next_review_date };
+                                    }
+                                }
+                                return cs;
+                            });
+                            sentences.value.forEach(ls => {
+                                if (!seenSentenceRefs.has(ls)) mergedSentences.push(ls);
+                            });
+                            sentences.value = mergedSentences;
+                        } else {
+                            sentences.value = cloudData.sentences;
+                        }
+                        try {
+                            localStorage.setItem(LOCAL_STORAGE_SENTENCES_KEY, JSON.stringify(sentences.value));
+                        } catch (e) {
+                            console.error('Failed to persist merged sentences', e);
+                        }
+                    }
+                };
 
-                    try {
-                        const bodyStr = JSON.stringify({
+                const japaneseSyncClient = window.ApiapiaSync.createSyncClient({
+                    endpoint: '/api/japanese/sync',
+                    getKey: () => syncKey.value.trim(),
+                    isAutoSync: () => autoSync.value,
+                    onStatusChange: (status, text) => {
+                        syncStatus.value = status;
+                        syncStatusText.value = text;
+                    },
+                    onLastSyncTime: (timeStr) => {
+                        lastSyncTime.value = timeStr;
+                        try {
+                            localStorage.setItem('japanese_study_last_sync_time', timeStr);
+                        } catch (e) {}
+                    },
+                    emptyCloudMessage: '该密钥在云端尚未有数据备份，请先在已有数据的设备上点击【推送到云端备份】。',
+                    buildPushPayload: (cloudData) => {
+                        if (cloudData) mergeWordsAndSentences(cloudData);
+                        return {
                             words: words.value,
-                            sentences: sentences.value,
-                            syncKey: key
-                        });
-                        const canKeepalive = useKeepalive && (typeof Blob === 'undefined' || new Blob([bodyStr]).size < 60000);
-                        const fetchOptions = {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: bodyStr
+                            sentences: sentences.value
                         };
-                        if (canKeepalive) {
-                            fetchOptions.keepalive = true;
-                        }
-                        const res = await fetch(`/api/sync?key=${encodeURIComponent(key)}`, fetchOptions);
-
-                        const json = await res.json();
-                        if (json.success) {
-                            syncStatus.value = 'success';
-                            const nowStr = new Date().toLocaleTimeString();
-                            syncStatusText.value = `同步成功 (${nowStr})`;
-                            lastSyncTime.value = new Date().toLocaleString();
-                            localStorage.setItem('japanese_study_last_sync_time', lastSyncTime.value);
-                            if (!silent) {
-                                if (window.kidToast) {
-                                    window.kidToast('☁️ 已成功推送到云端备份！', 'success');
-                                } else {
-                                    showToast('☁️ 已成功将本地学习进度推送到云端备份！');
-                                }
-                            }
-                        } else {
-                            syncStatus.value = 'error';
-                            syncStatusText.value = json.message || '同步失败';
-                            if (!silent) {
-                                if (window.kidAlert) {
-                                    window.kidAlert({
-                                        title: '推送失败',
-                                        message: '推送云端失败：' + (json.message || json.error),
-                                        icon: '⚠️',
-                                        type: 'warning'
-                                    });
-                                } else {
-                                    alert('推送云端失败：' + (json.message || json.error));
-                                }
-                            }
-                        }
-                    } catch (err) {
-                        syncStatus.value = 'error';
-                        syncStatusText.value = '网络或接口异常';
-                        if (!silent) {
-                            if (window.kidAlert) {
-                                window.kidAlert({
-                                    title: '网络异常',
-                                    message: '推送失败，请检查网络连接或 Cloudflare 部署状态：' + err.message,
-                                    icon: '⚠️',
-                                    type: 'danger'
-                                });
-                            } else {
-                                alert('推送失败，请检查网络连接或 Cloudflare 部署状态：' + err.message);
-                            }
-                        }
+                    },
+                    applyPullData: (cloudData) => {
+                        mergeWordsAndSentences(cloudData);
+                        return `☁️ 已同步最新数据（${words.value.length} 词，${sentences.value.length} 句）`;
                     }
-                };
+                });
 
-                const pullFromCloud = async (silent = false) => {
-                    const key = syncKey.value.trim();
-                    if (!key) {
-                        if (!silent) {
-                            if (window.kidAlert) {
-                                window.kidAlert({
-                                    title: '同步提示',
-                                    message: '请先输入专属同步密钥 (Sync Key)！',
-                                    icon: '💡',
-                                    type: 'warning'
-                                });
-                            } else {
-                                alert('请先输入专属同步密钥 (Sync Key)！');
-                            }
-                        }
-                        return;
-                    }
-
-                    if (!silent && window.kidConfirm) {
-                        const ok = await window.kidConfirm({
-                            title: '拉取云端数据？',
-                            message: '从云端拉取数据将合并并更新本地学习进度，确定要拉取吗？',
-                            icon: '⬇️',
-                            type: 'warning',
-                            confirmText: '确定拉取',
-                            cancelText: '取消'
-                        });
-                        if (!ok) return;
-                    }
-
-                    syncStatus.value = 'syncing';
-                    syncStatusText.value = '正在拉取...';
-
-                    try {
-                        const res = await fetch(`/api/sync?key=${encodeURIComponent(key)}`);
-                        const json = await res.json();
-
-                        if (json.success && json.data) {
-                            const cloudData = json.data;
-                            let wordsUpdated = false;
-                            let sentencesUpdated = false;
-
-                            // 智能合并学习进度：取本地与云端中的最高复习等级，并保留本地新增的自定义词汇/句子
-                            if (Array.isArray(cloudData.words) && cloudData.words.length > 0) {
-                                if (words.value && words.value.length > 0) {
-                                    const localWordMap = new Map();
-                                    words.value.forEach(w => {
-                                        if (w.id) localWordMap.set(w.id, w);
-                                        localWordMap.set(`${w.word}__${w.kana}`, w);
-                                    });
-                                    const seenWordRefs = new Set();
-                                    const mergedWords = cloudData.words.map(cw => {
-                                        const lw = (cw.id && localWordMap.get(cw.id)) || localWordMap.get(`${cw.word}__${cw.kana}`);
-                                        if (lw) {
-                                            seenWordRefs.add(lw);
-                                            if ((lw.level || 0) > (cw.level || 0)) {
-                                                return { ...cw, level: lw.level, next_review_date: lw.next_review_date };
-                                            }
-                                        }
-                                        return cw;
-                                    });
-                                    words.value.forEach(lw => {
-                                        if (!seenWordRefs.has(lw)) {
-                                            mergedWords.push(lw);
-                                        }
-                                    });
-                                    words.value = mergedWords;
-                                } else {
-                                    words.value = cloudData.words;
-                                }
-                                try {
-                                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(words.value));
-                                } catch (e) {
-                                    console.error('Failed to persist merged words', e);
-                                }
-                                wordsUpdated = true;
-                            }
-
-                            if (Array.isArray(cloudData.sentences) && cloudData.sentences.length > 0) {
-                                if (sentences.value && sentences.value.length > 0) {
-                                    const localSentenceMap = new Map();
-                                    sentences.value.forEach(s => {
-                                        if (s.id) localSentenceMap.set(s.id, s);
-                                        if (s.japanese) localSentenceMap.set(s.japanese, s);
-                                    });
-                                    const seenSentenceRefs = new Set();
-                                    const mergedSentences = cloudData.sentences.map(cs => {
-                                        const ls = (cs.id && localSentenceMap.get(cs.id)) || (cs.japanese && localSentenceMap.get(cs.japanese));
-                                        if (ls) {
-                                            seenSentenceRefs.add(ls);
-                                            if ((ls.level || 0) > (cs.level || 0)) {
-                                                return { ...cs, level: ls.level, next_review_date: ls.next_review_date };
-                                            }
-                                        }
-                                        return cs;
-                                    });
-                                    sentences.value.forEach(ls => {
-                                        if (!seenSentenceRefs.has(ls)) {
-                                            mergedSentences.push(ls);
-                                        }
-                                    });
-                                    sentences.value = mergedSentences;
-                                } else {
-                                    sentences.value = cloudData.sentences;
-                                }
-                                try {
-                                    localStorage.setItem(LOCAL_STORAGE_SENTENCES_KEY, JSON.stringify(sentences.value));
-                                } catch (e) {
-                                    console.error('Failed to persist merged sentences', e);
-                                }
-                                sentencesUpdated = true;
-                            }
-
-                            syncStatus.value = 'success';
-                            const nowStr = new Date().toLocaleTimeString();
-                            syncStatusText.value = `拉取成功 (${nowStr})`;
-                            lastSyncTime.value = new Date().toLocaleString();
-                            try {
-                                localStorage.setItem('japanese_study_last_sync_time', lastSyncTime.value);
-                            } catch (e) {}
-
-                            if (!silent) {
-                                if (window.kidToast) {
-                                    window.kidToast(`☁️ 已同步最新数据（${words.value.length} 词，${sentences.value.length} 句）`, 'success');
-                                } else {
-                                    showToast(`☁️ 已同步最新数据（${words.value.length} 词，${sentences.value.length} 句）`);
-                                }
-                            }
-                        } else if (json.success && !json.data) {
-                            syncStatus.value = 'idle';
-                            syncStatusText.value = '云端暂无数据';
-                            if (!silent) {
-                                if (window.kidAlert) {
-                                    window.kidAlert({
-                                        title: '云端暂无数据',
-                                        message: '该密钥在云端尚未有数据备份，请先在已有数据的设备上点击【推送到云端备份】。',
-                                        icon: '💡',
-                                        type: 'info'
-                                    });
-                                } else {
-                                    alert('该密钥在云端尚未有数据备份，请先在已有数据的设备上点击【推送到云端备份】。');
-                                }
-                            }
-                        } else {
-                            syncStatus.value = 'error';
-                            syncStatusText.value = json.message || '拉取失败';
-                            if (!silent) {
-                                if (window.kidAlert) {
-                                    window.kidAlert({
-                                        title: '拉取失败',
-                                        message: '拉取失败：' + (json.message || json.error),
-                                        icon: '⚠️',
-                                        type: 'warning'
-                                    });
-                                } else {
-                                    alert('拉取失败：' + (json.message || json.error));
-                                }
-                            }
-                        }
-                    } catch (err) {
-                        syncStatus.value = 'error';
-                        syncStatusText.value = '网络异常';
-                        if (!silent) {
-                            if (window.kidAlert) {
-                                window.kidAlert({
-                                    title: '网络异常',
-                                    message: '拉取失败，请检查网络或服务配置：' + err.message,
-                                    icon: '⚠️',
-                                    type: 'danger'
-                                });
-                            } else {
-                                alert('拉取失败，请检查网络或服务配置：' + err.message);
-                            }
-                        }
-                    }
-                };
+                const triggerAutoSync = () => japaneseSyncClient.triggerAutoSync();
+                const pushToCloud = (silent = false, useKeepalive = false) => japaneseSyncClient.pushToCloud(silent, useKeepalive);
+                const pullFromCloud = (silent = false) => japaneseSyncClient.pullFromCloud(silent);
 
                 onMounted(() => {
                     initVoices();
@@ -839,19 +643,14 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                     }
 
                     if (words.value.length > 0) {
-                        let confirmAppend = false;
-                        if (window.kidConfirm) {
-                            confirmAppend = await window.kidConfirm({
-                                title: '合并词库',
-                                message: `当前已有 ${words.value.length} 个词汇。点击【确定】进行合并追加（去重），点击【取消】放弃。`,
-                                icon: '📚',
-                                type: 'primary',
-                                confirmText: '确定合并',
-                                cancelText: '取消'
-                            });
-                        } else {
-                            confirmAppend = confirm(`当前已有 ${words.value.length} 个词汇。\n点击【确定】进行合并追加（去重），点击【取消】放弃。`);
-                        }
+                        const confirmAppend = await window.kidConfirm({
+                            title: '合并词库',
+                            message: `当前已有 ${words.value.length} 个词汇。点击【确定】进行合并追加（去重），点击【取消】放弃。`,
+                            icon: '📚',
+                            type: 'primary',
+                            confirmText: '确定合并',
+                            cancelText: '取消'
+                        });
                         if (!confirmAppend) return;
 
                         // Merge & de-duplicate by word + kana, updating missing meanings
@@ -936,16 +735,12 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                                     })).filter(i => i.word);
 
                                     if (imported.length === 0) {
-                                        if (window.kidAlert) {
-                                            window.kidAlert({
-                                                title: '导入提示',
-                                                message: '未能从 JSON 数组中识别出有效词汇。',
-                                                icon: '⚠️',
-                                                type: 'warning'
-                                            });
-                                        } else {
-                                            alert('未能从 JSON 数组中识别出有效词汇。');
-                                        }
+                                        window.kidAlert({
+                                            title: '导入提示',
+                                            message: '未能从 JSON 数组中识别出有效词汇。',
+                                            icon: '⚠️',
+                                            type: 'warning'
+                                        });
                                         return;
                                     }
 
@@ -983,16 +778,12 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                             });
 
                             if (imported.length === 0) {
-                                if (window.kidAlert) {
-                                    window.kidAlert({
-                                        title: '导入提示',
-                                        message: '未能从文件中识别出有效词汇。请确保文件格式为「单词(假名)」或 JSON。',
-                                        icon: '⚠️',
-                                        type: 'warning'
-                                    });
-                                } else {
-                                    alert('未能从文件中识别出有效词汇。请确保文件格式为「单词(假名)」或 JSON。');
-                                }
+                                window.kidAlert({
+                                    title: '导入提示',
+                                    message: '未能从文件中识别出有效词汇。请确保文件格式为「单词(假名)」或 JSON。',
+                                    icon: '⚠️',
+                                    type: 'warning'
+                                });
                                 return;
                             }
 
@@ -1011,16 +802,12 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                             showToast(`文件解析成功，已导入 ${added} 个新词汇！`, 'success');
                         } catch (err) {
                             console.error(err);
-                            if (window.kidAlert) {
-                                window.kidAlert({
-                                    title: '解析失败',
-                                    message: '解析文件失败：' + (err.message || '未知错误'),
-                                    icon: '❌',
-                                    type: 'danger'
-                                });
-                            } else {
-                                alert('解析文件失败：' + err.message);
-                            }
+                            window.kidAlert({
+                                title: '解析失败',
+                                message: '解析文件失败：' + (err.message || '未知错误'),
+                                icon: '❌',
+                                type: 'danger'
+                            });
                         }
                     };
                     reader.readAsText(file, 'UTF-8');
@@ -1058,19 +845,15 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                             showToast(`已重置并载入全部 ${sentences.value.length} 个内置句子！`, 'success');
                         }
                     };
-                    if (window.kidConfirm) {
-                        const ok = await window.kidConfirm({
-                            title: '重置句子库？',
-                            message: '确定要重置全部内置句子并将其复习等级恢复为初始状态吗？',
-                            icon: '⚠️',
-                            type: 'warning',
-                            confirmText: '确定重置',
-                            cancelText: '取消'
-                        });
-                        if (ok) doReset();
-                    } else if (confirm('确定要重置全部内置句子吗？')) {
-                        doReset();
-                    }
+                    const ok = await window.kidConfirm({
+                        title: '重置句子库？',
+                        message: '确定要重置全部内置句子并将其复习等级恢复为初始状态吗？',
+                        icon: '⚠️',
+                        type: 'warning',
+                        confirmText: '确定重置',
+                        cancelText: '取消'
+                    });
+                    if (ok) doReset();
                 };
 
                 // Clear All
@@ -1080,19 +863,15 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                         saveData();
                         showToast('已清空词库', 'warning');
                     };
-                    if (window.kidConfirm) {
-                        const ok = await window.kidConfirm({
-                            title: '清空词库？',
-                            message: `确定要清空全部 ${words.value.length} 个词汇吗？此操作不可恢复。`,
-                            icon: '🗑️',
-                            type: 'danger',
-                            confirmText: '确定清空',
-                            cancelText: '取消'
-                        });
-                        if (ok) doClear();
-                    } else if (confirm(`确定要清空全部 ${words.value.length} 个词汇吗？此操作不可恢复。`)) {
-                        doClear();
-                    }
+                    const ok = await window.kidConfirm({
+                        title: '清空词库？',
+                        message: `确定要清空全部 ${words.value.length} 个词汇吗？此操作不可恢复。`,
+                        icon: '🗑️',
+                        type: 'danger',
+                        confirmText: '确定清空',
+                        cancelText: '取消'
+                    });
+                    if (ok) doClear();
                 };
 
                 // Add / Edit / Delete word
@@ -1149,36 +928,27 @@ const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
                         saveData();
                         showToast('词汇已删除', 'success');
                     };
-                    if (window.kidConfirm) {
-                        const ok = await window.kidConfirm({
-                            title: '删除词汇？',
-                            message: '确定要删除该词汇吗？',
-                            icon: '🗑️',
-                            type: 'danger',
-                            confirmText: '确定删除',
-                            cancelText: '取消'
-                        });
-                        if (ok) doDelete();
-                    } else if (confirm('确定要删除该词汇吗？')) {
-                        doDelete();
-                    }
+                    const ok = await window.kidConfirm({
+                        title: '删除词汇？',
+                        message: '确定要删除该词汇吗？',
+                        icon: '🗑️',
+                        type: 'danger',
+                        confirmText: '确定删除',
+                        cancelText: '取消'
+                    });
+                    if (ok) doDelete();
                 };
 
                 const promptEditMeaning = async (word) => {
-                    let newMeaning = null;
-                    if (window.kidPrompt) {
-                        newMeaning = await window.kidPrompt({
-                            title: '补充 / 修改释义',
-                            message: `为「${word.word} (${word.kana})」输入中文释义：`,
-                            placeholder: '输入中文释义...',
-                            defaultValue: word.meaning || '',
-                            icon: '✏️',
-                            confirmText: '保存释义',
-                            cancelText: '取消'
-                        });
-                    } else {
-                        newMeaning = prompt(`请为「${word.word} (${word.kana})」输入中文释义：`, word.meaning || '');
-                    }
+                    const newMeaning = await window.kidPrompt({
+                        title: '补充 / 修改释义',
+                        message: `为「${word.word} (${word.kana})」输入中文释义：`,
+                        placeholder: '输入中文释义...',
+                        defaultValue: word.meaning || '',
+                        icon: '✏️',
+                        confirmText: '保存释义',
+                        cancelText: '取消'
+                    });
                     if (newMeaning !== null) {
                         word.meaning = newMeaning.trim();
                         const idx = words.value.findIndex(w => w.id === word.id);
@@ -2452,24 +2222,18 @@ const currentWordSentenceIndex = ref(0);
                 };
 
                 const clearWrongBook = async () => {
-                    if (window.kidConfirm) {
-                        const ok = await window.kidConfirm({
-                            title: '清空错题本？',
-                            message: '确定要清空假名错题记录吗？',
-                            icon: '🗑️',
-                            type: 'danger',
-                            confirmText: '确定清空',
-                            cancelText: '取消'
-                        });
-                        if (ok) {
-                            kanaWrongList.value = [];
-                            saveKanaWrongList();
-                            showToast('已清空错题本', 'success');
-                        }
-                    } else if (confirm('确定要清空假名错题本吗？')) {
+                    const ok = await window.kidConfirm({
+                        title: '清空错题本？',
+                        message: '确定要清空假名错题记录吗？',
+                        icon: '🗑️',
+                        type: 'danger',
+                        confirmText: '确定清空',
+                        cancelText: '取消'
+                    });
+                    if (ok) {
                         kanaWrongList.value = [];
                         saveKanaWrongList();
-                        showToast('已清空错题本');
+                        showToast('已清空错题本', 'success');
                     }
                 };
 

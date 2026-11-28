@@ -1,7 +1,7 @@
 {
   "name": "Apiapia 学习中心 · 小朋友趣味自学",
   "short_name": "Apiapia",
-  "description": "专为小朋友打造的趣味学习中心，萌宠猫咪 Apiapia 陪伴学习：日语听力与假名、汉字笔顺听写、英语核心动词闪卡",
+  "description": "专为小朋友打造的趣味学习中心，萌宠猫咪 Apiapia 陪伴学习：日语听力与假名、汉字笔顺听写、钢琴视奏与识音、英语核心动词闪卡",
   "id": "./index.html",
   "start_url": "./",
   "scope": "./",

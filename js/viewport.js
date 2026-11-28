@@ -1,13 +1,48 @@
 /**
  * ============================================================
- * 学习中心 · 移动端 / iPadOS 视口与安全区动态适配模块
- * Viewport & Safe Area Adapter for iOS / iPadOS Safari & Web
+ * 学习中心 · 移动端 / iPadOS 视口适配、设备环境检测与 SPA 桥接模块
+ * Viewport, Environment Detection & SPA Bridge
  * ============================================================
  */
 
 (function () {
     'use strict';
 
+    // 1. 统一设备与运行环境检测 (全站共享)
+    var ua = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+    var isIOS = typeof navigator !== 'undefined' && (
+        /iPad|iPhone|iPod/.test(ua) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    );
+    var isMobile = isIOS || /Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    var isWechat = /MicroMessenger/i.test(ua);
+    var isStandalone = (typeof window !== 'undefined') && (
+        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+        window.navigator.standalone === true ||
+        (typeof document !== 'undefined' && document.referrer.indexOf('android-app://') !== -1)
+    );
+
+    window.ApiapiaEnv = {
+        isIOS: isIOS,
+        isMobile: isMobile,
+        isWechat: isWechat,
+        isStandalone: isStandalone
+    };
+
+    function getTargetOrigin() {
+        return (window.location && window.location.origin && window.location.origin !== 'null')
+            ? window.location.origin
+            : '*';
+    }
+
+    function isSameOriginEvent(event) {
+        if (!window.location || !window.location.origin || window.location.origin === 'null') {
+            return true;
+        }
+        return event.origin === window.location.origin;
+    }
+
+    // 2. 视口高度动态适配
     function updateAppHeight() {
         if (window.scrollY !== 0) {
             window.scrollTo(0, 0);
@@ -22,10 +57,8 @@
         document.documentElement.style.setProperty('--app-height', h + 'px');
     }
 
-    // 监听窗口尺寸变化
     window.addEventListener('resize', updateAppHeight);
 
-    // 监听横竖屏切换（增加微延迟等待系统动效完成）
     window.addEventListener('orientationchange', function () {
         setTimeout(function () {
             window.scrollTo(0, 0);
@@ -33,7 +66,6 @@
         }, 150);
     });
 
-    // 深度监听视觉视口变化 (针对 iOS Safari 软键盘弹出与地址栏收缩)
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', updateAppHeight);
         window.visualViewport.addEventListener('scroll', function () {
@@ -43,25 +75,20 @@
         });
     }
 
-    // 防止页面意外被橡皮筋滚动拉扯
     window.addEventListener('scroll', function () {
         if (window.scrollY !== 0) {
             window.scrollTo(0, 0);
         }
     });
 
-    // 初始化
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', updateAppHeight);
     } else {
         updateAppHeight();
     }
 
-    // ============================================================
-    // SPA 单页 App 容器微前端通信桥接
-    // ============================================================
+    // 3. SPA 单页 App 容器微前端通信桥接
     if (window.self !== window.top) {
-        // 全局捕获阶段拦截所有返回根 index.html 首页的链接与按钮
         document.addEventListener('click', function (e) {
             var target = e.target;
             var link = target && target.closest ? target.closest('a') : null;
@@ -71,7 +98,7 @@
                     e.preventDefault();
                     e.stopPropagation();
                     try {
-                        window.parent.postMessage({ type: 'SPA_NAVIGATE_HOME' }, '*');
+                        window.parent.postMessage({ type: 'SPA_NAVIGATE_HOME' }, getTargetOrigin());
                     } catch (err) {
                         console.warn('[SPA-Bridge] postMessage error:', err);
                     }
@@ -79,10 +106,9 @@
             }
         }, true);
 
-        // 接收父级 SPA 容器广播的失焦/隐藏生命周期事件
         window.addEventListener('message', function (event) {
+            if (!isSameOriginEvent(event)) return;
             if (event.data && event.data.type === 'SPA_MODULE_DEACTIVATED') {
-                // 停止可能正在朗读的 TTS 语音合成
                 try {
                     if (window.speechSynthesis && window.speechSynthesis.speaking) {
                         window.speechSynthesis.cancel();

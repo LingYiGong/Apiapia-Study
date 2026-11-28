@@ -1,10 +1,16 @@
 .git
 .idea
+.claude
+.codex
+.mcp.json
+.gitignore
+.gitattributes
 node_modules
 .wrangler
 backend
 package.json
 package-lock.json
 wrangler.toml
+LICENSE
 *.md
 japanese/docs

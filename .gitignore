@@ -2,3 +2,6 @@ node_modules/
 .idea/
 .wrangler/
 .DS_Store
+.claude/
+.codex/
+.mcp.json

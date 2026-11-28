@@ -24,17 +24,11 @@ const app = createApp({
         // ==========================================
         // 手机桌面安装与 PWA 引导支持
         // ==========================================
-        const ua = navigator.userAgent || '';
-        const isIOS = ref(/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
-        const isWechat = ref(/MicroMessenger/i.test(ua));
-        const isMobile = ref(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
-
-        // 检测是否已经在独立桌面 App 模式运行 (PWA standalone 或 iOS WebClip)
-        const isStandalone = ref(
-            window.matchMedia('(display-mode: standalone)').matches ||
-            window.navigator.standalone === true ||
-            document.referrer.includes('android-app://')
-        );
+        const envInfo = window.ApiapiaEnv || {};
+        const isIOS = ref(Boolean(envInfo.isIOS));
+        const isWechat = ref(Boolean(envInfo.isWechat));
+        const isMobile = ref(Boolean(envInfo.isMobile));
+        const isStandalone = ref(Boolean(envInfo.isStandalone));
 
         const canInstallDirectly = ref(false); // 是否获得 beforeinstallprompt 原生调起支持
         const showInstallBanner = ref(false);  // 底部可爱安装横幅
@@ -134,23 +128,33 @@ const app = createApp({
             }
         });
 
+        // 全站真实数据规模常量（与各模块词库/字库精确对齐）
+        const hubStats = {
+            japaneseWords: 2785,
+            japaneseSentences: 438,
+            japaneseKana: 104,
+            hanziChars: 315,
+            englishVerbs: 100,
+            englishArticles: 10
+        };
+
         // 学习模块配置数据 (与项目实际数据及功能 100% 精确对齐)
         const modules = ref([
             {
                 id: 'japanese',
                 title: '日语听力与假名',
-                subtitle: '五十音田字格 · 1912词盲听 · 226句例句',
+                subtitle: `五十音田字格 · ${hubStats.japaneseWords}词盲听 · ${hubStats.japaneseSentences}句例句`,
                 icon: '🎌',
                 iconBg: 'bg-indigo-50 text-indigo-600 border border-indigo-100',
                 barClass: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500',
                 cardBorder: 'border-indigo-200 hover:border-indigo-400',
                 btnClass: 'kid-btn-primary',
-                userProgressText: '1912 词 · 226 句 · 104 假名',
+                userProgressText: `${hubStats.japaneseWords} 词 · ${hubStats.japaneseSentences} 句 · ${hubStats.japaneseKana} 假名`,
                 dueCount: 0,
                 masteredCount: 0,
                 tags: [
                     { text: '五十音田字格', color: '#6366f1' },
-                    { text: '1912词盲听', color: '#10b981' },
+                    { text: `${hubStats.japaneseWords}词盲听`, color: '#10b981' },
                     { text: '情境例句', color: '#8b5cf6' }
                 ],
                 url: 'japanese/frontend/index.html',
@@ -372,10 +376,17 @@ const app = createApp({
             return modules.value.find(m => m.id === currentModuleId.value) || null;
         });
 
-        const getModuleUrl = (mod) => {
-            if (!mod || !mod.url) return '';
-            const sep = mod.url.includes('?') ? '&' : '?';
-            return `${mod.url}${sep}theme=${isDark.value ? 'dark' : 'light'}`;
+        const getTargetOrigin = () => {
+            return (window.location && window.location.origin && window.location.origin !== 'null')
+                ? window.location.origin
+                : '*';
+        };
+
+        const syncAllIframesTheme = () => {
+            const theme = isDark.value ? 'dark' : 'light';
+            if (typeof window.broadcastTheme === 'function') {
+                window.broadcastTheme(theme);
+            }
         };
 
         const openModuleSPA = (id) => {
@@ -392,32 +403,20 @@ const app = createApp({
 
             const isAlreadyLoaded = loadedModulesMap.value[id] === true;
 
-            // 若尚未加入活动容器池，则加入
+            // 若尚未加入活动容器池，则固定 initialUrl 后加入（避免切换夜间模式时重置 iframe src）
             if (!activeModulesList.value.some(m => m.id === id)) {
-                activeModulesList.value.push(targetMod);
+                const sep = targetMod.url.includes('?') ? '&' : '?';
+                activeModulesList.value.push({
+                    ...targetMod,
+                    initialUrl: `${targetMod.url}${sep}theme=${isDark.value ? 'dark' : 'light'}`
+                });
             }
 
             // 立即切换当前模块，直接全屏滑入呈现
             currentModuleId.value = id;
 
-            // 同步将当前夜间模式预注入目标 Iframe，彻底杜绝白闪
-            setTimeout(() => {
-                try {
-                    const iframe = document.getElementById('iframe-' + id);
-                    if (iframe) {
-                        if (iframe.contentDocument && iframe.contentDocument.documentElement) {
-                            iframe.contentDocument.documentElement.classList.toggle('dark', isDark.value);
-                            iframe.contentDocument.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light');
-                        }
-                        if (iframe.contentWindow) {
-                            iframe.contentWindow.postMessage({
-                                type: 'APIAPIA_SET_THEME',
-                                theme: isDark.value ? 'dark' : 'light'
-                            }, '*');
-                        }
-                    }
-                } catch (e) {}
-            }, 50);
+            // 同步当前夜间模式至子 Iframe，彻底杜绝白闪
+            setTimeout(syncAllIframesTheme, 50);
 
             // 同步修改 Hash，支持手机系统返回键与浏览器前进后退自然生效
             const targetHash = '#/' + id;
@@ -436,33 +435,18 @@ const app = createApp({
         const onModuleIframeLoaded = (id) => {
             loadedModulesMap.value[id] = true;
             finishEnteringProgress();
-
-            // 向新加载就绪的子模块即时同步当前夜间模式状态
-            try {
-                const iframe = document.getElementById('iframe-' + id);
-                if (iframe) {
-                    if (iframe.contentDocument && iframe.contentDocument.documentElement) {
-                        iframe.contentDocument.documentElement.classList.toggle('dark', isDark.value);
-                        iframe.contentDocument.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light');
-                    }
-                    if (iframe.contentWindow) {
-                        iframe.contentWindow.postMessage({
-                            type: 'APIAPIA_SET_THEME',
-                            theme: isDark.value ? 'dark' : 'light'
-                        }, '*');
-                    }
-                }
-            } catch (e) {}
+            syncAllIframesTheme();
         };
 
         // 统一平滑返回学习中心首页
         const navigateHome = () => {
             if (!currentModuleId.value) return;
 
-            // 广播通知子应用已失焦（可停止朗读等）
+            const targetOrigin = getTargetOrigin();
+            // 广播通知子应用已失焦（可停止朗读、麦克风等）
             document.querySelectorAll('iframe').forEach(iframe => {
                 try {
-                    iframe.contentWindow?.postMessage({ type: 'SPA_MODULE_DEACTIVATED' }, '*');
+                    iframe.contentWindow?.postMessage({ type: 'SPA_MODULE_DEACTIVATED' }, targetOrigin);
                 } catch (e) {}
             });
 
@@ -492,21 +476,21 @@ const app = createApp({
         };
 
         const onWindowMessage = (event) => {
+            if (window.location && window.location.origin && window.location.origin !== 'null' && event.origin !== window.location.origin) {
+                return;
+            }
             if (event.data && event.data.type === 'SPA_NAVIGATE_HOME') {
                 navigateHome();
             }
         };
 
-        // 模块卡片点击入口 (由传统链接跳转改造为 SPA 无缝切换)
-        const goToModule = (url, id) => {
-            openModuleSPA(id);
+        const onPageShow = () => {
+            refreshModuleProgress();
         };
 
         onMounted(() => {
             refreshModuleProgress();
-            window.addEventListener('pageshow', () => {
-                refreshModuleProgress();
-            });
+            window.addEventListener('pageshow', onPageShow);
 
             // 注册 PWA ServiceWorker
             if ('serviceWorker' in navigator) {
@@ -539,6 +523,7 @@ const app = createApp({
 
         onUnmounted(() => {
             if (progressTimer) clearInterval(progressTimer);
+            window.removeEventListener('pageshow', onPageShow);
             window.removeEventListener('apiapia-theme-changed', onThemeChanged);
             window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt);
             window.removeEventListener('appinstalled', onAppInstalled);
@@ -552,8 +537,9 @@ const app = createApp({
             toggleTheme,
             lastVisitedModule,
             currentDateText,
+            hubStats,
             modules,
-            goToModule,
+            openModuleSPA,
             // 顶部流光与正在进入提示状态
             pageProgress,
             isProgressActive,
@@ -573,7 +559,6 @@ const app = createApp({
             currentModuleId,
             currentModuleMeta,
             activeModulesList,
-            getModuleUrl,
             onModuleIframeLoaded
         };
     }

@@ -1,10 +1,13 @@
 {
-  "name": "apiapia-study",
+  "name": "study-hub",
+  "version": "1.0.0",
+  "private": true,
   "description": "Apiapia学习中心 (日语、汉字、钢琴、英语) - 萌宠猫咪主题 - Cloudflare 全栈部署",
   "scripts": {
     "build": "echo 'Ready'",
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "check": "node -e \"const cp=require('child_process'),fs=require('fs'),path=require('path');const files=['app.js','sw.js','js/theme.js','js/viewport.js','js/kid-dialog.js','js/srs.js','js/cloud-sync.js','backend/worker.js','backend/routes/utils.js','backend/routes/hanzi.js','backend/routes/japanese.js','music/music.js','hanzi/hanzi.js','english/english.js','japanese/frontend/app.js'];for(const f of files){cp.execFileSync(process.execPath,['--check',f],{stdio:'inherit'});}console.log('All '+files.length+' JS files passed syntax check.');\""
   },
   "devDependencies": {
     "wrangler": "^3.109.2"

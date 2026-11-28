@@ -10,8 +10,6 @@ const WRITE_MODE_KEY = "hanziDictationWriteModeV1";
 const OUTLINE_MODE_KEY = "hanziIpadOutlineV1";
 const RECENT_NEW_COUNT = 25;
 
-let debounceSyncTimer = null;
-
 const state = {
     mode: "dictation",
     isWrongPractice: false,
@@ -211,7 +209,7 @@ const els = {
     backHomeBtn: document.getElementById("backHomeBtn")
 };
 
-const DAY = 24 * 60 * 60 * 1000;
+const DAY = window.ApiapiaSRS.DAY_MS;
 
 function getHanziIndexMap() {
     const map = new Map();
@@ -231,40 +229,15 @@ function isRecentAddition(char) {
 }
 
 function calculateNextReview(level) {
-    let daysToAdd = 0;
-    switch (Number(level) || 0) {
-        case 0: daysToAdd = 0; break;       // 今日/即时复习
-        case 1: daysToAdd = 1; break;       // 1 天后
-        case 2: daysToAdd = 3; break;       // 3 天后
-        case 3: daysToAdd = 7; break;       // 7 天后 (已掌握阶段)
-        case 4: daysToAdd = 14; break;      // 14 天后
-        case 5: daysToAdd = 30; break;      // 30 天后
-        default: daysToAdd = 60; break;     // 60 天后
-    }
-    return Date.now() + daysToAdd * DAY;
-}
-
-function getNextReviewDays(level) {
-    switch (Number(level) || 0) {
-        case 0: return "今日";
-        case 1: return "1天后";
-        case 2: return "3天后";
-        case 3: return "7天后";
-        case 4: return "14天后";
-        case 5: return "30天后";
-        default: return "60天后";
-    }
+    return window.ApiapiaSRS.calculateNextReview(level);
 }
 
 function isDueForReview(charStats) {
-    return (Number(charStats.nextReviewDate) || 0) <= Date.now();
+    return window.ApiapiaSRS.isDueForReview(charStats && charStats.nextReviewDate);
 }
 
 function formatDateDisplay(ts) {
-    if (!ts || ts <= Date.now()) return "今日待复习";
-    const d = new Date(Number(ts));
-    const diffDays = Math.ceil((ts - Date.now()) / DAY);
-    return `${diffDays}天后 (${d.getMonth() + 1}/${d.getDate()})`;
+    return window.ApiapiaSRS.formatDateDisplay(ts);
 }
 
 function updateLevelBadge(badgeEl, char) {
@@ -532,37 +505,14 @@ function setLastSyncTime(timeStr) {
     }
 }
 
-function triggerAutoSync() {
-    const key = (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim();
-    const autoSync = localStorage.getItem(AUTO_SYNC_STORAGE) === "true";
-    if (!autoSync || !key) return;
-
-    clearTimeout(debounceSyncTimer);
-    debounceSyncTimer = setTimeout(() => {
-        pushToCloud(true);
-    }, 2500);
-}
-
-async function pushToCloud(silent = false) {
-    const key = (els.syncKeyInput ? els.syncKeyInput.value.trim() : "") || (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim();
-    if (!key) {
-        if (!silent) {
-            if (window.kidAlert) {
-                window.kidAlert({
-                    title: "同步提示",
-                    message: "请先输入专属同步密钥 (Sync Key)！",
-                    icon: "💡",
-                    type: "warning"
-                });
-            } else {
-                alert("请先输入专属同步密钥 (Sync Key)！");
-            }
-        }
-        return;
-    }
-
-    setSyncStatus("syncing", "正在推送...");
-    try {
+const hanziSyncClient = window.ApiapiaSync.createSyncClient({
+    endpoint: "/api/hanzi/sync",
+    getKey: () => (els.syncKeyInput ? els.syncKeyInput.value.trim() : "") || (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim(),
+    isAutoSync: () => localStorage.getItem(AUTO_SYNC_STORAGE) === "true",
+    onStatusChange: (status, text) => setSyncStatus(status, text),
+    onLastSyncTime: (timeStr) => setLastSyncTime(timeStr),
+    emptyCloudMessage: "该密钥在云端尚无记录，您可以先点击【推送到云端】进行初次备份！",
+    buildPushPayload: (cloudData) => {
         let speechSettings = {};
         try {
             const raw = localStorage.getItem(SPEECH_SETTINGS_KEY);
@@ -570,73 +520,41 @@ async function pushToCloud(silent = false) {
         } catch (_) {}
 
         let stats = loadStats();
-        try {
-            const cloudRes = await fetch("/api/hanzi/sync", {headers: {"X-Sync-Key": key}});
-            const cloudJson = await cloudRes.json();
-            const cloudStats = cloudJson?.success && cloudJson.data?.stats;
-            if (cloudStats && typeof cloudStats === "object") {
-                stats = mergeStats(stats, cloudStats);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
-                refreshHomeStats();
-            }
-        } catch (error) {
-            console.warn("推送前读取云端数据失败，将直接推送本地数据：", error);
+        const cloudStats = cloudData && cloudData.stats;
+        if (cloudStats && typeof cloudStats === "object") {
+            stats = mergeStats(stats, cloudStats);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+            refreshHomeStats();
         }
-
-        const res = await fetch("/api/hanzi/sync", {
-            method: "POST",
-            headers: {"Content-Type": "application/json", "X-Sync-Key": key},
-            body: JSON.stringify({
-                stats,
-                strokeProgress: "",
-                speechSettings: speechSettings,
-                syncKey: key
-            })
-        });
-
-        const json = await res.json();
-        if (json.success) {
-            const now = new Date();
-            const nowStr = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
-            setSyncStatus("success", `同步成功 (${now.toLocaleTimeString()})`);
-            setLastSyncTime(nowStr);
-            if (!silent) {
-                if (window.kidToast) {
-                    window.kidToast("☁️ 已成功推送到云端备份！", "success");
-                } else {
-                    alert("☁️ 已成功将本地学习数据推送到云端备份！");
-                }
-            }
-        } else {
-            setSyncStatus("error", json.message || "同步失败");
-            if (!silent) {
-                if (window.kidAlert) {
-                    window.kidAlert({
-                        title: "推送失败",
-                        message: "推送云端失败：" + (json.message || json.error || "未知错误"),
-                        icon: "⚠️",
-                        type: "warning"
-                    });
-                } else {
-                    alert("推送云端失败：" + (json.message || json.error || "未知错误"));
-                }
-            }
+        return {
+            stats,
+            strokeProgress: "",
+            speechSettings
+        };
+    },
+    applyPullData: (cloudData) => {
+        if (cloudData.stats && typeof cloudData.stats === "object") {
+            const merged = mergeStats(loadStats(), cloudData.stats);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+            if (!statsEqual(merged, cloudData.stats)) hanziSyncClient.triggerAutoSync();
         }
-    } catch (err) {
-        setSyncStatus("error", "网络或接口异常");
-        if (!silent) {
-            if (window.kidAlert) {
-                window.kidAlert({
-                    title: "网络异常",
-                    message: "推送失败，请检查网络连接或 Cloudflare 部署状态：" + err.message,
-                    icon: "⚠️",
-                    type: "danger"
-                });
-            } else {
-                alert("推送失败，请检查网络连接或 Cloudflare 部署状态：" + err.message);
-            }
+        if (cloudData.speechSettings && typeof cloudData.speechSettings === "object") {
+            localStorage.setItem(SPEECH_SETTINGS_KEY, JSON.stringify(cloudData.speechSettings));
+            loadSpeechSettings();
         }
+        refreshHomeStats();
+        const total = cloudData.stats?.totalPracticed || 0;
+        const wrong = Object.values(cloudData.stats?.characters || {}).filter(c => c.inWrongBook || c.wrong > 0).length;
+        return `☁️ 已拉取云端数据（练习 ${total} 次，错字本 ${wrong} 个）`;
     }
+});
+
+function triggerAutoSync() {
+    hanziSyncClient.triggerAutoSync();
+}
+
+async function pushToCloud(silent = false) {
+    return hanziSyncClient.pushToCloud(silent);
 }
 
 function getRecordTime(record) {
@@ -682,111 +600,7 @@ function statsEqual(a, b) {
 }
 
 async function pullFromCloud(silent = false) {
-    const key = (els.syncKeyInput ? els.syncKeyInput.value.trim() : "") || (localStorage.getItem(SYNC_KEY_STORAGE) || "").trim();
-    if (!key) {
-        if (!silent) {
-            if (window.kidAlert) {
-                window.kidAlert({
-                    title: "同步提示",
-                    message: "请先输入专属同步密钥 (Sync Key)！",
-                    icon: "💡",
-                    type: "warning"
-                });
-            } else {
-                alert("请先输入专属同步密钥 (Sync Key)！");
-            }
-        }
-        return;
-    }
-
-    if (!silent && window.kidConfirm) {
-        const ok = await window.kidConfirm({
-            title: "拉取云端进度？",
-            message: "从云端拉取将覆盖本地当前的汉字学习记录与错字本，确定要拉取吗？",
-            icon: "⬇️",
-            type: "warning",
-            confirmText: "确定拉取",
-            cancelText: "取消"
-        });
-        if (!ok) return;
-    }
-
-    setSyncStatus("syncing", "正在拉取...");
-    try {
-        const res = await fetch("/api/hanzi/sync", {headers: {"X-Sync-Key": key}});
-        const json = await res.json();
-
-        if (json.success && json.data) {
-            const cloudData = json.data;
-            if (cloudData.stats && typeof cloudData.stats === "object") {
-                const merged = mergeStats(loadStats(), cloudData.stats);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-                if (!statsEqual(merged, cloudData.stats)) triggerAutoSync();
-            }
-            if (cloudData.speechSettings && typeof cloudData.speechSettings === "object") {
-                localStorage.setItem(SPEECH_SETTINGS_KEY, JSON.stringify(cloudData.speechSettings));
-                loadSpeechSettings();
-            }
-
-            refreshHomeStats();
-            const now = new Date();
-            const nowStr = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
-            setSyncStatus("success", `拉取成功 (${now.toLocaleTimeString()})`);
-            setLastSyncTime(nowStr);
-
-            if (!silent) {
-                const total = cloudData.stats?.totalPracticed || 0;
-                const wrong = Object.values(cloudData.stats?.characters || {}).filter(c => c.inWrongBook || c.wrong > 0).length;
-                if (window.kidToast) {
-                    window.kidToast(`☁️ 已拉取云端数据（练习 ${total} 次，错字本 ${wrong} 个）`, "success");
-                } else {
-                    alert(`☁️ 已成功拉取云端数据！（累计练习 ${total} 次，错字本 ${wrong} 个）`);
-                }
-            }
-        } else if (json.success && !json.data) {
-            setSyncStatus("success", "云端暂无数据");
-            if (!silent) {
-                if (window.kidAlert) {
-                    window.kidAlert({
-                        title: "云端暂无数据",
-                        message: "该密钥在云端尚无记录，您可以先点击【推送到云端】进行初次备份！",
-                        icon: "💡",
-                        type: "info"
-                    });
-                } else {
-                    alert("该密钥在云端尚无记录，您可以先点击【推送到云端】进行初次备份！");
-                }
-            }
-        } else {
-            setSyncStatus("error", json.message || "拉取失败");
-            if (!silent) {
-                if (window.kidAlert) {
-                    window.kidAlert({
-                        title: "拉取失败",
-                        message: "拉取失败：" + (json.message || json.error || "未知错误"),
-                        icon: "⚠️",
-                        type: "warning"
-                    });
-                } else {
-                    alert("拉取失败：" + (json.message || json.error || "未知错误"));
-                }
-            }
-        }
-    } catch (err) {
-        setSyncStatus("error", "网络或接口异常");
-        if (!silent) {
-            if (window.kidAlert) {
-                window.kidAlert({
-                    title: "网络异常",
-                    message: "拉取失败，请检查网络连接或 Cloudflare 部署状态：" + err.message,
-                    icon: "⚠️",
-                    type: "danger"
-                });
-            } else {
-                alert("拉取失败，请检查网络连接或 Cloudflare 部署状态：" + err.message);
-            }
-        }
-    }
+    return hanziSyncClient.pullFromCloud(silent);
 }
 
 function alertSpeechNotSupported() {
@@ -927,19 +741,14 @@ async function clearWrongBook() {
         return;
     }
 
-    let ok = false;
-    if (window.kidConfirm) {
-        ok = await window.kidConfirm({
-            title: "清空错字本？",
-            message: `确定要清空全部 ${wrongChars.length} 个错字记录吗？清空后错字本将重置为空。`,
-            icon: "🗑️",
-            type: "danger",
-            confirmText: "确定清空",
-            cancelText: "取消"
-        });
-    } else {
-        ok = window.confirm(`确定要清空全部 ${wrongChars.length} 个错字记录吗？`);
-    }
+    const ok = await window.kidConfirm({
+        title: "清空错字本？",
+        message: `确定要清空全部 ${wrongChars.length} 个错字记录吗？清空后错字本将重置为空。`,
+        icon: "🗑️",
+        type: "danger",
+        confirmText: "确定清空",
+        cancelText: "取消"
+    });
 
     if (ok) {
         wrongChars.forEach(item => {
@@ -2936,17 +2745,13 @@ function renderHanziWall(stats = loadStats()) {
 /* ================== 退出与重置 ================== */
 
 async function quitSession() {
-    if (window.kidConfirmExitPractice) {
-        const confirmed = await window.kidConfirmExitPractice({
-            title: "退出听写？",
-            message: "确定要退出听写吗？已经判定过的题目会保留记录。",
-            confirmText: "确定退出",
-            cancelText: "继续练习"
-        });
-        if (!confirmed) return;
-    } else {
-        if (!confirm("确定要退出听写吗？已经判定过的题目会保留记录。")) return;
-    }
+    const confirmed = await window.kidConfirmExitPractice({
+        title: "退出听写？",
+        message: "确定要退出听写吗？已经判定过的题目会保留记录。",
+        confirmText: "确定退出",
+        cancelText: "继续练习"
+    });
+    if (!confirmed) return;
 
     stopAllSpeech();
     clearIpadStrokeWriter();
@@ -2965,36 +2770,27 @@ async function quitSession() {
 }
 
 async function quitChoice() {
-    if (window.kidConfirmExitPractice) {
-        const confirmed = await window.kidConfirmExitPractice({
-            title: "退出选字游戏？",
-            message: "确定要退出选字游戏吗？",
-            confirmText: "确定退出",
-            cancelText: "继续练习"
-        });
-        if (!confirmed) return;
-    } else {
-        if (!confirm("确定要退出选字游戏吗？")) return;
-    }
+    const confirmed = await window.kidConfirmExitPractice({
+        title: "退出选字游戏？",
+        message: "确定要退出选字游戏吗？",
+        confirmText: "确定退出",
+        cancelText: "继续练习"
+    });
+    if (!confirmed) return;
     stopAllSpeech();
     showScreen("setup");
     refreshHomeStats();
 }
 
 async function resetAllData() {
-    let confirmed = false;
-    if (window.kidConfirm) {
-        confirmed = await window.kidConfirm({
-            title: "清空全部学习记录？",
-            message: "确定要清空全部学习记录吗？错字本和累计成绩都会被删除，此操作不能恢复。",
-            icon: "🗑️",
-            type: "danger",
-            confirmText: "确定清空",
-            cancelText: "取消"
-        });
-    } else {
-        confirmed = confirm("确定要清空全部学习记录吗？错字本和累计成绩都会被删除，此操作不能恢复。");
-    }
+    const confirmed = await window.kidConfirm({
+        title: "清空全部学习记录？",
+        message: "确定要清空全部学习记录吗？错字本和累计成绩都会被删除，此操作不能恢复。",
+        icon: "🗑️",
+        type: "danger",
+        confirmText: "确定清空",
+        cancelText: "取消"
+    });
 
     if (!confirmed) return;
 
@@ -3002,11 +2798,7 @@ async function resetAllData() {
     freshStats.resetAt = Date.now();
     saveStats(freshStats);
     refreshHomeStats();
-    if (window.kidToast) {
-        window.kidToast("学习记录已经清空啦！", "success");
-    } else {
-        alert("学习记录已经清空。");
-    }
+    window.kidToast("学习记录已经清空啦！", "success");
 }
 
 /* ================== 事件绑定 ================== */
@@ -3305,11 +3097,7 @@ document.getElementById("practiceWrongFromTabBtn")?.addEventListener("click", ()
     const stats = loadStats();
     const wrongChars = getWrongCharacters(stats);
     if (wrongChars.length === 0) {
-        if (window.kidToast) {
-            window.kidToast("错字本目前为空，太棒啦！🎉", "success");
-        } else {
-            alert("错字本目前为空，太棒啦！");
-        }
+        window.kidToast("错字本目前为空，太棒啦！🎉", "success");
         return;
     }
     startSession(wrongChars);
@@ -3319,11 +3107,7 @@ document.getElementById("practiceWrongChoiceBtn")?.addEventListener("click", () 
     const stats = loadStats();
     const wrongChars = getWrongCharacters(stats);
     if (wrongChars.length === 0) {
-        if (window.kidToast) {
-            window.kidToast("错字本目前为空，太棒啦！🎉", "success");
-        } else {
-            alert("错字本目前为空，太棒啦！");
-        }
+        window.kidToast("错字本目前为空，太棒啦！🎉", "success");
         return;
     }
     startChoice(wrongChars);
