@@ -25,9 +25,10 @@
     <script src="../../libs/vant.min.js"></script>
 
     <!-- 引入内置词库、句子库与假名库数据 -->
-    <script src="vocab_data.js?v=2.3.0"></script>
-    <script src="sentence_data.js?v=2.3.0"></script>
+    <script src="vocab_data.js?v=2.4.0"></script>
+    <script src="sentence_data.js?v=2.4.0"></script>
     <script src="kana_data.js?v=2.3.0"></script>
+    <script src="fallback_sentences.js?v=2.4.0"></script>
 
     <!-- 全局统一儿童友好设计系统样式表 -->
     <link rel="stylesheet" href="../../css/style.css?v=2.3.0" />
@@ -232,7 +233,6 @@
                     <input type="text"
                            v-model="syncKey"
                            placeholder="输入任意专属同步密码 (例: baby888)"
-                           clearable
                            autocomplete="off"
                            spellcheck="false"
                            @change="saveSyncConfig"
@@ -1362,20 +1362,18 @@
                     <div class="grid grid-cols-2 gap-2.5">
                         <button type="button" @click="importBuiltin()"
                                 class="py-3 px-3 kid-btn-primary text-white text-xs sm:text-sm font-black rounded-2xl shadow-sm">
-                            📦 补全内置词库 (1912词)
+                            📦 补全内置词库 ({{ builtinVocabCount }}词)
                         </button>
                         <button type="button" @click="resetSentences()"
                                 class="py-3 px-3 kid-btn-primary text-white text-xs sm:text-sm font-black rounded-2xl shadow-sm">
-                            📖 补全内置句子 (226句)
+                            📖 补全内置句子 ({{ builtinSentenceCount }}句)
                         </button>
                     </div>
 
                     <!-- 文件备份 / 导出 / 清空 -->
                     <div class="grid grid-cols-3 gap-2.5 pt-1">
-                        <label class="w-full">
-                            <button type="button" class="w-full py-2.5 px-2 kid-btn-light text-slate-700 text-xs sm:text-sm font-black rounded-2xl">
-                                <span>📂 导入备份</span>
-                            </button>
+                        <label class="w-full py-2.5 px-2 kid-btn-light text-slate-700 text-xs sm:text-sm font-black rounded-2xl flex items-center justify-center cursor-pointer select-none">
+                            <span>📂 导入备份</span>
                             <input type="file" accept=".txt,.json" @change="handleFileUpload" class="hidden">
                         </label>
                         <button type="button" @click="exportData"
@@ -1485,7 +1483,7 @@
                                     </div>
                                     <div class="text-[11px] text-slate-400 mt-1 flex space-x-2 font-medium">
                                         <span>下次: {{ formatDate(word.next_review_date) }}</span>
-                                        <span v-if="word.next_review_date <= Date.now()" class="text-rose-500 font-bold">● 待复习</span>
+                                        <span v-if="(word.next_review_date || 0) <= nowTimestamp" class="text-rose-500 font-bold">● 待复习</span>
                                     </div>
                                 </div>
                                 <div class="flex space-x-1.5 flex-shrink-0">
@@ -1685,6 +1683,6 @@
     </div>
 
     <!-- 核心业务逻辑脚本 -->
-    <script src="app.js?v=2.3.0"></script>
+    <script src="app.js?v=2.4.0"></script>
 </body>
 </html>

@@ -27,7 +27,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_4",
     "word": "又",
     "kana": "また",
-    "meaning": "又，再，还",
+    "meaning": "又，再，而且",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -43,7 +43,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_6",
     "word": "切る",
     "kana": "きる",
-    "meaning": "剪，切",
+    "meaning": "切，剪，切断",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -59,7 +59,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_8",
     "word": "が",
     "kana": "が",
-    "meaning": "但是；（主格助词）",
+    "meaning": "但是，然而(接续助词)",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -75,7 +75,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_10",
     "word": "まだ",
     "kana": "まだ",
-    "meaning": "还没，尚；还",
+    "meaning": "还没，尚，依然",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -91,7 +91,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_12",
     "word": "ずっと",
     "kana": "ずっと",
-    "meaning": "一直；得多",
+    "meaning": "一直，……得多",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -139,7 +139,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_18",
     "word": "取る",
     "kana": "とる",
-    "meaning": "拿，取",
+    "meaning": "拿，取，取得",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -147,7 +147,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_19",
     "word": "撮る",
     "kana": "とる",
-    "meaning": "照，拍（照）",
+    "meaning": "照，拍照，拍摄",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -155,7 +155,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_20",
     "word": "どうも",
     "kana": "どうも",
-    "meaning": "实在，很；谢谢",
+    "meaning": "实在，总觉得，谢谢",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -195,7 +195,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_25",
     "word": "休む",
     "kana": "やすむ",
-    "meaning": "休息，请假",
+    "meaning": "休息，缺席，请假",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -219,7 +219,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_28",
     "word": "元気",
     "kana": "げんき",
-    "meaning": "精神，健康",
+    "meaning": "精神，健康，活力",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -227,7 +227,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_29",
     "word": "呼ぶ",
     "kana": "よぶ",
-    "meaning": "呼唤，叫；邀请",
+    "meaning": "呼叫，称呼，邀请",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -251,7 +251,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_32",
     "word": "今",
     "kana": "いま",
-    "meaning": "现在",
+    "meaning": "现在，如今",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -315,7 +315,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_40",
     "word": "前",
     "kana": "まえ",
-    "meaning": "前面，之前",
+    "meaning": "前，前面，以前",
     "level": 0,
     "next_review_date": 1789530199423
   },
@@ -612,14 +612,6 @@ window.BUILTIN_VOCAB = [
     "word": "疲れる",
     "kana": "つかれる",
     "meaning": "疲劳，累",
-    "level": 0,
-    "next_review_date": 1789530199425
-  },
-  {
-    "id": "w_78",
-    "word": "入る",
-    "kana": "はいる",
-    "meaning": "进入",
     "level": 0,
     "next_review_date": 1789530199425
   },
@@ -2451,7 +2443,7 @@ window.BUILTIN_VOCAB = [
     "id": "w_307",
     "word": "あれ",
     "kana": "あれ",
-    "meaning": "那个（远称）",
+    "meaning": "那个（远称指示代词）",
     "level": 0,
     "next_review_date": 1789530199425
   },
@@ -5632,14 +5624,6 @@ window.BUILTIN_VOCAB = [
     "next_review_date": 1789530199426
   },
   {
-    "id": "w_705",
-    "word": "あれ",
-    "kana": "あれ",
-    "meaning": "那个（远称指示代词）",
-    "level": 0,
-    "next_review_date": 1789530199426
-  },
-  {
     "id": "w_706",
     "word": "それ",
     "kana": "それ",
@@ -6412,14 +6396,6 @@ window.BUILTIN_VOCAB = [
     "word": "違い",
     "kana": "ちがい",
     "meaning": "不同、差异；不对、错误",
-    "level": 0,
-    "next_review_date": 1789530199426
-  },
-  {
-    "id": "w_803",
-    "word": "出す",
-    "kana": "だす",
-    "meaning": "拿出，取出；寄出",
     "level": 0,
     "next_review_date": 1789530199426
   },
@@ -9964,342 +9940,6 @@ window.BUILTIN_VOCAB = [
     "word": "やる",
     "kana": "やる",
     "meaning": "做，干，给",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1247",
-    "word": "お茶",
-    "kana": "おちゃ",
-    "meaning": "茶，茶道",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1248",
-    "word": "普通",
-    "kana": "ふつう",
-    "meaning": "普通，一般，通常",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1249",
-    "word": "方",
-    "kana": "かた",
-    "meaning": "位，人，方式",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1250",
-    "word": "又",
-    "kana": "また",
-    "meaning": "又，再，而且",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1251",
-    "word": "有る",
-    "kana": "ある",
-    "meaning": "有，存在",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1252",
-    "word": "切る",
-    "kana": "きる",
-    "meaning": "切，剪，切断",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1253",
-    "word": "こちら",
-    "kana": "こちら",
-    "meaning": "这边，这位",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1254",
-    "word": "が",
-    "kana": "が",
-    "meaning": "但是，然而(接续助词)",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1255",
-    "word": "本",
-    "kana": "ほん",
-    "meaning": "书，书籍",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1256",
-    "word": "まだ",
-    "kana": "まだ",
-    "meaning": "还没，尚，依然",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1257",
-    "word": "見る",
-    "kana": "みる",
-    "meaning": "看，看望",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1258",
-    "word": "ずっと",
-    "kana": "ずっと",
-    "meaning": "一直，……得多",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1259",
-    "word": "そんなに",
-    "kana": "そんなに",
-    "meaning": "那么，那样",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1260",
-    "word": "する",
-    "kana": "する",
-    "meaning": "做，干",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1261",
-    "word": "引く",
-    "kana": "ひく",
-    "meaning": "拉，抽，查(词典)",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1262",
-    "word": "押す",
-    "kana": "おす",
-    "meaning": "推，按，压",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1263",
-    "word": "出る",
-    "kana": "でる",
-    "meaning": "出来，出去，出席",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1264",
-    "word": "取る",
-    "kana": "とる",
-    "meaning": "拿，取，取得",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1265",
-    "word": "撮る",
-    "kana": "とる",
-    "meaning": "照，拍照，拍摄",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1266",
-    "word": "どうも",
-    "kana": "どうも",
-    "meaning": "实在，总觉得，谢谢",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1267",
-    "word": "会社",
-    "kana": "かいしゃ",
-    "meaning": "公司",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1268",
-    "word": "掛かる",
-    "kana": "かかる",
-    "meaning": "花费(时间/金钱)，悬挂",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1269",
-    "word": "掛ける",
-    "kana": "かける",
-    "meaning": "戴(眼镜)，挂，打(电话)",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1270",
-    "word": "起きる",
-    "kana": "おきる",
-    "meaning": "起床，起来，发生",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1271",
-    "word": "休む",
-    "kana": "やすむ",
-    "meaning": "休息，缺席，请假",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1272",
-    "word": "教室",
-    "kana": "きょうしつ",
-    "meaning": "教室",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1273",
-    "word": "ペット",
-    "kana": "ぺっと",
-    "meaning": "宠物",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1274",
-    "word": "元気",
-    "kana": "げんき",
-    "meaning": "精神，健康，活力",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1275",
-    "word": "呼ぶ",
-    "kana": "よぶ",
-    "meaning": "呼叫，称呼，邀请",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1276",
-    "word": "もう",
-    "kana": "もう",
-    "meaning": "已经，再",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1277",
-    "word": "ゆっくり",
-    "kana": "ゆっくり",
-    "meaning": "慢慢地，好好地",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1278",
-    "word": "今",
-    "kana": "いま",
-    "meaning": "现在，如今",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1279",
-    "word": "細かい",
-    "kana": "こまかい",
-    "meaning": "零碎的，细小的，详细的",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1280",
-    "word": "子供",
-    "kana": "こども",
-    "meaning": "孩子，小孩",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1281",
-    "word": "自分",
-    "kana": "じぶん",
-    "meaning": "自己，自身",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1282",
-    "word": "重い",
-    "kana": "おもい",
-    "meaning": "重，沉重",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1283",
-    "word": "出来る",
-    "kana": "できる",
-    "meaning": "能，会，做好",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1284",
-    "word": "上げる",
-    "kana": "あげる",
-    "meaning": "给，提高，举起",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1285",
-    "word": "心配",
-    "kana": "しんぱい",
-    "meaning": "担心，担忧",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1286",
-    "word": "前",
-    "kana": "まえ",
-    "meaning": "前，前面，以前",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1287",
-    "word": "二人",
-    "kana": "ふたり",
-    "meaning": "两个人",
-    "level": 0,
-    "next_review_date": 1789530199427
-  },
-  {
-    "id": "w_1288",
-    "word": "入れる",
-    "kana": "いれる",
-    "meaning": "放进，装入",
     "level": 0,
     "next_review_date": 1789530199427
   },
@@ -16000,46 +15640,6 @@ window.BUILTIN_VOCAB = [
     "next_review_date": 1789540373343
   },
   {
-    "id": "w_2001",
-    "word": "生かす",
-    "kana": "いかす",
-    "meaning": "发挥，善用",
-    "level": 0,
-    "next_review_date": 1789540373343
-  },
-  {
-    "id": "w_2002",
-    "word": "勘違い",
-    "kana": "かんちがい",
-    "meaning": "误解，看错",
-    "level": 0,
-    "next_review_date": 1789540373343
-  },
-  {
-    "id": "w_2003",
-    "word": "面談",
-    "kana": "めんだん",
-    "meaning": "面谈，面接沟通 [求职]",
-    "level": 0,
-    "next_review_date": 1789540373343
-  },
-  {
-    "id": "w_2004",
-    "word": "最短",
-    "kana": "さいたん",
-    "meaning": "最短",
-    "level": 0,
-    "next_review_date": 1789540373343
-  },
-  {
-    "id": "w_2005",
-    "word": "取り入れる",
-    "kana": "とりいれる",
-    "meaning": "采用，引进，吸收",
-    "level": 0,
-    "next_review_date": 1789540373343
-  },
-  {
     "id": "w_2006",
     "word": "戻す",
     "kana": "もどす",
@@ -17358,6 +16958,5462 @@ window.BUILTIN_VOCAB = [
     "meaning": "建立，确立；如建立连接",
     "level": 0,
     "next_review_date": 1791160505501
+  },
+  {
+    "id": "w_2171",
+    "word": "之",
+    "kana": "これ",
+    "meaning": "此，这（书面语）",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2172",
+    "word": "なりすまし",
+    "kana": "なりすまし",
+    "meaning": "冒充，伪装 (Spoofing)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2173",
+    "word": "不可逆",
+    "kana": "ふかぎゃく",
+    "meaning": "不可逆",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2174",
+    "word": "身元",
+    "kana": "みもと",
+    "meaning": "身份，来历 (Identity)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2175",
+    "word": "依存性注入",
+    "kana": "いぞんせいちゅうにゅう",
+    "meaning": "依赖注入 (DI)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2176",
+    "word": "未処理",
+    "kana": "みしょり",
+    "meaning": "未处理 (Unprocessed)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2177",
+    "word": "階層化",
+    "kana": "かいそうか",
+    "meaning": "分层，分级 (Layered System)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2178",
+    "word": "置き換え",
+    "kana": "おきかえ",
+    "meaning": "替换，置换",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2179",
+    "word": "部分更新",
+    "kana": "ぶぶんこうしん",
+    "meaning": "局部更新 (Partial Update)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2180",
+    "word": "廃止",
+    "kana": "はいし",
+    "meaning": "废止，下线 (Deprecation)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2181",
+    "word": "破棄する",
+    "kana": "はきする",
+    "meaning": "销毁，释放",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2182",
+    "word": "発生する",
+    "kana": "はっせいする",
+    "meaning": "发生，出现",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2183",
+    "word": "勉強する",
+    "kana": "べんきょうする",
+    "meaning": "学习",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2184",
+    "word": "確認する",
+    "kana": "かくにんする",
+    "meaning": "确认",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2185",
+    "word": "理解する",
+    "kana": "りかいする",
+    "meaning": "理解",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2186",
+    "word": "連絡する",
+    "kana": "れんらくする",
+    "meaning": "联系",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2187",
+    "word": "連絡を取る",
+    "kana": "れんらくをとる",
+    "meaning": "保持联系，取得联系",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2188",
+    "word": "登録する",
+    "kana": "とうろくする",
+    "meaning": "注册，登记",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2189",
+    "word": "利用する",
+    "kana": "りようする",
+    "meaning": "使用，利用",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2190",
+    "word": "派遣会社に所属する",
+    "kana": "はけんがいしゃにしょぞくする",
+    "meaning": "隶属于派遣公司",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2191",
+    "word": "派遣会社に在籍する",
+    "kana": "はけんがいしゃにざいせきする",
+    "meaning": "在派遣公司任职",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2192",
+    "word": "待機中です",
+    "kana": "たいきちゅうです",
+    "meaning": "目前待机中",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2193",
+    "word": "日本語力を伸ばす",
+    "kana": "にほんごりょくをのばす",
+    "meaning": "提升日语能力",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2194",
+    "word": "履歴書を作成する",
+    "kana": "りれきしょをさくせいする",
+    "meaning": "制作简历",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2195",
+    "word": "履歴書を提出する",
+    "kana": "りれきしょをていしゅつする",
+    "meaning": "提交简历",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2196",
+    "word": "最新版を用意する",
+    "kana": "さいしんばんをよういする",
+    "meaning": "准备最新版",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2197",
+    "word": "メールでお送りする",
+    "kana": "めーるでおおくりする",
+    "meaning": "通过邮件发送（自谦）",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2198",
+    "word": "企業に応募する",
+    "kana": "きぎょうにおうぼする",
+    "meaning": "应聘公司",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2199",
+    "word": "可能性があります",
+    "kana": "かのうせいがあります",
+    "meaning": "有可能",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2200",
+    "word": "ただ",
+    "kana": "ただ",
+    "meaning": "不过",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2201",
+    "word": "そのため",
+    "kana": "そのため",
+    "meaning": "因此",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2202",
+    "word": "一方で",
+    "kana": "いっぽうで",
+    "meaning": "另一方面",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2203",
+    "word": "に基づいて",
+    "kana": "にもとづいて",
+    "meaning": "【语法】基于……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2204",
+    "word": "に従って",
+    "kana": "にしたがって",
+    "meaning": "【语法】依照……，随着……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2205",
+    "word": "に則り",
+    "kana": "にのっとり",
+    "meaning": "【语法】遵照……，依据……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2206",
+    "word": "を前提とする",
+    "kana": "をぜんていとする",
+    "meaning": "【语法】以……为前提",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2207",
+    "word": "が前提となる",
+    "kana": "がぜんていとなる",
+    "meaning": "【语法】以……为前提条件",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2208",
+    "word": "を介して",
+    "kana": "をかいして",
+    "meaning": "【语法】通过……，经由……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2209",
+    "word": "を通じて",
+    "kana": "をつうじて",
+    "meaning": "【语法】通过……；贯穿……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2210",
+    "word": "恐れがある",
+    "kana": "おそれがある",
+    "meaning": "【语法】有……的危险，恐怕会……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2211",
+    "word": "リスクがある",
+    "kana": "りすくがある",
+    "meaning": "【语法】存在……风险",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2212",
+    "word": "に不可欠である",
+    "kana": "にふかけつである",
+    "meaning": "【语法】对……不可或缺",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2213",
+    "word": "が必須となる",
+    "kana": "がひっすとなる",
+    "meaning": "【语法】……是必须的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2214",
+    "word": "といった",
+    "kana": "といった",
+    "meaning": "【语法】诸如……之类的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2215",
+    "word": "をはじめとする",
+    "kana": "をはじめとする",
+    "meaning": "【语法】以……为首的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2216",
+    "word": "傾向がある",
+    "kana": "けいこうがある",
+    "meaning": "【语法】有……的倾向",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2217",
+    "word": "が一般的である",
+    "kana": "がいっぱんてきである",
+    "meaning": "【语法】……是普遍的做法",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2218",
+    "word": "わけではない",
+    "kana": "わけではない",
+    "meaning": "【语法】并不是说……，未必……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2219",
+    "word": "ています",
+    "kana": "ています",
+    "meaning": "【语法】正在……；持续……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2220",
+    "word": "たいです",
+    "kana": "たいです",
+    "meaning": "【语法】想……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2221",
+    "word": "たいと考えています",
+    "kana": "たいとかんがえています",
+    "meaning": "【语法】想要……（面试用，较正式）",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2222",
+    "word": "経験があります",
+    "kana": "けいけんがあります",
+    "meaning": "【语法】有……经验",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2223",
+    "word": "に携わってきました",
+    "kana": "にたずさわってきました",
+    "meaning": "【语法】一直从事……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2224",
+    "word": "ながら",
+    "kana": "ながら",
+    "meaning": "【语法】一边……一边……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2225",
+    "word": "ので",
+    "kana": "ので",
+    "meaning": "【语法】因为……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2226",
+    "word": "ため",
+    "kana": "ため",
+    "meaning": "【语法】因为……（正式）；为了……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2227",
+    "word": "だけでなく～も",
+    "kana": "だけでなく～も",
+    "meaning": "【语法】不仅……而且……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2228",
+    "word": "ようになる",
+    "kana": "ようになる",
+    "meaning": "【语法】变得能够……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2229",
+    "word": "ようにする",
+    "kana": "ようにする",
+    "meaning": "【语法】有意识地努力做到……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2230",
+    "word": "ておく",
+    "kana": "ておく",
+    "meaning": "【语法】事先做好……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2231",
+    "word": "てもらう",
+    "kana": "てもらう",
+    "meaning": "【语法】请别人为自己做……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2232",
+    "word": "たほうがよい",
+    "kana": "たほうがよい",
+    "meaning": "【语法】最好……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2233",
+    "word": "ば",
+    "kana": "ば",
+    "meaning": "【语法】如果……（假定形）",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2234",
+    "word": "次第",
+    "kana": "しだい",
+    "meaning": "【语法】一……就……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2235",
+    "word": "という理解でよろしいでしょうか",
+    "kana": "というりかいでよろしいでしょうか",
+    "meaning": "【语法】您的理解是……，对吗？",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2236",
+    "word": "ということですね",
+    "kana": "ということですね",
+    "meaning": "【语法】也就是说……对吧",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2237",
+    "word": "ということではありません",
+    "kana": "ということではありません",
+    "meaning": "【语法】并不是说……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2238",
+    "word": "を考えると",
+    "kana": "をかんがえると",
+    "meaning": "【语法】考虑到……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2239",
+    "word": "を中心に",
+    "kana": "をちゅうしんに",
+    "meaning": "【语法】以……为中心",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2240",
+    "word": "にも対応できる",
+    "kana": "にもたいおうできる",
+    "meaning": "【语法】也能应对……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2241",
+    "word": "生成",
+    "kana": "せいせい",
+    "meaning": "生成，生成 (Generate)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2242",
+    "word": "設定",
+    "kana": "せってい",
+    "meaning": "设置，设定 (Setting)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2243",
+    "word": "アプリケーション",
+    "kana": "あぷりけーしょん",
+    "meaning": "应用程序 (Application)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2244",
+    "word": "コード",
+    "kana": "こーど",
+    "meaning": "代码 (Code)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2245",
+    "word": "重要",
+    "kana": "じゅうよう",
+    "meaning": "重要",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2246",
+    "word": "情報",
+    "kana": "じょうほう",
+    "meaning": "信息 (Information)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2247",
+    "word": "基本的",
+    "kana": "きほんてき",
+    "meaning": "基本的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2248",
+    "word": "追加",
+    "kana": "ついか",
+    "meaning": "追加，添加",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2249",
+    "word": "使用",
+    "kana": "しよう",
+    "meaning": "使用",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2250",
+    "word": "可能",
+    "kana": "かのう",
+    "meaning": "可能，可以",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2251",
+    "word": "機能",
+    "kana": "きのう",
+    "meaning": "功能 (Feature)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2252",
+    "word": "複数",
+    "kana": "ふくすう",
+    "meaning": "多个，复数",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2253",
+    "word": "実際",
+    "kana": "じっさい",
+    "meaning": "实际",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2254",
+    "word": "管理",
+    "kana": "かんり",
+    "meaning": "管理",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2255",
+    "word": "選択",
+    "kana": "せんたく",
+    "meaning": "选择",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2256",
+    "word": "実装",
+    "kana": "じっそう",
+    "meaning": "实现，开发 (Implementation)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2257",
+    "word": "非常",
+    "kana": "ひじょう",
+    "meaning": "非常",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2258",
+    "word": "役割",
+    "kana": "やくわり",
+    "meaning": "作用，角色 (Role)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2259",
+    "word": "適切",
+    "kana": "てきせつ",
+    "meaning": "恰当，合适",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2260",
+    "word": "検索",
+    "kana": "けんさく",
+    "meaning": "检索，搜索 (Search)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2261",
+    "word": "通常",
+    "kana": "つうじょう",
+    "meaning": "通常",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2262",
+    "word": "自動的",
+    "kana": "じどうてき",
+    "meaning": "自动的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2263",
+    "word": "シンプル",
+    "kana": "しんぷる",
+    "meaning": "简单，简洁 (Simple)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2264",
+    "word": "一般的",
+    "kana": "いっぱんてき",
+    "meaning": "一般的，普遍的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2265",
+    "word": "外部",
+    "kana": "がいぶ",
+    "meaning": "外部",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2266",
+    "word": "動作",
+    "kana": "どうさ",
+    "meaning": "动作，运行 (Behavior)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2267",
+    "word": "変更",
+    "kana": "へんこう",
+    "meaning": "变更",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2268",
+    "word": "表示",
+    "kana": "ひょうじ",
+    "meaning": "显示 (Display)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2269",
+    "word": "出力",
+    "kana": "しゅつりょく",
+    "meaning": "输出 (Output)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2270",
+    "word": "ツール",
+    "kana": "つーる",
+    "meaning": "工具 (Tool)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2271",
+    "word": "テキスト",
+    "kana": "てきすと",
+    "meaning": "文本 (Text)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2272",
+    "word": "プロジェクト",
+    "kana": "ぷろじぇくと",
+    "meaning": "项目 (Project)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2273",
+    "word": "保存",
+    "kana": "ほぞん",
+    "meaning": "保存",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2274",
+    "word": "結果",
+    "kana": "けっか",
+    "meaning": "结果",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2275",
+    "word": "強力",
+    "kana": "きょうりょく",
+    "meaning": "强大",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2276",
+    "word": "記述",
+    "kana": "きじゅつ",
+    "meaning": "描述，编写",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2277",
+    "word": "構成",
+    "kana": "こうせい",
+    "meaning": "构成，配置",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2278",
+    "word": "応答",
+    "kana": "おうとう",
+    "meaning": "应答，响应",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2279",
+    "word": "プロンプト",
+    "kana": "ぷろんぷと",
+    "meaning": "提示词 (Prompt)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2280",
+    "word": "制御",
+    "kana": "せいぎょ",
+    "meaning": "控制 (Control)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2281",
+    "word": "ステップ",
+    "kana": "すてっぷ",
+    "meaning": "步骤 (Step)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2282",
+    "word": "ドキュメント",
+    "kana": "どきゅめんと",
+    "meaning": "文档 (Document)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2283",
+    "word": "クリック",
+    "kana": "くりっく",
+    "meaning": "点击 (Click)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2284",
+    "word": "様々",
+    "kana": "さまざま",
+    "meaning": "各种各样",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2285",
+    "word": "依存関係",
+    "kana": "いぞんかんけい",
+    "meaning": "依赖关系 (Dependency)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2286",
+    "word": "主要",
+    "kana": "しゅよう",
+    "meaning": "主要",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2287",
+    "word": "実現",
+    "kana": "じつげん",
+    "meaning": "实现",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2288",
+    "word": "効率的",
+    "kana": "こうりつてき",
+    "meaning": "高效的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2289",
+    "word": "柔軟",
+    "kana": "じゅうなん",
+    "meaning": "灵活",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2290",
+    "word": "関連",
+    "kana": "かんれん",
+    "meaning": "相关，关联",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2291",
+    "word": "インターフェース",
+    "kana": "いんたーふぇーす",
+    "meaning": "接口，界面 (Interface)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2292",
+    "word": "統合",
+    "kana": "とうごう",
+    "meaning": "整合，集成 (Integration)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2293",
+    "word": "不可欠",
+    "kana": "ふかけつ",
+    "meaning": "不可或缺",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2294",
+    "word": "体験",
+    "kana": "たいけん",
+    "meaning": "体验",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2295",
+    "word": "エラー",
+    "kana": "えらー",
+    "meaning": "错误 (Error)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2296",
+    "word": "具体的",
+    "kana": "ぐたいてき",
+    "meaning": "具体的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2297",
+    "word": "容易",
+    "kana": "ようい",
+    "meaning": "容易",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2298",
+    "word": "全体",
+    "kana": "ぜんたい",
+    "meaning": "整体，全体",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2299",
+    "word": "要素",
+    "kana": "ようそ",
+    "meaning": "要素，元素 (Element)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2300",
+    "word": "学習",
+    "kana": "がくしゅう",
+    "meaning": "学习",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2301",
+    "word": "ライブラリ",
+    "kana": "らいぶらり",
+    "meaning": "库 (Library)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2302",
+    "word": "バージョン",
+    "kana": "ばーじょん",
+    "meaning": "版本 (Version)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2303",
+    "word": "コスト",
+    "kana": "こすと",
+    "meaning": "成本 (Cost)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2304",
+    "word": "ブラウザ",
+    "kana": "ぶらうざ",
+    "meaning": "浏览器 (Browser)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2305",
+    "word": "インストール",
+    "kana": "いんすとーる",
+    "meaning": "安装 (Install)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2306",
+    "word": "メリット",
+    "kana": "めりっと",
+    "meaning": "优点 (Merit)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2307",
+    "word": "デメリット",
+    "kana": "でめりっと",
+    "meaning": "缺点 (Demerit)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2308",
+    "word": "ベース",
+    "kana": "べーす",
+    "meaning": "基础，基于 (Base)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2309",
+    "word": "明確",
+    "kana": "めいかく",
+    "meaning": "明确",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2310",
+    "word": "指示",
+    "kana": "しじ",
+    "meaning": "指示，指令",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2311",
+    "word": "リスト",
+    "kana": "りすと",
+    "meaning": "列表 (List)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2312",
+    "word": "デプロイ",
+    "kana": "でぷろい",
+    "meaning": "部署 (Deploy)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2313",
+    "word": "デフォルト",
+    "kana": "でふぉると",
+    "meaning": "默认 (Default)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2314",
+    "word": "仕組み",
+    "kana": "しくみ",
+    "meaning": "结构，机制",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2315",
+    "word": "大規模言語モデル",
+    "kana": "だいきぼげんごもでる",
+    "meaning": "大语言模型 (LLM)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2316",
+    "word": "種類",
+    "kana": "しゅるい",
+    "meaning": "种类",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2317",
+    "word": "タスク",
+    "kana": "たすく",
+    "meaning": "任务 (Task)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2318",
+    "word": "フレームワーク",
+    "kana": "ふれーむわーく",
+    "meaning": "框架 (Framework)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2319",
+    "word": "プロセス",
+    "kana": "ぷろせす",
+    "meaning": "过程，进程 (Process)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2320",
+    "word": "概要",
+    "kana": "がいよう",
+    "meaning": "概要",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2321",
+    "word": "詳細",
+    "kana": "しょうさい",
+    "meaning": "详细",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2322",
+    "word": "ポイント",
+    "kana": "ぽいんと",
+    "meaning": "要点 (Point)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2323",
+    "word": "コマンド",
+    "kana": "こまんど",
+    "meaning": "命令 (Command)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2324",
+    "word": "パフォーマンス",
+    "kana": "ぱふぉーまんす",
+    "meaning": "性能 (Performance)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2325",
+    "word": "最適",
+    "kana": "さいてき",
+    "meaning": "最优，最合适",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2326",
+    "word": "フロー",
+    "kana": "ふろー",
+    "meaning": "流程 (Flow)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2327",
+    "word": "サンプルコード",
+    "kana": "さんぷるこーど",
+    "meaning": "示例代码 (Sample Code)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2328",
+    "word": "要約",
+    "kana": "ようやく",
+    "meaning": "摘要，概括 (Summary)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2329",
+    "word": "サポート",
+    "kana": "さぽーと",
+    "meaning": "支持 (Support)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2330",
+    "word": "存在",
+    "kana": "そんざい",
+    "meaning": "存在",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2331",
+    "word": "環境変数",
+    "kana": "かんきょうへんすう",
+    "meaning": "环境变量 (Environment Variable)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2332",
+    "word": "正確",
+    "kana": "せいかく",
+    "meaning": "准确",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2333",
+    "word": "対話",
+    "kana": "たいわ",
+    "meaning": "对话",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2334",
+    "word": "不要",
+    "kana": "ふよう",
+    "meaning": "不需要",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2335",
+    "word": "メッセージ",
+    "kana": "めっせーじ",
+    "meaning": "消息 (Message)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2336",
+    "word": "パターン",
+    "kana": "ぱたーん",
+    "meaning": "模式 (Pattern)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2337",
+    "word": "パラメータ",
+    "kana": "ぱらめーた",
+    "meaning": "参数 (Parameter)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2338",
+    "word": "前回",
+    "kana": "ぜんかい",
+    "meaning": "上次",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2339",
+    "word": "文字列",
+    "kana": "もじれつ",
+    "meaning": "字符串 (String)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2340",
+    "word": "発生",
+    "kana": "はっせい",
+    "meaning": "发生",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2341",
+    "word": "ワークフロー",
+    "kana": "わーくふろー",
+    "meaning": "工作流 (Workflow)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2342",
+    "word": "コンテキスト",
+    "kana": "こんてきすと",
+    "meaning": "上下文 (Context)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2343",
+    "word": "保持",
+    "kana": "ほじ",
+    "meaning": "保持，保留",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2344",
+    "word": "コンテナ",
+    "kana": "こんてな",
+    "meaning": "容器 (Container)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2345",
+    "word": "特徴",
+    "kana": "とくちょう",
+    "meaning": "特征，特点",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2346",
+    "word": "既存",
+    "kana": "きそん",
+    "meaning": "现有，已有",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2347",
+    "word": "調整",
+    "kana": "ちょうせい",
+    "meaning": "调整",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2348",
+    "word": "動的",
+    "kana": "どうてき",
+    "meaning": "动态的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2349",
+    "word": "基盤",
+    "kana": "きばん",
+    "meaning": "基础，基盘",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2350",
+    "word": "影響",
+    "kana": "えいきょう",
+    "meaning": "影响",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2351",
+    "word": "セキュリティ",
+    "kana": "せきゅりてぃ",
+    "meaning": "安全 (Security)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2352",
+    "word": "パッケージ",
+    "kana": "ぱっけーじ",
+    "meaning": "包 (Package)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2353",
+    "word": "基本",
+    "kana": "きほん",
+    "meaning": "基本",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2354",
+    "word": "エージェント",
+    "kana": "えーじぇんと",
+    "meaning": "智能体 (Agent)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2355",
+    "word": "解決",
+    "kana": "かいけつ",
+    "meaning": "解决",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2356",
+    "word": "考慮",
+    "kana": "こうりょ",
+    "meaning": "考虑",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2357",
+    "word": "共有",
+    "kana": "きょうゆう",
+    "meaning": "共享",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2358",
+    "word": "有効",
+    "kana": "ゆうこう",
+    "meaning": "有效",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2359",
+    "word": "ベクトル",
+    "kana": "べくとる",
+    "meaning": "向量 (Vector)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2360",
+    "word": "大規模",
+    "kana": "だいきぼ",
+    "meaning": "大规模",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2361",
+    "word": "高度",
+    "kana": "こうど",
+    "meaning": "高级，高度",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2362",
+    "word": "数値",
+    "kana": "すうち",
+    "meaning": "数值",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2363",
+    "word": "実践",
+    "kana": "じっせん",
+    "meaning": "实践",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2364",
+    "word": "依存",
+    "kana": "いぞん",
+    "meaning": "依赖",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2365",
+    "word": "クエリ",
+    "kana": "くえり",
+    "meaning": "查询 (Query)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2366",
+    "word": "公開",
+    "kana": "こうかい",
+    "meaning": "公开",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2367",
+    "word": "自身",
+    "kana": "じしん",
+    "meaning": "自身",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2368",
+    "word": "判断",
+    "kana": "はんだん",
+    "meaning": "判断",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2369",
+    "word": "文脈",
+    "kana": "ぶんみゃく",
+    "meaning": "上下文，语境",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2370",
+    "word": "ロジック",
+    "kana": "ろじっく",
+    "meaning": "逻辑 (Logic)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2371",
+    "word": "単一",
+    "kana": "たんいつ",
+    "meaning": "单一",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2372",
+    "word": "解説",
+    "kana": "かいせつ",
+    "meaning": "讲解，解说",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2373",
+    "word": "アノテーション",
+    "kana": "あのてーしょん",
+    "meaning": "注解 (Annotation)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2374",
+    "word": "開発者",
+    "kana": "かいはつしゃ",
+    "meaning": "开发者 (Developer)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2375",
+    "word": "比較",
+    "kana": "ひかく",
+    "meaning": "比较",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2376",
+    "word": "ターミナル",
+    "kana": "たーみなる",
+    "meaning": "终端 (Terminal)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2377",
+    "word": "重要性",
+    "kana": "じゅうようせい",
+    "meaning": "重要性",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2378",
+    "word": "最適化",
+    "kana": "さいてきか",
+    "meaning": "优化 (Optimization)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2379",
+    "word": "評価",
+    "kana": "ひょうか",
+    "meaning": "评估，评价 (Evaluation)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2380",
+    "word": "課題",
+    "kana": "かだい",
+    "meaning": "课题，问题",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2381",
+    "word": "制限",
+    "kana": "せいげん",
+    "meaning": "限制",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2382",
+    "word": "効果的",
+    "kana": "こうかてき",
+    "meaning": "有效的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2383",
+    "word": "最新",
+    "kana": "さいしん",
+    "meaning": "最新",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2384",
+    "word": "コンポーネント",
+    "kana": "こんぽーねんと",
+    "meaning": "组件 (Component)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2385",
+    "word": "インスタンス",
+    "kana": "いんすたんす",
+    "meaning": "实例 (Instance)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2386",
+    "word": "多様",
+    "kana": "たよう",
+    "meaning": "多样",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2387",
+    "word": "意図",
+    "kana": "いと",
+    "meaning": "意图",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2388",
+    "word": "品質",
+    "kana": "ひんしつ",
+    "meaning": "质量 (Quality)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2389",
+    "word": "拡張",
+    "kana": "かくちょう",
+    "meaning": "扩展 (Extension)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2390",
+    "word": "ベクトルストア",
+    "kana": "べくとるすとあ",
+    "meaning": "向量存储 (Vector Store)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2391",
+    "word": "フィールド",
+    "kana": "ふぃーるど",
+    "meaning": "字段 (Field)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2392",
+    "word": "運用",
+    "kana": "うんよう",
+    "meaning": "运维，运用 (Operation)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2393",
+    "word": "自動",
+    "kana": "じどう",
+    "meaning": "自动",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2394",
+    "word": "オプション",
+    "kana": "おぷしょん",
+    "meaning": "选项 (Option)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2395",
+    "word": "一部",
+    "kana": "いちぶ",
+    "meaning": "一部分",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2396",
+    "word": "基礎",
+    "kana": "きそ",
+    "meaning": "基础",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2397",
+    "word": "明示的",
+    "kana": "めいじてき",
+    "meaning": "明确的，显式的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2398",
+    "word": "動作確認",
+    "kana": "どうさかくにん",
+    "meaning": "运行确认，功能验证",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2399",
+    "word": "シナリオ",
+    "kana": "しなりお",
+    "meaning": "场景，剧本 (Scenario)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2400",
+    "word": "検索結果",
+    "kana": "けんさくけっか",
+    "meaning": "搜索结果",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2401",
+    "word": "分析",
+    "kana": "ぶんせき",
+    "meaning": "分析",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2402",
+    "word": "ディレクトリ",
+    "kana": "でぃれくとり",
+    "meaning": "目录 (Directory)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2403",
+    "word": "高速",
+    "kana": "こうそく",
+    "meaning": "高速",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2404",
+    "word": "正常",
+    "kana": "せいじょう",
+    "meaning": "正常",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2405",
+    "word": "手順",
+    "kana": "てじゅん",
+    "meaning": "步骤，顺序",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2406",
+    "word": "注意点",
+    "kana": "ちゅういてん",
+    "meaning": "注意点",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2407",
+    "word": "抽出",
+    "kana": "ちゅうしゅつ",
+    "meaning": "提取",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2408",
+    "word": "履歴",
+    "kana": "りれき",
+    "meaning": "履历，历史记录 (History)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2409",
+    "word": "プログラム",
+    "kana": "ぷろぐらむ",
+    "meaning": "程序 (Program)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2410",
+    "word": "変数",
+    "kana": "へんすう",
+    "meaning": "变量 (Variable)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2411",
+    "word": "サンプル",
+    "kana": "さんぷる",
+    "meaning": "样本，示例 (Sample)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2412",
+    "word": "信頼性",
+    "kana": "しんらいせい",
+    "meaning": "可靠性 (Reliability)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2413",
+    "word": "イメージ",
+    "kana": "いめーじ",
+    "meaning": "镜像；形象 (Image)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2414",
+    "word": "チェック",
+    "kana": "ちぇっく",
+    "meaning": "检查 (Check)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2415",
+    "word": "過去",
+    "kana": "かこ",
+    "meaning": "过去",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2416",
+    "word": "グラフ",
+    "kana": "ぐらふ",
+    "meaning": "图，图表 (Graph)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2417",
+    "word": "検証",
+    "kana": "けんしょう",
+    "meaning": "验证",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2418",
+    "word": "メモリ",
+    "kana": "めもり",
+    "meaning": "内存 (Memory)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2419",
+    "word": "要件",
+    "kana": "ようけん",
+    "meaning": "需求，要求 (Requirement)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2420",
+    "word": "アプリ",
+    "kana": "あぷり",
+    "meaning": "应用，App",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2421",
+    "word": "プログラミング",
+    "kana": "ぷろぐらみんぐ",
+    "meaning": "编程 (Programming)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2422",
+    "word": "役立つ",
+    "kana": "やくだつ",
+    "meaning": "有用，起作用",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2423",
+    "word": "利用可能",
+    "kana": "りようかのう",
+    "meaning": "可以利用",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2424",
+    "word": "従来",
+    "kana": "じゅうらい",
+    "meaning": "以往，传统",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2425",
+    "word": "大幅",
+    "kana": "おおはば",
+    "meaning": "大幅",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2426",
+    "word": "配置",
+    "kana": "はいち",
+    "meaning": "配置，布置",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2427",
+    "word": "リスク",
+    "kana": "りすく",
+    "meaning": "风险 (Risk)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2428",
+    "word": "構造化",
+    "kana": "こうぞうか",
+    "meaning": "结构化 (Structured)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2429",
+    "word": "改善",
+    "kana": "かいぜん",
+    "meaning": "改善",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2430",
+    "word": "自動化",
+    "kana": "じどうか",
+    "meaning": "自动化 (Automation)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2431",
+    "word": "簡潔",
+    "kana": "かんけつ",
+    "meaning": "简洁",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2432",
+    "word": "戦略",
+    "kana": "せんりゃく",
+    "meaning": "战略 (Strategy)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2433",
+    "word": "パイプライン",
+    "kana": "ぱいぷらいん",
+    "meaning": "管道，流水线 (Pipeline)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2434",
+    "word": "完全",
+    "kana": "かんぜん",
+    "meaning": "完全",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2435",
+    "word": "完了",
+    "kana": "かんりょう",
+    "meaning": "完成",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2436",
+    "word": "内部",
+    "kana": "ないぶ",
+    "meaning": "内部",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2437",
+    "word": "初期化",
+    "kana": "しょきか",
+    "meaning": "初始化 (Initialize)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2438",
+    "word": "モジュール",
+    "kana": "もじゅーる",
+    "meaning": "模块 (Module)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2439",
+    "word": "再利用",
+    "kana": "さいりよう",
+    "meaning": "复用",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2440",
+    "word": "開始",
+    "kana": "かいし",
+    "meaning": "开始",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2441",
+    "word": "削減",
+    "kana": "さくげん",
+    "meaning": "削减",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2442",
+    "word": "以降",
+    "kana": "いこう",
+    "meaning": "以后，之后",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2443",
+    "word": "実行結果",
+    "kana": "じっこうけっか",
+    "meaning": "执行结果",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2444",
+    "word": "修正",
+    "kana": "しゅうせい",
+    "meaning": "修正，修改",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2445",
+    "word": "人間",
+    "kana": "にんげん",
+    "meaning": "人类",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2446",
+    "word": "大量",
+    "kana": "たいりょう",
+    "meaning": "大量",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2447",
+    "word": "コンテンツ",
+    "kana": "こんてんつ",
+    "meaning": "内容 (Content)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2448",
+    "word": "状況",
+    "kana": "じょうきょう",
+    "meaning": "状况，情况",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2449",
+    "word": "習得",
+    "kana": "しゅうとく",
+    "meaning": "学会，掌握",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2450",
+    "word": "コメント",
+    "kana": "こめんと",
+    "meaning": "注释，评论 (Comment)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2451",
+    "word": "ビジネスロジック",
+    "kana": "びじねすろじっく",
+    "meaning": "业务逻辑 (Business Logic)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2452",
+    "word": "本番環境",
+    "kana": "ほんばんかんきょう",
+    "meaning": "生产环境 (Production)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2453",
+    "word": "付与",
+    "kana": "ふよ",
+    "meaning": "赋予，授予",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2454",
+    "word": "最終的",
+    "kana": "さいしゅうてき",
+    "meaning": "最终的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2455",
+    "word": "チャットボット",
+    "kana": "ちゃっとぼっと",
+    "meaning": "聊天机器人 (Chatbot)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2456",
+    "word": "質問応答",
+    "kana": "しつもんおうとう",
+    "meaning": "问答 (QA)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2457",
+    "word": "特化",
+    "kana": "とっか",
+    "meaning": "专门化，专注",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2458",
+    "word": "柔軟性",
+    "kana": "じゅうなんせい",
+    "meaning": "灵活性",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2459",
+    "word": "チャット",
+    "kana": "ちゃっと",
+    "meaning": "聊天 (Chat)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2460",
+    "word": "分割",
+    "kana": "ぶんかつ",
+    "meaning": "分割 (Split)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2461",
+    "word": "変化",
+    "kana": "へんか",
+    "meaning": "变化",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2462",
+    "word": "ベストプラクティス",
+    "kana": "べすとぷらくてぃす",
+    "meaning": "最佳实践 (Best Practice)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2463",
+    "word": "注入",
+    "kana": "ちゅうにゅう",
+    "meaning": "注入 (Inject)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2464",
+    "word": "焦点",
+    "kana": "しょうてん",
+    "meaning": "焦点",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2465",
+    "word": "記録",
+    "kana": "きろく",
+    "meaning": "记录",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2466",
+    "word": "目次",
+    "kana": "もくじ",
+    "meaning": "目录",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2467",
+    "word": "言語",
+    "kana": "げんご",
+    "meaning": "语言",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2468",
+    "word": "期待",
+    "kana": "きたい",
+    "meaning": "期待",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2469",
+    "word": "リアルタイム",
+    "kana": "りあるたいむ",
+    "meaning": "实时 (Real-time)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2470",
+    "word": "決定",
+    "kana": "けってい",
+    "meaning": "决定",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2471",
+    "word": "ルール",
+    "kana": "るーる",
+    "meaning": "规则 (Rule)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2472",
+    "word": "分岐",
+    "kana": "ぶんき",
+    "meaning": "分支 (Branch)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2473",
+    "word": "ループ",
+    "kana": "るーぷ",
+    "meaning": "循环 (Loop)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2474",
+    "word": "リンク",
+    "kana": "りんく",
+    "meaning": "链接 (Link)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2475",
+    "word": "公式",
+    "kana": "こうしき",
+    "meaning": "官方，正式",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2476",
+    "word": "独立",
+    "kana": "どくりつ",
+    "meaning": "独立",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2477",
+    "word": "継続的",
+    "kana": "けいぞくてき",
+    "meaning": "持续的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2478",
+    "word": "ローカル",
+    "kana": "ろーかる",
+    "meaning": "本地 (Local)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2479",
+    "word": "リポジトリ",
+    "kana": "りぽじとり",
+    "meaning": "仓库 (Repository)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2480",
+    "word": "ダウンロード",
+    "kana": "だうんろーど",
+    "meaning": "下载 (Download)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2481",
+    "word": "ドメイン",
+    "kana": "どめいん",
+    "meaning": "领域，域名 (Domain)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2482",
+    "word": "進化",
+    "kana": "しんか",
+    "meaning": "进化",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2483",
+    "word": "困難",
+    "kana": "こんなん",
+    "meaning": "困难",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2484",
+    "word": "分類",
+    "kana": "ぶんるい",
+    "meaning": "分类",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2485",
+    "word": "ロード",
+    "kana": "ろーど",
+    "meaning": "加载 (Load)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2486",
+    "word": "会話履歴",
+    "kana": "かいわりれき",
+    "meaning": "对话历史",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2487",
+    "word": "特性",
+    "kana": "とくせい",
+    "meaning": "特性",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2488",
+    "word": "チャンク",
+    "kana": "ちゃんく",
+    "meaning": "文本块 (Chunk)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2489",
+    "word": "実行時",
+    "kana": "じっこうじ",
+    "meaning": "运行时",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2490",
+    "word": "可読性",
+    "kana": "かどくせい",
+    "meaning": "可读性 (Readability)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2491",
+    "word": "単体",
+    "kana": "たんたい",
+    "meaning": "单体，单独",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2492",
+    "word": "単位",
+    "kana": "たんい",
+    "meaning": "单位",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2493",
+    "word": "プロバイダ",
+    "kana": "ぷろばいだ",
+    "meaning": "提供商 (Provider)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2494",
+    "word": "自動生成",
+    "kana": "じどうせいせい",
+    "meaning": "自动生成",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2495",
+    "word": "プラグイン",
+    "kana": "ぷらぐいん",
+    "meaning": "插件 (Plugin)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2496",
+    "word": "効率化",
+    "kana": "こうりつか",
+    "meaning": "提高效率",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2497",
+    "word": "ユースケース",
+    "kana": "ゆーすけーす",
+    "meaning": "用例，使用场景 (Use Case)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2498",
+    "word": "用途",
+    "kana": "ようと",
+    "meaning": "用途",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2499",
+    "word": "効率",
+    "kana": "こうりつ",
+    "meaning": "效率",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2500",
+    "word": "テンプレート",
+    "kana": "てんぷれーと",
+    "meaning": "模板 (Template)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2501",
+    "word": "セットアップ",
+    "kana": "せっとあっぷ",
+    "meaning": "安装配置 (Setup)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2502",
+    "word": "一連",
+    "kana": "いちれん",
+    "meaning": "一系列",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2503",
+    "word": "最大限",
+    "kana": "さいだいげん",
+    "meaning": "最大限度",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2504",
+    "word": "反映",
+    "kana": "はんえい",
+    "meaning": "反映，生效",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2505",
+    "word": "直感的",
+    "kana": "ちょっかんてき",
+    "meaning": "直观的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2506",
+    "word": "意味的",
+    "kana": "いみてき",
+    "meaning": "语义上的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2507",
+    "word": "性能",
+    "kana": "せいのう",
+    "meaning": "性能",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2508",
+    "word": "手法",
+    "kana": "しゅほう",
+    "meaning": "手法，方法",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2509",
+    "word": "コンソール",
+    "kana": "こんそーる",
+    "meaning": "控制台 (Console)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2510",
+    "word": "抽象化",
+    "kana": "ちゅうしょうか",
+    "meaning": "抽象化 (Abstraction)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2511",
+    "word": "標準的",
+    "kana": "ひょうじゅんてき",
+    "meaning": "标准的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2512",
+    "word": "堅牢",
+    "kana": "けんろう",
+    "meaning": "健壮，坚固",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2513",
+    "word": "精度",
+    "kana": "せいど",
+    "meaning": "精度 (Accuracy)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2514",
+    "word": "メタデータ",
+    "kana": "めたでーた",
+    "meaning": "元数据 (Metadata)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2515",
+    "word": "実践的",
+    "kana": "じっせんてき",
+    "meaning": "实践的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2516",
+    "word": "プロパティ",
+    "kana": "ぷろぱてぃ",
+    "meaning": "属性 (Property)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2517",
+    "word": "利点",
+    "kana": "りてん",
+    "meaning": "优点",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2518",
+    "word": "構成要素",
+    "kana": "こうせいようそ",
+    "meaning": "构成要素",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2519",
+    "word": "共通",
+    "kana": "きょうつう",
+    "meaning": "共通",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2520",
+    "word": "分離",
+    "kana": "ぶんり",
+    "meaning": "分离",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2521",
+    "word": "メカニズム",
+    "kana": "めかにずむ",
+    "meaning": "机制 (Mechanism)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2522",
+    "word": "固有",
+    "kana": "こゆう",
+    "meaning": "固有",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2523",
+    "word": "応用",
+    "kana": "おうよう",
+    "meaning": "应用",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2524",
+    "word": "ケース",
+    "kana": "けーす",
+    "meaning": "情况，案例 (Case)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2525",
+    "word": "セクション",
+    "kana": "せくしょん",
+    "meaning": "章节，部分 (Section)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2526",
+    "word": "手動",
+    "kana": "しゅどう",
+    "meaning": "手动",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2527",
+    "word": "対象",
+    "kana": "たいしょう",
+    "meaning": "对象，目标",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2528",
+    "word": "サイクル",
+    "kana": "さいくる",
+    "meaning": "周期，循环 (Cycle)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2529",
+    "word": "全体像",
+    "kana": "ぜんたいぞう",
+    "meaning": "整体面貌",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2530",
+    "word": "システムプロンプト",
+    "kana": "しすてむぷろんぷと",
+    "meaning": "系统提示词 (System Prompt)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2531",
+    "word": "フィルタリング",
+    "kana": "ふぃるたりんぐ",
+    "meaning": "过滤 (Filtering)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2532",
+    "word": "例外",
+    "kana": "れいがい",
+    "meaning": "例外 (Exception)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2533",
+    "word": "判定",
+    "kana": "はんてい",
+    "meaning": "判定",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2534",
+    "word": "一意",
+    "kana": "いちい",
+    "meaning": "唯一",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2535",
+    "word": "アシスタント",
+    "kana": "あしすたんと",
+    "meaning": "助手 (Assistant)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2536",
+    "word": "能力",
+    "kana": "のうりょく",
+    "meaning": "能力",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2537",
+    "word": "デバッグ",
+    "kana": "でばっぐ",
+    "meaning": "调试 (Debug)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2538",
+    "word": "スタイル",
+    "kana": "すたいる",
+    "meaning": "风格，样式 (Style)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2539",
+    "word": "維持",
+    "kana": "いじ",
+    "meaning": "维持",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2540",
+    "word": "提示",
+    "kana": "ていじ",
+    "meaning": "提示，出示",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2541",
+    "word": "低減",
+    "kana": "ていげん",
+    "meaning": "降低，减少",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2542",
+    "word": "意識",
+    "kana": "いしき",
+    "meaning": "意识",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2543",
+    "word": "集中",
+    "kana": "しゅうちゅう",
+    "meaning": "集中",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2544",
+    "word": "フェーズ",
+    "kana": "ふぇーず",
+    "meaning": "阶段 (Phase)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2545",
+    "word": "位置",
+    "kana": "いち",
+    "meaning": "位置",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2546",
+    "word": "停止",
+    "kana": "ていし",
+    "meaning": "停止",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2547",
+    "word": "デプロイメント",
+    "kana": "でぷろいめんと",
+    "meaning": "部署 (Deployment)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2548",
+    "word": "最小限",
+    "kana": "さいしょうげん",
+    "meaning": "最小限度",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2549",
+    "word": "マッピング",
+    "kana": "まっぴんぐ",
+    "meaning": "映射 (Mapping)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2550",
+    "word": "移動",
+    "kana": "いどう",
+    "meaning": "移动",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2551",
+    "word": "展開",
+    "kana": "てんかい",
+    "meaning": "展开，部署",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2552",
+    "word": "事実",
+    "kana": "じじつ",
+    "meaning": "事实",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2553",
+    "word": "画像",
+    "kana": "がぞう",
+    "meaning": "图像",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2554",
+    "word": "厳密",
+    "kana": "げんみつ",
+    "meaning": "严密，严格",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2555",
+    "word": "推論",
+    "kana": "すいろん",
+    "meaning": "推理，推断 (Inference)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2556",
+    "word": "レイテンシ",
+    "kana": "れいてんし",
+    "meaning": "延迟 (Latency)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2557",
+    "word": "具体例",
+    "kana": "ぐたいれい",
+    "meaning": "具体示例",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2558",
+    "word": "独自",
+    "kana": "どくじ",
+    "meaning": "独特，自有",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2559",
+    "word": "再度",
+    "kana": "さいど",
+    "meaning": "再次",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2560",
+    "word": "効果",
+    "kana": "こうか",
+    "meaning": "效果",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2561",
+    "word": "低下",
+    "kana": "ていか",
+    "meaning": "下降，降低",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2562",
+    "word": "根拠",
+    "kana": "こんきょ",
+    "meaning": "依据，根据",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2563",
+    "word": "アプローチ",
+    "kana": "あぷろーち",
+    "meaning": "方法，途径 (Approach)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2564",
+    "word": "汎用的",
+    "kana": "はんようてき",
+    "meaning": "通用的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2565",
+    "word": "一致",
+    "kana": "いっち",
+    "meaning": "一致",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2566",
+    "word": "指標",
+    "kana": "しひょう",
+    "meaning": "指标 (Metric)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2567",
+    "word": "監査",
+    "kana": "かんさ",
+    "meaning": "审计 (Audit)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2568",
+    "word": "ダッシュボード",
+    "kana": "だっしゅぼーど",
+    "meaning": "仪表盘 (Dashboard)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2569",
+    "word": "ネットワーク",
+    "kana": "ねっとわーく",
+    "meaning": "网络 (Network)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2570",
+    "word": "ライフサイクル",
+    "kana": "らいふさいくる",
+    "meaning": "生命周期 (Lifecycle)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2571",
+    "word": "ビルド",
+    "kana": "びるど",
+    "meaning": "构建 (Build)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2572",
+    "word": "ポート",
+    "kana": "ぽーと",
+    "meaning": "端口 (Port)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2573",
+    "word": "データセット",
+    "kana": "でーたせっと",
+    "meaning": "数据集 (Dataset)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2574",
+    "word": "同時",
+    "kana": "どうじ",
+    "meaning": "同时",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2575",
+    "word": "自律的",
+    "kana": "じりつてき",
+    "meaning": "自主的，自治的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2576",
+    "word": "豊富",
+    "kana": "ほうふ",
+    "meaning": "丰富",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2577",
+    "word": "個人情報",
+    "kana": "こじんじょうほう",
+    "meaning": "个人信息",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2578",
+    "word": "前処理",
+    "kana": "まえしょり",
+    "meaning": "预处理",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2579",
+    "word": "事前準備",
+    "kana": "じぜんじゅんび",
+    "meaning": "事先准备",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2580",
+    "word": "演習",
+    "kana": "えんしゅう",
+    "meaning": "演练，练习",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2581",
+    "word": "簡素化",
+    "kana": "かんそか",
+    "meaning": "简化",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2582",
+    "word": "チェーン",
+    "kana": "ちぇーん",
+    "meaning": "链 (Chain)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2583",
+    "word": "カテゴリ",
+    "kana": "かてごり",
+    "meaning": "类别 (Category)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2584",
+    "word": "結合",
+    "kana": "けつごう",
+    "meaning": "结合，集成",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2585",
+    "word": "収集",
+    "kana": "しゅうしゅう",
+    "meaning": "收集",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2586",
+    "word": "接続情報",
+    "kana": "せつぞくじょうほう",
+    "meaning": "连接信息",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2587",
+    "word": "指向",
+    "kana": "しこう",
+    "meaning": "导向，面向",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2588",
+    "word": "正確性",
+    "kana": "せいかくせい",
+    "meaning": "准确性",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2589",
+    "word": "外部知識",
+    "kana": "がいぶちしき",
+    "meaning": "外部知识",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2590",
+    "word": "一貫性",
+    "kana": "いっかんせい",
+    "meaning": "一致性 (Consistency)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2591",
+    "word": "スキーマ",
+    "kana": "すきーま",
+    "meaning": "模式，结构定义 (Schema)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2592",
+    "word": "スコア",
+    "kana": "すこあ",
+    "meaning": "分数 (Score)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2593",
+    "word": "体系的",
+    "kana": "たいけいてき",
+    "meaning": "系统的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2594",
+    "word": "ノード",
+    "kana": "のーど",
+    "meaning": "节点 (Node)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2595",
+    "word": "社内",
+    "kana": "しゃない",
+    "meaning": "公司内部",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2596",
+    "word": "安全性",
+    "kana": "あんぜんせい",
+    "meaning": "安全性",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2597",
+    "word": "ソースコード",
+    "kana": "そーすこーど",
+    "meaning": "源代码 (Source Code)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2598",
+    "word": "軽量",
+    "kana": "けいりょう",
+    "meaning": "轻量",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2599",
+    "word": "専用",
+    "kana": "せんよう",
+    "meaning": "专用",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2600",
+    "word": "フォルダ",
+    "kana": "ふぉるだ",
+    "meaning": "文件夹 (Folder)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2601",
+    "word": "標準",
+    "kana": "ひょうじゅん",
+    "meaning": "标准",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2602",
+    "word": "コミット",
+    "kana": "こみっと",
+    "meaning": "提交 (Commit)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2603",
+    "word": "支援",
+    "kana": "しえん",
+    "meaning": "支援，支持",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2604",
+    "word": "登場",
+    "kana": "とうじょう",
+    "meaning": "登场，出现",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2605",
+    "word": "可視化",
+    "kana": "かしか",
+    "meaning": "可视化 (Visualize)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2606",
+    "word": "頻繁",
+    "kana": "ひんぱん",
+    "meaning": "频繁",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2607",
+    "word": "高品質",
+    "kana": "こうひんしつ",
+    "meaning": "高质量",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2608",
+    "word": "状態管理",
+    "kana": "じょうたいかんり",
+    "meaning": "状态管理 (State Management)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2609",
+    "word": "構文",
+    "kana": "こうぶん",
+    "meaning": "语法，语句结构 (Syntax)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2610",
+    "word": "要求",
+    "kana": "ようきゅう",
+    "meaning": "要求",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2611",
+    "word": "自然言語",
+    "kana": "しぜんげんご",
+    "meaning": "自然语言",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2612",
+    "word": "明確化",
+    "kana": "めいかくか",
+    "meaning": "明确化",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2613",
+    "word": "実装例",
+    "kana": "じっそうれい",
+    "meaning": "实现示例",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2614",
+    "word": "ストリーミング",
+    "kana": "すとりーみんぐ",
+    "meaning": "流式传输 (Streaming)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2615",
+    "word": "条件分岐",
+    "kana": "じょうけんぶんき",
+    "meaning": "条件分支",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2616",
+    "word": "コントローラ",
+    "kana": "こんとろーら",
+    "meaning": "控制器 (Controller)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2617",
+    "word": "宣言",
+    "kana": "せんげん",
+    "meaning": "声明 (Declare)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2618",
+    "word": "入門",
+    "kana": "にゅうもん",
+    "meaning": "入门",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2619",
+    "word": "迅速",
+    "kana": "じんそく",
+    "meaning": "迅速",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2620",
+    "word": "開発効率",
+    "kana": "かいはつこうりつ",
+    "meaning": "开发效率",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2621",
+    "word": "通信",
+    "kana": "つうしん",
+    "meaning": "通信",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2622",
+    "word": "解析",
+    "kana": "かいせき",
+    "meaning": "解析 (Parse)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2623",
+    "word": "プロンプトエンジニアリング",
+    "kana": "ぷろんぷとえんじにありんぐ",
+    "meaning": "提示词工程 (Prompt Engineering)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2624",
+    "word": "ハルシネーション",
+    "kana": "はるしねーしょん",
+    "meaning": "幻觉 (Hallucination)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2625",
+    "word": "ページ",
+    "kana": "ぺーじ",
+    "meaning": "页面 (Page)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2626",
+    "word": "代表的",
+    "kana": "だいひょうてき",
+    "meaning": "代表性的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2627",
+    "word": "範囲",
+    "kana": "はんい",
+    "meaning": "范围",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2628",
+    "word": "レビュー",
+    "kana": "れびゅー",
+    "meaning": "评审，审查 (Review)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2629",
+    "word": "必要性",
+    "kana": "ひつようせい",
+    "meaning": "必要性",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2630",
+    "word": "監視",
+    "kana": "かんし",
+    "meaning": "监控 (Monitor)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2631",
+    "word": "一時的",
+    "kana": "いちじてき",
+    "meaning": "临时的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2632",
+    "word": "認証情報",
+    "kana": "にんしょうじょうほう",
+    "meaning": "认证信息 (Credentials)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2633",
+    "word": "区切る",
+    "kana": "くぎる",
+    "meaning": "分隔，划分",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2634",
+    "word": "重複",
+    "kana": "じゅうふく",
+    "meaning": "重复",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2635",
+    "word": "ルーティング",
+    "kana": "るーてぃんぐ",
+    "meaning": "路由 (Routing)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2636",
+    "word": "使用量",
+    "kana": "しようりょう",
+    "meaning": "使用量",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2637",
+    "word": "固定",
+    "kana": "こてい",
+    "meaning": "固定",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2638",
+    "word": "単純",
+    "kana": "たんじゅん",
+    "meaning": "简单",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2639",
+    "word": "インタラクション",
+    "kana": "いんたらくしょん",
+    "meaning": "交互 (Interaction)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2640",
+    "word": "無効",
+    "kana": "むこう",
+    "meaning": "无效",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2641",
+    "word": "トランザクション",
+    "kana": "とらんざくしょん",
+    "meaning": "事务 (Transaction)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2642",
+    "word": "インデックス",
+    "kana": "いんでっくす",
+    "meaning": "索引 (Index)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2643",
+    "word": "参考",
+    "kana": "さんこう",
+    "meaning": "参考",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2644",
+    "word": "類似度",
+    "kana": "るいじど",
+    "meaning": "相似度 (Similarity)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2645",
+    "word": "増加",
+    "kana": "ぞうか",
+    "meaning": "增加",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2646",
+    "word": "コンストラクタ",
+    "kana": "こんすとらくた",
+    "meaning": "构造函数 (Constructor)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2647",
+    "word": "カスタマイズ",
+    "kana": "かすたまいず",
+    "meaning": "定制 (Customize)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2648",
+    "word": "評価指標",
+    "kana": "ひょうかしひょう",
+    "meaning": "评估指标",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2649",
+    "word": "情報検索",
+    "kana": "じょうほうけんさく",
+    "meaning": "信息检索",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2650",
+    "word": "メトリクス",
+    "kana": "めとりくす",
+    "meaning": "指标 (Metrics)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2651",
+    "word": "新規作成",
+    "kana": "しんきさくせい",
+    "meaning": "新建",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2652",
+    "word": "レベル",
+    "kana": "れべる",
+    "meaning": "等级，水平 (Level)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2653",
+    "word": "標準化",
+    "kana": "ひょうじゅんか",
+    "meaning": "标准化",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2654",
+    "word": "再起動",
+    "kana": "さいきどう",
+    "meaning": "重启 (Restart)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2655",
+    "word": "画面",
+    "kana": "がめん",
+    "meaning": "画面，屏幕",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2656",
+    "word": "文章",
+    "kana": "ぶんしょう",
+    "meaning": "文章",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2657",
+    "word": "コンパイル",
+    "kana": "こんぱいる",
+    "meaning": "编译 (Compile)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2658",
+    "word": "エンティティ",
+    "kana": "えんてぃてぃ",
+    "meaning": "实体 (Entity)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2659",
+    "word": "応答速度",
+    "kana": "おうとうそくど",
+    "meaning": "响应速度",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2660",
+    "word": "対策",
+    "kana": "たいさく",
+    "meaning": "对策",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2661",
+    "word": "経由",
+    "kana": "けいゆ",
+    "meaning": "经由",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2662",
+    "word": "抑制",
+    "kana": "よくせい",
+    "meaning": "抑制",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2663",
+    "word": "データソース",
+    "kana": "でーたそーす",
+    "meaning": "数据源 (Data Source)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2664",
+    "word": "不適切",
+    "kana": "ふてきせつ",
+    "meaning": "不恰当",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2665",
+    "word": "利用方法",
+    "kana": "りようほうほう",
+    "meaning": "使用方法",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2666",
+    "word": "段階的",
+    "kana": "だんかいてき",
+    "meaning": "分阶段的，逐步的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2667",
+    "word": "編集",
+    "kana": "へんしゅう",
+    "meaning": "编辑",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2668",
+    "word": "区別",
+    "kana": "くべつ",
+    "meaning": "区别",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2669",
+    "word": "領域",
+    "kana": "りょういき",
+    "meaning": "领域",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2670",
+    "word": "不十分",
+    "kana": "ふじゅうぶん",
+    "meaning": "不充分",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2671",
+    "word": "項目",
+    "kana": "こうもく",
+    "meaning": "项目，条目",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2672",
+    "word": "網羅",
+    "kana": "もうら",
+    "meaning": "网罗，全面涵盖",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2673",
+    "word": "保証",
+    "kana": "ほしょう",
+    "meaning": "保证",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2674",
+    "word": "アカウント",
+    "kana": "あかうんと",
+    "meaning": "账号 (Account)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2675",
+    "word": "限界",
+    "kana": "げんかい",
+    "meaning": "极限，局限",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2676",
+    "word": "発展",
+    "kana": "はってん",
+    "meaning": "发展",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2677",
+    "word": "補完",
+    "kana": "ほかん",
+    "meaning": "补全，补充",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2678",
+    "word": "リトライ",
+    "kana": "りとらい",
+    "meaning": "重试 (Retry)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2679",
+    "word": "手間",
+    "kana": "てま",
+    "meaning": "功夫，麻烦",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2680",
+    "word": "機密情報",
+    "kana": "きみつじょうほう",
+    "meaning": "机密信息",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2681",
+    "word": "コンテキストウィンドウ",
+    "kana": "こんてきすとうぃんどう",
+    "meaning": "上下文窗口 (Context Window)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2682",
+    "word": "回数",
+    "kana": "かいすう",
+    "meaning": "次数",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2683",
+    "word": "履歴管理",
+    "kana": "りれきかんり",
+    "meaning": "历史管理",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2684",
+    "word": "実用的",
+    "kana": "じつようてき",
+    "meaning": "实用的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2685",
+    "word": "複雑性",
+    "kana": "ふくざつせい",
+    "meaning": "复杂性",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2686",
+    "word": "バランス",
+    "kana": "ばらんす",
+    "meaning": "平衡 (Balance)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2687",
+    "word": "定期的",
+    "kana": "ていきてき",
+    "meaning": "定期的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2688",
+    "word": "挿入",
+    "kana": "そうにゅう",
+    "meaning": "插入 (Insert)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2689",
+    "word": "継承",
+    "kana": "けいしょう",
+    "meaning": "继承 (Inheritance)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2690",
+    "word": "マニュアル",
+    "kana": "まにゅある",
+    "meaning": "手册 (Manual)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2691",
+    "word": "近年",
+    "kana": "きんねん",
+    "meaning": "近年",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2692",
+    "word": "エコシステム",
+    "kana": "えこしすてむ",
+    "meaning": "生态系统 (Ecosystem)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2693",
+    "word": "想定",
+    "kana": "そうてい",
+    "meaning": "设想，预期",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2694",
+    "word": "検出",
+    "kana": "けんしゅつ",
+    "meaning": "检测，检出",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2695",
+    "word": "排除",
+    "kana": "はいじょ",
+    "meaning": "排除",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2696",
+    "word": "配列",
+    "kana": "はいれつ",
+    "meaning": "数组 (Array)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2697",
+    "word": "前提条件",
+    "kana": "ぜんていじょうけん",
+    "meaning": "前提条件",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2698",
+    "word": "代入",
+    "kana": "だいにゅう",
+    "meaning": "赋值 (Assign)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2699",
+    "word": "ソフトウェア",
+    "kana": "そふとうぇあ",
+    "meaning": "软件 (Software)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2700",
+    "word": "基本概念",
+    "kana": "きほんがいねん",
+    "meaning": "基本概念",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2701",
+    "word": "普及",
+    "kana": "ふきゅう",
+    "meaning": "普及",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2702",
+    "word": "再現性",
+    "kana": "さいげんせい",
+    "meaning": "可复现性",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2703",
+    "word": "省略",
+    "kana": "しょうりゃく",
+    "meaning": "省略",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2704",
+    "word": "ファインチューニング",
+    "kana": "ふぁいんちゅーにんぐ",
+    "meaning": "微调 (Fine-tuning)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2705",
+    "word": "スクリプト",
+    "kana": "すくりぷと",
+    "meaning": "脚本 (Script)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2706",
+    "word": "プライバシー",
+    "kana": "ぷらいばしー",
+    "meaning": "隐私 (Privacy)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2707",
+    "word": "フィードバック",
+    "kana": "ふぃーどばっく",
+    "meaning": "反馈 (Feedback)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2708",
+    "word": "記憶",
+    "kana": "きおく",
+    "meaning": "记忆",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2709",
+    "word": "情報源",
+    "kana": "じょうほうげん",
+    "meaning": "信息来源",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2710",
+    "word": "入出力",
+    "kana": "にゅうしゅつりょく",
+    "meaning": "输入输出 (I/O)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2711",
+    "word": "意思決定",
+    "kana": "いしけってい",
+    "meaning": "决策",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2712",
+    "word": "前提",
+    "kana": "ぜんてい",
+    "meaning": "前提",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2713",
+    "word": "組織",
+    "kana": "そしき",
+    "meaning": "组织",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2714",
+    "word": "ペルソナ",
+    "kana": "ぺるそな",
+    "meaning": "人设，角色设定 (Persona)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2715",
+    "word": "自動評価",
+    "kana": "じどうひょうか",
+    "meaning": "自动评估",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2716",
+    "word": "応答時間",
+    "kana": "おうとうじかん",
+    "meaning": "响应时间",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2717",
+    "word": "限定",
+    "kana": "げんてい",
+    "meaning": "限定",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2718",
+    "word": "実施",
+    "kana": "じっし",
+    "meaning": "实施",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2719",
+    "word": "トレース",
+    "kana": "とれーす",
+    "meaning": "追踪 (Trace)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2720",
+    "word": "インタラクティブ",
+    "kana": "いんたらくてぃぶ",
+    "meaning": "交互式 (Interactive)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2721",
+    "word": "ウィジェット",
+    "kana": "うぃじぇっと",
+    "meaning": "小组件 (Widget)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2722",
+    "word": "コマンドライン",
+    "kana": "こまんどらいん",
+    "meaning": "命令行 (Command Line)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2723",
+    "word": "本番",
+    "kana": "ほんばん",
+    "meaning": "正式（生产）环境；正式上场",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2724",
+    "word": "マイクロサービス",
+    "kana": "まいくろさーびす",
+    "meaning": "微服务 (Microservice)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2725",
+    "word": "中核",
+    "kana": "ちゅうかく",
+    "meaning": "核心",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2726",
+    "word": "ホスト",
+    "kana": "ほすと",
+    "meaning": "主机 (Host)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2727",
+    "word": "ログイン",
+    "kana": "ろぐいん",
+    "meaning": "登录 (Login)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2728",
+    "word": "分野",
+    "kana": "ぶんや",
+    "meaning": "领域",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2729",
+    "word": "強化",
+    "kana": "きょうか",
+    "meaning": "强化",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2730",
+    "word": "膨大",
+    "kana": "ぼうだい",
+    "meaning": "庞大",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2731",
+    "word": "プラットフォーム",
+    "kana": "ぷらっとふぉーむ",
+    "meaning": "平台 (Platform)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2732",
+    "word": "明示",
+    "kana": "めいじ",
+    "meaning": "明示，明确表示",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2733",
+    "word": "工夫",
+    "kana": "くふう",
+    "meaning": "设法，下功夫",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2734",
+    "word": "補足",
+    "kana": "ほそく",
+    "meaning": "补充",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2735",
+    "word": "ロギング",
+    "kana": "ろぎんぐ",
+    "meaning": "日志记录 (Logging)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2736",
+    "word": "エラーハンドリング",
+    "kana": "えらーはんどりんぐ",
+    "meaning": "错误处理 (Error Handling)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2737",
+    "word": "優先",
+    "kana": "ゆうせん",
+    "meaning": "优先",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2738",
+    "word": "フォーマット",
+    "kana": "ふぉーまっと",
+    "meaning": "格式 (Format)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2739",
+    "word": "連結",
+    "kana": "れんけつ",
+    "meaning": "连接，拼接",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2740",
+    "word": "返却",
+    "kana": "へんきゃく",
+    "meaning": "返还，返回",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2741",
+    "word": "メンテナンス",
+    "kana": "めんてなんす",
+    "meaning": "维护 (Maintenance)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2742",
+    "word": "カスタム",
+    "kana": "かすたむ",
+    "meaning": "自定义 (Custom)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2743",
+    "word": "仕様",
+    "kana": "しよう",
+    "meaning": "规格，规范 (Specification)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2744",
+    "word": "専門的",
+    "kana": "せんもんてき",
+    "meaning": "专业的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2745",
+    "word": "観察",
+    "kana": "かんさつ",
+    "meaning": "观察",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2746",
+    "word": "関数呼び出し",
+    "kana": "かんすうよびだし",
+    "meaning": "函数调用 (Function Calling)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2747",
+    "word": "絶対",
+    "kana": "ぜったい",
+    "meaning": "绝对",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2748",
+    "word": "検知",
+    "kana": "けんち",
+    "meaning": "检测，探测",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2749",
+    "word": "スケーラブル",
+    "kana": "すけーらぶる",
+    "meaning": "可扩展的 (Scalable)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2750",
+    "word": "カラム",
+    "kana": "からむ",
+    "meaning": "列 (Column)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2751",
+    "word": "基準",
+    "kana": "きじゅん",
+    "meaning": "基准，标准",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2752",
+    "word": "参考資料",
+    "kana": "さんこうしりょう",
+    "meaning": "参考资料",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2753",
+    "word": "セマンティック",
+    "kana": "せまんてぃっく",
+    "meaning": "语义的 (Semantic)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2754",
+    "word": "ハイブリッド",
+    "kana": "はいぶりっど",
+    "meaning": "混合 (Hybrid)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2755",
+    "word": "個別",
+    "kana": "こべつ",
+    "meaning": "个别",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2756",
+    "word": "価格",
+    "kana": "かかく",
+    "meaning": "价格",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2757",
+    "word": "類似",
+    "kana": "るいじ",
+    "meaning": "类似",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2758",
+    "word": "曖昧",
+    "kana": "あいまい",
+    "meaning": "模糊，含糊",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2759",
+    "word": "非同期",
+    "kana": "ひどうき",
+    "meaning": "异步 (Async)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2760",
+    "word": "解釈",
+    "kana": "かいしゃく",
+    "meaning": "解释",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2761",
+    "word": "評価結果",
+    "kana": "ひょうかけっか",
+    "meaning": "评估结果",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2762",
+    "word": "状態遷移",
+    "kana": "じょうたいせんい",
+    "meaning": "状态迁移",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2763",
+    "word": "通知",
+    "kana": "つうち",
+    "meaning": "通知",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2764",
+    "word": "承認",
+    "kana": "しょうにん",
+    "meaning": "批准，认可",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2765",
+    "word": "ナレッジ",
+    "kana": "なれっじ",
+    "meaning": "知识 (Knowledge)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2766",
+    "word": "新規",
+    "kana": "しんき",
+    "meaning": "新的，新建",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2767",
+    "word": "継続",
+    "kana": "けいぞく",
+    "meaning": "继续，持续",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2768",
+    "word": "イベント",
+    "kana": "いべんと",
+    "meaning": "事件，活动 (Event)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2769",
+    "word": "ユニットテスト",
+    "kana": "ゆにっとてすと",
+    "meaning": "单元测试 (Unit Test)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2770",
+    "word": "プロトコル",
+    "kana": "ぷろとこる",
+    "meaning": "协议 (Protocol)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2771",
+    "word": "クエリパラメータ",
+    "kana": "くえりぱらめーた",
+    "meaning": "查询参数 (Query Parameter)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2772",
+    "word": "エラーメッセージ",
+    "kana": "えらーめっせーじ",
+    "meaning": "错误消息 (Error Message)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2773",
+    "word": "インポート",
+    "kana": "いんぽーと",
+    "meaning": "导入 (Import)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2774",
+    "word": "クリア",
+    "kana": "くりあ",
+    "meaning": "清除；通关 (Clear)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2775",
+    "word": "先頭",
+    "kana": "せんとう",
+    "meaning": "开头，最前面",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2776",
+    "word": "ブロック",
+    "kana": "ぶろっく",
+    "meaning": "块 (Block)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2777",
+    "word": "スターター",
+    "kana": "すたーたー",
+    "meaning": "启动器 (Starter)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2778",
+    "word": "自動構成",
+    "kana": "じどうこうせい",
+    "meaning": "自动配置 (Auto Configuration)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2779",
+    "word": "設計図",
+    "kana": "せっけいず",
+    "meaning": "设计图",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2780",
+    "word": "レイヤー",
+    "kana": "れいやー",
+    "meaning": "层 (Layer)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2781",
+    "word": "開発環境",
+    "kana": "かいはつかんきょう",
+    "meaning": "开发环境",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2782",
+    "word": "実行環境",
+    "kana": "じっこうかんきょう",
+    "meaning": "运行环境",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2783",
+    "word": "ルート",
+    "kana": "るーと",
+    "meaning": "路由；根 (Route/Root)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2784",
+    "word": "マルチモーダル",
+    "kana": "まるちもーだる",
+    "meaning": "多模态 (Multimodal)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2785",
+    "word": "再試行",
+    "kana": "さいしこう",
+    "meaning": "重试",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2786",
+    "word": "リリース",
+    "kana": "りりーす",
+    "meaning": "发布 (Release)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2787",
+    "word": "アクション",
+    "kana": "あくしょん",
+    "meaning": "动作 (Action)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2788",
+    "word": "バッチ",
+    "kana": "ばっち",
+    "meaning": "批处理 (Batch)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2789",
+    "word": "ステートレス",
+    "kana": "すてーとれす",
+    "meaning": "无状态 (Stateless)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2790",
+    "word": "リクエストボディ",
+    "kana": "りくえすとぼでぃ",
+    "meaning": "请求体 (Request Body)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2791",
+    "word": "ボトルネック",
+    "kana": "ぼとるねっく",
+    "meaning": "瓶颈 (Bottleneck)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2792",
+    "word": "定量的",
+    "kana": "ていりょうてき",
+    "meaning": "定量的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2793",
+    "word": "観点",
+    "kana": "かんてん",
+    "meaning": "观点，角度",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2794",
+    "word": "実運用",
+    "kana": "じつうんよう",
+    "meaning": "实际运维运行",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2795",
+    "word": "責務",
+    "kana": "せきむ",
+    "meaning": "职责 (Responsibility)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2796",
+    "word": "現場",
+    "kana": "げんば",
+    "meaning": "现场",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2797",
+    "word": "蓄積",
+    "kana": "ちくせき",
+    "meaning": "积累",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2798",
+    "word": "ノウハウ",
+    "kana": "のうはう",
+    "meaning": "诀窍，专有知识 (Know-how)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2799",
+    "word": "集計",
+    "kana": "しゅうけい",
+    "meaning": "汇总，统计",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2800",
+    "word": "確保",
+    "kana": "かくほ",
+    "meaning": "确保，保证",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2801",
+    "word": "モニタリング",
+    "kana": "もにたりんぐ",
+    "meaning": "监控 (Monitoring)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2802",
+    "word": "背景",
+    "kana": "はいけい",
+    "meaning": "背景",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2803",
+    "word": "受信",
+    "kana": "じゅしん",
+    "meaning": "接收 (Receive)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2804",
+    "word": "ソート",
+    "kana": "そーと",
+    "meaning": "排序 (Sort)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2805",
+    "word": "ビュー",
+    "kana": "びゅー",
+    "meaning": "视图 (View)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2806",
+    "word": "一覧",
+    "kana": "いちらん",
+    "meaning": "一览，列表",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2807",
+    "word": "プロキシ",
+    "kana": "ぷろきし",
+    "meaning": "代理 (Proxy)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2808",
+    "word": "ステートメント",
+    "kana": "すてーとめんと",
+    "meaning": "语句，声明 (Statement)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2809",
+    "word": "修飾子",
+    "kana": "しゅうしょくし",
+    "meaning": "修饰符 (Modifier)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2810",
+    "word": "環境設定",
+    "kana": "かんきょうせってい",
+    "meaning": "环境设置",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2811",
+    "word": "ストレージ",
+    "kana": "すとれーじ",
+    "meaning": "存储 (Storage)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2812",
+    "word": "発揮",
+    "kana": "はっき",
+    "meaning": "发挥",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2813",
+    "word": "パラダイム",
+    "kana": "ぱらだいむ",
+    "meaning": "范式 (Paradigm)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2814",
+    "word": "顕著",
+    "kana": "けんちょ",
+    "meaning": "显著",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2815",
+    "word": "著しい",
+    "kana": "いちじるしい",
+    "meaning": "显著的，明显的",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2816",
+    "word": "相当",
+    "kana": "そうとう",
+    "meaning": "相当（于）；相当地",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2817",
+    "word": "見落とす",
+    "kana": "みおとす",
+    "meaning": "漏看，遗漏",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2818",
+    "word": "デシリアライズ",
+    "kana": "でしりあらいず",
+    "meaning": "反序列化 (Deserialize)",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2819",
+    "word": "試行錯誤",
+    "kana": "しこうさくご",
+    "meaning": "反复试验，摸索",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2820",
+    "word": "実践練習",
+    "kana": "じっせんれんしゅう",
+    "meaning": "实践练习",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2821",
+    "word": "における",
+    "kana": "における",
+    "meaning": "【语法】在……中，在……方面",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2822",
+    "word": "に対して",
+    "kana": "にたいして",
+    "meaning": "【语法】对于……；针对……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2823",
+    "word": "に応じて",
+    "kana": "におうじて",
+    "meaning": "【语法】根据……，按照……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2824",
+    "word": "によって異なる",
+    "kana": "によってことなる",
+    "meaning": "【语法】因……而异",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2825",
+    "word": "必要がある",
+    "kana": "ひつようがある",
+    "meaning": "【语法】有必要……，需要……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2826",
+    "word": "ことができる",
+    "kana": "ことができる",
+    "meaning": "【语法】能够……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2827",
+    "word": "について",
+    "kana": "について",
+    "meaning": "【语法】关于……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2828",
+    "word": "ことで",
+    "kana": "ことで",
+    "meaning": "【语法】通过……（做某事）",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2829",
+    "word": "上で",
+    "kana": "うえで",
+    "meaning": "【语法】在……时；在……方面",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2830",
+    "word": "に伴い",
+    "kana": "にともない",
+    "meaning": "【语法】随着……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2831",
+    "word": "により",
+    "kana": "により",
+    "meaning": "【语法】由于……，通过……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2832",
+    "word": "を用いて",
+    "kana": "をもちいて",
+    "meaning": "【语法】使用……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2833",
+    "word": "を通して",
+    "kana": "をとおして",
+    "meaning": "【语法】通过……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2834",
+    "word": "以下の通り",
+    "kana": "いかのとおり",
+    "meaning": "【语法】如下所述",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2835",
+    "word": "を可能にする",
+    "kana": "をかのうにする",
+    "meaning": "【语法】使……成为可能",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2836",
+    "word": "しやすい",
+    "kana": "しやすい",
+    "meaning": "【语法】容易做……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2837",
+    "word": "にくい",
+    "kana": "にくい",
+    "meaning": "【语法】不容易……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2838",
+    "word": "一方",
+    "kana": "いっぽう",
+    "meaning": "【语法】另一方面，",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2839",
+    "word": "つつ",
+    "kana": "つつ",
+    "meaning": "【语法】一边……一边……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2840",
+    "word": "際に",
+    "kana": "さいに",
+    "meaning": "【语法】……的时候",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2841",
+    "word": "際には",
+    "kana": "さいには",
+    "meaning": "【语法】……的时候（强调）",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2842",
+    "word": "につれて",
+    "kana": "につれて",
+    "meaning": "【语法】随着……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2843",
+    "word": "に沿って",
+    "kana": "にそって",
+    "meaning": "【语法】沿着……，按照……",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2844",
+    "word": "または",
+    "kana": "または",
+    "meaning": "【连接词】或者",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2845",
+    "word": "および",
+    "kana": "および",
+    "meaning": "【连接词】以及",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2846",
+    "word": "さらに",
+    "kana": "さらに",
+    "meaning": "【连接词】进一步，而且",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2847",
+    "word": "ただし",
+    "kana": "ただし",
+    "meaning": "【连接词】但是，不过",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2848",
+    "word": "つまり",
+    "kana": "つまり",
+    "meaning": "【连接词】也就是说",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2849",
+    "word": "したがって",
+    "kana": "したがって",
+    "meaning": "【连接词】因此，所以",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2850",
+    "word": "もしくは",
+    "kana": "もしくは",
+    "meaning": "【连接词】或者",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2851",
+    "word": "あるいは",
+    "kana": "あるいは",
+    "meaning": "【连接词】或者",
+    "level": 0,
+    "next_review_date": 1795863392942
+  },
+  {
+    "id": "w_2852",
+    "word": "なお",
+    "kana": "なお",
+    "meaning": "【连接词】另外，此外",
+    "level": 0,
+    "next_review_date": 1795863392942
   }
 ];
 
